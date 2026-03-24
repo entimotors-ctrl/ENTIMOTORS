@@ -1,26 +1,19 @@
 FROM php:8.2-apache
 
-# Instalamos extensiones para la base de datos
+# 1. Instalamos extensiones de PHP
 RUN docker-php-ext-install mysqli pdo pdo_mysql
 
-# Copiamos todo el contenido (ENTIMOTORS y api-server)
+# 2. Copiamos TODO el contenido de tu GitHub al servidor
 COPY . /var/www/html/
 
-# --- CONFIGURACIÓN DE ACCESO ---
-# Le decimos a Apache que la web principal está en ENTIMOTORS
-ENV APACHE_DOCUMENT_ROOT /var/www/html/ENTIMOTORS
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+# 3. MOVER ARCHIVOS (Si están dentro de ENTIMOTORS, los sacamos a la raíz)
+# Esto evita el error 404 porque pone el index.html donde Apache lo busca sí o sí.
+RUN if [ -d "/var/www/html/ENTIMOTORS" ]; then cp -r /var/www/html/ENTIMOTORS/* /var/www/html/; fi
 
-# Habilitamos que Apache reconozca index.html e index.php
-RUN echo "DirectoryIndex index.html index.php" >> /etc/apache2/apache2.conf
+# 4. Permisos para que el panel funcione
+RUN chown -R www-data:www-data /var/www/html && chmod -R 755 /var/www/html
 
-# --- PERMISOS DE ESCRITURA ---
-# Damos permisos a todo el proyecto para que el panel pueda subir archivos
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html
-
-# Ajuste de puerto para Render
+# 5. Configuración de puerto para Render
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
 
 EXPOSE 80
