@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTIMOTORS | Taller Especializado | San Antonio de Pacura</title>
+    <meta name="description" content="Taller de motos ENTIMOTORS en San Antonio de Pacura, Olancho. Especialistas en inyección electrónica, diagnóstico con escáner y venta de repuestos de alta calidad.">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300;400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root { 
+            --red-primary: #e11d48; 
+            --glass-bg: rgba(255,255,255,0.03); 
+            --glass-border: rgba(255,255,255,0.08); 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #0a0a0a; 
+            color: #fff; 
+            position: relative;
+        }
+
+        /* --- LOGO ENTIMOTORS COMO MARCA DE AGUA DE FONDO --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60vw;
+            height: 60vw;
+            background-image: url('img/logo2.webp'); /* Logo de ENTIMOTORS */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.03; /* Muy sutil */
+            z-index: -1; 
+            pointer-events: none;
+        }
+
+        .font-teko { font-family: 'Teko', sans-serif; }
+
+        .glass-panel { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 1.25rem; 
+        }
+
+        .nav-link { 
+            font-family: 'Teko', sans-serif; 
+            font-size: 1.25rem; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            transition: all 0.3s; 
+        }
+        .nav-link:hover { color: var(--red-primary); transform: translateY(-1px); }
+        .nav-link.active { color: var(--red-primary); border-bottom: 2px solid var(--red-primary); }
+
+        .hero-gradient { 
+            background: radial-gradient(circle at center, rgba(225,29,72,0.10) 0%, transparent 70%); 
+        }
+
+        .card-hover { 
+            transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); 
+            will-change: transform, border-color;
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px); 
+            border-color: rgba(225,29,72,0.4); 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            background: rgba(255,255,255,0.05);
+        }
+
+        .card-hover:hover .icon-service {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        ::-webkit-scrollbar { width: 8px; } 
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; } 
+        ::-webkit-scrollbar-thumb:hover { background: var(--red-primary); }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed w-full z-50 py-3 px-6 bg-black/85 backdrop-blur-lg border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="/" class="flex items-center space-x-3 group">
+                <img src="img/logo2.webp" alt="ENTIMOTORS Logo" class="h-12 transition-transform group-hover:scale-105" onerror="this.style.display='none'">
+                <span class="font-teko text-3xl font-bold tracking-tighter self-end">ENTI<span class="text-red-600">MOTORS</span></span>
+            </a>
+
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="/" class="nav-link active">Inicio</a>
+                <a href="/trabajos.html" class="nav-link text-gray-300">Trabajos</a>
+                <a href="/catalogo.html" class="nav-link text-gray-300">Catálogo</a>
+                <a href="/#contacto" class="nav-link text-gray-300">Contacto</a>
+            </div>
+
+            <div class="flex items-center space-x-2">
+                <a href="https://wa.me/50497049635" target="_blank" class="hidden sm:block bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-full transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-600/20">Cita Online</a>
+                <button id="menu-btn" class="md:hidden text-white text-3xl p-2 leading-none">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="mobile-menu" class="glass-panel fixed top-[68px] left-3 right-3 z-40 hidden flex-col gap-1 p-4 border border-white/10 shadow-2xl">
+        <a href="/" class="nav-link block py-3 text-red-500 border-b border-white/5">Inicio</a>
+        <a href="/trabajos.html" class="nav-link block py-3 text-white border-b border-white/5">Trabajos</a>
+        <a href="/catalogo.html" class="nav-link block py-3 text-white border-b border-white/5">Catálogo</a>
+        <a href="/#contacto" class="nav-link block py-3 text-white border-b border-white/5">Contacto</a>
+        <a href="https://wa.me/50497049635" target="_blank" class="sm:hidden mt-2 block text-center bg-red-600 text-white font-bold py-3 px-5 rounded-full uppercase text-xs tracking-widest">Cita Online</a>
+    </div>
+
+    <section id="inicio" class="relative min-h-screen flex items-center pt-24 overflow-hidden">
+        <div class="absolute inset-0 hero-gradient"></div>
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="text-center md:text-left">
+                <span class="text-red-500 font-bold uppercase tracking-[0.3em] text-xs px-3 py-1 bg-red-600/10 rounded-fullInline">Expertos en Alta Cilindrada</span>
+                <h1 class="text-5xl sm:text-6xl md:text-7xl lg:text-9xl font-teko leading-none mt-6 uppercase font-bold tracking-tight">Precisión <br><span class="text-red-600 italic">Sin Límites</span></h1>
+                <p class="text-gray-400 mt-6 text-lg max-w-md mx-auto md:mx-0">Especialistas en Inyección Electrónica, Diagnóstico por Escáner y mecánica de precisión en Olancho.</p>
+                <div class="mt-12 flex flex-wrap gap-4 justify-center md:justify-start">
+                    <a href="/catalogo.html" class="glass-panel px-9 py-4 font-bold uppercase hover:bg-white hover:text-black transition-all text-sm tracking-wider">Ver Catálogo</a>
+                    <a href="#servicios" class="text-white border-b-2 border-red-600 hover:border-white py-4 font-bold uppercase tracking-widest text-sm transition-colors">Nuestros Servicios</a>
+                </div>
+            </div>
+            <div class="relative mt-12 md:mt-0">
+                <div class="absolute inset-0 bg-red-600/20 blur-[120px] rounded-full"></div>
+                <img src="img/hero-moto.webp" alt="Moto Deportiva de Alta Cilindrada" class="w-full relative z-10 drop-shadow-[0_10px_50px_rgba(225,29,72,0.3)]" onerror="this.style.display='none'">
+            </div>
+        </div>
+    </section>
+
+    <section id="servicios" class="py-28 px-6 bg-[#0c0c0c] relative border-t border-white/5">
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="mb-20 text-center md:text-left">
+                <span class="font-teko text-xl text-red-500 uppercase tracking-widest">Lo que hacemos</span>
+                <h2 class="text-4xl sm:text-5xl md:text-6xl font-teko uppercase italic text-white leading-none font-bold">Nuestros <span class="text-red-600">Servicios</span></h2>
+                <div class="h-1 w-24 bg-red-600 mt-4 mx-auto md:mx-0 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-panel p-9 card-hover group">
+                    <div class="icon-service text-red-600 mb-6 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a2 2 0 0 1-2.17-.61l-.9-.9a1 1 0 0 1 0-1.4l1.6-1.6a1 1 0 0 1 1.4 0l.9.9a2 2 0 0 1 .61 2.17l3.77 3.77a1 1 0 0 1 0 1.4l-1.6 1.6a1 1 0 0 1-1.4 0l-1.6-1.6a1 1 0 0 1 0-1.4"/><path d="m21.2 14-6.32 6.32c-.93.94-2.48.21-3.41-.72l-1.34-1.34a2 2 0 0 0-2.83 0l-2.2 2.2a2 2 0 0 1-2.83 0l-1.34-1.34a2 2 0 0 1 0-2.83l2.2-2.2a2 2 0 0 0 0-2.83l-1.34-1.34a2.43 2.43 0 0 1-.72-3.41L6 6"/><path d="m14 2 2 2"/></svg>
+                    </div>
+                    <h3 class="font-teko text-3xl uppercase mb-3 font-semibold tracking-tight text-white">Mecánica General</h3>
+                    <p class="text-gray-400 text-base leading-relaxed">Mantenimiento preventivo y correctivo de alta precisión para todo tipo de motos.</p>
+                </div>
+
+                <div class="glass-panel p-9 card-hover group">
+                    <div class="icon-service text-red-600 mb-6 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scan-face"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+                    </div>
+                    <h3 class="font-teko text-3xl uppercase mb-3 font-semibold tracking-tight text-white">Diagnóstico Electrónico</h3>
+                    <p class="text-gray-400 text-base leading-relaxed">Escáner avanzado, lectura de códigos de error y mapeo de ECU para optimizar rendimiento.</p>
+                </div>
+
+                <div class="glass-panel p-9 card-hover group">
+                    <div class="icon-service text-red-600 mb-6 transition-all duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fuel"><path d="M3 22h12"/><path d="M4 18h10"/><path d="M14 22V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14"/><path d="M18 10h4"/><path d="M19 14h1"/><path d="M14 8h6a2 2 0 0 1 2 2v7.5a1.5 1.5 0 0 1-3 0V14"/><path d="M8 6V4"/><path d="M5 10h6"/><path d="M5 14h6"/></svg>
+                    </div>
+                    <h3 class="font-teko text-3xl uppercase mb-3 font-semibold tracking-tight text-white">Inyección Electrónica</h3>
+                    <p class="text-gray-400 text-base leading-relaxed">Limpieza de inyectores por ultrasonido y calibración de cuerpos de aceleración.</p>
+                </div>
+            </div>
+
+            <div class="mt-16 text-center">
+                <a href="/trabajos.html" class="inline-block bg-white hover:bg-red-600 text-black hover:text-white font-bold py-4 px-12 rounded-full transition-all uppercase tracking-widest text-sm shadow-xl hover:shadow-red-600/20">Ver Galería de Trabajos</a>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contacto" class="py-24 px-6 border-t border-white/5 bg-[#050505] relative z-10">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-3 gap-12 text-center md:text-left">
+            <div class="flex flex-col items-center md:items-start">
+                <img src="img/logo2.webp" alt="ENTIMOTORS" class="h-16 mb-3" onerror="this.style.display='none'">
+                <span class="font-teko text-3xl font-bold tracking-tighter block mb-4">ENTI<span class="text-red-600">MOTORS</span></span>
+                <p class="text-gray-500 text-sm max-w-sm">Pasión por la perfección sobre dos ruedas. Líderes en tecnología de diagnóstico y mecánica avanzada en San Antonio de Pacura.</p>
+            </div>
+
+            <div class="md:pl-10">
+                <h4 class="font-teko text-2xl uppercase mb-6 text-white tracking-wider">Contacto Directo</h4>
+                <ul class="space-y-4 text-gray-400 text-sm">
+                    <li class="flex items-center justify-center md:justify-start space-x-3"><span class="text-red-600 text-lg">📍</span><span>San Antonio de Pacura, Gualaco, Olancho</span></li>
+                    <li class="flex items-center justify-center md:justify-start space-x-3"><span class="text-red-600 text-lg">📞</span><span>+504 9704-9635</span></li>
+                    <li class="flex items-center justify-center md:justify-start space-x-3"><span class="text-red-600 text-lg">💬</span><a href="https://wa.me/50497049635" target="_blank" class="hover:text-red-500 transition-colors">Enviar WhatsApp</a></li>
+                </ul>
+            </div>
+
+            <div class="md:pl-10">
+                <h4 class="font-teko text-2xl uppercase mb-6 text-white tracking-wider">Horario de Atención</h4>
+                <p class="text-gray-400 text-sm italic bg-white/5 inline-block px-4 py-2 rounded-lg">Lunes a Sábado: 8:00 AM – 5:00 PM</p>
+                <div class="mt-8">
+                    <a href="https://wa.me/50497049635?text=Hola%20ENTIMOTORS,%20me%20gustaría%20agendar%20una%20cita." target="_blank" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition-all uppercase text-xs tracking-widest shadow-lg shadow-red-600/20">Agendar Cita Ahora</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto mt-20 pt-10 border-t border-white/5 text-center">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-gray-600">
+                <p>&copy; 2026 ENTIMOTORS. Todos los derechos reservados.</p>
+
+                <div class="flex items-center gap-3">
+                    <span class="text-gray-700">Desarrollado por</span>
+                    <img src="img/logo_personal.webp" alt="Wilkin Antúnez Logo" class="h-8 opacity-70 hover:opacity-100 transition-opacity" onerror="this.alt='Wilkin Antúnez'">
+                </div>
+
+            </div>
+        </div>
+    </footer>
+
+    <a href="https://wa.me/50497049635?text=Hola%20ENTIMOTORS,%20me%20gustaría%20más%20información." class="fixed bottom-6 right-6 z-50 bg-[#25D366] p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300" target="_blank" aria-label="Contactar por WhatsApp">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="white">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+    </a>
+
+    <script>
+        // Menu Móvil
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        menuBtn?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.classList.contains('hidden') && !mobileMenu.contains(e.target) && e.target !== menuBtn) {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+            }
+        });
+    </script>
+</body>
+</html>

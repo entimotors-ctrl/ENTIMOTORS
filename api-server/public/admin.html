@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ENTIMOTORS – Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --red: #e11d48;
+      --red-dark: #be123c;
+      --bg: #0a0a0a;
+      --surface: #111;
+      --glass: rgba(255,255,255,0.04);
+      --glass-border: rgba(255,255,255,0.08);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: #f0f0f0; font-family: 'Inter', sans-serif; min-height: 100vh; }
+    h1,h2,h3,.font-teko { font-family: 'Teko', sans-serif; letter-spacing: 0.03em; }
+
+    .glass-panel {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 12px;
+    }
+
+    .btn-red {
+      background: var(--red);
+      color: #fff;
+      font-family: 'Teko', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 1.5rem;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+    .btn-red:hover { background: var(--red-dark); }
+    .btn-red:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--red);
+      font-family: 'Teko', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--red);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-outline:hover { background: var(--red); color: #fff; }
+
+    .input-field {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      color: #f0f0f0;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus { border-color: var(--red); }
+    .input-field::placeholder { color: #555; }
+
+    select.input-field option { background: #1a1a1a; }
+
+    .label { display: block; margin-bottom: 0.4rem; color: #888; font-size: 0.85rem; letter-spacing: 0.03em; }
+
+    .form-grid-3 { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 600px) { .form-grid-3 { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 800px) { .form-grid-3 { grid-template-columns: 1fr 1fr 1fr; } }
+
+    .form-grid-2 { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+    @media (min-width: 600px) { .form-grid-2 { grid-template-columns: 1fr 1fr; } }
+
+    .tab-nav-btn {
+      font-family: 'Teko', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.05em;
+      padding: 0.5rem 1.2rem;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-bottom: 2px solid transparent;
+    }
+    .tab-nav-btn.active { color: var(--red); border-bottom-color: var(--red); }
+    .tab-nav-btn:hover { color: #ccc; }
+
+    .table-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--glass-border);
+      font-size: 0.9rem;
+    }
+    .table-row:last-child { border-bottom: none; }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 9999;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-family: 'Teko', sans-serif;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      backdrop-filter: blur(12px);
+      transition: opacity 0.4s;
+    }
+    .toast-success { background: rgba(34,197,94,0.2); border: 1px solid #4ade80; color: #4ade80; }
+    .toast-error { background: rgba(225,29,72,0.2); border: 1px solid var(--red); color: var(--red); }
+
+    #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    #dashboard { display: none; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="glass-panel" style="width:100%; max-width:400px; margin:1rem; padding:2.5rem;">
+    <div style="text-align:center; margin-bottom:2rem;">
+      <h1 class="font-teko" style="font-size:2.5rem;">
+        ENTI<span style="color:var(--red);">MOTORS</span>
+      </h1>
+      <p style="color:#555; font-size:0.9rem; margin-top:0.25rem;">Panel de Administración</p>
+    </div>
+    <form id="login-form">
+      <div style="margin-bottom:1.2rem;">
+        <label class="label">Contraseña</label>
+        <input type="password" id="password-input" class="input-field" placeholder="Ingresa la contraseña" required />
+      </div>
+      <button type="submit" class="btn-red">Acceder</button>
+      <p id="login-error" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; text-align:center; display:none;">Contraseña incorrecta</p>
+    </form>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <!-- TOP BAR -->
+  <header class="glass-panel" style="border-radius:0; border-left:none; border-right:none; border-top:none; padding:0.75rem 1.5rem; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:50;">
+    <span class="font-teko" style="font-size:1.5rem;">ENTI<span style="color:var(--red);">MOTORS</span> <span style="color:#555; font-size:1rem;">/ Admin</span></span>
+    <div class="flex gap-3 items-center">
+      <a href="/" style="color:#666; font-size:0.85rem; text-decoration:none;">← Ver Sitio</a>
+      <button onclick="logout()" style="background:none; border:1px solid #333; color:#666; padding:0.3rem 0.8rem; border-radius:6px; cursor:pointer; font-size:0.85rem;">Salir</button>
+    </div>
+  </header>
+
+  <div style="max-width:900px; margin:2rem auto; padding:0 1rem;">
+    <!-- TABS -->
+    <div style="display:flex; gap:0; border-bottom: 1px solid var(--glass-border); margin-bottom:2rem;">
+      <button class="tab-nav-btn active" onclick="showTab('products')">Catálogo</button>
+      <button class="tab-nav-btn" onclick="showTab('projects')">Proyectos</button>
+      <button class="tab-nav-btn" onclick="showTab('videos')">Videos</button>
+    </div>
+
+    <!-- TAB: PRODUCTOS -->
+    <div id="tab-products">
+      <div class="glass-panel" style="padding:1.5rem; margin-bottom:2rem;">
+        <h2 class="font-teko mb-4" style="font-size:1.6rem; color:var(--red);">Agregar Repuesto</h2>
+        <form id="product-form">
+          <div class="form-grid-3 mb-4">
+            <div>
+              <label class="label">Nombre del producto</label>
+              <input type="text" name="name" class="input-field" placeholder="Ej: Filtro de aceite" required />
+            </div>
+            <div>
+              <label class="label">Precio (L.)</label>
+              <input type="number" name="price" class="input-field" placeholder="0.00" step="0.01" min="0" required />
+            </div>
+            <div>
+              <label class="label">Categoría</label>
+              <select name="category" class="input-field" required>
+                <option value="repuesto">🔧 Repuesto</option>
+                <option value="accesorio">✨ Accesorio</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:1.2rem;">
+            <label class="label">Imagen del producto</label>
+            <input type="file" name="image" class="input-field" accept="image/*" style="padding:0.4rem;" />
+          </div>
+          <button type="submit" class="btn-red">Agregar Producto</button>
+        </form>
+      </div>
+
+      <h3 class="font-teko mb-3" style="font-size:1.4rem; color:#aaa;">Productos Registrados</h3>
+      <div class="glass-panel" id="products-list">
+        <p style="text-align:center; padding:2rem; color:#555;">Cargando...</p>
+      </div>
+    </div>
+
+    <!-- TAB: PROYECTOS -->
+    <div id="tab-projects" style="display:none;">
+      <div class="glass-panel" style="padding:1.5rem; margin-bottom:2rem;">
+        <h2 class="font-teko mb-4" style="font-size:1.6rem; color:var(--red);">Agregar Proyecto</h2>
+        <form id="project-form">
+          <div class="form-grid-2 mb-4">
+            <div>
+              <label class="label">Título del trabajo</label>
+              <input type="text" name="title" class="input-field" placeholder="Ej: Restauración Motor V8" required />
+            </div>
+            <div>
+              <label class="label">Estado</label>
+              <select name="status" class="input-field" required>
+                <option value="en_curso">En Curso</option>
+                <option value="terminado">Terminado</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:1.2rem;">
+            <label class="label">Foto del proyecto *</label>
+            <input type="file" name="image" class="input-field" accept="image/*" required style="padding:0.4rem;" />
+          </div>
+          <button type="submit" class="btn-red">Agregar Proyecto</button>
+        </form>
+      </div>
+
+      <h3 class="font-teko mb-3" style="font-size:1.4rem; color:#aaa;">Proyectos Registrados</h3>
+      <div class="glass-panel" id="projects-list">
+        <p style="text-align:center; padding:2rem; color:#555;">Cargando...</p>
+      </div>
+    </div>
+
+    <!-- TAB: VIDEOS -->
+    <div id="tab-videos" style="display:none;">
+      <div class="glass-panel" style="padding:1.5rem; margin-bottom:2rem;">
+        <h2 class="font-teko mb-4" style="font-size:1.6rem; color:var(--red);">Agregar Video</h2>
+        <form id="video-form">
+          <div style="margin-bottom:1rem;">
+            <label class="label">Título</label>
+            <input type="text" name="title" class="input-field" placeholder="Ej: Cambio de frenos en 10 minutos" required />
+          </div>
+          <div style="margin-bottom:1.2rem;">
+            <label class="label">URL de YouTube o TikTok</label>
+            <input type="url" name="url" class="input-field" placeholder="https://youtube.com/watch?v=... o https://tiktok.com/@.../video/..." required />
+            <p style="color:#555; font-size:0.8rem; margin-top:0.4rem;">Compatible con YouTube, YouTube Shorts y TikTok</p>
+          </div>
+          <button type="submit" class="btn-red">Agregar Video</button>
+        </form>
+      </div>
+
+      <h3 class="font-teko mb-3" style="font-size:1.4rem; color:#aaa;">Videos Registrados</h3>
+      <div class="glass-panel" id="videos-list">
+        <p style="text-align:center; padding:2rem; color:#555;">Cargando...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" style="display:none;"></div>
+
+<script>
+  let authToken = localStorage.getItem('enti_token') || '';
+  const BASE = '/api';
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast toast-${type}`;
+    t.style.display = 'block';
+    t.style.opacity = '1';
+    setTimeout(() => {
+      t.style.opacity = '0';
+      setTimeout(() => t.style.display = 'none', 400);
+    }, 3000);
+  }
+
+  function headers() {
+    return { Authorization: `Bearer ${authToken}` };
+  }
+
+  async function checkAuth() {
+    if (!authToken) return;
+    const r = await fetch(`${BASE}/healthz`);
+    if (r.ok) showDashboard();
+  }
+
+  function showDashboard() {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadAll();
+  }
+
+  function logout() {
+    authToken = '';
+    localStorage.removeItem('enti_token');
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pw = document.getElementById('password-input').value;
+    const r = await fetch(`${BASE}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw })
+    });
+    const data = await r.json();
+    if (r.ok) {
+      authToken = data.token;
+      localStorage.setItem('enti_token', authToken);
+      document.getElementById('login-error').style.display = 'none';
+      showDashboard();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  });
+
+  function showTab(tab) {
+    ['products', 'projects', 'videos'].forEach(t => {
+      document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+    });
+    document.querySelectorAll('.tab-nav-btn').forEach((btn, i) => {
+      const tabs = ['products', 'projects', 'videos'];
+      btn.classList.toggle('active', tabs[i] === tab);
+    });
+  }
+
+  async function loadAll() {
+    loadProducts();
+    loadProjects();
+    loadVideos();
+  }
+
+  // ---- PRODUCTS ----
+  async function loadProducts() {
+    const r = await fetch(`${BASE}/products`);
+    const data = await r.json();
+    const el = document.getElementById('products-list');
+    if (!data.length) {
+      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin productos aún.</p>';
+      return;
+    }
+    el.innerHTML = data.map(p => `
+      <div class="table-row">
+        ${p.image ? `<img src="${p.image}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;" />` : '<div style="width:48px;height:48px;background:#1a1a1a;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🔧</div>'}
+        <div style="flex:1; min-width:0;">
+          <p style="font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</p>
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-top:2px;">
+            <p style="color:var(--red); font-family:'Teko',sans-serif; font-size:1.1rem;">L. ${parseFloat(p.price).toFixed(2)}</p>
+            <span style="font-size:0.7rem; padding:1px 8px; border-radius:999px; font-family:'Teko',sans-serif; letter-spacing:0.05em; ${p.category === 'accesorio' ? 'background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid #a855f7' : 'background:rgba(225,29,72,0.12);color:var(--red);border:1px solid var(--red)'}">
+              ${p.category === 'accesorio' ? '✨ Accesorio' : '🔧 Repuesto'}
+            </span>
+          </div>
+        </div>
+        <button onclick="deleteProduct(${p.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('product-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const fd = new FormData(form);
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const r = await fetch(`${BASE}/products`, { method: 'POST', headers: headers(), body: fd });
+    btn.disabled = false; btn.textContent = 'Agregar Producto';
+    if (r.ok) { showToast('Producto agregado'); form.reset(); loadProducts(); }
+    else { const d = await r.json(); showToast(d.error || 'Error', 'error'); }
+  });
+
+  async function deleteProduct(id) {
+    if (!confirm('¿Eliminar este producto?')) return;
+    const r = await fetch(`${BASE}/products/${id}`, { method: 'DELETE', headers: headers() });
+    if (r.ok) { showToast('Producto eliminado'); loadProducts(); }
+    else showToast('Error al eliminar', 'error');
+  }
+
+  // ---- PROJECTS ----
+  async function loadProjects() {
+    const r = await fetch(`${BASE}/projects`);
+    const data = await r.json();
+    const el = document.getElementById('projects-list');
+    if (!data.length) {
+      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin proyectos aún.</p>';
+      return;
+    }
+    el.innerHTML = data.map(p => `
+      <div class="table-row">
+        <img src="${p.image}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
+        <div style="flex:1; min-width:0;">
+          <p style="font-weight:500;">${p.title}</p>
+          <span style="font-size:0.8rem; padding:2px 8px; border-radius:999px; font-family:'Teko',sans-serif; letter-spacing:0.05em; ${p.status === 'en_curso' ? 'background:rgba(225,29,72,0.15);color:var(--red);border:1px solid var(--red)' : 'background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid #4ade80'}">
+            ${p.status === 'en_curso' ? 'En Curso' : 'Terminado'}
+          </span>
+        </div>
+        <button onclick="deleteProject(${p.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('project-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const fd = new FormData(form);
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const r = await fetch(`${BASE}/projects`, { method: 'POST', headers: headers(), body: fd });
+    btn.disabled = false; btn.textContent = 'Agregar Proyecto';
+    if (r.ok) { showToast('Proyecto agregado'); form.reset(); loadProjects(); }
+    else { const d = await r.json(); showToast(d.error || 'Error', 'error'); }
+  });
+
+  async function deleteProject(id) {
+    if (!confirm('¿Eliminar este proyecto?')) return;
+    const r = await fetch(`${BASE}/projects/${id}`, { method: 'DELETE', headers: headers() });
+    if (r.ok) { showToast('Proyecto eliminado'); loadProjects(); }
+    else showToast('Error al eliminar', 'error');
+  }
+
+  // ---- VIDEOS ----
+  async function loadVideos() {
+    const r = await fetch(`${BASE}/videos`);
+    const data = await r.json();
+    const el = document.getElementById('videos-list');
+    if (!data.length) {
+      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin videos aún.</p>';
+      return;
+    }
+    el.innerHTML = data.map(v => `
+      <div class="table-row">
+        <div style="flex:1; min-width:0;">
+          <p style="font-weight:500;">${v.title}</p>
+          <p style="color:#555; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.url}</p>
+        </div>
+        <button onclick="deleteVideo(${v.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
+      </div>
+    `).join('');
+  }
+
+  document.getElementById('video-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const fd = new FormData(form);
+    const btn = form.querySelector('button[type=submit]');
+    btn.disabled = true; btn.textContent = 'Guardando...';
+    const r = await fetch(`${BASE}/videos`, {
+      method: 'POST',
+      headers: { ...headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: fd.get('title'), url: fd.get('url') })
+    });
+    btn.disabled = false; btn.textContent = 'Agregar Video';
+    if (r.ok) { showToast('Video agregado'); form.reset(); loadVideos(); }
+    else { const d = await r.json(); showToast(d.error || 'URL inválida', 'error'); }
+  });
+
+  async function deleteVideo(id) {
+    if (!confirm('¿Eliminar este video?')) return;
+    const r = await fetch(`${BASE}/videos/${id}`, { method: 'DELETE', headers: headers() });
+    if (r.ok) { showToast('Video eliminado'); loadVideos(); }
+    else showToast('Error al eliminar', 'error');
+  }
+
+  checkAuth();
+</script>
+</body>
+</html>
