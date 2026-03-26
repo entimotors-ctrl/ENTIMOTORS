@@ -20490,27 +20490,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router7;
+    module.exports = Router8;
     module.exports.Route = Route;
-    function Router7(options) {
-      if (!(this instanceof Router7)) {
-        return new Router7(options);
+    function Router8(options) {
+      if (!(this instanceof Router8)) {
+        return new Router8(options);
       }
       const opts = options || {};
-      function router7(req, res, next) {
-        router7.handle(req, res, next);
+      function router8(req, res, next) {
+        router8.handle(req, res, next);
       }
-      Object.setPrototypeOf(router7, this);
-      router7.caseSensitive = opts.caseSensitive;
-      router7.mergeParams = opts.mergeParams;
-      router7.params = {};
-      router7.strict = opts.strict;
-      router7.stack = [];
-      return router7;
+      Object.setPrototypeOf(router8, this);
+      router8.caseSensitive = opts.caseSensitive;
+      router8.mergeParams = opts.mergeParams;
+      router8.params = {};
+      router8.strict = opts.strict;
+      router8.stack = [];
+      return router8;
     }
-    Router7.prototype = function() {
+    Router8.prototype = function() {
     };
-    Router7.prototype.param = function param(name, fn) {
+    Router8.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20530,7 +20530,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router7.prototype.handle = function handle(req, res, callback) {
+    Router8.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20657,7 +20657,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router7.prototype.use = function use(handler) {
+    Router8.prototype.use = function use(handler) {
       let offset = 0;
       let path4 = "/";
       if (typeof handler !== "function") {
@@ -20690,7 +20690,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router7.prototype.route = function route(path4) {
+    Router8.prototype.route = function route(path4) {
       const route2 = new Route(path4);
       const layer = new Layer(path4, {
         sensitive: this.caseSensitive,
@@ -20705,7 +20705,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router7.prototype[method] = function(path4) {
+      Router8.prototype[method] = function(path4) {
         const route = this.route(path4);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -20888,13 +20888,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router7 = require_router();
+    var Router8 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router7 = null;
+      var router8 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -20903,13 +20903,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router7 === null) {
-            router7 = new Router7({
+          if (router8 === null) {
+            router8 = new Router8({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router7;
+          return router8;
         }
       });
     };
@@ -20980,15 +20980,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router7 = this.router;
+      var router8 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router7.use(path4, fn2);
+          return router8.use(path4, fn2);
         }
         debug(".use app under %s", path4);
         fn2.mountpath = path4;
         fn2.parent = this;
-        router7.use(path4, function mounted_app(req, res, next) {
+        router8.use(path4, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -23515,7 +23515,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router7 = require_router();
+    var Router8 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23537,8 +23537,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router7.Route;
-    exports.Router = Router7;
+    exports.Route = Router8.Route;
+    exports.Router = Router8;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -27934,7 +27934,7 @@ var require_pino = __commonJS({
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/runner/workspace/artifacts/api-server/dist";
+        const outputDir = "/home/wilkin/Descargas/Node-Creator/artifacts/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -53420,14 +53420,14 @@ var require_main3 = __commonJS({
 });
 
 // src/app.ts
-var import_express7 = __toESM(require_express2(), 1);
+var import_express8 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
 import path3 from "path";
 import { fileURLToPath } from "url";
 
 // src/routes/index.ts
-var import_express6 = __toESM(require_express2(), 1);
+var import_express7 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -65105,14 +65105,14 @@ var resolveFetch2 = (customFetch) => {
 var resolveHeadersConstructor = () => {
   return Headers;
 };
-var fetchWithAuth = (supabaseKey, getAccessToken, customFetch) => {
+var fetchWithAuth = (supabaseKey2, getAccessToken, customFetch) => {
   const fetch$1 = resolveFetch2(customFetch);
   const HeadersConstructor = resolveHeadersConstructor();
   return async (input, init) => {
     var _await$getAccessToken;
-    const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey;
+    const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey2;
     let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
-    if (!headers.has("apikey")) headers.set("apikey", supabaseKey);
+    if (!headers.has("apikey")) headers.set("apikey", supabaseKey2);
     if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
     return fetch$1(input, _objectSpread23(_objectSpread23({}, init), {}, { headers }));
   };
@@ -65136,8 +65136,8 @@ function applySettingDefaults(options, defaults) {
   else delete result.accessToken;
   return result;
 }
-function validateSupabaseUrl(supabaseUrl) {
-  const trimmedUrl = supabaseUrl === null || supabaseUrl === void 0 ? void 0 : supabaseUrl.trim();
+function validateSupabaseUrl(supabaseUrl2) {
+  const trimmedUrl = supabaseUrl2 === null || supabaseUrl2 === void 0 ? void 0 : supabaseUrl2.trim();
   if (!trimmedUrl) throw new Error("supabaseUrl is required.");
   if (!trimmedUrl.match(/^https?:\/\//i)) throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
   try {
@@ -65339,12 +65339,12 @@ var SupabaseClient = class {
   * const { data } = await supabase.from('profiles').select('*')
   * ```
   */
-  constructor(supabaseUrl, supabaseKey, options) {
+  constructor(supabaseUrl2, supabaseKey2, options) {
     var _settings$auth$storag, _settings$global$head;
-    this.supabaseUrl = supabaseUrl;
-    this.supabaseKey = supabaseKey;
-    const baseUrl = validateSupabaseUrl(supabaseUrl);
-    if (!supabaseKey) throw new Error("supabaseKey is required.");
+    this.supabaseUrl = supabaseUrl2;
+    this.supabaseKey = supabaseKey2;
+    const baseUrl = validateSupabaseUrl(supabaseUrl2);
+    if (!supabaseKey2) throw new Error("supabaseKey is required.");
     this.realtimeUrl = new URL("realtime/v1", baseUrl);
     this.realtimeUrl.protocol = this.realtimeUrl.protocol.replace("http", "ws");
     this.authUrl = new URL("auth/v1", baseUrl);
@@ -65369,7 +65369,7 @@ var SupabaseClient = class {
         throw new Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(prop)} is not possible`);
       } });
     }
-    this.fetch = fetchWithAuth(supabaseKey, this._getAccessToken.bind(this), settings.global.fetch);
+    this.fetch = fetchWithAuth(supabaseKey2, this._getAccessToken.bind(this), settings.global.fetch);
     this.realtime = this._initRealtimeClient(_objectSpread23({
       headers: this.headers,
       accessToken: this._getAccessToken.bind(this)
@@ -65521,8 +65521,8 @@ var SupabaseClient = class {
     }
   }
 };
-var createClient = (supabaseUrl, supabaseKey, options) => {
-  return new SupabaseClient(supabaseUrl, supabaseKey, options);
+var createClient = (supabaseUrl2, supabaseKey2, options) => {
+  return new SupabaseClient(supabaseUrl2, supabaseKey2, options);
 };
 function shouldShowDeprecationWarning() {
   if (typeof window !== "undefined") return false;
@@ -65761,14 +65761,47 @@ router5.post("/admin/login", (req, res) => {
 });
 var admin_auth_default = router5;
 
-// src/routes/index.ts
+// src/routes/rifa.ts
+var import_express6 = __toESM(require_express2(), 1);
+var supabaseUrl = process.env.SUPABASE_URL;
+var supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+var supabase2 = createClient(supabaseUrl, supabaseKey);
 var router6 = (0, import_express6.Router)();
-router6.use(health_default);
-router6.use(admin_auth_default);
-router6.use(products_default);
-router6.use(projects_default);
-router6.use(videos_default);
-var routes_default = router6;
+router6.post("/registrar", async (req, res) => {
+  const { codigo, nombre, telefono } = req.body;
+  if (!codigo || !nombre || !telefono) {
+    return res.status(400).json({ error: "Faltan datos obligatorios." });
+  }
+  try {
+    const { error } = await supabase2.from("rifa").insert([{
+      codigo: codigo.toUpperCase(),
+      nombre,
+      telefono,
+      fecha_registro: (/* @__PURE__ */ new Date()).toISOString()
+    }]);
+    if (error) {
+      if (error.code === "23505") {
+        return res.status(400).json({ error: "Este c\xF3digo ya fue registrado." });
+      }
+      throw error;
+    }
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error("Error Rifa:", err);
+    return res.status(500).json({ error: "Error interno del servidor." });
+  }
+});
+var rifa_default = router6;
+
+// src/routes/index.ts
+var router7 = (0, import_express7.Router)();
+router7.use("/rifa", rifa_default);
+router7.use(health_default);
+router7.use(admin_auth_default);
+router7.use(products_default);
+router7.use(projects_default);
+router7.use(videos_default);
+var routes_default = router7;
 
 // src/lib/logger.ts
 var import_pino = __toESM(require_pino(), 1);
@@ -65790,7 +65823,7 @@ var logger = (0, import_pino.default)({
 
 // src/app.ts
 var __dirname2 = path3.dirname(fileURLToPath(import.meta.url));
-var app = (0, import_express7.default)();
+var app = (0, import_express8.default)();
 app.use(
   (0, import_pino_http.default)({
     logger,
@@ -65811,10 +65844,10 @@ app.use(
   })
 );
 app.use((0, import_cors.default)());
-app.use(import_express7.default.json());
-app.use(import_express7.default.urlencoded({ extended: true }));
-app.use("/uploads", import_express7.default.static(path3.resolve(__dirname2, "../uploads")));
-app.use(import_express7.default.static(path3.resolve(__dirname2, "../public")));
+app.use(import_express8.default.json());
+app.use(import_express8.default.urlencoded({ extended: true }));
+app.use("/uploads", import_express8.default.static(path3.resolve(__dirname2, "../uploads")));
+app.use(import_express8.default.static(path3.resolve(__dirname2, "../public")));
 app.use("/api", routes_default);
 app.get("/{*splat}", (_req, res) => {
   res.sendFile(path3.resolve(__dirname2, "../public/index.html"));
