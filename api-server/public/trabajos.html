@@ -231,9 +231,29 @@
         </div>
     </footer>
 
-    <div id="lightbox" onclick="closeLightbox()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:1000; align-items:center; justify-content:center; cursor:zoom-out;" class="backdrop-blur-sm">
-        <img id="lightbox-img" src="" alt="" style="max-width:90vw; max-height:85vh; border-radius:1rem; object-fit:contain;" class="shadow-2xl border border-white/10">
-        <span class="absolute top-6 right-6 text-white text-4xl font-teko cursor-pointer">×</span>
+    <div id="lightbox" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.96); z-index:1000;" class="backdrop-blur-sm">
+      <!-- Cerrar al click en el fondo -->
+      <div onclick="closeLightbox()" style="position:absolute; inset:0; z-index:0;"></div>
+
+      <!-- Botón cerrar -->
+      <button onclick="closeLightbox()" style="position:absolute; top:1rem; right:1rem; z-index:20; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15); color:#fff; width:42px; height:42px; border-radius:50%; font-size:1.4rem; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;">&#x2715;</button>
+
+      <!-- Contenido galería -->
+      <div style="position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:4rem 1rem 1rem; gap:0.75rem;">
+
+        <!-- Imagen principal con flechas -->
+        <div style="display:flex; align-items:center; gap:0.75rem; max-width:100%;">
+          <button id="lb-prev" onclick="lbNav(-1)" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#fff; width:44px; height:44px; border-radius:50%; font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s;">&#8249;</button>
+          <img id="lightbox-img" src="" alt="" style="max-width:80vw; max-height:68vh; border-radius:0.75rem; object-fit:contain; box-shadow:0 25px 60px rgba(0,0,0,0.6); border:1px solid rgba(255,255,255,0.08);">
+          <button id="lb-next" onclick="lbNav(1)" style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); color:#fff; width:44px; height:44px; border-radius:50%; font-size:1.8rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s;">&#8250;</button>
+        </div>
+
+        <!-- Contador -->
+        <div id="lb-counter" style="color:#888; font-family:'Teko',sans-serif; font-size:1rem; letter-spacing:0.05em;"></div>
+
+        <!-- Thumbnails -->
+        <div id="lb-thumbs" style="display:flex; gap:0.4rem; overflow-x:auto; max-width:90vw; padding:0.25rem; scrollbar-width:thin;"></div>
+      </div>
     </div>
 
     <a href="https://wa.me/50497049635?text=Hola%20ENTIMOTORS,%20me%20gustaría%20más%20información." class="fixed bottom-6 right-6 z-50 bg-[#25D366] p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 shadow-[#25D366]/30" target="_blank" aria-label="Contactar por WhatsApp">
@@ -258,10 +278,6 @@
                 mobileMenu.classList.remove('flex');
             }
         });
-
-        function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
-        }
     </script>
     <script src="/js/trabajos.js"></script>
 </body>
