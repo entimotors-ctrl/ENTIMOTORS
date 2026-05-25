@@ -308,9 +308,15 @@
             </div>
           </div>
           <div style="margin-bottom:1.2rem;">
-            <label class="label">Fotos del proyecto (puedes seleccionar varias)</label>
-            <input type="file" name="images" class="input-field" accept="image/*" multiple style="padding:0.4rem;" />
-            <p style="color:#555; font-size:0.8rem; margin-top:0.35rem;">Opcional — puedes agregar fotos después también</p>
+            <label class="label">Fotos del proyecto</label>
+            <div class="photo-grid" id="new-project-preview">
+              <label class="add-photos-label" id="new-project-add-btn" title="Agregar foto">
+                +
+                <input type="file" accept="image/*" style="display:none;"
+                  onchange="addNewProjectPhoto(this)" />
+              </label>
+            </div>
+            <p style="color:#555; font-size:0.8rem; margin-top:0.5rem;">Toca + para agregar fotos una a una &bull; Opcional</p>
           </div>
           <button type="submit" class="btn-red">Crear Proyecto</button>
         </form>
@@ -521,16 +527,63 @@
     }).join('');
   }
 
+  // Fotos acumuladas para el formulario de nuevo proyecto
+  let newProjectFiles = [];
+
+  function addNewProjectPhoto(input) {
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    const idx = newProjectFiles.length;
+    newProjectFiles.push(file);
+    input.value = '';
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const thumb = document.createElement('div');
+      thumb.className = 'photo-thumb';
+      thumb.id = `np-thumb-${idx}`;
+      thumb.innerHTML = `
+        <img src="${e.target.result}" alt="foto" />
+        <button type="button" class="photo-thumb-del" onclick="removeNewProjectPhoto(${idx})">&times;</button>
+      `;
+      const addBtn = document.getElementById('new-project-add-btn');
+      document.getElementById('new-project-preview').insertBefore(thumb, addBtn);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function removeNewProjectPhoto(idx) {
+    newProjectFiles[idx] = null;
+    const thumb = document.getElementById(`np-thumb-${idx}`);
+    if (thumb) thumb.remove();
+  }
+
   document.getElementById('project-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target;
-    const fd = new FormData(form);
+    const fd = new FormData();
+    fd.append('title', form.title.value);
+    fd.append('status', form.status.value);
+    const validFiles = newProjectFiles.filter(f => f !== null);
+    for (const file of validFiles) fd.append('images', file);
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Guardando...';
     const r = await fetch(`${BASE}/projects`, { method: 'POST', headers: headers(), body: fd });
     btn.disabled = false; btn.textContent = 'Crear Proyecto';
-    if (r.ok) { showToast('Proyecto creado'); form.reset(); loadProjects(); }
-    else { const d = await r.json(); showToast(d.error || 'Error', 'error'); }
+    if (r.ok) {
+      showToast('Proyecto creado');
+      form.reset();
+      newProjectFiles = [];
+      document.getElementById('new-project-preview').innerHTML = `
+        <label class="add-photos-label" id="new-project-add-btn" title="Agregar foto">
+          +
+          <input type="file" accept="image/*" style="display:none;" onchange="addNewProjectPhoto(this)" />
+        </label>`;
+      loadProjects();
+    } else {
+      const d = await r.json();
+      showToast(d.error || 'Error', 'error');
+    }
   });
 
   async function uploadMorePhotos(projectId, input) {
