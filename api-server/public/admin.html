@@ -134,6 +134,82 @@
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+    .project-card {
+      border-bottom: 1px solid var(--glass-border);
+      padding: 1rem;
+    }
+    .project-card:last-child { border-bottom: none; }
+
+    .photo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+    .photo-thumb {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--glass-border);
+    }
+    .photo-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .photo-thumb-del {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(0,0,0,0.75);
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      font-size: 0.7rem;
+      line-height: 1;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .photo-thumb:hover .photo-thumb-del { opacity: 1; }
+
+    .add-photos-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      border: 1px dashed #444;
+      cursor: pointer;
+      color: #555;
+      font-size: 1.6rem;
+      transition: border-color 0.2s, color 0.2s;
+      flex-shrink: 0;
+    }
+    .add-photos-label:hover { border-color: var(--red); color: var(--red); }
+
+    .badge-status {
+      font-size: 0.75rem;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-family: 'Teko', sans-serif;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.2s;
+    }
+    .badge-status:hover { opacity: 0.75; }
   </style>
 </head>
 <body>
@@ -232,10 +308,11 @@
             </div>
           </div>
           <div style="margin-bottom:1.2rem;">
-            <label class="label">Foto del proyecto *</label>
-            <input type="file" name="image" class="input-field" accept="image/*" required style="padding:0.4rem;" />
+            <label class="label">Fotos del proyecto (puedes seleccionar varias)</label>
+            <input type="file" name="images" class="input-field" accept="image/*" multiple style="padding:0.4rem;" />
+            <p style="color:#555; font-size:0.8rem; margin-top:0.35rem;">Opcional — puedes agregar fotos después también</p>
           </div>
-          <button type="submit" class="btn-red">Agregar Proyecto</button>
+          <button type="submit" class="btn-red">Crear Proyecto</button>
         </form>
       </div>
 
@@ -401,18 +478,47 @@
       el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin proyectos aún.</p>';
       return;
     }
-    el.innerHTML = data.map(p => `
-      <div class="table-row">
-        <img src="${p.image}" style="width:64px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;" />
-        <div style="flex:1; min-width:0;">
-          <p style="font-weight:500;">${p.title}</p>
-          <span style="font-size:0.8rem; padding:2px 8px; border-radius:999px; font-family:'Teko',sans-serif; letter-spacing:0.05em; ${p.status === 'en_curso' ? 'background:rgba(225,29,72,0.15);color:var(--red);border:1px solid var(--red)' : 'background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid #4ade80'}">
-            ${p.status === 'en_curso' ? 'En Curso' : 'Terminado'}
-          </span>
+    el.innerHTML = data.map(p => {
+      const imgs = p.project_images || [];
+      const statusStyle = p.status === 'en_curso'
+        ? 'background:rgba(225,29,72,0.15);color:var(--red);border:1px solid var(--red)'
+        : 'background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid #4ade80';
+      const nextStatus = p.status === 'en_curso' ? 'terminado' : 'en_curso';
+      const nextLabel = p.status === 'en_curso' ? 'Marcar Terminado' : 'Reabrir';
+
+      const thumbsHtml = imgs.map(img => `
+        <div class="photo-thumb">
+          <img src="${img.image_url}" alt="foto" loading="lazy" />
+          <button class="photo-thumb-del" onclick="deleteProjectImage(${p.id}, ${img.id})" title="Eliminar foto">✕</button>
         </div>
-        <button onclick="deleteProject(${p.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
-      </div>
-    `).join('');
+      `).join('');
+
+      return `
+        <div class="project-card" id="project-card-${p.id}">
+          <div style="display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
+            <div style="flex:1; min-width:0;">
+              <p style="font-weight:500; margin-bottom:0.4rem;">${p.title}</p>
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
+                <span class="badge-status" style="${statusStyle}" onclick="toggleProjectStatus(${p.id}, '${nextStatus}')" title="${nextLabel}">
+                  ${p.status === 'en_curso' ? '🔧 En Curso' : '✅ Terminado'}
+                </span>
+                <span style="color:#555; font-size:0.75rem;">${imgs.length} foto${imgs.length !== 1 ? 's' : ''}</span>
+              </div>
+            </div>
+            <button onclick="deleteProject(${p.id})" class="btn-outline" style="flex-shrink:0; font-size:0.85rem;">Eliminar</button>
+          </div>
+
+          <div class="photo-grid">
+            ${thumbsHtml}
+            <label class="add-photos-label" title="Agregar más fotos">
+              +
+              <input type="file" accept="image/*" multiple style="display:none;"
+                onchange="uploadMorePhotos(${p.id}, this)" />
+            </label>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   document.getElementById('project-form').addEventListener('submit', async (e) => {
@@ -422,13 +528,48 @@
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Guardando...';
     const r = await fetch(`${BASE}/projects`, { method: 'POST', headers: headers(), body: fd });
-    btn.disabled = false; btn.textContent = 'Agregar Proyecto';
-    if (r.ok) { showToast('Proyecto agregado'); form.reset(); loadProjects(); }
+    btn.disabled = false; btn.textContent = 'Crear Proyecto';
+    if (r.ok) { showToast('Proyecto creado'); form.reset(); loadProjects(); }
     else { const d = await r.json(); showToast(d.error || 'Error', 'error'); }
   });
 
+  async function uploadMorePhotos(projectId, input) {
+    if (!input.files || input.files.length === 0) return;
+    const fd = new FormData();
+    for (const file of input.files) fd.append('images', file);
+    const label = input.closest('label');
+    label.textContent = '...';
+    const r = await fetch(`${BASE}/projects/${projectId}/images`, {
+      method: 'POST',
+      headers: headers(),
+      body: fd
+    });
+    label.innerHTML = '+<input type="file" accept="image/*" multiple style="display:none;" onchange="uploadMorePhotos(' + projectId + ', this)" />';
+    if (r.ok) { showToast('Fotos agregadas'); loadProjects(); }
+    else { const d = await r.json(); showToast(d.error || 'Error al subir', 'error'); }
+  }
+
+  async function deleteProjectImage(projectId, imageId) {
+    if (!confirm('¿Eliminar esta foto?')) return;
+    const r = await fetch(`${BASE}/projects/${projectId}/images/${imageId}`, {
+      method: 'DELETE', headers: headers()
+    });
+    if (r.ok) { showToast('Foto eliminada'); loadProjects(); }
+    else showToast('Error al eliminar foto', 'error');
+  }
+
+  async function toggleProjectStatus(id, newStatus) {
+    const r = await fetch(`${BASE}/projects/${id}/status`, {
+      method: 'PATCH',
+      headers: { ...headers(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    if (r.ok) { showToast('Estado actualizado'); loadProjects(); }
+    else showToast('Error al cambiar estado', 'error');
+  }
+
   async function deleteProject(id) {
-    if (!confirm('¿Eliminar este proyecto?')) return;
+    if (!confirm('¿Eliminar este proyecto y todas sus fotos?')) return;
     const r = await fetch(`${BASE}/projects/${id}`, { method: 'DELETE', headers: headers() });
     if (r.ok) { showToast('Proyecto eliminado'); loadProjects(); }
     else showToast('Error al eliminar', 'error');
