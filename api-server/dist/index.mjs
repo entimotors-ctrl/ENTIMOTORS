@@ -47,9 +47,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// ../../node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js
+// node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js
 var require_ms = __commonJS({
-  "../../node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js"(exports, module) {
+  "node_modules/.pnpm/ms@2.1.3/node_modules/ms/index.js"(exports, module) {
     var s = 1e3;
     var m = s * 60;
     var h = m * 60;
@@ -163,9 +163,9 @@ var require_ms = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js
+// node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js
 var require_common = __commonJS({
-  "../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js"(exports, module) {
+  "node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/common.js"(exports, module) {
     function setup(env) {
       createDebug.debug = createDebug;
       createDebug.default = createDebug;
@@ -340,9 +340,9 @@ var require_common = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js
+// node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js
 var require_browser = __commonJS({
-  "../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js"(exports, module) {
+  "node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/browser.js"(exports, module) {
     exports.formatArgs = formatArgs;
     exports.save = save;
     exports.load = load;
@@ -510,18 +510,18 @@ var require_browser = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js
+// node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js
 var require_node = __commonJS({
-  "../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js"(exports, module) {
+  "node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/node.js"(exports, module) {
     var tty = __require("tty");
-    var util2 = __require("util");
+    var util = __require("util");
     exports.init = init;
     exports.log = log;
     exports.formatArgs = formatArgs;
     exports.save = save;
     exports.load = load;
     exports.useColors = useColors;
-    exports.destroy = util2.deprecate(
+    exports.destroy = util.deprecate(
       () => {
       },
       "Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."
@@ -652,7 +652,7 @@ var require_node = __commonJS({
       return (/* @__PURE__ */ new Date()).toISOString() + " ";
     }
     function log(...args) {
-      return process.stderr.write(util2.formatWithOptions(exports.inspectOpts, ...args) + "\n");
+      return process.stderr.write(util.formatWithOptions(exports.inspectOpts, ...args) + "\n");
     }
     function save(namespaces) {
       if (namespaces) {
@@ -675,18 +675,18 @@ var require_node = __commonJS({
     var { formatters } = module.exports;
     formatters.o = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts).split("\n").map((str) => str.trim()).join(" ");
+      return util.inspect(v, this.inspectOpts).split("\n").map((str) => str.trim()).join(" ");
     };
     formatters.O = function(v) {
       this.inspectOpts.colors = this.useColors;
-      return util2.inspect(v, this.inspectOpts);
+      return util.inspect(v, this.inspectOpts);
     };
   }
 });
 
-// ../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/index.js
+// node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/index.js
 var require_src = __commonJS({
-  "../../node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/index.js"(exports, module) {
+  "node_modules/.pnpm/debug@4.4.3/node_modules/debug/src/index.js"(exports, module) {
     if (typeof process === "undefined" || process.type === "renderer" || process.browser === true || process.__nwjs) {
       module.exports = require_browser();
     } else {
@@ -695,9 +695,9 @@ var require_src = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js
+// node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js
 var require_depd = __commonJS({
-  "../../node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js"(exports, module) {
+  "node_modules/.pnpm/depd@2.0.0/node_modules/depd/index.js"(exports, module) {
     var relative = __require("path").relative;
     module.exports = depd;
     var basePath = process.cwd();
@@ -1001,9 +1001,9 @@ var require_depd = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js
+// node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js
 var require_setprototypeof = __commonJS({
-  "../../node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js"(exports, module) {
+  "node_modules/.pnpm/setprototypeof@1.2.0/node_modules/setprototypeof/index.js"(exports, module) {
     "use strict";
     module.exports = Object.setPrototypeOf || ({ __proto__: [] } instanceof Array ? setProtoOf : mixinProperties);
     function setProtoOf(obj, proto) {
@@ -1021,9 +1021,9 @@ var require_setprototypeof = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/codes.json
+// node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/codes.json
 var require_codes = __commonJS({
-  "../../node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/codes.json"(exports, module) {
+  "node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/codes.json"(exports, module) {
     module.exports = {
       "100": "Continue",
       "101": "Switching Protocols",
@@ -1092,9 +1092,9 @@ var require_codes = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/index.js
+// node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/index.js
 var require_statuses = __commonJS({
-  "../../node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/index.js"(exports, module) {
+  "node_modules/.pnpm/statuses@2.0.2/node_modules/statuses/index.js"(exports, module) {
     "use strict";
     var codes = require_codes();
     module.exports = status;
@@ -1163,9 +1163,9 @@ var require_statuses = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js
+// node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js
 var require_inherits_browser = __commonJS({
-  "../../node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js"(exports, module) {
+  "node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits_browser.js"(exports, module) {
     if (typeof Object.create === "function") {
       module.exports = function inherits(ctor, superCtor) {
         if (superCtor) {
@@ -1195,23 +1195,23 @@ var require_inherits_browser = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js
+// node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js
 var require_inherits = __commonJS({
-  "../../node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js"(exports, module) {
+  "node_modules/.pnpm/inherits@2.0.4/node_modules/inherits/inherits.js"(exports, module) {
     try {
-      util2 = __require("util");
-      if (typeof util2.inherits !== "function") throw "";
-      module.exports = util2.inherits;
+      util = __require("util");
+      if (typeof util.inherits !== "function") throw "";
+      module.exports = util.inherits;
     } catch (e) {
       module.exports = require_inherits_browser();
     }
-    var util2;
+    var util;
   }
 });
 
-// ../../node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js
+// node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js
 var require_toidentifier = __commonJS({
-  "../../node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js"(exports, module) {
+  "node_modules/.pnpm/toidentifier@1.0.1/node_modules/toidentifier/index.js"(exports, module) {
     "use strict";
     module.exports = toIdentifier;
     function toIdentifier(str) {
@@ -1222,9 +1222,9 @@ var require_toidentifier = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/http-errors@2.0.1/node_modules/http-errors/index.js
+// node_modules/.pnpm/http-errors@2.0.1/node_modules/http-errors/index.js
 var require_http_errors = __commonJS({
-  "../../node_modules/.pnpm/http-errors@2.0.1/node_modules/http-errors/index.js"(exports, module) {
+  "node_modules/.pnpm/http-errors@2.0.1/node_modules/http-errors/index.js"(exports, module) {
     "use strict";
     var deprecate = require_depd()("http-errors");
     var setPrototypeOf = require_setprototypeof();
@@ -1386,9 +1386,9 @@ var require_http_errors = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/bytes@3.1.2/node_modules/bytes/index.js
+// node_modules/.pnpm/bytes@3.1.2/node_modules/bytes/index.js
 var require_bytes = __commonJS({
-  "../../node_modules/.pnpm/bytes@3.1.2/node_modules/bytes/index.js"(exports, module) {
+  "node_modules/.pnpm/bytes@3.1.2/node_modules/bytes/index.js"(exports, module) {
     "use strict";
     module.exports = bytes;
     module.exports.format = format;
@@ -1475,9 +1475,9 @@ var require_bytes = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/safer-buffer@2.1.2/node_modules/safer-buffer/safer.js
+// node_modules/.pnpm/safer-buffer@2.1.2/node_modules/safer-buffer/safer.js
 var require_safer = __commonJS({
-  "../../node_modules/.pnpm/safer-buffer@2.1.2/node_modules/safer-buffer/safer.js"(exports, module) {
+  "node_modules/.pnpm/safer-buffer@2.1.2/node_modules/safer-buffer/safer.js"(exports, module) {
     "use strict";
     var buffer = __require("buffer");
     var Buffer2 = buffer.Buffer;
@@ -1543,9 +1543,9 @@ var require_safer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/bom-handling.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/bom-handling.js
 var require_bom_handling = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/bom-handling.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/bom-handling.js"(exports) {
     "use strict";
     var BOMChar = "\uFEFF";
     exports.PrependBOM = PrependBOMWrapper;
@@ -1589,9 +1589,9 @@ var require_bom_handling = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/helpers/merge-exports.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/helpers/merge-exports.js
 var require_merge_exports = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/helpers/merge-exports.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/helpers/merge-exports.js"(exports, module) {
     "use strict";
     var hasOwn = typeof Object.hasOwn === "undefined" ? Function.call.bind(Object.prototype.hasOwnProperty) : Object.hasOwn;
     function mergeModules(target, module2) {
@@ -1605,9 +1605,9 @@ var require_merge_exports = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/internal.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/internal.js
 var require_internal = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/internal.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/internal.js"(exports, module) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     module.exports = {
@@ -1786,9 +1786,9 @@ var require_internal = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf32.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf32.js
 var require_utf32 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf32.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf32.js"(exports) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     exports._utf32 = Utf32Codec;
@@ -2017,9 +2017,9 @@ var require_utf32 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf16.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf16.js
 var require_utf16 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf16.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf16.js"(exports) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     exports.utf16be = Utf16BECodec;
@@ -2160,9 +2160,9 @@ var require_utf16 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf7.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf7.js
 var require_utf7 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf7.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/utf7.js"(exports) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     exports.utf7 = Utf7Codec;
@@ -2189,10 +2189,10 @@ var require_utf7 = __commonJS({
       this.inBase64 = false;
       this.base64Accum = "";
     }
-    var base64Regex2 = /[A-Za-z0-9\/+]/;
+    var base64Regex = /[A-Za-z0-9\/+]/;
     var base64Chars = [];
     for (i = 0; i < 256; i++) {
-      base64Chars[i] = base64Regex2.test(String.fromCharCode(i));
+      base64Chars[i] = base64Regex.test(String.fromCharCode(i));
     }
     var i;
     var plusChar = "+".charCodeAt(0);
@@ -2378,9 +2378,9 @@ var require_utf7 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-codec.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-codec.js
 var require_sbcs_codec = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-codec.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-codec.js"(exports) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     exports._sbcs = SBCSCodec;
@@ -2440,9 +2440,9 @@ var require_sbcs_codec = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data.js
 var require_sbcs_data = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data.js"(exports, module) {
     "use strict";
     module.exports = {
       // Not supported by iconv, not sure why.
@@ -2593,9 +2593,9 @@ var require_sbcs_data = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data-generated.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data-generated.js
 var require_sbcs_data_generated = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data-generated.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/sbcs-data-generated.js"(exports, module) {
     "use strict";
     module.exports = {
       "437": "cp437",
@@ -3048,9 +3048,9 @@ var require_sbcs_data_generated = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-codec.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-codec.js
 var require_dbcs_codec = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-codec.js"(exports) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-codec.js"(exports) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     exports._dbcs = DBCSCodec;
@@ -3508,9 +3508,9 @@ var require_dbcs_codec = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/shiftjis.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/shiftjis.json
 var require_shiftjis = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/shiftjis.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/shiftjis.json"(exports, module) {
     module.exports = [
       ["0", "\0", 128],
       ["a1", "\uFF61", 62],
@@ -3639,9 +3639,9 @@ var require_shiftjis = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/eucjp.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/eucjp.json
 var require_eucjp = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/eucjp.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/eucjp.json"(exports, module) {
     module.exports = [
       ["0", "\0", 127],
       ["8ea1", "\uFF61", 62],
@@ -3827,9 +3827,9 @@ var require_eucjp = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp936.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp936.json
 var require_cp936 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp936.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp936.json"(exports, module) {
     module.exports = [
       ["0", "\0", 127, "\u20AC"],
       ["8140", "\u4E02\u4E04\u4E05\u4E06\u4E0F\u4E12\u4E17\u4E1F\u4E20\u4E21\u4E23\u4E26\u4E29\u4E2E\u4E2F\u4E31\u4E33\u4E35\u4E37\u4E3C\u4E40\u4E41\u4E42\u4E44\u4E46\u4E4A\u4E51\u4E55\u4E57\u4E5A\u4E5B\u4E62\u4E63\u4E64\u4E65\u4E67\u4E68\u4E6A", 5, "\u4E72\u4E74", 9, "\u4E7F", 6, "\u4E87\u4E8A"],
@@ -4097,9 +4097,9 @@ var require_cp936 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gbk-added.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gbk-added.json
 var require_gbk_added = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gbk-added.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gbk-added.json"(exports, module) {
     module.exports = [
       ["a140", "\uE4C6", 62],
       ["a180", "\uE505", 32],
@@ -4159,16 +4159,16 @@ var require_gbk_added = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json
 var require_gb18030_ranges = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/gb18030-ranges.json"(exports, module) {
     module.exports = { uChars: [128, 165, 169, 178, 184, 216, 226, 235, 238, 244, 248, 251, 253, 258, 276, 284, 300, 325, 329, 334, 364, 463, 465, 467, 469, 471, 473, 475, 477, 506, 594, 610, 712, 716, 730, 930, 938, 962, 970, 1026, 1104, 1106, 8209, 8215, 8218, 8222, 8231, 8241, 8244, 8246, 8252, 8365, 8452, 8454, 8458, 8471, 8482, 8556, 8570, 8596, 8602, 8713, 8720, 8722, 8726, 8731, 8737, 8740, 8742, 8748, 8751, 8760, 8766, 8777, 8781, 8787, 8802, 8808, 8816, 8854, 8858, 8870, 8896, 8979, 9322, 9372, 9548, 9588, 9616, 9622, 9634, 9652, 9662, 9672, 9676, 9680, 9702, 9735, 9738, 9793, 9795, 11906, 11909, 11913, 11917, 11928, 11944, 11947, 11951, 11956, 11960, 11964, 11979, 12284, 12292, 12312, 12319, 12330, 12351, 12436, 12447, 12535, 12543, 12586, 12842, 12850, 12964, 13200, 13215, 13218, 13253, 13263, 13267, 13270, 13384, 13428, 13727, 13839, 13851, 14617, 14703, 14801, 14816, 14964, 15183, 15471, 15585, 16471, 16736, 17208, 17325, 17330, 17374, 17623, 17997, 18018, 18212, 18218, 18301, 18318, 18760, 18811, 18814, 18820, 18823, 18844, 18848, 18872, 19576, 19620, 19738, 19887, 40870, 59244, 59336, 59367, 59413, 59417, 59423, 59431, 59437, 59443, 59452, 59460, 59478, 59493, 63789, 63866, 63894, 63976, 63986, 64016, 64018, 64021, 64025, 64034, 64037, 64042, 65074, 65093, 65107, 65112, 65127, 65132, 65375, 65510, 65536], gbChars: [0, 36, 38, 45, 50, 81, 89, 95, 96, 100, 103, 104, 105, 109, 126, 133, 148, 172, 175, 179, 208, 306, 307, 308, 309, 310, 311, 312, 313, 341, 428, 443, 544, 545, 558, 741, 742, 749, 750, 805, 819, 820, 7922, 7924, 7925, 7927, 7934, 7943, 7944, 7945, 7950, 8062, 8148, 8149, 8152, 8164, 8174, 8236, 8240, 8262, 8264, 8374, 8380, 8381, 8384, 8388, 8390, 8392, 8393, 8394, 8396, 8401, 8406, 8416, 8419, 8424, 8437, 8439, 8445, 8482, 8485, 8496, 8521, 8603, 8936, 8946, 9046, 9050, 9063, 9066, 9076, 9092, 9100, 9108, 9111, 9113, 9131, 9162, 9164, 9218, 9219, 11329, 11331, 11334, 11336, 11346, 11361, 11363, 11366, 11370, 11372, 11375, 11389, 11682, 11686, 11687, 11692, 11694, 11714, 11716, 11723, 11725, 11730, 11736, 11982, 11989, 12102, 12336, 12348, 12350, 12384, 12393, 12395, 12397, 12510, 12553, 12851, 12962, 12973, 13738, 13823, 13919, 13933, 14080, 14298, 14585, 14698, 15583, 15847, 16318, 16434, 16438, 16481, 16729, 17102, 17122, 17315, 17320, 17402, 17418, 17859, 17909, 17911, 17915, 17916, 17936, 17939, 17961, 18664, 18703, 18814, 18962, 19043, 33469, 33470, 33471, 33484, 33485, 33490, 33497, 33501, 33505, 33513, 33520, 33536, 33550, 37845, 37921, 37948, 38029, 38038, 38064, 38065, 38066, 38069, 38075, 38076, 38078, 39108, 39109, 39113, 39114, 39115, 39116, 39265, 39394, 189e3] };
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp949.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp949.json
 var require_cp949 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp949.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp949.json"(exports, module) {
     module.exports = [
       ["0", "\0", 127],
       ["8141", "\uAC02\uAC03\uAC05\uAC06\uAC0B", 4, "\uAC18\uAC1E\uAC1F\uAC21\uAC22\uAC23\uAC25", 6, "\uAC2E\uAC32\uAC33\uAC34"],
@@ -4445,9 +4445,9 @@ var require_cp949 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp950.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp950.json
 var require_cp950 = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp950.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/cp950.json"(exports, module) {
     module.exports = [
       ["0", "\0", 127],
       ["a140", "\u3000\uFF0C\u3001\u3002\uFF0E\u2027\uFF1B\uFF1A\uFF1F\uFF01\uFE30\u2026\u2025\uFE50\uFE51\uFE52\xB7\uFE54\uFE55\uFE56\uFE57\uFF5C\u2013\uFE31\u2014\uFE33\u2574\uFE34\uFE4F\uFF08\uFF09\uFE35\uFE36\uFF5B\uFF5D\uFE37\uFE38\u3014\u3015\uFE39\uFE3A\u3010\u3011\uFE3B\uFE3C\u300A\u300B\uFE3D\uFE3E\u3008\u3009\uFE3F\uFE40\u300C\u300D\uFE41\uFE42\u300E\u300F\uFE43\uFE44\uFE59\uFE5A"],
@@ -4628,9 +4628,9 @@ var require_cp950 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/big5-added.json
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/big5-added.json
 var require_big5_added = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/big5-added.json"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/tables/big5-added.json"(exports, module) {
     module.exports = [
       ["8740", "\u43F0\u4C32\u4603\u45A6\u4578\u{27267}\u4D77\u45B3\u{27CB1}\u4CE2\u{27CC5}\u3B95\u4736\u4744\u4C47\u4C40\u{242BF}\u{23617}\u{27352}\u{26E8B}\u{270D2}\u4C57\u{2A351}\u474F\u45DA\u4C85\u{27C6C}\u4D07\u4AA4\u46A1\u{26B23}\u7225\u{25A54}\u{21A63}\u{23E06}\u{23F61}\u664D\u56FB"],
       ["8767", "\u7D95\u591D\u{28BB9}\u3DF4\u9734\u{27BEF}\u5BDB\u{21D5E}\u5AA4\u3625\u{29EB0}\u5AD1\u5BB7\u5CFC\u676E\u8593\u{29945}\u7461\u749D\u3875\u{21D53}\u{2369E}\u{26021}\u3EEC"],
@@ -4756,9 +4756,9 @@ var require_big5_added = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-data.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-data.js
 var require_dbcs_data = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-data.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/dbcs-data.js"(exports, module) {
     "use strict";
     module.exports = {
       // == Japanese/ShiftJIS ====================================================
@@ -5003,9 +5003,9 @@ var require_dbcs_data = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/index.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/index.js
 var require_encodings = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/index.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/encodings/index.js"(exports, module) {
     "use strict";
     var mergeModules = require_merge_exports();
     var modules = [
@@ -5028,9 +5028,9 @@ var require_encodings = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/streams.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/streams.js
 var require_streams = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/streams.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/streams.js"(exports, module) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     module.exports = function(streamModule) {
@@ -5125,9 +5125,9 @@ var require_streams = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/index.js
+// node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/index.js
 var require_lib = __commonJS({
-  "../../node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/index.js"(exports, module) {
+  "node_modules/.pnpm/iconv-lite@0.7.2/node_modules/iconv-lite/lib/index.js"(exports, module) {
     "use strict";
     var Buffer2 = require_safer().Buffer;
     var bomHandling = require_bom_handling();
@@ -5257,9 +5257,9 @@ var require_lib = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js
+// node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js
 var require_unpipe = __commonJS({
-  "../../node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js"(exports, module) {
+  "node_modules/.pnpm/unpipe@1.0.0/node_modules/unpipe/index.js"(exports, module) {
     "use strict";
     module.exports = unpipe;
     function hasPipeDataListeners(stream) {
@@ -5295,9 +5295,9 @@ var require_unpipe = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/raw-body@3.0.2/node_modules/raw-body/index.js
+// node_modules/.pnpm/raw-body@3.0.2/node_modules/raw-body/index.js
 var require_raw_body = __commonJS({
-  "../../node_modules/.pnpm/raw-body@3.0.2/node_modules/raw-body/index.js"(exports, module) {
+  "node_modules/.pnpm/raw-body@3.0.2/node_modules/raw-body/index.js"(exports, module) {
     "use strict";
     var asyncHooks = tryRequireAsyncHooks();
     var bytes = require_bytes();
@@ -5484,9 +5484,9 @@ var require_raw_body = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js
+// node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js
 var require_ee_first = __commonJS({
-  "../../node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js"(exports, module) {
+  "node_modules/.pnpm/ee-first@1.1.1/node_modules/ee-first/index.js"(exports, module) {
     "use strict";
     module.exports = first;
     function first(stuff, done) {
@@ -5540,9 +5540,9 @@ var require_ee_first = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js
+// node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js
 var require_on_finished = __commonJS({
-  "../../node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js"(exports, module) {
+  "node_modules/.pnpm/on-finished@2.4.1/node_modules/on-finished/index.js"(exports, module) {
     "use strict";
     module.exports = onFinished;
     module.exports.isFinished = isFinished;
@@ -5644,113 +5644,140 @@ var require_on_finished = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js
-var require_content_type = __commonJS({
-  "../../node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js"(exports) {
+// node_modules/.pnpm/content-type@2.0.0/node_modules/content-type/dist/index.js
+var require_dist = __commonJS({
+  "node_modules/.pnpm/content-type@2.0.0/node_modules/content-type/dist/index.js"(exports) {
     "use strict";
-    var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
-    var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
-    var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-    var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g;
-    var QUOTE_REGEXP = /([\\"])/g;
-    var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    Object.defineProperty(exports, "__esModule", { value: true });
     exports.format = format;
     exports.parse = parse;
+    var TEXT_REGEXP = /^[\u0009\u0020-\u007e\u0080-\u00ff]*$/;
+    var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    var QUOTE_REGEXP = /[\\"]/g;
+    var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    var NullObject = /* @__PURE__ */ (() => {
+      const C = function() {
+      };
+      C.prototype = /* @__PURE__ */ Object.create(null);
+      return C;
+    })();
     function format(obj) {
-      if (!obj || typeof obj !== "object") {
-        throw new TypeError("argument obj is required");
-      }
-      var parameters = obj.parameters;
-      var type = obj.type;
+      const { type, parameters } = obj;
       if (!type || !TYPE_REGEXP.test(type)) {
-        throw new TypeError("invalid type");
+        throw new TypeError(`Invalid type: ${type}`);
       }
-      var string = type;
-      if (parameters && typeof parameters === "object") {
-        var param;
-        var params = Object.keys(parameters).sort();
-        for (var i = 0; i < params.length; i++) {
-          param = params[i];
+      let result = type;
+      if (parameters) {
+        for (const param of Object.keys(parameters)) {
           if (!TOKEN_REGEXP.test(param)) {
-            throw new TypeError("invalid parameter name");
+            throw new TypeError(`Invalid parameter name: ${param}`);
           }
-          string += "; " + param + "=" + qstring(parameters[param]);
+          result += `; ${param}=${qstring(parameters[param])}`;
         }
       }
-      return string;
+      return result;
     }
-    function parse(string) {
-      if (!string) {
-        throw new TypeError("argument string is required");
-      }
-      var header = typeof string === "object" ? getcontenttype(string) : string;
-      if (typeof header !== "string") {
-        throw new TypeError("argument string is required to be a string");
-      }
-      var index = header.indexOf(";");
-      var type = index !== -1 ? header.slice(0, index).trim() : header.trim();
-      if (!TYPE_REGEXP.test(type)) {
-        throw new TypeError("invalid media type");
-      }
-      var obj = new ContentType(type.toLowerCase());
-      if (index !== -1) {
-        var key;
-        var match;
-        var value;
-        PARAM_REGEXP.lastIndex = index;
-        while (match = PARAM_REGEXP.exec(header)) {
-          if (match.index !== index) {
-            throw new TypeError("invalid parameter format");
-          }
-          index += match[0].length;
-          key = match[1].toLowerCase();
-          value = match[2];
-          if (value.charCodeAt(0) === 34) {
-            value = value.slice(1, -1);
-            if (value.indexOf("\\") !== -1) {
-              value = value.replace(QESC_REGEXP, "$1");
+    function parse(header, options) {
+      const len = header.length;
+      let index = skipOWS(header, 0, len);
+      const valueStart = index;
+      index = skipValue(header, index, len);
+      const valueEnd = trailingOWS(header, valueStart, index);
+      const type = header.slice(valueStart, valueEnd).toLowerCase();
+      const parameters = options?.parameters === false ? new NullObject() : parseParameters(header, index, len);
+      return { type, parameters };
+    }
+    var SP = 32;
+    var HTAB = 9;
+    var SEMI = 59;
+    var EQ = 61;
+    var DQUOTE = 34;
+    var BSLASH = 92;
+    function parseParameters(header, index, len) {
+      const parameters = new NullObject();
+      parameter: while (index < len) {
+        index = skipOWS(header, index + 1, len);
+        const keyStart = index;
+        while (index < len) {
+          const code = header.charCodeAt(index);
+          if (code === SEMI)
+            continue parameter;
+          if (code === EQ) {
+            const keyEnd = trailingOWS(header, keyStart, index);
+            const key = header.slice(keyStart, keyEnd).toLowerCase();
+            index = skipOWS(header, index + 1, len);
+            if (index < len && header.charCodeAt(index) === DQUOTE) {
+              index++;
+              let value = "";
+              while (index < len) {
+                const code2 = header.charCodeAt(index++);
+                if (code2 === DQUOTE) {
+                  index = skipValue(header, index, len);
+                  if (parameters[key] === void 0)
+                    parameters[key] = value;
+                  break;
+                }
+                if (code2 === BSLASH && index < len) {
+                  value += header[index++];
+                  continue;
+                }
+                value += String.fromCharCode(code2);
+              }
+              continue parameter;
             }
+            const valueStart = index;
+            index = skipValue(header, index, len);
+            if (parameters[key] === void 0) {
+              const valueEnd = trailingOWS(header, valueStart, index);
+              parameters[key] = header.slice(valueStart, valueEnd);
+            }
+            continue parameter;
           }
-          obj.parameters[key] = value;
-        }
-        if (index !== header.length) {
-          throw new TypeError("invalid parameter format");
+          index++;
         }
       }
-      return obj;
+      return parameters;
     }
-    function getcontenttype(obj) {
-      var header;
-      if (typeof obj.getHeader === "function") {
-        header = obj.getHeader("content-type");
-      } else if (typeof obj.headers === "object") {
-        header = obj.headers && obj.headers["content-type"];
+    function skipValue(str, index, len) {
+      while (index < len) {
+        const char = str.charCodeAt(index);
+        if (char === SEMI)
+          break;
+        index++;
       }
-      if (typeof header !== "string") {
-        throw new TypeError("content-type header is missing from object");
-      }
-      return header;
+      return index;
     }
-    function qstring(val) {
-      var str = String(val);
-      if (TOKEN_REGEXP.test(str)) {
+    function skipOWS(header, index, len) {
+      while (index < len) {
+        const char = header.charCodeAt(index);
+        if (char !== SP && char !== HTAB)
+          break;
+        index++;
+      }
+      return index;
+    }
+    function trailingOWS(header, start, end) {
+      while (end > start) {
+        const char = header.charCodeAt(end - 1);
+        if (char !== SP && char !== HTAB)
+          break;
+        end--;
+      }
+      return end;
+    }
+    function qstring(str) {
+      if (TOKEN_REGEXP.test(str))
         return str;
-      }
-      if (str.length > 0 && !TEXT_REGEXP.test(str)) {
-        throw new TypeError("invalid parameter value");
-      }
-      return '"' + str.replace(QUOTE_REGEXP, "\\$1") + '"';
-    }
-    function ContentType(type) {
-      this.parameters = /* @__PURE__ */ Object.create(null);
-      this.type = type;
+      if (TEXT_REGEXP.test(str))
+        return `"${str.replace(QUOTE_REGEXP, "\\$&")}"`;
+      throw new TypeError(`Invalid parameter value: ${str}`);
     }
   }
 });
 
-// ../../node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/db.json
+// node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/db.json
 var require_db = __commonJS({
-  "../../node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/db.json"(exports, module) {
+  "node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/db.json"(exports, module) {
     module.exports = {
       "application/1d-interleaved-parityfec": {
         source: "iana"
@@ -15096,16 +15123,16 @@ var require_db = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/index.js
+// node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/index.js
 var require_mime_db = __commonJS({
-  "../../node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/index.js"(exports, module) {
+  "node_modules/.pnpm/mime-db@1.54.0/node_modules/mime-db/index.js"(exports, module) {
     module.exports = require_db();
   }
 });
 
-// ../../node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/mimeScore.js
+// node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/mimeScore.js
 var require_mimeScore = __commonJS({
-  "../../node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/mimeScore.js"(exports, module) {
+  "node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/mimeScore.js"(exports, module) {
     var FACET_SCORES = {
       "prs.": 100,
       "x-": 200,
@@ -15147,9 +15174,9 @@ var require_mimeScore = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/index.js
+// node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/index.js
 var require_mime_types = __commonJS({
-  "../../node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/index.js"(exports) {
+  "node_modules/.pnpm/mime-types@3.0.2/node_modules/mime-types/index.js"(exports) {
     "use strict";
     var db = require_mime_db();
     var extname = __require("path").extname;
@@ -15253,9 +15280,9 @@ var require_mime_types = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/media-typer@1.1.0/node_modules/media-typer/index.js
+// node_modules/.pnpm/media-typer@1.1.0/node_modules/media-typer/index.js
 var require_media_typer = __commonJS({
-  "../../node_modules/.pnpm/media-typer@1.1.0/node_modules/media-typer/index.js"(exports) {
+  "node_modules/.pnpm/media-typer@1.1.0/node_modules/media-typer/index.js"(exports) {
     "use strict";
     var SUBTYPE_NAME_REGEXP = /^[A-Za-z0-9][A-Za-z0-9!#$&^_.-]{0,126}$/;
     var TYPE_NAME_REGEXP = /^[A-Za-z0-9][A-Za-z0-9!#$&^_-]{0,126}$/;
@@ -15323,11 +15350,11 @@ var require_media_typer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/type-is@2.0.1/node_modules/type-is/index.js
+// node_modules/.pnpm/type-is@2.1.0/node_modules/type-is/index.js
 var require_type_is = __commonJS({
-  "../../node_modules/.pnpm/type-is@2.0.1/node_modules/type-is/index.js"(exports, module) {
+  "node_modules/.pnpm/type-is@2.1.0/node_modules/type-is/index.js"(exports, module) {
     "use strict";
-    var contentType = require_content_type();
+    var contentType = require_dist();
     var mime = require_mime_types();
     var typer = require_media_typer();
     module.exports = typeofrequest;
@@ -15336,9 +15363,12 @@ var require_type_is = __commonJS({
     module.exports.normalize = normalize;
     module.exports.match = mimeMatch;
     function typeis(value, types_) {
+      if (value && typeof value === "object") {
+        value = value.headers["content-type"];
+      }
       var i;
       var types = types_;
-      var val = tryNormalizeType(value);
+      var val = normalizeType(value);
       if (!val) {
         return false;
       }
@@ -15404,22 +15434,120 @@ var require_type_is = __commonJS({
       return true;
     }
     function normalizeType(value) {
-      var type = contentType.parse(value).type;
+      if (!value) return null;
+      var type = contentType.parse(value, { parameters: false }).type;
       return typer.test(type) ? type : null;
-    }
-    function tryNormalizeType(value) {
-      try {
-        return value ? normalizeType(value) : null;
-      } catch (err) {
-        return null;
-      }
     }
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/utils.js
+// node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js
+var require_content_type = __commonJS({
+  "node_modules/.pnpm/content-type@1.0.5/node_modules/content-type/index.js"(exports) {
+    "use strict";
+    var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
+    var TEXT_REGEXP = /^[\u000b\u0020-\u007e\u0080-\u00ff]+$/;
+    var TOKEN_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g;
+    var QUOTE_REGEXP = /([\\"])/g;
+    var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+    exports.format = format;
+    exports.parse = parse;
+    function format(obj) {
+      if (!obj || typeof obj !== "object") {
+        throw new TypeError("argument obj is required");
+      }
+      var parameters = obj.parameters;
+      var type = obj.type;
+      if (!type || !TYPE_REGEXP.test(type)) {
+        throw new TypeError("invalid type");
+      }
+      var string = type;
+      if (parameters && typeof parameters === "object") {
+        var param;
+        var params = Object.keys(parameters).sort();
+        for (var i = 0; i < params.length; i++) {
+          param = params[i];
+          if (!TOKEN_REGEXP.test(param)) {
+            throw new TypeError("invalid parameter name");
+          }
+          string += "; " + param + "=" + qstring(parameters[param]);
+        }
+      }
+      return string;
+    }
+    function parse(string) {
+      if (!string) {
+        throw new TypeError("argument string is required");
+      }
+      var header = typeof string === "object" ? getcontenttype(string) : string;
+      if (typeof header !== "string") {
+        throw new TypeError("argument string is required to be a string");
+      }
+      var index = header.indexOf(";");
+      var type = index !== -1 ? header.slice(0, index).trim() : header.trim();
+      if (!TYPE_REGEXP.test(type)) {
+        throw new TypeError("invalid media type");
+      }
+      var obj = new ContentType(type.toLowerCase());
+      if (index !== -1) {
+        var key;
+        var match;
+        var value;
+        PARAM_REGEXP.lastIndex = index;
+        while (match = PARAM_REGEXP.exec(header)) {
+          if (match.index !== index) {
+            throw new TypeError("invalid parameter format");
+          }
+          index += match[0].length;
+          key = match[1].toLowerCase();
+          value = match[2];
+          if (value.charCodeAt(0) === 34) {
+            value = value.slice(1, -1);
+            if (value.indexOf("\\") !== -1) {
+              value = value.replace(QESC_REGEXP, "$1");
+            }
+          }
+          obj.parameters[key] = value;
+        }
+        if (index !== header.length) {
+          throw new TypeError("invalid parameter format");
+        }
+      }
+      return obj;
+    }
+    function getcontenttype(obj) {
+      var header;
+      if (typeof obj.getHeader === "function") {
+        header = obj.getHeader("content-type");
+      } else if (typeof obj.headers === "object") {
+        header = obj.headers && obj.headers["content-type"];
+      }
+      if (typeof header !== "string") {
+        throw new TypeError("content-type header is missing from object");
+      }
+      return header;
+    }
+    function qstring(val) {
+      var str = String(val);
+      if (TOKEN_REGEXP.test(str)) {
+        return str;
+      }
+      if (str.length > 0 && !TEXT_REGEXP.test(str)) {
+        throw new TypeError("invalid parameter value");
+      }
+      return '"' + str.replace(QUOTE_REGEXP, "\\$1") + '"';
+    }
+    function ContentType(type) {
+      this.parameters = /* @__PURE__ */ Object.create(null);
+      this.type = type;
+    }
+  }
+});
+
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/utils.js
 var require_utils = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/utils.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/utils.js"(exports, module) {
     "use strict";
     var bytes = require_bytes();
     var contentType = require_content_type();
@@ -15468,9 +15596,9 @@ var require_utils = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/read.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/read.js
 var require_read = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/read.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/read.js"(exports, module) {
     "use strict";
     var createError = require_http_errors();
     var getBody = require_raw_body();
@@ -15626,9 +15754,9 @@ var require_read = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/json.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/json.js
 var require_json = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/json.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/json.js"(exports, module) {
     "use strict";
     var debug = require_src()("body-parser:json");
     var read = require_read();
@@ -15708,9 +15836,9 @@ var require_json = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/raw.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/raw.js
 var require_raw = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/raw.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/raw.js"(exports, module) {
     "use strict";
     var debug = require_src()("body-parser:raw");
     var read = require_read();
@@ -15730,9 +15858,9 @@ var require_raw = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/text.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/text.js
 var require_text = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/text.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/text.js"(exports, module) {
     "use strict";
     var debug = require_src()("body-parser:text");
     var read = require_read();
@@ -15747,24 +15875,24 @@ var require_text = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/type.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/type.js
 var require_type = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/type.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/type.js"(exports, module) {
     "use strict";
     module.exports = TypeError;
   }
 });
 
-// ../../node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/util.inspect.js
+// node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/util.inspect.js
 var require_util_inspect = __commonJS({
-  "../../node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/util.inspect.js"(exports, module) {
+  "node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/util.inspect.js"(exports, module) {
     module.exports = __require("util").inspect;
   }
 });
 
-// ../../node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/index.js
+// node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/index.js
 var require_object_inspect = __commonJS({
-  "../../node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/index.js"(exports, module) {
+  "node_modules/.pnpm/object-inspect@1.13.4/node_modules/object-inspect/index.js"(exports, module) {
     var hasMap = typeof Map === "function" && Map.prototype;
     var mapSizeDescriptor = Object.getOwnPropertyDescriptor && hasMap ? Object.getOwnPropertyDescriptor(Map.prototype, "size") : null;
     var mapSize = hasMap && mapSizeDescriptor && typeof mapSizeDescriptor.get === "function" ? mapSizeDescriptor.get : null;
@@ -16293,9 +16421,9 @@ var require_object_inspect = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/side-channel-list@1.0.0/node_modules/side-channel-list/index.js
+// node_modules/.pnpm/side-channel-list@1.0.1/node_modules/side-channel-list/index.js
 var require_side_channel_list = __commonJS({
-  "../../node_modules/.pnpm/side-channel-list@1.0.0/node_modules/side-channel-list/index.js"(exports, module) {
+  "node_modules/.pnpm/side-channel-list@1.0.1/node_modules/side-channel-list/index.js"(exports, module) {
     "use strict";
     var inspect = require_object_inspect();
     var $TypeError = require_type();
@@ -16355,9 +16483,8 @@ var require_side_channel_list = __commonJS({
           }
         },
         "delete": function(key) {
-          var root = $o && $o.next;
           var deletedNode = listDelete($o, key);
-          if (deletedNode && root && root === deletedNode) {
+          if (deletedNode && $o && !$o.next) {
             $o = void 0;
           }
           return !!deletedNode;
@@ -16387,113 +16514,113 @@ var require_side_channel_list = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/es-object-atoms@1.1.1/node_modules/es-object-atoms/index.js
+// node_modules/.pnpm/es-object-atoms@1.1.2/node_modules/es-object-atoms/index.js
 var require_es_object_atoms = __commonJS({
-  "../../node_modules/.pnpm/es-object-atoms@1.1.1/node_modules/es-object-atoms/index.js"(exports, module) {
+  "node_modules/.pnpm/es-object-atoms@1.1.2/node_modules/es-object-atoms/index.js"(exports, module) {
     "use strict";
     module.exports = Object;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/index.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/index.js
 var require_es_errors = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/index.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/index.js"(exports, module) {
     "use strict";
     module.exports = Error;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/eval.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/eval.js
 var require_eval = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/eval.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/eval.js"(exports, module) {
     "use strict";
     module.exports = EvalError;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/range.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/range.js
 var require_range = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/range.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/range.js"(exports, module) {
     "use strict";
     module.exports = RangeError;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/ref.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/ref.js
 var require_ref = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/ref.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/ref.js"(exports, module) {
     "use strict";
     module.exports = ReferenceError;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/syntax.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/syntax.js
 var require_syntax = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/syntax.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/syntax.js"(exports, module) {
     "use strict";
     module.exports = SyntaxError;
   }
 });
 
-// ../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/uri.js
+// node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/uri.js
 var require_uri = __commonJS({
-  "../../node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/uri.js"(exports, module) {
+  "node_modules/.pnpm/es-errors@1.3.0/node_modules/es-errors/uri.js"(exports, module) {
     "use strict";
     module.exports = URIError;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/abs.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/abs.js
 var require_abs = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/abs.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/abs.js"(exports, module) {
     "use strict";
     module.exports = Math.abs;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/floor.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/floor.js
 var require_floor = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/floor.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/floor.js"(exports, module) {
     "use strict";
     module.exports = Math.floor;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/max.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/max.js
 var require_max = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/max.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/max.js"(exports, module) {
     "use strict";
     module.exports = Math.max;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/min.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/min.js
 var require_min = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/min.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/min.js"(exports, module) {
     "use strict";
     module.exports = Math.min;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/pow.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/pow.js
 var require_pow = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/pow.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/pow.js"(exports, module) {
     "use strict";
     module.exports = Math.pow;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/round.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/round.js
 var require_round = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/round.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/round.js"(exports, module) {
     "use strict";
     module.exports = Math.round;
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/isNaN.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/isNaN.js
 var require_isNaN = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/isNaN.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/isNaN.js"(exports, module) {
     "use strict";
     module.exports = Number.isNaN || function isNaN2(a) {
       return a !== a;
@@ -16501,9 +16628,9 @@ var require_isNaN = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/sign.js
+// node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/sign.js
 var require_sign = __commonJS({
-  "../../node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/sign.js"(exports, module) {
+  "node_modules/.pnpm/math-intrinsics@1.1.0/node_modules/math-intrinsics/sign.js"(exports, module) {
     "use strict";
     var $isNaN = require_isNaN();
     module.exports = function sign(number) {
@@ -16515,17 +16642,17 @@ var require_sign = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/gOPD.js
+// node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/gOPD.js
 var require_gOPD = __commonJS({
-  "../../node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/gOPD.js"(exports, module) {
+  "node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/gOPD.js"(exports, module) {
     "use strict";
     module.exports = Object.getOwnPropertyDescriptor;
   }
 });
 
-// ../../node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/index.js
+// node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/index.js
 var require_gopd = __commonJS({
-  "../../node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/index.js"(exports, module) {
+  "node_modules/.pnpm/gopd@1.2.0/node_modules/gopd/index.js"(exports, module) {
     "use strict";
     var $gOPD = require_gOPD();
     if ($gOPD) {
@@ -16539,9 +16666,9 @@ var require_gopd = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/es-define-property@1.0.1/node_modules/es-define-property/index.js
+// node_modules/.pnpm/es-define-property@1.0.1/node_modules/es-define-property/index.js
 var require_es_define_property = __commonJS({
-  "../../node_modules/.pnpm/es-define-property@1.0.1/node_modules/es-define-property/index.js"(exports, module) {
+  "node_modules/.pnpm/es-define-property@1.0.1/node_modules/es-define-property/index.js"(exports, module) {
     "use strict";
     var $defineProperty = Object.defineProperty || false;
     if ($defineProperty) {
@@ -16555,9 +16682,9 @@ var require_es_define_property = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/shams.js
+// node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/shams.js
 var require_shams = __commonJS({
-  "../../node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/shams.js"(exports, module) {
+  "node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/shams.js"(exports, module) {
     "use strict";
     module.exports = function hasSymbols() {
       if (typeof Symbol !== "function" || typeof Object.getOwnPropertySymbols !== "function") {
@@ -16610,9 +16737,9 @@ var require_shams = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/index.js
+// node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/index.js
 var require_has_symbols = __commonJS({
-  "../../node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/index.js"(exports, module) {
+  "node_modules/.pnpm/has-symbols@1.1.0/node_modules/has-symbols/index.js"(exports, module) {
     "use strict";
     var origSymbol = typeof Symbol !== "undefined" && Symbol;
     var hasSymbolSham = require_shams();
@@ -16634,26 +16761,26 @@ var require_has_symbols = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Reflect.getPrototypeOf.js
+// node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Reflect.getPrototypeOf.js
 var require_Reflect_getPrototypeOf = __commonJS({
-  "../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Reflect.getPrototypeOf.js"(exports, module) {
+  "node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Reflect.getPrototypeOf.js"(exports, module) {
     "use strict";
     module.exports = typeof Reflect !== "undefined" && Reflect.getPrototypeOf || null;
   }
 });
 
-// ../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Object.getPrototypeOf.js
+// node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Object.getPrototypeOf.js
 var require_Object_getPrototypeOf = __commonJS({
-  "../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Object.getPrototypeOf.js"(exports, module) {
+  "node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/Object.getPrototypeOf.js"(exports, module) {
     "use strict";
     var $Object = require_es_object_atoms();
     module.exports = $Object.getPrototypeOf || null;
   }
 });
 
-// ../../node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/implementation.js
+// node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/implementation.js
 var require_implementation = __commonJS({
-  "../../node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/implementation.js"(exports, module) {
+  "node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/implementation.js"(exports, module) {
     "use strict";
     var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
     var toStr = Object.prototype.toString;
@@ -16727,42 +16854,42 @@ var require_implementation = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/index.js
+// node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/index.js
 var require_function_bind = __commonJS({
-  "../../node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/index.js"(exports, module) {
+  "node_modules/.pnpm/function-bind@1.1.2/node_modules/function-bind/index.js"(exports, module) {
     "use strict";
     var implementation = require_implementation();
     module.exports = Function.prototype.bind || implementation;
   }
 });
 
-// ../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionCall.js
+// node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionCall.js
 var require_functionCall = __commonJS({
-  "../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionCall.js"(exports, module) {
+  "node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionCall.js"(exports, module) {
     "use strict";
     module.exports = Function.prototype.call;
   }
 });
 
-// ../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionApply.js
+// node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionApply.js
 var require_functionApply = __commonJS({
-  "../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionApply.js"(exports, module) {
+  "node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/functionApply.js"(exports, module) {
     "use strict";
     module.exports = Function.prototype.apply;
   }
 });
 
-// ../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/reflectApply.js
+// node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/reflectApply.js
 var require_reflectApply = __commonJS({
-  "../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/reflectApply.js"(exports, module) {
+  "node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/reflectApply.js"(exports, module) {
     "use strict";
     module.exports = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
   }
 });
 
-// ../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/actualApply.js
+// node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/actualApply.js
 var require_actualApply = __commonJS({
-  "../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/actualApply.js"(exports, module) {
+  "node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/actualApply.js"(exports, module) {
     "use strict";
     var bind = require_function_bind();
     var $apply = require_functionApply();
@@ -16772,9 +16899,9 @@ var require_actualApply = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/index.js
+// node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/index.js
 var require_call_bind_apply_helpers = __commonJS({
-  "../../node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/index.js"(exports, module) {
+  "node_modules/.pnpm/call-bind-apply-helpers@1.0.2/node_modules/call-bind-apply-helpers/index.js"(exports, module) {
     "use strict";
     var bind = require_function_bind();
     var $TypeError = require_type();
@@ -16789,9 +16916,9 @@ var require_call_bind_apply_helpers = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/dunder-proto@1.0.1/node_modules/dunder-proto/get.js
+// node_modules/.pnpm/dunder-proto@1.0.1/node_modules/dunder-proto/get.js
 var require_get = __commonJS({
-  "../../node_modules/.pnpm/dunder-proto@1.0.1/node_modules/dunder-proto/get.js"(exports, module) {
+  "node_modules/.pnpm/dunder-proto@1.0.1/node_modules/dunder-proto/get.js"(exports, module) {
     "use strict";
     var callBind = require_call_bind_apply_helpers();
     var gOPD = require_gopd();
@@ -16820,9 +16947,9 @@ var require_get = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/index.js
+// node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/index.js
 var require_get_proto = __commonJS({
-  "../../node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/index.js"(exports, module) {
+  "node_modules/.pnpm/get-proto@1.0.1/node_modules/get-proto/index.js"(exports, module) {
     "use strict";
     var reflectGetProto = require_Reflect_getPrototypeOf();
     var originalGetProto = require_Object_getPrototypeOf();
@@ -16840,9 +16967,9 @@ var require_get_proto = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/hasown@2.0.2/node_modules/hasown/index.js
+// node_modules/.pnpm/hasown@2.0.3/node_modules/hasown/index.js
 var require_hasown = __commonJS({
-  "../../node_modules/.pnpm/hasown@2.0.2/node_modules/hasown/index.js"(exports, module) {
+  "node_modules/.pnpm/hasown@2.0.3/node_modules/hasown/index.js"(exports, module) {
     "use strict";
     var call = Function.prototype.call;
     var $hasOwn = Object.prototype.hasOwnProperty;
@@ -16851,9 +16978,9 @@ var require_hasown = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/get-intrinsic@1.3.0/node_modules/get-intrinsic/index.js
+// node_modules/.pnpm/get-intrinsic@1.3.0/node_modules/get-intrinsic/index.js
 var require_get_intrinsic = __commonJS({
-  "../../node_modules/.pnpm/get-intrinsic@1.3.0/node_modules/get-intrinsic/index.js"(exports, module) {
+  "node_modules/.pnpm/get-intrinsic@1.3.0/node_modules/get-intrinsic/index.js"(exports, module) {
     "use strict";
     var undefined2;
     var $Object = require_es_object_atoms();
@@ -17182,9 +17309,9 @@ var require_get_intrinsic = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/call-bound@1.0.4/node_modules/call-bound/index.js
+// node_modules/.pnpm/call-bound@1.0.4/node_modules/call-bound/index.js
 var require_call_bound = __commonJS({
-  "../../node_modules/.pnpm/call-bound@1.0.4/node_modules/call-bound/index.js"(exports, module) {
+  "node_modules/.pnpm/call-bound@1.0.4/node_modules/call-bound/index.js"(exports, module) {
     "use strict";
     var GetIntrinsic = require_get_intrinsic();
     var callBindBasic = require_call_bind_apply_helpers();
@@ -17205,9 +17332,9 @@ var require_call_bound = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/side-channel-map@1.0.1/node_modules/side-channel-map/index.js
+// node_modules/.pnpm/side-channel-map@1.0.1/node_modules/side-channel-map/index.js
 var require_side_channel_map = __commonJS({
-  "../../node_modules/.pnpm/side-channel-map@1.0.1/node_modules/side-channel-map/index.js"(exports, module) {
+  "node_modules/.pnpm/side-channel-map@1.0.1/node_modules/side-channel-map/index.js"(exports, module) {
     "use strict";
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
@@ -17261,9 +17388,9 @@ var require_side_channel_map = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/side-channel-weakmap@1.0.2/node_modules/side-channel-weakmap/index.js
+// node_modules/.pnpm/side-channel-weakmap@1.0.2/node_modules/side-channel-weakmap/index.js
 var require_side_channel_weakmap = __commonJS({
-  "../../node_modules/.pnpm/side-channel-weakmap@1.0.2/node_modules/side-channel-weakmap/index.js"(exports, module) {
+  "node_modules/.pnpm/side-channel-weakmap@1.0.2/node_modules/side-channel-weakmap/index.js"(exports, module) {
     "use strict";
     var GetIntrinsic = require_get_intrinsic();
     var callBound = require_call_bound();
@@ -17334,9 +17461,9 @@ var require_side_channel_weakmap = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js
+// node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js
 var require_side_channel = __commonJS({
-  "../../node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js"(exports, module) {
+  "node_modules/.pnpm/side-channel@1.1.0/node_modules/side-channel/index.js"(exports, module) {
     "use strict";
     var $TypeError = require_type();
     var inspect = require_object_inspect();
@@ -17373,9 +17500,9 @@ var require_side_channel = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/formats.js
+// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js
 var require_formats = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/formats.js"(exports, module) {
+  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/formats.js"(exports, module) {
     "use strict";
     var replace = String.prototype.replace;
     var percentTwenties = /%20/g;
@@ -17399,9 +17526,9 @@ var require_formats = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/utils.js
+// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js
 var require_utils2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/utils.js"(exports, module) {
+  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/utils.js"(exports, module) {
     "use strict";
     var formats = require_formats();
     var getSideChannel = require_side_channel();
@@ -17663,9 +17790,9 @@ var require_utils2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/stringify.js
+// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js
 var require_stringify = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/stringify.js"(exports, module) {
+  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/stringify.js"(exports, module) {
     "use strict";
     var getSideChannel = require_side_channel();
     var utils = require_utils2();
@@ -17751,7 +17878,7 @@ var require_stringify = __commonJS({
       }
       if (obj === null) {
         if (strictNullHandling) {
-          return encoder && !encodeValuesOnly ? encoder(prefix, defaults.encoder, charset, "key", format) : prefix;
+          return formatter(encoder && !encodeValuesOnly ? encoder(prefix, defaults.encoder, charset, "key", format) : prefix);
         }
         obj = "";
       }
@@ -17769,7 +17896,9 @@ var require_stringify = __commonJS({
       var objKeys;
       if (generateArrayPrefix === "comma" && isArray(obj)) {
         if (encodeValuesOnly && encoder) {
-          obj = utils.maybeMap(obj, encoder);
+          obj = utils.maybeMap(obj, function(v) {
+            return v == null ? v : encoder(v);
+          });
         }
         objKeys = [{ value: obj.length > 0 ? obj.join(",") || null : void 0 }];
       } else if (isArray(filter)) {
@@ -17907,6 +18036,9 @@ var require_stringify = __commonJS({
       var sideChannel = getSideChannel();
       for (var i = 0; i < objKeys.length; ++i) {
         var key = objKeys[i];
+        if (typeof key === "undefined" || key === null) {
+          continue;
+        }
         var value = obj[key];
         if (options.skipNulls && value === null) {
           continue;
@@ -17936,9 +18068,9 @@ var require_stringify = __commonJS({
       var prefix = options.addQueryPrefix === true ? "?" : "";
       if (options.charsetSentinel) {
         if (options.charset === "iso-8859-1") {
-          prefix += "utf8=%26%2310003%3B&";
+          prefix += "utf8=%26%2310003%3B" + options.delimiter;
         } else {
-          prefix += "utf8=%E2%9C%93&";
+          prefix += "utf8=%E2%9C%93" + options.delimiter;
         }
       }
       return joined.length > 0 ? prefix + joined : "";
@@ -17946,9 +18078,9 @@ var require_stringify = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/parse.js
+// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js
 var require_parse = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/parse.js"(exports, module) {
+  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/parse.js"(exports, module) {
     "use strict";
     var utils = require_utils2();
     var has = Object.prototype.hasOwnProperty;
@@ -18000,9 +18132,9 @@ var require_parse = __commonJS({
       var limit = options.parameterLimit === Infinity ? void 0 : options.parameterLimit;
       var parts = cleanStr.split(
         options.delimiter,
-        options.throwOnLimitExceeded ? limit + 1 : limit
+        options.throwOnLimitExceeded && typeof limit !== "undefined" ? limit + 1 : limit
       );
-      if (options.throwOnLimitExceeded && parts.length > limit) {
+      if (options.throwOnLimitExceeded && typeof limit !== "undefined" && parts.length > limit) {
         throw new RangeError("Parameter limit exceeded. Only " + limit + " parameter" + (limit === 1 ? "" : "s") + " allowed.");
       }
       var skipIndex = -1;
@@ -18121,8 +18253,8 @@ var require_parse = __commonJS({
       }
       return leaf;
     };
-    var splitKeyIntoSegments = function splitKeyIntoSegments2(givenKey, options) {
-      var key = options.allowDots ? givenKey.replace(/\.([^.[]+)/g, "[$1]") : givenKey;
+    var splitKeyIntoSegments = function splitKeyIntoSegments2(originalKey, options) {
+      var key = options.allowDots ? originalKey.replace(/\.([^.[]+)/g, "[$1]") : originalKey;
       if (options.depth <= 0) {
         if (!options.plainObjects && has.call(Object.prototype, key)) {
           if (!options.allowPrototypes) {
@@ -18131,37 +18263,56 @@ var require_parse = __commonJS({
         }
         return [key];
       }
-      var brackets = /(\[[^[\]]*])/;
-      var child = /(\[[^[\]]*])/g;
-      var segment = brackets.exec(key);
-      var parent = segment ? key.slice(0, segment.index) : key;
-      var keys = [];
+      var segments = [];
+      var first = key.indexOf("[");
+      var parent = first >= 0 ? key.slice(0, first) : key;
       if (parent) {
         if (!options.plainObjects && has.call(Object.prototype, parent)) {
           if (!options.allowPrototypes) {
             return;
           }
         }
-        keys[keys.length] = parent;
+        segments[segments.length] = parent;
       }
-      var i = 0;
-      while ((segment = child.exec(key)) !== null && i < options.depth) {
-        i += 1;
-        var segmentContent = segment[1].slice(1, -1);
-        if (!options.plainObjects && has.call(Object.prototype, segmentContent)) {
-          if (!options.allowPrototypes) {
-            return;
+      var n = key.length;
+      var open = first;
+      var collected = 0;
+      while (open >= 0 && collected < options.depth) {
+        var level = 1;
+        var i = open + 1;
+        var close = -1;
+        while (i < n && close < 0) {
+          var cu = key.charCodeAt(i);
+          if (cu === 91) {
+            level += 1;
+          } else if (cu === 93) {
+            level -= 1;
+            if (level === 0) {
+              close = i;
+            }
           }
+          i += 1;
         }
-        keys[keys.length] = segment[1];
+        if (close < 0) {
+          segments[segments.length] = "[" + key.slice(open) + "]";
+          return segments;
+        }
+        var seg = key.slice(open, close + 1);
+        var content = seg.slice(1, -1);
+        if (!options.plainObjects && has.call(Object.prototype, content) && !options.allowPrototypes) {
+          return;
+        }
+        segments[segments.length] = seg;
+        collected += 1;
+        open = key.indexOf("[", close + 1);
       }
-      if (segment) {
+      if (open >= 0) {
         if (options.strictDepth === true) {
           throw new RangeError("Input depth exceeded depth option of " + options.depth + " and strictDepth is true");
         }
-        keys[keys.length] = "[" + key.slice(segment.index) + "]";
+        segments[segments.length] = "[" + key.slice(open) + "]";
       }
-      return keys;
+      return segments;
     };
     var parseKeys = function parseQueryStringKeys(givenKey, val, options, valuesParsed) {
       if (!givenKey) {
@@ -18245,9 +18396,9 @@ var require_parse = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/index.js
+// node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js
 var require_lib2 = __commonJS({
-  "../../node_modules/.pnpm/qs@6.15.0/node_modules/qs/lib/index.js"(exports, module) {
+  "node_modules/.pnpm/qs@6.15.2/node_modules/qs/lib/index.js"(exports, module) {
     "use strict";
     var stringify = require_stringify();
     var parse = require_parse();
@@ -18260,9 +18411,9 @@ var require_lib2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/urlencoded.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/urlencoded.js
 var require_urlencoded = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/urlencoded.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/lib/types/urlencoded.js"(exports, module) {
     "use strict";
     var createError = require_http_errors();
     var debug = require_src()("body-parser:urlencoded");
@@ -18348,9 +18499,9 @@ var require_urlencoded = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/index.js
+// node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/index.js
 var require_body_parser = __commonJS({
-  "../../node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/index.js"(exports, module) {
+  "node_modules/.pnpm/body-parser@2.2.2/node_modules/body-parser/index.js"(exports, module) {
     "use strict";
     exports = module.exports = bodyParser;
     Object.defineProperty(exports, "json", {
@@ -18379,9 +18530,9 @@ var require_body_parser = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/merge-descriptors@2.0.0/node_modules/merge-descriptors/index.js
+// node_modules/.pnpm/merge-descriptors@2.0.0/node_modules/merge-descriptors/index.js
 var require_merge_descriptors = __commonJS({
-  "../../node_modules/.pnpm/merge-descriptors@2.0.0/node_modules/merge-descriptors/index.js"(exports, module) {
+  "node_modules/.pnpm/merge-descriptors@2.0.0/node_modules/merge-descriptors/index.js"(exports, module) {
     "use strict";
     function mergeDescriptors(destination, source, overwrite = true) {
       if (!destination) {
@@ -18403,9 +18554,9 @@ var require_merge_descriptors = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/encodeurl@2.0.0/node_modules/encodeurl/index.js
+// node_modules/.pnpm/encodeurl@2.0.0/node_modules/encodeurl/index.js
 var require_encodeurl = __commonJS({
-  "../../node_modules/.pnpm/encodeurl@2.0.0/node_modules/encodeurl/index.js"(exports, module) {
+  "node_modules/.pnpm/encodeurl@2.0.0/node_modules/encodeurl/index.js"(exports, module) {
     "use strict";
     module.exports = encodeUrl;
     var ENCODE_CHARS_REGEXP = /(?:[^\x21\x23-\x3B\x3D\x3F-\x5F\x61-\x7A\x7C\x7E]|%(?:[^0-9A-Fa-f]|[0-9A-Fa-f][^0-9A-Fa-f]|$))+/g;
@@ -18417,9 +18568,9 @@ var require_encodeurl = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js
+// node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js
 var require_escape_html = __commonJS({
-  "../../node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js"(exports, module) {
+  "node_modules/.pnpm/escape-html@1.0.3/node_modules/escape-html/index.js"(exports, module) {
     "use strict";
     var matchHtmlRegExp = /["'&<>]/;
     module.exports = escapeHtml;
@@ -18464,9 +18615,9 @@ var require_escape_html = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js
+// node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js
 var require_parseurl = __commonJS({
-  "../../node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js"(exports, module) {
+  "node_modules/.pnpm/parseurl@1.3.3/node_modules/parseurl/index.js"(exports, module) {
     "use strict";
     var url = __require("url");
     var parse = url.parse;
@@ -18548,9 +18699,9 @@ var require_parseurl = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/finalhandler@2.1.1/node_modules/finalhandler/index.js
+// node_modules/.pnpm/finalhandler@2.1.1/node_modules/finalhandler/index.js
 var require_finalhandler = __commonJS({
-  "../../node_modules/.pnpm/finalhandler@2.1.1/node_modules/finalhandler/index.js"(exports, module) {
+  "node_modules/.pnpm/finalhandler@2.1.1/node_modules/finalhandler/index.js"(exports, module) {
     "use strict";
     var debug = require_src()("finalhandler");
     var encodeUrl = require_encodeurl();
@@ -18675,9 +18826,9 @@ var require_finalhandler = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js
 var require_view = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/view.js"(exports, module) {
     "use strict";
     var debug = require_src()("express:view");
     var path4 = __require("node:path");
@@ -18769,9 +18920,9 @@ var require_view = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js
+// node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js
 var require_etag = __commonJS({
-  "../../node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js"(exports, module) {
+  "node_modules/.pnpm/etag@1.8.1/node_modules/etag/index.js"(exports, module) {
     "use strict";
     module.exports = etag;
     var crypto2 = __require("crypto");
@@ -18811,9 +18962,9 @@ var require_etag = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/forwarded@0.2.0/node_modules/forwarded/index.js
+// node_modules/.pnpm/forwarded@0.2.0/node_modules/forwarded/index.js
 var require_forwarded = __commonJS({
-  "../../node_modules/.pnpm/forwarded@0.2.0/node_modules/forwarded/index.js"(exports, module) {
+  "node_modules/.pnpm/forwarded@0.2.0/node_modules/forwarded/index.js"(exports, module) {
     "use strict";
     module.exports = forwarded;
     function forwarded(req) {
@@ -18858,9 +19009,9 @@ var require_forwarded = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/ipaddr.js@1.9.1/node_modules/ipaddr.js/lib/ipaddr.js
+// node_modules/.pnpm/ipaddr.js@1.9.1/node_modules/ipaddr.js/lib/ipaddr.js
 var require_ipaddr = __commonJS({
-  "../../node_modules/.pnpm/ipaddr.js@1.9.1/node_modules/ipaddr.js/lib/ipaddr.js"(exports, module) {
+  "node_modules/.pnpm/ipaddr.js@1.9.1/node_modules/ipaddr.js/lib/ipaddr.js"(exports, module) {
     (function() {
       var expandIPv6, ipaddr, ipv4Part, ipv4Regexes, ipv6Part, ipv6Regexes, matchCIDR, root, zoneIndex;
       ipaddr = {};
@@ -19480,9 +19631,9 @@ var require_ipaddr = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js
+// node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js
 var require_proxy_addr = __commonJS({
-  "../../node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js"(exports, module) {
+  "node_modules/.pnpm/proxy-addr@2.0.7/node_modules/proxy-addr/index.js"(exports, module) {
     "use strict";
     module.exports = proxyaddr;
     module.exports.all = alladdrs;
@@ -19639,9 +19790,9 @@ var require_proxy_addr = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js
 var require_utils3 = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js"(exports) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/utils.js"(exports) {
     "use strict";
     var { METHODS } = __require("node:http");
     var contentType = require_content_type();
@@ -19766,9 +19917,9 @@ var require_utils3 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/wrappy@1.0.2/node_modules/wrappy/wrappy.js
+// node_modules/.pnpm/wrappy@1.0.2/node_modules/wrappy/wrappy.js
 var require_wrappy = __commonJS({
-  "../../node_modules/.pnpm/wrappy@1.0.2/node_modules/wrappy/wrappy.js"(exports, module) {
+  "node_modules/.pnpm/wrappy@1.0.2/node_modules/wrappy/wrappy.js"(exports, module) {
     module.exports = wrappy;
     function wrappy(fn, cb) {
       if (fn && cb) return wrappy(fn)(cb);
@@ -19796,9 +19947,9 @@ var require_wrappy = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/once@1.4.0/node_modules/once/once.js
+// node_modules/.pnpm/once@1.4.0/node_modules/once/once.js
 var require_once = __commonJS({
-  "../../node_modules/.pnpm/once@1.4.0/node_modules/once/once.js"(exports, module) {
+  "node_modules/.pnpm/once@1.4.0/node_modules/once/once.js"(exports, module) {
     var wrappy = require_wrappy();
     module.exports = wrappy(once);
     module.exports.strict = wrappy(onceStrict);
@@ -19840,9 +19991,9 @@ var require_once = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/is-promise@4.0.0/node_modules/is-promise/index.js
+// node_modules/.pnpm/is-promise@4.0.0/node_modules/is-promise/index.js
 var require_is_promise = __commonJS({
-  "../../node_modules/.pnpm/is-promise@4.0.0/node_modules/is-promise/index.js"(exports, module) {
+  "node_modules/.pnpm/is-promise@4.0.0/node_modules/is-promise/index.js"(exports, module) {
     module.exports = isPromise;
     module.exports.default = isPromise;
     function isPromise(obj) {
@@ -19851,9 +20002,9 @@ var require_is_promise = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/path-to-regexp@8.3.0/node_modules/path-to-regexp/dist/index.js
-var require_dist = __commonJS({
-  "../../node_modules/.pnpm/path-to-regexp@8.3.0/node_modules/path-to-regexp/dist/index.js"(exports) {
+// node_modules/.pnpm/path-to-regexp@8.4.2/node_modules/path-to-regexp/dist/index.js
+var require_dist2 = __commonJS({
+  "node_modules/.pnpm/path-to-regexp@8.4.2/node_modules/path-to-regexp/dist/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.PathError = exports.TokenData = void 0;
@@ -19866,19 +20017,7 @@ var require_dist = __commonJS({
     var NOOP_VALUE = (value) => value;
     var ID_START = /^[$_\p{ID_Start}]$/u;
     var ID_CONTINUE = /^[$\u200c\u200d\p{ID_Continue}]$/u;
-    var SIMPLE_TOKENS = {
-      // Groups.
-      "{": "{",
-      "}": "}",
-      // Reserved.
-      "(": "(",
-      ")": ")",
-      "[": "[",
-      "]": "]",
-      "+": "+",
-      "?": "?",
-      "!": "!"
-    };
+    var ID = /^[$_\p{ID_Start}][$\u200c\u200d\p{ID_Continue}]*$/u;
     function escapeText(str) {
       return str.replace(/[{}()\[\]+?!:*\\]/g, "\\$&");
     }
@@ -19906,97 +20045,90 @@ var require_dist = __commonJS({
     function parse(str, options = {}) {
       const { encodePath = NOOP_VALUE } = options;
       const chars = [...str];
-      const tokens = [];
       let index = 0;
-      let pos = 0;
-      function name() {
-        let value = "";
-        if (ID_START.test(chars[index])) {
-          do {
-            value += chars[index++];
-          } while (ID_CONTINUE.test(chars[index]));
-        } else if (chars[index] === '"') {
-          let quoteStart = index;
-          while (index++ < chars.length) {
-            if (chars[index] === '"') {
-              index++;
-              quoteStart = 0;
-              break;
-            }
-            if (chars[index] === "\\")
-              index++;
-            value += chars[index];
-          }
-          if (quoteStart) {
-            throw new PathError(`Unterminated quote at index ${quoteStart}`, str);
-          }
-        }
-        if (!value) {
-          throw new PathError(`Missing parameter name at index ${index}`, str);
-        }
-        return value;
-      }
-      while (index < chars.length) {
-        const value = chars[index];
-        const type = SIMPLE_TOKENS[value];
-        if (type) {
-          tokens.push({ type, index: index++, value });
-        } else if (value === "\\") {
-          tokens.push({ type: "escape", index: index++, value: chars[index++] });
-        } else if (value === ":") {
-          tokens.push({ type: "param", index: index++, value: name() });
-        } else if (value === "*") {
-          tokens.push({ type: "wildcard", index: index++, value: name() });
-        } else {
-          tokens.push({ type: "char", index: index++, value });
-        }
-      }
-      tokens.push({ type: "end", index, value: "" });
-      function consumeUntil(endType) {
+      function consumeUntil(end) {
         const output = [];
-        while (true) {
-          const token = tokens[pos++];
-          if (token.type === endType)
-            break;
-          if (token.type === "char" || token.type === "escape") {
-            let path4 = token.value;
-            let cur = tokens[pos];
-            while (cur.type === "char" || cur.type === "escape") {
-              path4 += cur.value;
-              cur = tokens[++pos];
+        let path4 = "";
+        function writePath() {
+          if (!path4)
+            return;
+          output.push({
+            type: "text",
+            value: encodePath(path4)
+          });
+          path4 = "";
+        }
+        while (index < chars.length) {
+          const value = chars[index++];
+          if (value === end) {
+            writePath();
+            return output;
+          }
+          if (value === "\\") {
+            if (index === chars.length) {
+              throw new PathError(`Unexpected end after \\ at index ${index}`, str);
             }
-            output.push({
-              type: "text",
-              value: encodePath(path4)
-            });
+            path4 += chars[index++];
             continue;
           }
-          if (token.type === "param" || token.type === "wildcard") {
-            output.push({
-              type: token.type,
-              name: token.value
-            });
+          if (value === ":" || value === "*") {
+            const type = value === ":" ? "param" : "wildcard";
+            let name = "";
+            if (ID_START.test(chars[index])) {
+              do {
+                name += chars[index++];
+              } while (ID_CONTINUE.test(chars[index]));
+            } else if (chars[index] === '"') {
+              let quoteStart = index;
+              while (index < chars.length) {
+                if (chars[++index] === '"') {
+                  index++;
+                  quoteStart = 0;
+                  break;
+                }
+                if (chars[index] === "\\")
+                  index++;
+                name += chars[index];
+              }
+              if (quoteStart) {
+                throw new PathError(`Unterminated quote at index ${quoteStart}`, str);
+              }
+            }
+            if (!name) {
+              throw new PathError(`Missing parameter name at index ${index}`, str);
+            }
+            writePath();
+            output.push({ type, name });
             continue;
           }
-          if (token.type === "{") {
+          if (value === "{") {
+            writePath();
             output.push({
               type: "group",
               tokens: consumeUntil("}")
             });
             continue;
           }
-          throw new PathError(`Unexpected ${token.type} at index ${token.index}, expected ${endType}`, str);
+          if (value === "}" || value === "(" || value === ")" || value === "[" || value === "]" || value === "+" || value === "?" || value === "!") {
+            throw new PathError(`Unexpected ${value} at index ${index - 1}`, str);
+          }
+          path4 += value;
         }
+        if (end) {
+          throw new PathError(`Unexpected end at index ${index}, expected ${end}`, str);
+        }
+        writePath();
         return output;
       }
-      return new TokenData(consumeUntil("end"), str);
+      return new TokenData(consumeUntil(""), str);
     }
     function compile(path4, options = {}) {
       const { encode = encodeURIComponent, delimiter = DEFAULT_DELIMITER } = options;
       const data = typeof path4 === "object" ? path4 : parse(path4, options);
       const fn = tokensToFunction(data.tokens, delimiter, encode);
       return function path5(params = {}) {
-        const [path6, ...missing] = fn(params);
+        const missing = [];
+        const path6 = fn(params, missing);
         if (missing.length) {
           throw new TypeError(`Missing parameters: ${missing.join(", ")}`);
         }
@@ -20005,55 +20137,61 @@ var require_dist = __commonJS({
     }
     function tokensToFunction(tokens, delimiter, encode) {
       const encoders = tokens.map((token) => tokenToFunction(token, delimiter, encode));
-      return (data) => {
-        const result = [""];
+      return (data, missing) => {
+        let result = "";
         for (const encoder of encoders) {
-          const [value, ...extras] = encoder(data);
-          result[0] += value;
-          result.push(...extras);
+          result += encoder(data, missing);
         }
         return result;
       };
     }
     function tokenToFunction(token, delimiter, encode) {
       if (token.type === "text")
-        return () => [token.value];
+        return () => token.value;
       if (token.type === "group") {
         const fn = tokensToFunction(token.tokens, delimiter, encode);
-        return (data) => {
-          const [value, ...missing] = fn(data);
-          if (!missing.length)
-            return [value];
-          return [""];
+        return (data, missing) => {
+          const len = missing.length;
+          const value = fn(data, missing);
+          if (missing.length === len)
+            return value;
+          missing.length = len;
+          return "";
         };
       }
       const encodeValue = encode || NOOP_VALUE;
       if (token.type === "wildcard" && encode !== false) {
-        return (data) => {
+        return (data, missing) => {
           const value = data[token.name];
-          if (value == null)
-            return ["", token.name];
+          if (value == null) {
+            missing.push(token.name);
+            return "";
+          }
           if (!Array.isArray(value) || value.length === 0) {
             throw new TypeError(`Expected "${token.name}" to be a non-empty array`);
           }
-          return [
-            value.map((value2, index) => {
-              if (typeof value2 !== "string") {
-                throw new TypeError(`Expected "${token.name}/${index}" to be a string`);
-              }
-              return encodeValue(value2);
-            }).join(delimiter)
-          ];
+          let result = "";
+          for (let i = 0; i < value.length; i++) {
+            if (typeof value[i] !== "string") {
+              throw new TypeError(`Expected "${token.name}/${i}" to be a string`);
+            }
+            if (i > 0)
+              result += delimiter;
+            result += encodeValue(value[i]);
+          }
+          return result;
         };
       }
-      return (data) => {
+      return (data, missing) => {
         const value = data[token.name];
-        if (value == null)
-          return ["", token.name];
+        if (value == null) {
+          missing.push(token.name);
+          return "";
+        }
         if (typeof value !== "string") {
           throw new TypeError(`Expected "${token.name}" to be a string`);
         }
-        return [encodeValue(value)];
+        return encodeValue(value);
       };
     }
     function match(path4, options = {}) {
@@ -20085,106 +20223,134 @@ var require_dist = __commonJS({
     function pathToRegexp(path4, options = {}) {
       const { delimiter = DEFAULT_DELIMITER, end = true, sensitive = false, trailing = true } = options;
       const keys = [];
-      const flags = sensitive ? "" : "i";
-      const sources = [];
-      for (const input of pathsToArray(path4, [])) {
-        const data = typeof input === "object" ? input : parse(input, options);
-        for (const tokens of flatten(data.tokens, 0, [])) {
-          sources.push(toRegExpSource(tokens, delimiter, keys, data.originalPath));
+      let source = "";
+      let combinations = 0;
+      function process2(path5) {
+        if (Array.isArray(path5)) {
+          for (const p of path5)
+            process2(p);
+          return;
         }
+        const data = typeof path5 === "object" ? path5 : parse(path5, options);
+        flatten(data.tokens, 0, [], (tokens) => {
+          if (combinations >= 256) {
+            throw new PathError("Too many path combinations", data.originalPath);
+          }
+          if (combinations > 0)
+            source += "|";
+          source += toRegExpSource(tokens, delimiter, keys, data.originalPath);
+          combinations++;
+        });
       }
-      let pattern = `^(?:${sources.join("|")})`;
+      process2(path4);
+      let pattern = `^(?:${source})`;
       if (trailing)
-        pattern += `(?:${escape2(delimiter)}$)?`;
-      pattern += end ? "$" : `(?=${escape2(delimiter)}|$)`;
-      const regexp = new RegExp(pattern, flags);
-      return { regexp, keys };
+        pattern += "(?:" + escape2(delimiter) + "$)?";
+      pattern += end ? "$" : "(?=" + escape2(delimiter) + "|$)";
+      return { regexp: new RegExp(pattern, sensitive ? "" : "i"), keys };
     }
-    function pathsToArray(paths, init) {
-      if (Array.isArray(paths)) {
-        for (const p of paths)
-          pathsToArray(p, init);
-      } else {
-        init.push(paths);
-      }
-      return init;
-    }
-    function* flatten(tokens, index, init) {
-      if (index === tokens.length) {
-        return yield init;
-      }
-      const token = tokens[index];
-      if (token.type === "group") {
-        for (const seq of flatten(token.tokens, 0, init.slice())) {
-          yield* flatten(tokens, index + 1, seq);
+    function flatten(tokens, index, result, callback) {
+      while (index < tokens.length) {
+        const token = tokens[index++];
+        if (token.type === "group") {
+          const len = result.length;
+          flatten(token.tokens, 0, result, (seq) => flatten(tokens, index, seq, callback));
+          result.length = len;
+          continue;
         }
-      } else {
-        init.push(token);
+        result.push(token);
       }
-      yield* flatten(tokens, index + 1, init);
+      callback(result);
     }
     function toRegExpSource(tokens, delimiter, keys, originalPath) {
       let result = "";
       let backtrack = "";
-      let isSafeSegmentParam = true;
-      for (const token of tokens) {
+      let wildcardBacktrack = "";
+      let prevCaptureType = 0;
+      let hasSegmentCapture = 0;
+      let index = 0;
+      function hasInSegment(index2, type) {
+        while (index2 < tokens.length) {
+          const token = tokens[index2++];
+          if (token.type === type)
+            return true;
+          if (token.type === "text") {
+            if (token.value.includes(delimiter))
+              break;
+          }
+        }
+        return false;
+      }
+      function peekText(index2) {
+        let result2 = "";
+        while (index2 < tokens.length) {
+          const token = tokens[index2++];
+          if (token.type !== "text")
+            break;
+          result2 += token.value;
+        }
+        return result2;
+      }
+      while (index < tokens.length) {
+        const token = tokens[index++];
         if (token.type === "text") {
           result += escape2(token.value);
           backtrack += token.value;
-          isSafeSegmentParam || (isSafeSegmentParam = token.value.includes(delimiter));
+          if (prevCaptureType === 2)
+            wildcardBacktrack += token.value;
+          if (token.value.includes(delimiter))
+            hasSegmentCapture = 0;
           continue;
         }
         if (token.type === "param" || token.type === "wildcard") {
-          if (!isSafeSegmentParam && !backtrack) {
+          if (prevCaptureType && !backtrack) {
             throw new PathError(`Missing text before "${token.name}" ${token.type}`, originalPath);
           }
           if (token.type === "param") {
-            result += `(${negate(delimiter, isSafeSegmentParam ? "" : backtrack)}+)`;
+            result += hasSegmentCapture & 2 ? `(${negate(delimiter, backtrack)}+)` : hasInSegment(index, "wildcard") ? `(${negate(delimiter, peekText(index))}+)` : hasSegmentCapture & 1 ? `(${negate(delimiter, backtrack)}+|${escape2(backtrack)})` : `(${negate(delimiter, "")}+)`;
+            hasSegmentCapture |= prevCaptureType = 1;
           } else {
-            result += `([\\s\\S]+)`;
+            result += hasSegmentCapture & 2 ? `(${negate(backtrack, "")}+)` : wildcardBacktrack ? `(${negate(wildcardBacktrack, "")}+|${negate(delimiter, "")}+)` : `([^]+)`;
+            wildcardBacktrack = "";
+            hasSegmentCapture |= prevCaptureType = 2;
           }
           keys.push(token);
           backtrack = "";
-          isSafeSegmentParam = false;
           continue;
         }
+        throw new TypeError(`Unknown token type: ${token.type}`);
       }
       return result;
     }
-    function negate(delimiter, backtrack) {
-      if (backtrack.length < 2) {
-        if (delimiter.length < 2)
-          return `[^${escape2(delimiter + backtrack)}]`;
-        return `(?:(?!${escape2(delimiter)})[^${escape2(backtrack)}])`;
-      }
-      if (delimiter.length < 2) {
-        return `(?:(?!${escape2(backtrack)})[^${escape2(delimiter)}])`;
-      }
-      return `(?:(?!${escape2(backtrack)}|${escape2(delimiter)})[\\s\\S])`;
+    function negate(a, b) {
+      if (b.length > a.length)
+        return negate(b, a);
+      if (a === b)
+        b = "";
+      if (b.length > 1)
+        return `(?:(?!${escape2(a)}|${escape2(b)})[^])`;
+      if (a.length > 1)
+        return `(?:(?!${escape2(a)})[^${escape2(b)}])`;
+      return `[^${escape2(a + b)}]`;
     }
-    function stringifyTokens(tokens) {
+    function stringifyTokens(tokens, index) {
       let value = "";
-      let i = 0;
-      function name(value2) {
-        const isSafe = isNameSafe(value2) && isNextNameSafe(tokens[i]);
-        return isSafe ? value2 : JSON.stringify(value2);
-      }
-      while (i < tokens.length) {
-        const token = tokens[i++];
+      while (index < tokens.length) {
+        const token = tokens[index++];
         if (token.type === "text") {
           value += escapeText(token.value);
           continue;
         }
         if (token.type === "group") {
-          value += `{${stringifyTokens(token.tokens)}}`;
+          value += "{" + stringifyTokens(token.tokens, 0) + "}";
           continue;
         }
         if (token.type === "param") {
-          value += `:${name(token.name)}`;
+          value += ":" + stringifyName(token.name, tokens[index]);
           continue;
         }
         if (token.type === "wildcard") {
-          value += `*${name(token.name)}`;
+          value += "*" + stringifyName(token.name, tokens[index]);
           continue;
         }
         throw new TypeError(`Unknown token type: ${token.type}`);
@@ -20192,26 +20358,25 @@ var require_dist = __commonJS({
       return value;
     }
     function stringify(data) {
-      return stringifyTokens(data.tokens);
+      return stringifyTokens(data.tokens, 0);
     }
-    function isNameSafe(name) {
-      const [first, ...rest] = name;
-      return ID_START.test(first) && rest.every((char) => ID_CONTINUE.test(char));
-    }
-    function isNextNameSafe(token) {
-      if (token && token.type === "text")
-        return !ID_CONTINUE.test(token.value[0]);
-      return true;
+    function stringifyName(name, next) {
+      if (!ID.test(name))
+        return JSON.stringify(name);
+      if ((next === null || next === void 0 ? void 0 : next.type) === "text" && ID_CONTINUE.test(next.value[0])) {
+        return JSON.stringify(name);
+      }
+      return name;
     }
   }
 });
 
-// ../../node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js
+// node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js
 var require_layer = __commonJS({
-  "../../node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js"(exports, module) {
+  "node_modules/.pnpm/router@2.2.0/node_modules/router/lib/layer.js"(exports, module) {
     "use strict";
     var isPromise = require_is_promise();
-    var pathRegexp = require_dist();
+    var pathRegexp = require_dist2();
     var debug = require_src()("router:layer");
     var deprecate = require_depd()("router");
     var TRAILING_SLASH_REGEXP = /\/+$/;
@@ -20356,9 +20521,9 @@ var require_layer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js
+// node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js
 var require_route = __commonJS({
-  "../../node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js"(exports, module) {
+  "node_modules/.pnpm/router@2.2.0/node_modules/router/lib/route.js"(exports, module) {
     "use strict";
     var debug = require_src()("router:route");
     var Layer = require_layer();
@@ -20476,9 +20641,9 @@ var require_route = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/router@2.2.0/node_modules/router/index.js
+// node_modules/.pnpm/router@2.2.0/node_modules/router/index.js
 var require_router = __commonJS({
-  "../../node_modules/.pnpm/router@2.2.0/node_modules/router/index.js"(exports, module) {
+  "node_modules/.pnpm/router@2.2.0/node_modules/router/index.js"(exports, module) {
     "use strict";
     var isPromise = require_is_promise();
     var Layer = require_layer();
@@ -20874,9 +21039,9 @@ var require_router = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js
 var require_application = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js"(exports, module) {
     "use strict";
     var finalhandler = require_finalhandler();
     var debug = require_src()("express:application");
@@ -21135,9 +21300,9 @@ var require_application = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/charset.js
+// node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/charset.js
 var require_charset = __commonJS({
-  "../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/charset.js"(exports, module) {
+  "node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/charset.js"(exports, module) {
     "use strict";
     module.exports = preferredCharsets;
     module.exports.preferredCharsets = preferredCharsets;
@@ -21222,9 +21387,9 @@ var require_charset = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/encoding.js
+// node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/encoding.js
 var require_encoding = __commonJS({
-  "../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/encoding.js"(exports, module) {
+  "node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/encoding.js"(exports, module) {
     "use strict";
     module.exports = preferredEncodings;
     module.exports.preferredEncodings = preferredEncodings;
@@ -21335,9 +21500,9 @@ var require_encoding = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/language.js
+// node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/language.js
 var require_language = __commonJS({
-  "../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/language.js"(exports, module) {
+  "node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/language.js"(exports, module) {
     "use strict";
     module.exports = preferredLanguages;
     module.exports.preferredLanguages = preferredLanguages;
@@ -21430,9 +21595,9 @@ var require_language = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/mediaType.js
+// node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/mediaType.js
 var require_mediaType = __commonJS({
-  "../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/mediaType.js"(exports, module) {
+  "node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/lib/mediaType.js"(exports, module) {
     "use strict";
     module.exports = preferredMediaTypes;
     module.exports.preferredMediaTypes = preferredMediaTypes;
@@ -21592,9 +21757,9 @@ var require_mediaType = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/index.js
+// node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/index.js
 var require_negotiator = __commonJS({
-  "../../node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/index.js"(exports, module) {
+  "node_modules/.pnpm/negotiator@1.0.0/node_modules/negotiator/index.js"(exports, module) {
     "use strict";
     var preferredCharsets = require_charset();
     var preferredEncodings = require_encoding();
@@ -21648,9 +21813,9 @@ var require_negotiator = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/accepts@2.0.0/node_modules/accepts/index.js
+// node_modules/.pnpm/accepts@2.0.0/node_modules/accepts/index.js
 var require_accepts = __commonJS({
-  "../../node_modules/.pnpm/accepts@2.0.0/node_modules/accepts/index.js"(exports, module) {
+  "node_modules/.pnpm/accepts@2.0.0/node_modules/accepts/index.js"(exports, module) {
     "use strict";
     var Negotiator = require_negotiator();
     var mime = require_mime_types();
@@ -21729,9 +21894,9 @@ var require_accepts = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/fresh@2.0.0/node_modules/fresh/index.js
+// node_modules/.pnpm/fresh@2.0.0/node_modules/fresh/index.js
 var require_fresh = __commonJS({
-  "../../node_modules/.pnpm/fresh@2.0.0/node_modules/fresh/index.js"(exports, module) {
+  "node_modules/.pnpm/fresh@2.0.0/node_modules/fresh/index.js"(exports, module) {
     "use strict";
     var CACHE_CONTROL_NO_CACHE_REGEXP = /(?:^|,)\s*?no-cache\s*?(?:,|$)/;
     module.exports = fresh;
@@ -21801,9 +21966,9 @@ var require_fresh = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js
+// node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js
 var require_range_parser = __commonJS({
-  "../../node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js"(exports, module) {
+  "node_modules/.pnpm/range-parser@1.2.1/node_modules/range-parser/index.js"(exports, module) {
     "use strict";
     module.exports = rangeParser;
     function rangeParser(size, str, options) {
@@ -21882,9 +22047,9 @@ var require_range_parser = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js
 var require_request = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/request.js"(exports, module) {
     "use strict";
     var accepts = require_accepts();
     var isIP = __require("node:net").isIP;
@@ -22030,16 +22195,14 @@ var require_request = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/content-disposition@1.0.1/node_modules/content-disposition/index.js
+// node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js
 var require_content_disposition = __commonJS({
-  "../../node_modules/.pnpm/content-disposition@1.0.1/node_modules/content-disposition/index.js"(exports, module) {
+  "node_modules/.pnpm/content-disposition@1.1.0/node_modules/content-disposition/index.js"(exports, module) {
     "use strict";
     module.exports = contentDisposition;
     module.exports.parse = parse;
-    var basename = __require("path").basename;
+    var utf8Decoder = new TextDecoder("utf-8");
     var ENCODE_URL_ATTR_CHAR_REGEXP = /[\x00-\x20"'()*,/:;<=>?@[\\\]{}\x7f]/g;
-    var HEX_ESCAPE_REGEXP = /%[0-9A-Fa-f]{2}/;
-    var HEX_ESCAPE_REPLACE_REGEXP = /%([0-9A-Fa-f]{2})/g;
     var NON_LATIN1_REGEXP = /[^\x20-\x7e\xa0-\xff]/g;
     var QESC_REGEXP = /\\([\u0000-\u007f])/g;
     var QUOTE_REGEXP = /([\\"])/g;
@@ -22075,7 +22238,7 @@ var require_content_disposition = __commonJS({
       var isQuotedString = TEXT_REGEXP.test(name);
       var fallbackName = typeof fallback !== "string" ? fallback && getlatin1(name) : basename(fallback);
       var hasFallback = typeof fallbackName === "string" && fallbackName !== name;
-      if (hasFallback || !isQuotedString || HEX_ESCAPE_REGEXP.test(name)) {
+      if (hasFallback || !isQuotedString || hasHexEscape(name)) {
         params["filename*"] = name;
       }
       if (isQuotedString || hasFallback) {
@@ -22102,26 +22265,32 @@ var require_content_disposition = __commonJS({
       return string;
     }
     function decodefield(str) {
-      var match = EXT_VALUE_REGEXP.exec(str);
+      const match = EXT_VALUE_REGEXP.exec(str);
       if (!match) {
         throw new TypeError("invalid extended field value");
       }
-      var charset = match[1].toLowerCase();
-      var encoded = match[2];
-      var value;
-      var binary = encoded.replace(HEX_ESCAPE_REPLACE_REGEXP, pdecode);
+      const charset = match[1].toLowerCase();
+      const encoded = match[2];
       switch (charset) {
-        case "iso-8859-1":
-          value = getlatin1(binary);
-          break;
+        case "iso-8859-1": {
+          const binary = decodeHexEscapes(encoded);
+          return getlatin1(binary);
+        }
         case "utf-8":
-        case "utf8":
-          value = Buffer.from(binary, "binary").toString("utf8");
-          break;
-        default:
-          throw new TypeError("unsupported charset in extended field");
+        case "utf8": {
+          try {
+            return decodeURIComponent(encoded);
+          } catch {
+            const binary = decodeHexEscapes(encoded);
+            const bytes = new Uint8Array(binary.length);
+            for (let idx = 0; idx < binary.length; idx++) {
+              bytes[idx] = binary.charCodeAt(idx);
+            }
+            return utf8Decoder.decode(bytes);
+          }
+        }
       }
-      return value;
+      throw new TypeError("unsupported charset in extended field");
     }
     function getlatin1(val) {
       return String(val).replace(NON_LATIN1_REGEXP, "?");
@@ -22171,9 +22340,6 @@ var require_content_disposition = __commonJS({
       }
       return new ContentDisposition(type, params);
     }
-    function pdecode(str, hex) {
-      return String.fromCharCode(parseInt(hex, 16));
-    }
     function pencode(char) {
       return "%" + String(char).charCodeAt(0).toString(16).toUpperCase();
     }
@@ -22190,12 +22356,57 @@ var require_content_disposition = __commonJS({
       this.type = type;
       this.parameters = parameters;
     }
+    function basename(path4) {
+      const normalized = path4.replaceAll("\\", "/");
+      let end = normalized.length;
+      while (end > 0 && normalized[end - 1] === "/") {
+        end--;
+      }
+      if (end === 0) {
+        return "";
+      }
+      let start = end - 1;
+      while (start >= 0 && normalized[start] !== "/") {
+        start--;
+      }
+      return normalized.slice(start + 1, end);
+    }
+    function isHexDigit(char) {
+      const code = char.charCodeAt(0);
+      return code >= 48 && code <= 57 || // 0-9
+      code >= 65 && code <= 70 || // A-F
+      code >= 97 && code <= 102;
+    }
+    function hasHexEscape(str) {
+      const maxIndex = str.length - 3;
+      let lastIndex = -1;
+      while ((lastIndex = str.indexOf("%", lastIndex + 1)) !== -1 && lastIndex <= maxIndex) {
+        if (isHexDigit(str[lastIndex + 1]) && isHexDigit(str[lastIndex + 2])) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function decodeHexEscapes(str) {
+      const firstEscape = str.indexOf("%");
+      if (firstEscape === -1) return str;
+      let result = str.slice(0, firstEscape);
+      for (let idx = firstEscape; idx < str.length; idx++) {
+        if (str[idx] === "%" && idx + 2 < str.length && isHexDigit(str[idx + 1]) && isHexDigit(str[idx + 2])) {
+          result += String.fromCharCode(Number.parseInt(str[idx + 1] + str[idx + 2], 16));
+          idx += 2;
+        } else {
+          result += str[idx];
+        }
+      }
+      return result;
+    }
   }
 });
 
-// ../../node_modules/.pnpm/cookie-signature@1.2.2/node_modules/cookie-signature/index.js
+// node_modules/.pnpm/cookie-signature@1.2.2/node_modules/cookie-signature/index.js
 var require_cookie_signature = __commonJS({
-  "../../node_modules/.pnpm/cookie-signature@1.2.2/node_modules/cookie-signature/index.js"(exports) {
+  "node_modules/.pnpm/cookie-signature@1.2.2/node_modules/cookie-signature/index.js"(exports) {
     var crypto2 = __require("crypto");
     exports.sign = function(val, secret) {
       if ("string" != typeof val) throw new TypeError("Cookie value must be provided as a string.");
@@ -22211,9 +22422,9 @@ var require_cookie_signature = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/cookie@0.7.2/node_modules/cookie/index.js
+// node_modules/.pnpm/cookie@0.7.2/node_modules/cookie/index.js
 var require_cookie = __commonJS({
-  "../../node_modules/.pnpm/cookie@0.7.2/node_modules/cookie/index.js"(exports) {
+  "node_modules/.pnpm/cookie@0.7.2/node_modules/cookie/index.js"(exports) {
     "use strict";
     exports.parse = parse;
     exports.serialize = serialize;
@@ -22377,9 +22588,9 @@ var require_cookie = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/send@1.2.1/node_modules/send/index.js
+// node_modules/.pnpm/send@1.2.1/node_modules/send/index.js
 var require_send = __commonJS({
-  "../../node_modules/.pnpm/send@1.2.1/node_modules/send/index.js"(exports, module) {
+  "node_modules/.pnpm/send@1.2.1/node_modules/send/index.js"(exports, module) {
     "use strict";
     var createError = require_http_errors();
     var debug = require_src()("send");
@@ -22395,7 +22606,7 @@ var require_send = __commonJS({
     var path4 = __require("path");
     var statuses = require_statuses();
     var Stream = __require("stream");
-    var util2 = __require("util");
+    var util = __require("util");
     var extname = path4.extname;
     var join = path4.join;
     var normalize = path4.normalize;
@@ -22430,7 +22641,7 @@ var require_send = __commonJS({
       this._maxage = !isNaN(this._maxage) ? Math.min(Math.max(0, this._maxage), MAX_MAXAGE) : 0;
       this._root = opts.root ? resolve(opts.root) : null;
     }
-    util2.inherits(SendStream, Stream);
+    util.inherits(SendStream, Stream);
     SendStream.prototype.error = function error(status, err) {
       if (hasListeners(this, "error")) {
         return this.emit("error", createHttpError(status, err));
@@ -22739,7 +22950,7 @@ var require_send = __commonJS({
       debug("content-type %s", type2);
       res.setHeader("Content-Type", type2);
     };
-    SendStream.prototype.setHeader = function setHeader(path5, stat) {
+    SendStream.prototype.setHeader = function setHeader2(path5, stat) {
       var res = this.res;
       this.emit("headers", res, path5, stat);
       if (this._acceptRanges && !res.getHeader("Accept-Ranges")) {
@@ -22860,9 +23071,9 @@ var require_send = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/vary@1.1.2/node_modules/vary/index.js
+// node_modules/.pnpm/vary@1.1.2/node_modules/vary/index.js
 var require_vary = __commonJS({
-  "../../node_modules/.pnpm/vary@1.1.2/node_modules/vary/index.js"(exports, module) {
+  "node_modules/.pnpm/vary@1.1.2/node_modules/vary/index.js"(exports, module) {
     "use strict";
     module.exports = vary;
     module.exports.append = append;
@@ -22933,9 +23144,9 @@ var require_vary = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js
 var require_response = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/response.js"(exports, module) {
     "use strict";
     var contentDisposition = require_content_disposition();
     var createError = require_http_errors();
@@ -23254,7 +23465,7 @@ var require_response = __commonJS({
       this.append("Set-Cookie", cookie.serialize(name, String(val), opts));
       return this;
     };
-    res.location = function location(url) {
+    res.location = function location2(url) {
       return this.set("Location", encodeUrl(url));
     };
     res.redirect = function redirect(url) {
@@ -23403,9 +23614,9 @@ var require_response = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/serve-static@2.2.1/node_modules/serve-static/index.js
+// node_modules/.pnpm/serve-static@2.2.1/node_modules/serve-static/index.js
 var require_serve_static = __commonJS({
-  "../../node_modules/.pnpm/serve-static@2.2.1/node_modules/serve-static/index.js"(exports, module) {
+  "node_modules/.pnpm/serve-static@2.2.1/node_modules/serve-static/index.js"(exports, module) {
     "use strict";
     var encodeUrl = require_encodeurl();
     var escapeHtml = require_escape_html();
@@ -23507,9 +23718,9 @@ var require_serve_static = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js
 var require_express = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/lib/express.js"(exports, module) {
     "use strict";
     var bodyParser = require_body_parser();
     var EventEmitter = __require("node:events").EventEmitter;
@@ -23547,17 +23758,17 @@ var require_express = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/express@5.2.1/node_modules/express/index.js
+// node_modules/.pnpm/express@5.2.1/node_modules/express/index.js
 var require_express2 = __commonJS({
-  "../../node_modules/.pnpm/express@5.2.1/node_modules/express/index.js"(exports, module) {
+  "node_modules/.pnpm/express@5.2.1/node_modules/express/index.js"(exports, module) {
     "use strict";
     module.exports = require_express();
   }
 });
 
-// ../../node_modules/.pnpm/object-assign@4.1.1/node_modules/object-assign/index.js
+// node_modules/.pnpm/object-assign@4.1.1/node_modules/object-assign/index.js
 var require_object_assign = __commonJS({
-  "../../node_modules/.pnpm/object-assign@4.1.1/node_modules/object-assign/index.js"(exports, module) {
+  "node_modules/.pnpm/object-assign@4.1.1/node_modules/object-assign/index.js"(exports, module) {
     "use strict";
     var getOwnPropertySymbols = Object.getOwnPropertySymbols;
     var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -23625,9 +23836,9 @@ var require_object_assign = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/cors@2.8.6/node_modules/cors/lib/index.js
+// node_modules/.pnpm/cors@2.8.6/node_modules/cors/lib/index.js
 var require_lib3 = __commonJS({
-  "../../node_modules/.pnpm/cors@2.8.6/node_modules/cors/lib/index.js"(exports, module) {
+  "node_modules/.pnpm/cors@2.8.6/node_modules/cors/lib/index.js"(exports, module) {
     (function() {
       "use strict";
       var assign = require_object_assign();
@@ -23833,9 +24044,9 @@ var require_lib3 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-helpers.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-helpers.js
 var require_err_helpers = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-helpers.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-helpers.js"(exports, module) {
     "use strict";
     var isErrorLike = (err) => {
       return err && typeof err.message === "string";
@@ -23890,9 +24101,9 @@ var require_err_helpers = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-proto.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-proto.js
 var require_err_proto = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-proto.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-proto.js"(exports, module) {
     "use strict";
     var seen = /* @__PURE__ */ Symbol("circular-ref-tag");
     var rawSymbol = /* @__PURE__ */ Symbol("pino-raw-err-ref");
@@ -23941,9 +24152,9 @@ var require_err_proto = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err.js
 var require_err = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err.js"(exports, module) {
     "use strict";
     module.exports = errSerializer;
     var { messageWithCauses, stackWithCauses, isErrorLike } = require_err_helpers();
@@ -23981,9 +24192,9 @@ var require_err = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-with-cause.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-with-cause.js
 var require_err_with_cause = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-with-cause.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/err-with-cause.js"(exports, module) {
     "use strict";
     module.exports = errWithCauseSerializer;
     var { isErrorLike } = require_err_helpers();
@@ -24024,9 +24235,9 @@ var require_err_with_cause = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/req.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/req.js
 var require_req = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/req.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/req.js"(exports, module) {
     "use strict";
     module.exports = {
       mapHttpRequest,
@@ -24119,9 +24330,9 @@ var require_req = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/res.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/res.js
 var require_res = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/res.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/lib/res.js"(exports, module) {
     "use strict";
     module.exports = {
       mapHttpResponse,
@@ -24168,9 +24379,9 @@ var require_res = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/index.js
+// node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/index.js
 var require_pino_std_serializers = __commonJS({
-  "../../node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/index.js"(exports, module) {
+  "node_modules/.pnpm/pino-std-serializers@7.1.0/node_modules/pino-std-serializers/index.js"(exports, module) {
     "use strict";
     var errSerializer = require_err();
     var errWithCauseSerializer = require_err_with_cause();
@@ -24205,9 +24416,9 @@ var require_pino_std_serializers = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/caller.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/caller.js
 var require_caller = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/caller.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/caller.js"(exports, module) {
     "use strict";
     function noOpPrepareStackTrace(_, stack) {
       return stack;
@@ -24233,9 +24444,9 @@ var require_caller = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@pinojs+redact@0.4.0/node_modules/@pinojs/redact/index.js
+// node_modules/.pnpm/@pinojs+redact@0.4.0/node_modules/@pinojs/redact/index.js
 var require_redact = __commonJS({
-  "../../node_modules/.pnpm/@pinojs+redact@0.4.0/node_modules/@pinojs/redact/index.js"(exports, module) {
+  "node_modules/.pnpm/@pinojs+redact@0.4.0/node_modules/@pinojs/redact/index.js"(exports, module) {
     "use strict";
     function deepClone(obj) {
       if (obj === null || typeof obj !== "object") {
@@ -24666,9 +24877,9 @@ var require_redact = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/symbols.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/symbols.js
 var require_symbols = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/symbols.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/symbols.js"(exports, module) {
     "use strict";
     var setLevelSym = /* @__PURE__ */ Symbol("pino.setLevel");
     var getLevelSym = /* @__PURE__ */ Symbol("pino.getLevel");
@@ -24737,9 +24948,9 @@ var require_symbols = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/redaction.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/redaction.js
 var require_redaction = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/redaction.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/redaction.js"(exports, module) {
     "use strict";
     var Redact = require_redact();
     var { redactFmtSym, wildcardFirstSym } = require_symbols();
@@ -24819,9 +25030,9 @@ var require_redaction = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/time.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/time.js
 var require_time = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/time.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/time.js"(exports, module) {
     "use strict";
     var nullTime = () => "";
     var epochTime = () => `,"time":${Date.now()}`;
@@ -24850,9 +25061,9 @@ var require_time = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/quick-format-unescaped@4.0.4/node_modules/quick-format-unescaped/index.js
+// node_modules/.pnpm/quick-format-unescaped@4.0.4/node_modules/quick-format-unescaped/index.js
 var require_quick_format_unescaped = __commonJS({
-  "../../node_modules/.pnpm/quick-format-unescaped@4.0.4/node_modules/quick-format-unescaped/index.js"(exports, module) {
+  "node_modules/.pnpm/quick-format-unescaped@4.0.4/node_modules/quick-format-unescaped/index.js"(exports, module) {
     "use strict";
     function tryStringify(o) {
       try {
@@ -24969,12 +25180,12 @@ var require_quick_format_unescaped = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/atomic-sleep@1.0.0/node_modules/atomic-sleep/index.js
+// node_modules/.pnpm/atomic-sleep@1.0.0/node_modules/atomic-sleep/index.js
 var require_atomic_sleep = __commonJS({
-  "../../node_modules/.pnpm/atomic-sleep@1.0.0/node_modules/atomic-sleep/index.js"(exports, module) {
+  "node_modules/.pnpm/atomic-sleep@1.0.0/node_modules/atomic-sleep/index.js"(exports, module) {
     "use strict";
     if (typeof SharedArrayBuffer !== "undefined" && typeof Atomics !== "undefined") {
-      let sleep = function(ms) {
+      let sleep2 = function(ms) {
         const valid = ms > 0 && ms < Infinity;
         if (valid === false) {
           if (typeof ms !== "number" && typeof ms !== "bigint") {
@@ -24985,9 +25196,9 @@ var require_atomic_sleep = __commonJS({
         Atomics.wait(nil, 0, 0, Number(ms));
       };
       const nil = new Int32Array(new SharedArrayBuffer(4));
-      module.exports = sleep;
+      module.exports = sleep2;
     } else {
-      let sleep = function(ms) {
+      let sleep2 = function(ms) {
         const valid = ms > 0 && ms < Infinity;
         if (valid === false) {
           if (typeof ms !== "number" && typeof ms !== "bigint") {
@@ -24999,20 +25210,20 @@ var require_atomic_sleep = __commonJS({
         while (target > Date.now()) {
         }
       };
-      module.exports = sleep;
+      module.exports = sleep2;
     }
   }
 });
 
-// ../../node_modules/.pnpm/sonic-boom@4.2.1/node_modules/sonic-boom/index.js
+// node_modules/.pnpm/sonic-boom@4.2.1/node_modules/sonic-boom/index.js
 var require_sonic_boom = __commonJS({
-  "../../node_modules/.pnpm/sonic-boom@4.2.1/node_modules/sonic-boom/index.js"(exports, module) {
+  "node_modules/.pnpm/sonic-boom@4.2.1/node_modules/sonic-boom/index.js"(exports, module) {
     "use strict";
     var fs = __require("fs");
     var EventEmitter = __require("events");
     var inherits = __require("util").inherits;
     var path4 = __require("path");
-    var sleep = require_atomic_sleep();
+    var sleep2 = require_atomic_sleep();
     var assert = __require("assert");
     var BUSY_WRITE_TIMEOUT = 100;
     var kEmptyBuffer = Buffer.allocUnsafe(0);
@@ -25158,7 +25369,7 @@ var require_sonic_boom = __commonJS({
           if ((err.code === "EAGAIN" || err.code === "EBUSY") && this.retryEAGAIN(err, this._writingBuf.length, this._len - this._writingBuf.length)) {
             if (this.sync) {
               try {
-                sleep(BUSY_WRITE_TIMEOUT);
+                sleep2(BUSY_WRITE_TIMEOUT);
                 this.release(void 0, 0);
               } catch (err2) {
                 this.release(err2);
@@ -25467,11 +25678,11 @@ var require_sonic_boom = __commonJS({
             this._bufs.shift();
           }
         } catch (err) {
-          const shouldRetry = err.code === "EAGAIN" || err.code === "EBUSY";
-          if (shouldRetry && !this.retryEAGAIN(err, buf.length, this._len - buf.length)) {
+          const shouldRetry2 = err.code === "EAGAIN" || err.code === "EBUSY";
+          if (shouldRetry2 && !this.retryEAGAIN(err, buf.length, this._len - buf.length)) {
             throw err;
           }
-          sleep(BUSY_WRITE_TIMEOUT);
+          sleep2(BUSY_WRITE_TIMEOUT);
         }
       }
       try {
@@ -25504,11 +25715,11 @@ var require_sonic_boom = __commonJS({
             this._lens.shift();
           }
         } catch (err) {
-          const shouldRetry = err.code === "EAGAIN" || err.code === "EBUSY";
-          if (shouldRetry && !this.retryEAGAIN(err, buf.length, this._len - buf.length)) {
+          const shouldRetry2 = err.code === "EAGAIN" || err.code === "EBUSY";
+          if (shouldRetry2 && !this.retryEAGAIN(err, buf.length, this._len - buf.length)) {
             throw err;
           }
-          sleep(BUSY_WRITE_TIMEOUT);
+          sleep2(BUSY_WRITE_TIMEOUT);
         }
       }
     }
@@ -25591,9 +25802,9 @@ var require_sonic_boom = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/on-exit-leak-free@2.1.2/node_modules/on-exit-leak-free/index.js
+// node_modules/.pnpm/on-exit-leak-free@2.1.2/node_modules/on-exit-leak-free/index.js
 var require_on_exit_leak_free = __commonJS({
-  "../../node_modules/.pnpm/on-exit-leak-free@2.1.2/node_modules/on-exit-leak-free/index.js"(exports, module) {
+  "node_modules/.pnpm/on-exit-leak-free@2.1.2/node_modules/on-exit-leak-free/index.js"(exports, module) {
     "use strict";
     var refs = {
       exit: [],
@@ -25685,9 +25896,9 @@ var require_on_exit_leak_free = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/package.json
+// node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/package.json
 var require_package = __commonJS({
-  "../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/package.json"(exports, module) {
+  "node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/package.json"(exports, module) {
     module.exports = {
       name: "thread-stream",
       version: "3.1.0",
@@ -25748,9 +25959,9 @@ var require_package = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/wait.js
+// node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/wait.js
 var require_wait = __commonJS({
-  "../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/wait.js"(exports, module) {
+  "node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/wait.js"(exports, module) {
     "use strict";
     var MAX_TIMEOUT = 1e3;
     function wait(state, index, expected, timeout, done) {
@@ -25806,9 +26017,9 @@ var require_wait = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/indexes.js
+// node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/indexes.js
 var require_indexes = __commonJS({
-  "../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/indexes.js"(exports, module) {
+  "node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/lib/indexes.js"(exports, module) {
     "use strict";
     var WRITE_INDEX = 4;
     var READ_INDEX = 8;
@@ -25819,9 +26030,9 @@ var require_indexes = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/index.js
+// node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/index.js
 var require_thread_stream = __commonJS({
-  "../../node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/index.js"(exports, module) {
+  "node_modules/.pnpm/thread-stream@3.1.0/node_modules/thread-stream/index.js"(exports, module) {
     "use strict";
     var { version: version3 } = require_package();
     var { EventEmitter } = __require("events");
@@ -26242,14 +26453,14 @@ var require_thread_stream = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/transport.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/transport.js
 var require_transport = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/transport.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/transport.js"(exports, module) {
     "use strict";
     var { createRequire } = __require("module");
     var getCallers = require_caller();
     var { join, isAbsolute, sep } = __require("node:path");
-    var sleep = require_atomic_sleep();
+    var sleep2 = require_atomic_sleep();
     var onExit = require_on_exit_leak_free();
     var ThreadStream = require_thread_stream();
     function setupOnExit(stream) {
@@ -26283,7 +26494,7 @@ var require_transport = __commonJS({
           return;
         }
         stream.flushSync();
-        sleep(100);
+        sleep2(100);
         stream.end();
       }
       return stream;
@@ -26373,9 +26584,9 @@ var require_transport = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/tools.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/tools.js
 var require_tools = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/tools.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/tools.js"(exports, module) {
     "use strict";
     var diagChan = __require("node:diagnostics_channel");
     var format = require_quick_format_unescaped();
@@ -26710,9 +26921,9 @@ var require_tools = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/constants.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/constants.js
 var require_constants = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/constants.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/constants.js"(exports, module) {
     var DEFAULT_LEVELS = {
       trace: 10,
       debug: 20,
@@ -26732,9 +26943,9 @@ var require_constants = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/levels.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/levels.js
 var require_levels = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/levels.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/levels.js"(exports, module) {
     "use strict";
     var {
       lsCacheSym,
@@ -26925,17 +27136,17 @@ var require_levels = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/meta.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/meta.js
 var require_meta = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/meta.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/meta.js"(exports, module) {
     "use strict";
     module.exports = { version: "9.14.0" };
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/proto.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/proto.js
 var require_proto = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/proto.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/proto.js"(exports, module) {
     "use strict";
     var { EventEmitter } = __require("node:events");
     var {
@@ -27164,9 +27375,9 @@ var require_proto = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js
+// node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js
 var require_safe_stable_stringify = __commonJS({
-  "../../node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js"(exports, module) {
+  "node_modules/.pnpm/safe-stable-stringify@2.5.0/node_modules/safe-stable-stringify/index.js"(exports, module) {
     "use strict";
     var { hasOwnProperty } = Object.prototype;
     var stringify = configure();
@@ -27760,9 +27971,9 @@ ${originalIndentation}`;
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/multistream.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/multistream.js
 var require_multistream = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/multistream.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/lib/multistream.js"(exports, module) {
     "use strict";
     var metadata = /* @__PURE__ */ Symbol.for("pino.metadata");
     var { DEFAULT_LEVELS } = require_constants();
@@ -27928,13 +28139,13 @@ var require_multistream = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/pino.js
+// node_modules/.pnpm/pino@9.14.0/node_modules/pino/pino.js
 var require_pino = __commonJS({
-  "../../node_modules/.pnpm/pino@9.14.0/node_modules/pino/pino.js"(exports, module) {
+  "node_modules/.pnpm/pino@9.14.0/node_modules/pino/pino.js"(exports, module) {
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/wilkin/Descargas/Node-Creator/artifacts/api-server/dist";
+        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -28148,9 +28359,9 @@ var require_pino = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/get-caller-file@2.0.5/node_modules/get-caller-file/index.js
+// node_modules/.pnpm/get-caller-file@2.0.5/node_modules/get-caller-file/index.js
 var require_get_caller_file = __commonJS({
-  "../../node_modules/.pnpm/get-caller-file@2.0.5/node_modules/get-caller-file/index.js"(exports, module) {
+  "node_modules/.pnpm/get-caller-file@2.0.5/node_modules/get-caller-file/index.js"(exports, module) {
     "use strict";
     module.exports = function getCallerFile(position) {
       if (position === void 0) {
@@ -28172,9 +28383,9 @@ var require_get_caller_file = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/pino-http@10.5.0/node_modules/pino-http/logger.js
+// node_modules/.pnpm/pino-http@10.5.0/node_modules/pino-http/logger.js
 var require_logger = __commonJS({
-  "../../node_modules/.pnpm/pino-http@10.5.0/node_modules/pino-http/logger.js"(exports, module) {
+  "node_modules/.pnpm/pino-http@10.5.0/node_modules/pino-http/logger.js"(exports, module) {
     "use strict";
     var { pino: pino2, symbols: { stringifySym, chindingsSym } } = require_pino();
     var serializers = require_pino_std_serializers();
@@ -28396,9 +28607,9 @@ var require_logger = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/media-typer@0.3.0/node_modules/media-typer/index.js
+// node_modules/.pnpm/media-typer@0.3.0/node_modules/media-typer/index.js
 var require_media_typer2 = __commonJS({
-  "../../node_modules/.pnpm/media-typer@0.3.0/node_modules/media-typer/index.js"(exports) {
+  "node_modules/.pnpm/media-typer@0.3.0/node_modules/media-typer/index.js"(exports) {
     var paramRegExp = /; *([!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+) *= *("(?:[ !\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u0020-\u007e])*"|[!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+) */g;
     var textRegExp = /^[\u0020-\u007e\u0080-\u00ff]+$/;
     var tokenRegExp = /^[!#$%&'\*\+\-\.0-9A-Z\^_`a-z\|~]+$/;
@@ -28520,9 +28731,9 @@ var require_media_typer2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/db.json
+// node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/db.json
 var require_db2 = __commonJS({
-  "../../node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/db.json"(exports, module) {
+  "node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/db.json"(exports, module) {
     module.exports = {
       "application/1d-interleaved-parityfec": {
         source: "iana"
@@ -37045,16 +37256,16 @@ var require_db2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/index.js
+// node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/index.js
 var require_mime_db2 = __commonJS({
-  "../../node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/index.js"(exports, module) {
+  "node_modules/.pnpm/mime-db@1.52.0/node_modules/mime-db/index.js"(exports, module) {
     module.exports = require_db2();
   }
 });
 
-// ../../node_modules/.pnpm/mime-types@2.1.35/node_modules/mime-types/index.js
+// node_modules/.pnpm/mime-types@2.1.35/node_modules/mime-types/index.js
 var require_mime_types2 = __commonJS({
-  "../../node_modules/.pnpm/mime-types@2.1.35/node_modules/mime-types/index.js"(exports) {
+  "node_modules/.pnpm/mime-types@2.1.35/node_modules/mime-types/index.js"(exports) {
     "use strict";
     var db = require_mime_db2();
     var extname = __require("path").extname;
@@ -37142,9 +37353,9 @@ var require_mime_types2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/type-is@1.6.18/node_modules/type-is/index.js
+// node_modules/.pnpm/type-is@1.6.18/node_modules/type-is/index.js
 var require_type_is2 = __commonJS({
-  "../../node_modules/.pnpm/type-is@1.6.18/node_modules/type-is/index.js"(exports, module) {
+  "node_modules/.pnpm/type-is@1.6.18/node_modules/type-is/index.js"(exports, module) {
     "use strict";
     var typer = require_media_typer2();
     var mime = require_mime_types2();
@@ -37247,9 +37458,9 @@ var require_type_is2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/utils.js
+// node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/utils.js
 var require_utils4 = __commonJS({
-  "../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/utils.js"(exports, module) {
+  "node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/utils.js"(exports, module) {
     "use strict";
     function parseContentType(str) {
       if (str.length === 0)
@@ -38934,9 +39145,9 @@ var require_utils4 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/streamsearch@1.1.0/node_modules/streamsearch/lib/sbmh.js
+// node_modules/.pnpm/streamsearch@1.1.0/node_modules/streamsearch/lib/sbmh.js
 var require_sbmh = __commonJS({
-  "../../node_modules/.pnpm/streamsearch@1.1.0/node_modules/streamsearch/lib/sbmh.js"(exports, module) {
+  "node_modules/.pnpm/streamsearch@1.1.0/node_modules/streamsearch/lib/sbmh.js"(exports, module) {
     "use strict";
     function memcmp(buf1, pos1, buf2, pos2, num) {
       for (let i = 0; i < num; ++i) {
@@ -39331,9 +39542,9 @@ var require_sbmh = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/multipart.js
+// node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/multipart.js
 var require_multipart = __commonJS({
-  "../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/multipart.js"(exports, module) {
+  "node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/multipart.js"(exports, module) {
     "use strict";
     var { Readable, Writable } = __require("stream");
     var StreamSearch = require_sbmh();
@@ -40378,9 +40589,9 @@ var require_multipart = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/urlencoded.js
+// node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/urlencoded.js
 var require_urlencoded2 = __commonJS({
-  "../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/urlencoded.js"(exports, module) {
+  "node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/types/urlencoded.js"(exports, module) {
     "use strict";
     var { Writable } = __require("stream");
     var { getDecoder } = require_utils4();
@@ -40925,9 +41136,9 @@ var require_urlencoded2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/index.js
+// node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/index.js
 var require_lib4 = __commonJS({
-  "../../node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/index.js"(exports, module) {
+  "node_modules/.pnpm/busboy@1.6.0/node_modules/busboy/lib/index.js"(exports, module) {
     "use strict";
     var { parseContentType } = require_utils4();
     function getInstance(cfg) {
@@ -40977,9 +41188,9 @@ var require_lib4 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/parse-path.js
+// node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/parse-path.js
 var require_parse_path = __commonJS({
-  "../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/parse-path.js"(exports, module) {
+  "node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/parse-path.js"(exports, module) {
     var reFirstKey = /^[^\[]*/;
     var reDigitPath = /^\[(\d+)\]/;
     var reNormalPath = /^\[([^\]]+)\]/;
@@ -41026,9 +41237,9 @@ var require_parse_path = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/set-value.js
+// node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/set-value.js
 var require_set_value = __commonJS({
-  "../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/set-value.js"(exports, module) {
+  "node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/lib/set-value.js"(exports, module) {
     function valueType(value) {
       if (value === void 0) return "undefined";
       if (Array.isArray(value)) return "array";
@@ -41089,9 +41300,9 @@ var require_set_value = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/index.js
+// node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/index.js
 var require_append_field = __commonJS({
-  "../../node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/index.js"(exports, module) {
+  "node_modules/.pnpm/append-field@1.0.0/node_modules/append-field/index.js"(exports, module) {
     var parsePath = require_parse_path();
     var setValue = require_set_value();
     function appendField(store, key, value) {
@@ -41104,9 +41315,9 @@ var require_append_field = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/counter.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/counter.js
 var require_counter = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/counter.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/counter.js"(exports, module) {
     var EventEmitter = __require("events").EventEmitter;
     function Counter() {
       EventEmitter.call(this);
@@ -41130,10 +41341,10 @@ var require_counter = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/multer-error.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/multer-error.js
 var require_multer_error = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/multer-error.js"(exports, module) {
-    var util2 = __require("util");
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/multer-error.js"(exports, module) {
+    var util = __require("util");
     var errorMessages = {
       LIMIT_PART_COUNT: "Too many parts",
       LIMIT_FILE_SIZE: "File too large",
@@ -41151,14 +41362,14 @@ var require_multer_error = __commonJS({
       this.code = code;
       if (field) this.field = field;
     }
-    util2.inherits(MulterError, Error);
+    util.inherits(MulterError, Error);
     module.exports = MulterError;
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/file-appender.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/file-appender.js
 var require_file_appender = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/file-appender.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/file-appender.js"(exports, module) {
     function arrayRemove(arr, item) {
       var idx = arr.indexOf(item);
       if (~idx) arr.splice(idx, 1);
@@ -41233,9 +41444,9 @@ var require_file_appender = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/remove-uploaded-files.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/remove-uploaded-files.js
 var require_remove_uploaded_files = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/remove-uploaded-files.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/remove-uploaded-files.js"(exports, module) {
     function removeUploadedFiles(uploadedFiles, remove2, cb) {
       var length = uploadedFiles.length;
       var errors = [];
@@ -41263,9 +41474,9 @@ var require_remove_uploaded_files = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/make-middleware.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/make-middleware.js
 var require_make_middleware = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/make-middleware.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/lib/make-middleware.js"(exports, module) {
     var is = require_type_is2();
     var Busboy = require_lib4();
     var appendField = require_append_field();
@@ -41472,9 +41683,9 @@ var require_make_middleware = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/disk.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/disk.js
 var require_disk = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/disk.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/disk.js"(exports, module) {
     var fs = __require("fs");
     var os = __require("os");
     var path4 = __require("path");
@@ -41532,16 +41743,16 @@ var require_disk = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/stream.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/stream.js
 var require_stream = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/stream.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/stream.js"(exports, module) {
     module.exports = __require("stream");
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/buffer_list.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/buffer_list.js
 var require_buffer_list = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/buffer_list.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/buffer_list.js"(exports, module) {
     "use strict";
     function ownKeys5(object, enumerableOnly) {
       var keys = Object.keys(object);
@@ -41781,9 +41992,9 @@ var require_buffer_list = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/destroy.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/destroy.js
 var require_destroy = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/destroy.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/destroy.js"(exports, module) {
     "use strict";
     function destroy(err, cb) {
       var _this = this;
@@ -41870,9 +42081,9 @@ var require_destroy = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/errors.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/errors.js
 var require_errors = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/errors.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/errors.js"(exports, module) {
     "use strict";
     var codes = {};
     function createErrorType(code, message, Base) {
@@ -41970,9 +42181,9 @@ var require_errors = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/state.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/state.js
 var require_state = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/state.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/state.js"(exports, module) {
     "use strict";
     var ERR_INVALID_OPT_VALUE = require_errors().codes.ERR_INVALID_OPT_VALUE;
     function highWaterMarkFrom(options, isDuplex, duplexKey) {
@@ -41995,16 +42206,16 @@ var require_state = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/util-deprecate@1.0.2/node_modules/util-deprecate/node.js
+// node_modules/.pnpm/util-deprecate@1.0.2/node_modules/util-deprecate/node.js
 var require_node2 = __commonJS({
-  "../../node_modules/.pnpm/util-deprecate@1.0.2/node_modules/util-deprecate/node.js"(exports, module) {
+  "node_modules/.pnpm/util-deprecate@1.0.2/node_modules/util-deprecate/node.js"(exports, module) {
     module.exports = __require("util").deprecate;
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_writable.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_writable.js
 var require_stream_writable = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_writable.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_writable.js"(exports, module) {
     "use strict";
     module.exports = Writable;
     function CorkedRequest(state) {
@@ -42473,9 +42684,9 @@ var require_stream_writable = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_duplex.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_duplex.js
 var require_stream_duplex = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_duplex.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_duplex.js"(exports, module) {
     "use strict";
     var objectKeys = Object.keys || function(obj) {
       var keys2 = [];
@@ -42566,9 +42777,9 @@ var require_stream_duplex = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/safe-buffer@5.2.1/node_modules/safe-buffer/index.js
+// node_modules/.pnpm/safe-buffer@5.2.1/node_modules/safe-buffer/index.js
 var require_safe_buffer = __commonJS({
-  "../../node_modules/.pnpm/safe-buffer@5.2.1/node_modules/safe-buffer/index.js"(exports, module) {
+  "node_modules/.pnpm/safe-buffer@5.2.1/node_modules/safe-buffer/index.js"(exports, module) {
     var buffer = __require("buffer");
     var Buffer2 = buffer.Buffer;
     function copyProps(src, dst) {
@@ -42624,9 +42835,9 @@ var require_safe_buffer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/string_decoder@1.3.0/node_modules/string_decoder/lib/string_decoder.js
+// node_modules/.pnpm/string_decoder@1.3.0/node_modules/string_decoder/lib/string_decoder.js
 var require_string_decoder = __commonJS({
-  "../../node_modules/.pnpm/string_decoder@1.3.0/node_modules/string_decoder/lib/string_decoder.js"(exports) {
+  "node_modules/.pnpm/string_decoder@1.3.0/node_modules/string_decoder/lib/string_decoder.js"(exports) {
     "use strict";
     var Buffer2 = require_safe_buffer().Buffer;
     var isEncoding = Buffer2.isEncoding || function(encoding) {
@@ -42862,9 +43073,9 @@ var require_string_decoder = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/end-of-stream.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/end-of-stream.js
 var require_end_of_stream = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/end-of-stream.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/end-of-stream.js"(exports, module) {
     "use strict";
     var ERR_STREAM_PREMATURE_CLOSE = require_errors().codes.ERR_STREAM_PREMATURE_CLOSE;
     function once(callback) {
@@ -42951,9 +43162,9 @@ var require_end_of_stream = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/async_iterator.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/async_iterator.js
 var require_async_iterator = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/async_iterator.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/async_iterator.js"(exports, module) {
     "use strict";
     var _Object$setPrototypeO;
     function _defineProperty4(obj, key, value) {
@@ -43134,9 +43345,9 @@ var require_async_iterator = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/from.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/from.js
 var require_from = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/from.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/from.js"(exports, module) {
     "use strict";
     function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
       try {
@@ -43255,9 +43466,9 @@ var require_from = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_readable.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_readable.js
 var require_stream_readable = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_readable.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_readable.js"(exports, module) {
     "use strict";
     module.exports = Readable;
     var Duplex;
@@ -43988,9 +44199,9 @@ var require_stream_readable = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_transform.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_transform.js
 var require_stream_transform = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_transform.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_transform.js"(exports, module) {
     "use strict";
     module.exports = Transform;
     var _require$codes = require_errors().codes;
@@ -44089,9 +44300,9 @@ var require_stream_transform = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_passthrough.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_passthrough.js
 var require_stream_passthrough = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_passthrough.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/_stream_passthrough.js"(exports, module) {
     "use strict";
     module.exports = PassThrough;
     var Transform = require_stream_transform();
@@ -44106,9 +44317,9 @@ var require_stream_passthrough = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/pipeline.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/pipeline.js
 var require_pipeline = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/pipeline.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/lib/internal/streams/pipeline.js"(exports, module) {
     "use strict";
     var eos;
     function once(callback) {
@@ -44191,9 +44402,9 @@ var require_pipeline = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/readable.js
+// node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/readable.js
 var require_readable = __commonJS({
-  "../../node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/readable.js"(exports, module) {
+  "node_modules/.pnpm/readable-stream@3.6.2/node_modules/readable-stream/readable.js"(exports, module) {
     var Stream = __require("stream");
     if (process.env.READABLE_STREAM === "disable" && Stream) {
       module.exports = Stream.Readable;
@@ -44213,9 +44424,9 @@ var require_readable = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/buffer-from@1.1.2/node_modules/buffer-from/index.js
+// node_modules/.pnpm/buffer-from@1.1.2/node_modules/buffer-from/index.js
 var require_buffer_from = __commonJS({
-  "../../node_modules/.pnpm/buffer-from@1.1.2/node_modules/buffer-from/index.js"(exports, module) {
+  "node_modules/.pnpm/buffer-from@1.1.2/node_modules/buffer-from/index.js"(exports, module) {
     var toString = Object.prototype.toString;
     var isModern = typeof Buffer !== "undefined" && typeof Buffer.alloc === "function" && typeof Buffer.allocUnsafe === "function" && typeof Buffer.from === "function";
     function isArrayBuffer(input) {
@@ -44262,9 +44473,9 @@ var require_buffer_from = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/typedarray@0.0.6/node_modules/typedarray/index.js
+// node_modules/.pnpm/typedarray@0.0.6/node_modules/typedarray/index.js
 var require_typedarray = __commonJS({
-  "../../node_modules/.pnpm/typedarray@0.0.6/node_modules/typedarray/index.js"(exports) {
+  "node_modules/.pnpm/typedarray@0.0.6/node_modules/typedarray/index.js"(exports) {
     var undefined2 = void 0;
     var MAX_ARRAY_LENGTH = 1e5;
     var ECMAScript = /* @__PURE__ */ (function() {
@@ -44738,21 +44949,21 @@ var require_typedarray = __commonJS({
         }
         configureProperties(this);
       };
-      function makeGetter(arrayType2) {
+      function makeGetter(arrayType) {
         return function(byteOffset, littleEndian) {
           byteOffset = ECMAScript.ToUint32(byteOffset);
-          if (byteOffset + arrayType2.BYTES_PER_ELEMENT > this.byteLength) {
+          if (byteOffset + arrayType.BYTES_PER_ELEMENT > this.byteLength) {
             throw new RangeError("Array index out of range");
           }
           byteOffset += this.byteOffset;
-          var uint8Array = new exports.Uint8Array(this.buffer, byteOffset, arrayType2.BYTES_PER_ELEMENT), bytes = [], i;
-          for (i = 0; i < arrayType2.BYTES_PER_ELEMENT; i += 1) {
+          var uint8Array = new exports.Uint8Array(this.buffer, byteOffset, arrayType.BYTES_PER_ELEMENT), bytes = [], i;
+          for (i = 0; i < arrayType.BYTES_PER_ELEMENT; i += 1) {
             bytes.push(r(uint8Array, i));
           }
           if (Boolean(littleEndian) === Boolean(IS_BIG_ENDIAN)) {
             bytes.reverse();
           }
-          return r(new arrayType2(new exports.Uint8Array(bytes).buffer), 0);
+          return r(new arrayType(new exports.Uint8Array(bytes).buffer), 0);
         };
       }
       DataView2.prototype.getUint8 = makeGetter(exports.Uint8Array);
@@ -44763,20 +44974,20 @@ var require_typedarray = __commonJS({
       DataView2.prototype.getInt32 = makeGetter(exports.Int32Array);
       DataView2.prototype.getFloat32 = makeGetter(exports.Float32Array);
       DataView2.prototype.getFloat64 = makeGetter(exports.Float64Array);
-      function makeSetter(arrayType2) {
+      function makeSetter(arrayType) {
         return function(byteOffset, value, littleEndian) {
           byteOffset = ECMAScript.ToUint32(byteOffset);
-          if (byteOffset + arrayType2.BYTES_PER_ELEMENT > this.byteLength) {
+          if (byteOffset + arrayType.BYTES_PER_ELEMENT > this.byteLength) {
             throw new RangeError("Array index out of range");
           }
-          var typeArray = new arrayType2([value]), byteArray = new exports.Uint8Array(typeArray.buffer), bytes = [], i, byteView;
-          for (i = 0; i < arrayType2.BYTES_PER_ELEMENT; i += 1) {
+          var typeArray = new arrayType([value]), byteArray = new exports.Uint8Array(typeArray.buffer), bytes = [], i, byteView;
+          for (i = 0; i < arrayType.BYTES_PER_ELEMENT; i += 1) {
             bytes.push(r(byteArray, i));
           }
           if (Boolean(littleEndian) === Boolean(IS_BIG_ENDIAN)) {
             bytes.reverse();
           }
-          byteView = new exports.Uint8Array(this.buffer, byteOffset, arrayType2.BYTES_PER_ELEMENT);
+          byteView = new exports.Uint8Array(this.buffer, byteOffset, arrayType.BYTES_PER_ELEMENT);
           byteView.set(bytes);
         };
       }
@@ -44793,9 +45004,9 @@ var require_typedarray = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/concat-stream@2.0.0/node_modules/concat-stream/index.js
+// node_modules/.pnpm/concat-stream@2.0.0/node_modules/concat-stream/index.js
 var require_concat_stream = __commonJS({
-  "../../node_modules/.pnpm/concat-stream@2.0.0/node_modules/concat-stream/index.js"(exports, module) {
+  "node_modules/.pnpm/concat-stream@2.0.0/node_modules/concat-stream/index.js"(exports, module) {
     var Writable = require_readable().Writable;
     var inherits = require_inherits();
     var bufferFrom = require_buffer_from();
@@ -44924,9 +45135,9 @@ var require_concat_stream = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/memory.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/memory.js
 var require_memory = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/memory.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/storage/memory.js"(exports, module) {
     var concat = require_concat_stream();
     function MemoryStorage(opts) {
     }
@@ -44948,9 +45159,9 @@ var require_memory = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js
+// node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js
 var require_multer = __commonJS({
-  "../../node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js"(exports, module) {
+  "node_modules/.pnpm/multer@2.1.1/node_modules/multer/index.js"(exports, module) {
     var makeMiddleware = require_make_middleware();
     var diskStorage = require_disk();
     var memoryStorage = require_memory();
@@ -45041,7 +45252,7 @@ var require_multer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs
+// node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs
 var tslib_es6_exports = {};
 __export(tslib_es6_exports, {
   __addDisposableResource: () => __addDisposableResource,
@@ -45480,7 +45691,7 @@ function __rewriteRelativeImportExtension(path4, preserveJsx) {
 }
 var extendStatics, __assign, __createBinding, __setModuleDefault, ownKeys, _SuppressedError, tslib_es6_default;
 var init_tslib_es6 = __esm({
-  "../../node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs"() {
+  "node_modules/.pnpm/tslib@2.8.1/node_modules/tslib/tslib.es6.mjs"() {
     extendStatics = function(d, b) {
       extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
         d2.__proto__ = b2;
@@ -45566,9 +45777,9 @@ var init_tslib_es6 = __esm({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/helper.js
+// node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/helper.js
 var require_helper = __commonJS({
-  "../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/helper.js"(exports) {
+  "node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/helper.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.resolveFetch = void 0;
@@ -45582,9 +45793,9 @@ var require_helper = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/types.js
+// node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/types.js
 var require_types = __commonJS({
-  "../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/types.js"(exports) {
+  "node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/types.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FunctionRegion = exports.FunctionsHttpError = exports.FunctionsRelayError = exports.FunctionsFetchError = exports.FunctionsError = void 0;
@@ -45593,6 +45804,13 @@ var require_types = __commonJS({
         super(message);
         this.name = name;
         this.context = context;
+      }
+      toJSON() {
+        return {
+          name: this.name,
+          message: this.message,
+          context: this.context
+        };
       }
     };
     exports.FunctionsError = FunctionsError2;
@@ -45635,9 +45853,9 @@ var require_types = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js
+// node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js
 var require_FunctionsClient = __commonJS({
-  "../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js"(exports) {
+  "node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FunctionsClient = void 0;
@@ -45648,12 +45866,22 @@ var require_FunctionsClient = __commonJS({
       /**
        * Creates a new Functions client bound to an Edge Functions URL.
        *
-       * @example
+       * @example Using supabase-js (recommended)
+       * ```ts
+       * import { createClient } from '@supabase/supabase-js'
+       *
+       * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+       * const { data, error } = await supabase.functions.invoke('hello-world')
+       * ```
+       *
+       * @category Edge Functions
+       *
+       * @example Standalone import for bundle-sensitive environments
        * ```ts
        * import { FunctionsClient, FunctionRegion } from '@supabase/functions-js'
        *
        * const functions = new FunctionsClient('https://xyzcompany.supabase.co/functions/v1', {
-       *   headers: { apikey: 'public-anon-key' },
+       *   headers: { apikey: 'your-publishable-key' },
        *   region: FunctionRegion.UsEast1,
        * })
        * ```
@@ -45667,7 +45895,10 @@ var require_FunctionsClient = __commonJS({
       /**
        * Updates the authorization header
        * @param token - the new jwt token sent in the authorisation header
-       * @example
+       *
+       * @category Edge Functions
+       *
+       * @example Setting the authorization header
        * ```ts
        * functions.setAuth(session.access_token)
        * ```
@@ -45680,6 +45911,120 @@ var require_FunctionsClient = __commonJS({
        * @param functionName - The name of the Function to invoke.
        * @param options - Options for invoking the Function.
        * @example
+       * ```ts
+       * const { data, error } = await functions.invoke('hello-world', {
+       *   body: { name: 'Ada' },
+       * })
+       * ```
+       *
+       * @category Edge Functions
+       *
+       * @remarks
+       * - Requires an Authorization header.
+       * - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+       * - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behavior by passing in a `Content-Type` header of your own.
+       * - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
+       *
+       * @example Basic invocation
+       * ```js
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   body: { foo: 'bar' }
+       * })
+       * ```
+       *
+       * @exampleDescription Error handling
+       * A `FunctionsHttpError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+       *
+       * @example Error handling
+       * ```js
+       * import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
+       *
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   headers: {
+       *     "my-custom-header": 'my-custom-header-value'
+       *   },
+       *   body: { foo: 'bar' }
+       * })
+       *
+       * if (error instanceof FunctionsHttpError) {
+       *   const errorMessage = await error.context.json()
+       *   console.log('Function returned an error', errorMessage)
+       * } else if (error instanceof FunctionsRelayError) {
+       *   console.log('Relay error:', error.message)
+       * } else if (error instanceof FunctionsFetchError) {
+       *   console.log('Fetch error:', error.message)
+       * }
+       * ```
+       *
+       * @exampleDescription Passing custom headers
+       * You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+       *
+       * @example Passing custom headers
+       * ```js
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   headers: {
+       *     "my-custom-header": 'my-custom-header-value'
+       *   },
+       *   body: { foo: 'bar' }
+       * })
+       * ```
+       *
+       * @exampleDescription Calling with DELETE HTTP verb
+       * You can also set the HTTP verb to `DELETE` when calling your Edge Function.
+       *
+       * @example Calling with DELETE HTTP verb
+       * ```js
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   headers: {
+       *     "my-custom-header": 'my-custom-header-value'
+       *   },
+       *   body: { foo: 'bar' },
+       *   method: 'DELETE'
+       * })
+       * ```
+       *
+       * @exampleDescription Invoking a Function in the UsEast1 region
+       * Here are the available regions:
+       * - `FunctionRegion.Any`
+       * - `FunctionRegion.ApNortheast1`
+       * - `FunctionRegion.ApNortheast2`
+       * - `FunctionRegion.ApSouth1`
+       * - `FunctionRegion.ApSoutheast1`
+       * - `FunctionRegion.ApSoutheast2`
+       * - `FunctionRegion.CaCentral1`
+       * - `FunctionRegion.EuCentral1`
+       * - `FunctionRegion.EuWest1`
+       * - `FunctionRegion.EuWest2`
+       * - `FunctionRegion.EuWest3`
+       * - `FunctionRegion.SaEast1`
+       * - `FunctionRegion.UsEast1`
+       * - `FunctionRegion.UsWest1`
+       * - `FunctionRegion.UsWest2`
+       *
+       * @example Invoking a Function in the UsEast1 region
+       * ```js
+       * import { createClient, FunctionRegion } from '@supabase/supabase-js'
+       *
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   body: { foo: 'bar' },
+       *   region: FunctionRegion.UsEast1
+       * })
+       * ```
+       *
+       * @exampleDescription Calling with GET HTTP verb
+       * You can also set the HTTP verb to `GET` when calling your Edge Function.
+       *
+       * @example Calling with GET HTTP verb
+       * ```js
+       * const { data, error } = await supabase.functions.invoke('hello', {
+       *   headers: {
+       *     "my-custom-header": 'my-custom-header-value'
+       *   },
+       *   method: 'GET'
+       * })
+       * ```
+       *
+       * @example Standalone client invoke
        * ```ts
        * const { data, error } = await functions.invoke('hello-world', {
        *   body: { name: 'Ada' },
@@ -45786,9 +46131,9 @@ var require_FunctionsClient = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/index.js
+// node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/index.js
 var require_main = __commonJS({
-  "../../node_modules/.pnpm/@supabase+functions-js@2.99.3/node_modules/@supabase/functions-js/dist/main/index.js"(exports) {
+  "node_modules/.pnpm/@supabase+functions-js@2.106.2/node_modules/@supabase/functions-js/dist/main/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.FunctionRegion = exports.FunctionsRelayError = exports.FunctionsHttpError = exports.FunctionsFetchError = exports.FunctionsError = exports.FunctionsClient = void 0;
@@ -45815,9 +46160,9 @@ var require_main = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/websocket-factory.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/websocket-factory.js
 var require_websocket_factory = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/websocket-factory.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/websocket-factory.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WebSocketFactory = void 0;
@@ -45830,22 +46175,24 @@ var require_websocket_factory = __commonJS({
       static detectEnvironment() {
         var _a;
         if (typeof WebSocket !== "undefined") {
-          return { type: "native", constructor: WebSocket };
+          return { type: "native", wsConstructor: WebSocket };
         }
-        if (typeof globalThis !== "undefined" && typeof globalThis.WebSocket !== "undefined") {
-          return { type: "native", constructor: globalThis.WebSocket };
+        const gt = globalThis;
+        if (typeof globalThis !== "undefined" && typeof gt.WebSocket !== "undefined") {
+          return { type: "native", wsConstructor: gt.WebSocket };
         }
-        if (typeof global !== "undefined" && typeof global.WebSocket !== "undefined") {
-          return { type: "native", constructor: global.WebSocket };
+        const gl = typeof global !== "undefined" ? global : void 0;
+        if (gl && typeof gl.WebSocket !== "undefined") {
+          return { type: "native", wsConstructor: gl.WebSocket };
         }
-        if (typeof globalThis !== "undefined" && typeof globalThis.WebSocketPair !== "undefined" && typeof globalThis.WebSocket === "undefined") {
+        if (typeof globalThis !== "undefined" && typeof gt.WebSocketPair !== "undefined" && typeof globalThis.WebSocket === "undefined") {
           return {
             type: "cloudflare",
             error: "Cloudflare Workers detected. WebSocket clients are not supported in Cloudflare Workers.",
             workaround: "Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime."
           };
         }
-        if (typeof globalThis !== "undefined" && globalThis.EdgeRuntime || typeof navigator !== "undefined" && ((_a = navigator.userAgent) === null || _a === void 0 ? void 0 : _a.includes("Vercel-Edge"))) {
+        if (typeof globalThis !== "undefined" && gt.EdgeRuntime || typeof navigator !== "undefined" && ((_a = navigator.userAgent) === null || _a === void 0 ? void 0 : _a.includes("Vercel-Edge"))) {
           return {
             type: "unsupported",
             error: "Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.",
@@ -45860,7 +46207,7 @@ var require_websocket_factory = __commonJS({
             const nodeVersion = parseInt(versionString.replace(/^v/, "").split(".")[0]);
             if (nodeVersion >= 22) {
               if (typeof globalThis.WebSocket !== "undefined") {
-                return { type: "native", constructor: globalThis.WebSocket };
+                return { type: "native", wsConstructor: globalThis.WebSocket };
               }
               return {
                 type: "unsupported",
@@ -45884,16 +46231,22 @@ var require_websocket_factory = __commonJS({
       /**
        * Returns the best available WebSocket constructor for the current runtime.
        *
-       * @example
+       * @category Realtime
+       *
+       * @example Example with error handling
        * ```ts
-       * const WS = WebSocketFactory.getWebSocketConstructor()
-       * const socket = new WS('wss://realtime.supabase.co/socket')
+       * try {
+       *   const WS = WebSocketFactory.getWebSocketConstructor()
+       *   const socket = new WS('wss://example.com/socket')
+       * } catch (error) {
+       *   console.error('WebSocket not available in this environment.', error)
+       * }
        * ```
        */
       static getWebSocketConstructor() {
         const env = this.detectEnvironment();
-        if (env.constructor) {
-          return env.constructor;
+        if (env.wsConstructor) {
+          return env.wsConstructor;
         }
         let errorMessage = env.error || "WebSocket not supported in this environment.";
         if (env.workaround) {
@@ -45904,24 +46257,15 @@ Suggested solution: ${env.workaround}`;
         throw new Error(errorMessage);
       }
       /**
-       * Creates a WebSocket using the detected constructor.
-       *
-       * @example
-       * ```ts
-       * const socket = WebSocketFactory.createWebSocket('wss://realtime.supabase.co/socket')
-       * ```
-       */
-      static createWebSocket(url, protocols) {
-        const WS = this.getWebSocketConstructor();
-        return new WS(url, protocols);
-      }
-      /**
        * Detects whether the runtime can establish WebSocket connections.
        *
-       * @example
+       * @category Realtime
+       *
+       * @example Example in a Node.js script
        * ```ts
        * if (!WebSocketFactory.isWebSocketSupported()) {
-       *   console.warn('Falling back to long polling')
+       *   console.error('WebSockets are required for this script.')
+       *   process.exitCode = 1
        * }
        * ```
        */
@@ -45939,19 +46283,19 @@ Suggested solution: ${env.workaround}`;
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/version.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/version.js
 var require_version = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/version.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/version.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.version = void 0;
-    exports.version = "2.99.3";
+    exports.version = "2.106.2";
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/constants.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/constants.js
 var require_constants2 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/constants.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/constants.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.CONNECTION_STATE = exports.TRANSPORTS = exports.CHANNEL_EVENTS = exports.CHANNEL_STATES = exports.SOCKET_STATES = exports.MAX_PUSH_BUFFER_SIZE = exports.WS_CLOSE_NORMAL = exports.DEFAULT_TIMEOUT = exports.VERSION = exports.DEFAULT_VSN = exports.VSN_2_0_0 = exports.VSN_1_0_0 = exports.DEFAULT_VERSION = void 0;
@@ -45964,47 +46308,42 @@ var require_constants2 = __commonJS({
     exports.DEFAULT_TIMEOUT = 1e4;
     exports.WS_CLOSE_NORMAL = 1e3;
     exports.MAX_PUSH_BUFFER_SIZE = 100;
-    var SOCKET_STATES;
-    (function(SOCKET_STATES2) {
-      SOCKET_STATES2[SOCKET_STATES2["connecting"] = 0] = "connecting";
-      SOCKET_STATES2[SOCKET_STATES2["open"] = 1] = "open";
-      SOCKET_STATES2[SOCKET_STATES2["closing"] = 2] = "closing";
-      SOCKET_STATES2[SOCKET_STATES2["closed"] = 3] = "closed";
-    })(SOCKET_STATES || (exports.SOCKET_STATES = SOCKET_STATES = {}));
-    var CHANNEL_STATES;
-    (function(CHANNEL_STATES2) {
-      CHANNEL_STATES2["closed"] = "closed";
-      CHANNEL_STATES2["errored"] = "errored";
-      CHANNEL_STATES2["joined"] = "joined";
-      CHANNEL_STATES2["joining"] = "joining";
-      CHANNEL_STATES2["leaving"] = "leaving";
-    })(CHANNEL_STATES || (exports.CHANNEL_STATES = CHANNEL_STATES = {}));
-    var CHANNEL_EVENTS;
-    (function(CHANNEL_EVENTS2) {
-      CHANNEL_EVENTS2["close"] = "phx_close";
-      CHANNEL_EVENTS2["error"] = "phx_error";
-      CHANNEL_EVENTS2["join"] = "phx_join";
-      CHANNEL_EVENTS2["reply"] = "phx_reply";
-      CHANNEL_EVENTS2["leave"] = "phx_leave";
-      CHANNEL_EVENTS2["access_token"] = "access_token";
-    })(CHANNEL_EVENTS || (exports.CHANNEL_EVENTS = CHANNEL_EVENTS = {}));
-    var TRANSPORTS;
-    (function(TRANSPORTS2) {
-      TRANSPORTS2["websocket"] = "websocket";
-    })(TRANSPORTS || (exports.TRANSPORTS = TRANSPORTS = {}));
-    var CONNECTION_STATE;
-    (function(CONNECTION_STATE2) {
-      CONNECTION_STATE2["Connecting"] = "connecting";
-      CONNECTION_STATE2["Open"] = "open";
-      CONNECTION_STATE2["Closing"] = "closing";
-      CONNECTION_STATE2["Closed"] = "closed";
-    })(CONNECTION_STATE || (exports.CONNECTION_STATE = CONNECTION_STATE = {}));
+    exports.SOCKET_STATES = {
+      connecting: 0,
+      open: 1,
+      closing: 2,
+      closed: 3
+    };
+    exports.CHANNEL_STATES = {
+      closed: "closed",
+      errored: "errored",
+      joined: "joined",
+      joining: "joining",
+      leaving: "leaving"
+    };
+    exports.CHANNEL_EVENTS = {
+      close: "phx_close",
+      error: "phx_error",
+      join: "phx_join",
+      reply: "phx_reply",
+      leave: "phx_leave",
+      access_token: "access_token"
+    };
+    exports.TRANSPORTS = {
+      websocket: "websocket"
+    };
+    exports.CONNECTION_STATE = {
+      connecting: "connecting",
+      open: "open",
+      closing: "closing",
+      closed: "closed"
+    };
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/serializer.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/serializer.js
 var require_serializer = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/serializer.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/serializer.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var Serializer = class {
@@ -46149,41 +46488,9 @@ var require_serializer = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/timer.js
-var require_timer = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/timer.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var Timer = class {
-      constructor(callback, timerCalc) {
-        this.callback = callback;
-        this.timerCalc = timerCalc;
-        this.timer = void 0;
-        this.tries = 0;
-        this.callback = callback;
-        this.timerCalc = timerCalc;
-      }
-      reset() {
-        this.tries = 0;
-        clearTimeout(this.timer);
-        this.timer = void 0;
-      }
-      // Cancels any previous scheduleTimeout and schedules callback
-      scheduleTimeout() {
-        clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-          this.tries = this.tries + 1;
-          this.callback();
-        }, this.timerCalc(this.tries + 1));
-      }
-    };
-    exports.default = Timer;
-  }
-});
-
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/transformers.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/transformers.js
 var require_transformers = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/transformers.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/transformers.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.httpEndpointURL = exports.toTimestampString = exports.toArray = exports.toJson = exports.toNumber = exports.toBoolean = exports.convertCell = exports.convertColumn = exports.convertChangeData = exports.PostgresTypes = void 0;
@@ -46360,44 +46667,130 @@ var require_transformers = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/push.js
-var require_push = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/lib/push.js"(exports) {
+// node_modules/.pnpm/@supabase+phoenix@0.4.2/node_modules/@supabase/phoenix/priv/static/phoenix.cjs.js
+var require_phoenix_cjs = __commonJS({
+  "node_modules/.pnpm/@supabase+phoenix@0.4.2/node_modules/@supabase/phoenix/priv/static/phoenix.cjs.js"(exports, module) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    var constants_1 = require_constants2();
+    var __defProp2 = Object.defineProperty;
+    var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
+    var __getOwnPropNames2 = Object.getOwnPropertyNames;
+    var __hasOwnProp2 = Object.prototype.hasOwnProperty;
+    var __export2 = (target, all) => {
+      for (var name in all)
+        __defProp2(target, name, { get: all[name], enumerable: true });
+    };
+    var __copyProps2 = (to, from, except, desc) => {
+      if (from && typeof from === "object" || typeof from === "function") {
+        for (let key of __getOwnPropNames2(from))
+          if (!__hasOwnProp2.call(to, key) && key !== except)
+            __defProp2(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc2(from, key)) || desc.enumerable });
+      }
+      return to;
+    };
+    var __toCommonJS2 = (mod) => __copyProps2(__defProp2({}, "__esModule", { value: true }), mod);
+    var phoenix_exports = {};
+    __export2(phoenix_exports, {
+      Channel: () => Channel,
+      LongPoll: () => LongPoll,
+      Presence: () => Presence,
+      Push: () => Push,
+      Serializer: () => serializer_default,
+      Socket: () => Socket,
+      Timer: () => Timer
+    });
+    module.exports = __toCommonJS2(phoenix_exports);
+    var closure = (value) => {
+      if (typeof value === "function") {
+        return (
+          /** @type {() => T} */
+          value
+        );
+      } else {
+        let closure2 = function() {
+          return value;
+        };
+        return closure2;
+      }
+    };
+    var globalSelf = typeof self !== "undefined" ? self : null;
+    var phxWindow = typeof window !== "undefined" ? window : null;
+    var global2 = globalSelf || phxWindow || globalThis;
+    var DEFAULT_VSN = "2.0.0";
+    var DEFAULT_TIMEOUT = 1e4;
+    var WS_CLOSE_NORMAL = 1e3;
+    var SOCKET_STATES = (
+      /** @type {const} */
+      { connecting: 0, open: 1, closing: 2, closed: 3 }
+    );
+    var CHANNEL_STATES = (
+      /** @type {const} */
+      {
+        closed: "closed",
+        errored: "errored",
+        joined: "joined",
+        joining: "joining",
+        leaving: "leaving"
+      }
+    );
+    var CHANNEL_EVENTS = (
+      /** @type {const} */
+      {
+        close: "phx_close",
+        error: "phx_error",
+        join: "phx_join",
+        reply: "phx_reply",
+        leave: "phx_leave"
+      }
+    );
+    var TRANSPORTS = (
+      /** @type {const} */
+      {
+        longpoll: "longpoll",
+        websocket: "websocket"
+      }
+    );
+    var XHR_STATES = (
+      /** @type {const} */
+      {
+        complete: 4
+      }
+    );
+    var AUTH_TOKEN_PREFIX = "base64url.bearer.phx.";
     var Push = class {
       /**
        * Initializes the Push
-       *
-       * @param channel The Channel
-       * @param event The event, for example `"phx_join"`
-       * @param payload The payload, for example `{user_id: 123}`
-       * @param timeout The push timeout in milliseconds
+       * @param {Channel} channel - The Channel
+       * @param {ChannelEvent} event - The event, for example `"phx_join"`
+       * @param {() => Record<string, unknown>} payload - The payload, for example `{user_id: 123}`
+       * @param {number} timeout - The push timeout in milliseconds
        */
-      constructor(channel, event, payload = {}, timeout = constants_1.DEFAULT_TIMEOUT) {
+      constructor(channel, event, payload, timeout) {
         this.channel = channel;
         this.event = event;
-        this.payload = payload;
-        this.timeout = timeout;
-        this.sent = false;
-        this.timeoutTimer = void 0;
-        this.ref = "";
+        this.payload = payload || function() {
+          return {};
+        };
         this.receivedResp = null;
+        this.timeout = timeout;
+        this.timeoutTimer = null;
         this.recHooks = [];
-        this.refEvent = null;
+        this.sent = false;
+        this.ref = void 0;
       }
+      /**
+       *
+       * @param {number} timeout
+       */
       resend(timeout) {
         this.timeout = timeout;
-        this._cancelRefEvent();
-        this.ref = "";
-        this.refEvent = null;
-        this.receivedResp = null;
-        this.sent = false;
+        this.reset();
         this.send();
       }
+      /**
+       *
+       */
       send() {
-        if (this._hasReceived("timeout")) {
+        if (this.hasReceived("timeout")) {
           return;
         }
         this.startTimeout();
@@ -46405,249 +46798,1715 @@ var require_push = __commonJS({
         this.channel.socket.push({
           topic: this.channel.topic,
           event: this.event,
-          payload: this.payload,
+          payload: this.payload(),
           ref: this.ref,
-          join_ref: this.channel._joinRef()
+          join_ref: this.channel.joinRef()
         });
       }
-      updatePayload(payload) {
-        this.payload = Object.assign(Object.assign({}, this.payload), payload);
-      }
+      /**
+       *
+       * @param {string} status
+       * @param {(response: any) => void} callback
+       */
       receive(status, callback) {
-        var _a;
-        if (this._hasReceived(status)) {
-          callback((_a = this.receivedResp) === null || _a === void 0 ? void 0 : _a.response);
+        if (this.hasReceived(status)) {
+          callback(this.receivedResp.response);
         }
         this.recHooks.push({ status, callback });
         return this;
       }
-      startTimeout() {
-        if (this.timeoutTimer) {
+      reset() {
+        this.cancelRefEvent();
+        this.ref = null;
+        this.refEvent = null;
+        this.receivedResp = null;
+        this.sent = false;
+      }
+      destroy() {
+        this.cancelRefEvent();
+        this.cancelTimeout();
+      }
+      /**
+       * @private
+       */
+      matchReceive({ status, response, _ref }) {
+        this.recHooks.filter((h) => h.status === status).forEach((h) => h.callback(response));
+      }
+      /**
+       * @private
+       */
+      cancelRefEvent() {
+        if (!this.refEvent) {
           return;
         }
-        this.ref = this.channel.socket._makeRef();
-        this.refEvent = this.channel._replyEventName(this.ref);
-        const callback = (payload) => {
-          this._cancelRefEvent();
-          this._cancelTimeout();
+        this.channel.off(this.refEvent);
+      }
+      cancelTimeout() {
+        clearTimeout(this.timeoutTimer);
+        this.timeoutTimer = null;
+      }
+      startTimeout() {
+        if (this.timeoutTimer) {
+          this.cancelTimeout();
+        }
+        this.ref = this.channel.socket.makeRef();
+        this.refEvent = this.channel.replyEventName(this.ref);
+        this.channel.on(this.refEvent, (payload) => {
+          this.cancelRefEvent();
+          this.cancelTimeout();
           this.receivedResp = payload;
-          this._matchReceive(payload);
-        };
-        this.channel._on(this.refEvent, {}, callback);
+          this.matchReceive(payload);
+        });
         this.timeoutTimer = setTimeout(() => {
           this.trigger("timeout", {});
         }, this.timeout);
       }
-      trigger(status, response) {
-        if (this.refEvent)
-          this.channel._trigger(this.refEvent, { status, response });
-      }
-      destroy() {
-        this._cancelRefEvent();
-        this._cancelTimeout();
-      }
-      _cancelRefEvent() {
-        if (!this.refEvent) {
-          return;
-        }
-        this.channel._off(this.refEvent, {});
-      }
-      _cancelTimeout() {
-        clearTimeout(this.timeoutTimer);
-        this.timeoutTimer = void 0;
-      }
-      _matchReceive({ status, response }) {
-        this.recHooks.filter((h) => h.status === status).forEach((h) => h.callback(response));
-      }
-      _hasReceived(status) {
+      /**
+       * @private
+       */
+      hasReceived(status) {
         return this.receivedResp && this.receivedResp.status === status;
       }
+      trigger(status, response) {
+        this.channel.trigger(this.refEvent, { status, response });
+      }
     };
-    exports.default = Push;
-  }
-});
-
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimePresence.js
-var require_RealtimePresence = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimePresence.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.REALTIME_PRESENCE_LISTEN_EVENTS = void 0;
-    var REALTIME_PRESENCE_LISTEN_EVENTS;
-    (function(REALTIME_PRESENCE_LISTEN_EVENTS2) {
-      REALTIME_PRESENCE_LISTEN_EVENTS2["SYNC"] = "sync";
-      REALTIME_PRESENCE_LISTEN_EVENTS2["JOIN"] = "join";
-      REALTIME_PRESENCE_LISTEN_EVENTS2["LEAVE"] = "leave";
-    })(REALTIME_PRESENCE_LISTEN_EVENTS || (exports.REALTIME_PRESENCE_LISTEN_EVENTS = REALTIME_PRESENCE_LISTEN_EVENTS = {}));
-    var RealtimePresence = class _RealtimePresence {
+    var Timer = class {
       /**
-       * Creates a Presence helper that keeps the local presence state in sync with the server.
+      * @param {() => void} callback
+      * @param {(tries: number) => number} timerCalc
+      */
+      constructor(callback, timerCalc) {
+        this.callback = callback;
+        this.timerCalc = timerCalc;
+        this.timer = void 0;
+        this.tries = 0;
+      }
+      reset() {
+        this.tries = 0;
+        clearTimeout(this.timer);
+      }
+      /**
+       * Cancels any previous scheduleTimeout and schedules callback
+       */
+      scheduleTimeout() {
+        clearTimeout(this.timer);
+        this.timer = setTimeout(() => {
+          this.tries = this.tries + 1;
+          this.callback();
+        }, this.timerCalc(this.tries + 1));
+      }
+    };
+    var Channel = class {
+      /**
+       * @param {string} topic
+       * @param {Params | (() => Params)} params
+       * @param {Socket} socket
+       */
+      constructor(topic, params, socket) {
+        this.state = CHANNEL_STATES.closed;
+        this.topic = topic;
+        this.params = closure(params || {});
+        this.socket = socket;
+        this.bindings = [];
+        this.bindingRef = 0;
+        this.timeout = this.socket.timeout;
+        this.joinedOnce = false;
+        this.joinPush = new Push(this, CHANNEL_EVENTS.join, this.params, this.timeout);
+        this.pushBuffer = [];
+        this.stateChangeRefs = [];
+        this.rejoinTimer = new Timer(() => {
+          if (this.socket.isConnected()) {
+            this.rejoin();
+          }
+        }, this.socket.rejoinAfterMs);
+        this.stateChangeRefs.push(this.socket.onError(() => this.rejoinTimer.reset()));
+        this.stateChangeRefs.push(
+          this.socket.onOpen(() => {
+            this.rejoinTimer.reset();
+            if (this.isErrored()) {
+              this.rejoin();
+            }
+          })
+        );
+        this.joinPush.receive("ok", () => {
+          this.state = CHANNEL_STATES.joined;
+          this.rejoinTimer.reset();
+          this.pushBuffer.forEach((pushEvent) => pushEvent.send());
+          this.pushBuffer = [];
+        });
+        this.joinPush.receive("error", (reason) => {
+          this.state = CHANNEL_STATES.errored;
+          if (this.socket.hasLogger()) this.socket.log("channel", `error ${this.topic}`, reason);
+          if (this.socket.isConnected()) {
+            this.rejoinTimer.scheduleTimeout();
+          }
+        });
+        this.onClose(() => {
+          this.rejoinTimer.reset();
+          if (this.socket.hasLogger()) this.socket.log("channel", `close ${this.topic}`);
+          this.state = CHANNEL_STATES.closed;
+          this.socket.remove(this);
+        });
+        this.onError((reason) => {
+          if (this.socket.hasLogger()) this.socket.log("channel", `error ${this.topic}`, reason);
+          if (this.isJoining()) {
+            this.joinPush.reset();
+          }
+          this.state = CHANNEL_STATES.errored;
+          if (this.socket.isConnected()) {
+            this.rejoinTimer.scheduleTimeout();
+          }
+        });
+        this.joinPush.receive("timeout", () => {
+          if (this.socket.hasLogger()) this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout);
+          let leavePush = new Push(this, CHANNEL_EVENTS.leave, closure({}), this.timeout);
+          leavePush.send();
+          this.state = CHANNEL_STATES.errored;
+          this.joinPush.reset();
+          if (this.socket.isConnected()) {
+            this.rejoinTimer.scheduleTimeout();
+          }
+        });
+        this.on(CHANNEL_EVENTS.reply, (payload, ref) => {
+          this.trigger(this.replyEventName(ref), payload);
+        });
+      }
+      /**
+       * Join the channel
+       * @param {number} timeout
+       * @returns {Push}
+       */
+      join(timeout = this.timeout) {
+        if (this.joinedOnce) {
+          throw new Error("tried to join multiple times. 'join' can only be called a single time per channel instance");
+        } else {
+          this.timeout = timeout;
+          this.joinedOnce = true;
+          this.rejoin();
+          return this.joinPush;
+        }
+      }
+      /**
+       * Teardown the channel.
        *
-       * @param channel - The realtime channel to bind to.
-       * @param opts - Optional custom event names, e.g. `{ events: { state: 'state', diff: 'diff' } }`.
+       * Destroys and stops related timers.
+       */
+      teardown() {
+        this.pushBuffer.forEach((push) => push.destroy());
+        this.pushBuffer = [];
+        this.rejoinTimer.reset();
+        this.joinPush.destroy();
+        this.state = CHANNEL_STATES.closed;
+        this.bindings = [];
+      }
+      /**
+       * Hook into channel close
+       * @param {ChannelBindingCallback} callback
+       */
+      onClose(callback) {
+        this.on(CHANNEL_EVENTS.close, callback);
+      }
+      /**
+       * Hook into channel errors
+       * @param {ChannelOnErrorCallback} callback
+       * @return {number}
+       */
+      onError(callback) {
+        return this.on(CHANNEL_EVENTS.error, (reason) => callback(reason));
+      }
+      /**
+       * Subscribes on channel events
+       *
+       * Subscription returns a ref counter, which can be used later to
+       * unsubscribe the exact event listener
        *
        * @example
-       * ```ts
-       * const presence = new RealtimePresence(channel)
+       * const ref1 = channel.on("event", do_stuff)
+       * const ref2 = channel.on("event", do_other_stuff)
+       * channel.off("event", ref1)
+       * // Since unsubscription, do_stuff won't fire,
+       * // while do_other_stuff will keep firing on the "event"
        *
-       * channel.on('presence', ({ event, key }) => {
-       *   console.log(`Presence ${event} on ${key}`)
-       * })
-       * ```
+       * @param {string} event
+       * @param {ChannelBindingCallback} callback
+       * @returns {number} ref
        */
-      constructor(channel, opts) {
-        this.channel = channel;
-        this.state = {};
-        this.pendingDiffs = [];
-        this.joinRef = null;
-        this.enabled = false;
-        this.caller = {
-          onJoin: () => {
-          },
-          onLeave: () => {
-          },
-          onSync: () => {
+      on(event, callback) {
+        let ref = this.bindingRef++;
+        this.bindings.push({ event, ref, callback });
+        return ref;
+      }
+      /**
+       * Unsubscribes off of channel events
+       *
+       * Use the ref returned from a channel.on() to unsubscribe one
+       * handler, or pass nothing for the ref to unsubscribe all
+       * handlers for the given event.
+       *
+       * @example
+       * // Unsubscribe the do_stuff handler
+       * const ref1 = channel.on("event", do_stuff)
+       * channel.off("event", ref1)
+       *
+       * // Unsubscribe all handlers from event
+       * channel.off("event")
+       *
+       * @param {string} event
+       * @param {number} [ref]
+       */
+      off(event, ref) {
+        this.bindings = this.bindings.filter((bind) => {
+          return !(bind.event === event && (typeof ref === "undefined" || ref === bind.ref));
+        });
+      }
+      /**
+       * @private
+       */
+      canPush() {
+        return this.socket.isConnected() && this.isJoined();
+      }
+      /**
+       * Sends a message `event` to phoenix with the payload `payload`.
+       * Phoenix receives this in the `handle_in(event, payload, socket)`
+       * function. if phoenix replies or it times out (default 10000ms),
+       * then optionally the reply can be received.
+       *
+       * @example
+       * channel.push("event")
+       *   .receive("ok", payload => console.log("phoenix replied:", payload))
+       *   .receive("error", err => console.log("phoenix errored", err))
+       *   .receive("timeout", () => console.log("timed out pushing"))
+       * @param {string} event
+       * @param {Object} payload
+       * @param {number} [timeout]
+       * @returns {Push}
+       */
+      push(event, payload, timeout = this.timeout) {
+        payload = payload || {};
+        if (!this.joinedOnce) {
+          throw new Error(`tried to push '${event}' to '${this.topic}' before joining. Use channel.join() before pushing events`);
+        }
+        let pushEvent = new Push(this, event, function() {
+          return payload;
+        }, timeout);
+        if (this.canPush()) {
+          pushEvent.send();
+        } else {
+          pushEvent.startTimeout();
+          this.pushBuffer.push(pushEvent);
+        }
+        return pushEvent;
+      }
+      /** Leaves the channel
+       *
+       * Unsubscribes from server events, and
+       * instructs channel to terminate on server
+       *
+       * Triggers onClose() hooks
+       *
+       * To receive leave acknowledgements, use the `receive`
+       * hook to bind to the server ack, ie:
+       *
+       * @example
+       * channel.leave().receive("ok", () => alert("left!") )
+       *
+       * @param {number} timeout
+       * @returns {Push}
+       */
+      leave(timeout = this.timeout) {
+        this.rejoinTimer.reset();
+        this.joinPush.cancelTimeout();
+        this.state = CHANNEL_STATES.leaving;
+        let onClose = () => {
+          if (this.socket.hasLogger()) this.socket.log("channel", `leave ${this.topic}`);
+          this.trigger(CHANNEL_EVENTS.close, "leave");
+        };
+        let leavePush = new Push(this, CHANNEL_EVENTS.leave, closure({}), timeout);
+        leavePush.receive("ok", () => onClose()).receive("timeout", () => onClose());
+        leavePush.send();
+        if (!this.canPush()) {
+          leavePush.trigger("ok", {});
+        }
+        return leavePush;
+      }
+      /**
+       * Overridable message hook
+       *
+       * Receives all events for specialized message handling
+       * before dispatching to the channel callbacks.
+       *
+       * Must return the payload, modified or unmodified
+       * @type{ChannelOnMessage}
+       */
+      onMessage(_event, payload, _ref) {
+        return payload;
+      }
+      /**
+       * Overridable filter hook
+       *
+       * If this function returns `true`, `binding`'s callback will be called.
+       *
+       * @type{ChannelFilterBindings}
+       */
+      filterBindings(_binding, _payload, _ref) {
+        return true;
+      }
+      isMember(topic, event, payload, joinRef) {
+        if (this.topic !== topic) {
+          return false;
+        }
+        if (joinRef && joinRef !== this.joinRef()) {
+          if (this.socket.hasLogger()) this.socket.log("channel", "dropping outdated message", { topic, event, payload, joinRef });
+          return false;
+        } else {
+          return true;
+        }
+      }
+      joinRef() {
+        return this.joinPush.ref;
+      }
+      /**
+       * @private
+       */
+      rejoin(timeout = this.timeout) {
+        if (this.isLeaving()) {
+          return;
+        }
+        this.socket.leaveOpenTopic(this.topic);
+        this.state = CHANNEL_STATES.joining;
+        this.joinPush.resend(timeout);
+      }
+      /**
+       * @param {string} event
+       * @param {unknown} [payload]
+       * @param {?string} [ref]
+       * @param {?string} [joinRef]
+       */
+      trigger(event, payload, ref, joinRef) {
+        let handledPayload = this.onMessage(event, payload, ref, joinRef);
+        if (payload && !handledPayload) {
+          throw new Error("channel onMessage callbacks must return the payload, modified or unmodified");
+        }
+        let eventBindings = this.bindings.filter((bind) => bind.event === event && this.filterBindings(bind, payload, ref));
+        for (let i = 0; i < eventBindings.length; i++) {
+          let bind = eventBindings[i];
+          bind.callback(handledPayload, ref, joinRef || this.joinRef());
+        }
+      }
+      /**
+      * @param {string} ref
+      */
+      replyEventName(ref) {
+        return `chan_reply_${ref}`;
+      }
+      isClosed() {
+        return this.state === CHANNEL_STATES.closed;
+      }
+      isErrored() {
+        return this.state === CHANNEL_STATES.errored;
+      }
+      isJoined() {
+        return this.state === CHANNEL_STATES.joined;
+      }
+      isJoining() {
+        return this.state === CHANNEL_STATES.joining;
+      }
+      isLeaving() {
+        return this.state === CHANNEL_STATES.leaving;
+      }
+    };
+    var Ajax = class {
+      static request(method, endPoint, headers, body, timeout, ontimeout, callback) {
+        if (global2.XDomainRequest) {
+          let req = new global2.XDomainRequest();
+          return this.xdomainRequest(req, method, endPoint, body, timeout, ontimeout, callback);
+        } else if (global2.XMLHttpRequest) {
+          let req = new global2.XMLHttpRequest();
+          return this.xhrRequest(req, method, endPoint, headers, body, timeout, ontimeout, callback);
+        } else if (global2.fetch && global2.AbortController) {
+          return this.fetchRequest(method, endPoint, headers, body, timeout, ontimeout, callback);
+        } else {
+          throw new Error("No suitable XMLHttpRequest implementation found");
+        }
+      }
+      static fetchRequest(method, endPoint, headers, body, timeout, ontimeout, callback) {
+        let options = {
+          method,
+          headers,
+          body
+        };
+        let controller = null;
+        if (timeout) {
+          controller = new AbortController();
+          const _timeoutId = setTimeout(() => controller.abort(), timeout);
+          options.signal = controller.signal;
+        }
+        global2.fetch(endPoint, options).then((response) => response.text()).then((data) => this.parseJSON(data)).then((data) => callback && callback(data)).catch((err) => {
+          if (err.name === "AbortError" && ontimeout) {
+            ontimeout();
+          } else {
+            callback && callback(null);
+          }
+        });
+        return controller;
+      }
+      static xdomainRequest(req, method, endPoint, body, timeout, ontimeout, callback) {
+        req.timeout = timeout;
+        req.open(method, endPoint);
+        req.onload = () => {
+          let response = this.parseJSON(req.responseText);
+          callback && callback(response);
+        };
+        if (ontimeout) {
+          req.ontimeout = ontimeout;
+        }
+        req.onprogress = () => {
+        };
+        req.send(body);
+        return req;
+      }
+      static xhrRequest(req, method, endPoint, headers, body, timeout, ontimeout, callback) {
+        req.open(method, endPoint, true);
+        req.timeout = timeout;
+        for (let [key, value] of Object.entries(headers)) {
+          req.setRequestHeader(key, value);
+        }
+        req.onerror = () => callback && callback(null);
+        req.onreadystatechange = () => {
+          if (req.readyState === XHR_STATES.complete && callback) {
+            let response = this.parseJSON(req.responseText);
+            callback(response);
           }
         };
-        const events = (opts === null || opts === void 0 ? void 0 : opts.events) || {
-          state: "presence_state",
-          diff: "presence_diff"
+        if (ontimeout) {
+          req.ontimeout = ontimeout;
+        }
+        req.send(body);
+        return req;
+      }
+      static parseJSON(resp) {
+        if (!resp || resp === "") {
+          return null;
+        }
+        try {
+          return JSON.parse(resp);
+        } catch {
+          console && console.log("failed to parse JSON response", resp);
+          return null;
+        }
+      }
+      static serialize(obj, parentKey) {
+        let queryStr = [];
+        for (var key in obj) {
+          if (!Object.prototype.hasOwnProperty.call(obj, key)) {
+            continue;
+          }
+          let paramKey = parentKey ? `${parentKey}[${key}]` : key;
+          let paramVal = obj[key];
+          if (typeof paramVal === "object") {
+            queryStr.push(this.serialize(paramVal, paramKey));
+          } else {
+            queryStr.push(encodeURIComponent(paramKey) + "=" + encodeURIComponent(paramVal));
+          }
+        }
+        return queryStr.join("&");
+      }
+      static appendParams(url, params) {
+        if (Object.keys(params).length === 0) {
+          return url;
+        }
+        let prefix = url.match(/\?/) ? "&" : "?";
+        return `${url}${prefix}${this.serialize(params)}`;
+      }
+    };
+    var arrayBufferToBase64 = (buffer) => {
+      let binary = "";
+      let bytes = new Uint8Array(buffer);
+      let len = bytes.byteLength;
+      for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      return btoa(binary);
+    };
+    var LongPoll = class {
+      constructor(endPoint, protocols) {
+        if (protocols && protocols.length === 2 && protocols[1].startsWith(AUTH_TOKEN_PREFIX)) {
+          this.authToken = atob(protocols[1].slice(AUTH_TOKEN_PREFIX.length));
+        }
+        this.endPoint = null;
+        this.token = null;
+        this.skipHeartbeat = true;
+        this.reqs = /* @__PURE__ */ new Set();
+        this.awaitingBatchAck = false;
+        this.currentBatch = null;
+        this.currentBatchTimer = null;
+        this.batchBuffer = [];
+        this.onopen = function() {
         };
-        this.channel._on(events.state, {}, (newState) => {
-          const { onJoin, onLeave, onSync } = this.caller;
-          this.joinRef = this.channel._joinRef();
-          this.state = _RealtimePresence.syncState(this.state, newState, onJoin, onLeave);
+        this.onerror = function() {
+        };
+        this.onmessage = function() {
+        };
+        this.onclose = function() {
+        };
+        this.pollEndpoint = this.normalizeEndpoint(endPoint);
+        this.readyState = SOCKET_STATES.connecting;
+        setTimeout(() => this.poll(), 0);
+      }
+      normalizeEndpoint(endPoint) {
+        return endPoint.replace("ws://", "http://").replace("wss://", "https://").replace(new RegExp("(.*)/" + TRANSPORTS.websocket), "$1/" + TRANSPORTS.longpoll);
+      }
+      endpointURL() {
+        return Ajax.appendParams(this.pollEndpoint, { token: this.token });
+      }
+      closeAndRetry(code, reason, wasClean) {
+        this.close(code, reason, wasClean);
+        this.readyState = SOCKET_STATES.connecting;
+      }
+      ontimeout() {
+        this.onerror("timeout");
+        this.closeAndRetry(1005, "timeout", false);
+      }
+      isActive() {
+        return this.readyState === SOCKET_STATES.open || this.readyState === SOCKET_STATES.connecting;
+      }
+      poll() {
+        const headers = { "Accept": "application/json" };
+        if (this.authToken) {
+          headers["X-Phoenix-AuthToken"] = this.authToken;
+        }
+        this.ajax("GET", headers, null, () => this.ontimeout(), (resp) => {
+          if (resp) {
+            var { status, token, messages } = resp;
+            if (status === 410 && this.token !== null) {
+              this.onerror(410);
+              this.closeAndRetry(3410, "session_gone", false);
+              return;
+            }
+            this.token = token;
+          } else {
+            status = 0;
+          }
+          switch (status) {
+            case 200:
+              messages.forEach((msg) => {
+                setTimeout(() => this.onmessage({ data: msg }), 0);
+              });
+              this.poll();
+              break;
+            case 204:
+              this.poll();
+              break;
+            case 410:
+              this.readyState = SOCKET_STATES.open;
+              this.onopen({});
+              this.poll();
+              break;
+            case 403:
+              this.onerror(403);
+              this.close(1008, "forbidden", false);
+              break;
+            case 0:
+            case 500:
+              this.onerror(500);
+              this.closeAndRetry(1011, "internal server error", 500);
+              break;
+            default:
+              throw new Error(`unhandled poll status ${status}`);
+          }
+        });
+      }
+      // we collect all pushes within the current event loop by
+      // setTimeout 0, which optimizes back-to-back procedural
+      // pushes against an empty buffer
+      send(body) {
+        if (typeof body !== "string") {
+          body = arrayBufferToBase64(body);
+        }
+        if (this.currentBatch) {
+          this.currentBatch.push(body);
+        } else if (this.awaitingBatchAck) {
+          this.batchBuffer.push(body);
+        } else {
+          this.currentBatch = [body];
+          this.currentBatchTimer = setTimeout(() => {
+            this.batchSend(this.currentBatch);
+            this.currentBatch = null;
+          }, 0);
+        }
+      }
+      batchSend(messages) {
+        this.awaitingBatchAck = true;
+        this.ajax("POST", { "Content-Type": "application/x-ndjson" }, messages.join("\n"), () => this.onerror("timeout"), (resp) => {
+          this.awaitingBatchAck = false;
+          if (!resp || resp.status !== 200) {
+            this.onerror(resp && resp.status);
+            this.closeAndRetry(1011, "internal server error", false);
+          } else if (this.batchBuffer.length > 0) {
+            this.batchSend(this.batchBuffer);
+            this.batchBuffer = [];
+          }
+        });
+      }
+      close(code, reason, wasClean) {
+        for (let req of this.reqs) {
+          req.abort();
+        }
+        this.readyState = SOCKET_STATES.closed;
+        let opts = Object.assign({ code: 1e3, reason: void 0, wasClean: true }, { code, reason, wasClean });
+        this.batchBuffer = [];
+        clearTimeout(this.currentBatchTimer);
+        this.currentBatchTimer = null;
+        if (typeof CloseEvent !== "undefined") {
+          this.onclose(new CloseEvent("close", opts));
+        } else {
+          this.onclose(opts);
+        }
+      }
+      ajax(method, headers, body, onCallerTimeout, callback) {
+        let req;
+        let ontimeout = () => {
+          this.reqs.delete(req);
+          onCallerTimeout();
+        };
+        req = Ajax.request(method, this.endpointURL(), headers, body, this.timeout, ontimeout, (resp) => {
+          this.reqs.delete(req);
+          if (this.isActive()) {
+            callback(resp);
+          }
+        });
+        this.reqs.add(req);
+      }
+    };
+    var Presence = class _Presence {
+      /**
+       * Initializes the Presence
+       * @param {Channel} channel - The Channel
+       * @param {PresenceOptions} [opts] - The options, for example `{events: {state: "state", diff: "diff"}}`
+       */
+      constructor(channel, opts = {}) {
+        let events = opts.events || /** @type {PresenceEvents} */
+        { state: "presence_state", diff: "presence_diff" };
+        this.state = {};
+        this.pendingDiffs = [];
+        this.channel = channel;
+        this.joinRef = null;
+        this.caller = {
+          onJoin: function() {
+          },
+          onLeave: function() {
+          },
+          onSync: function() {
+          }
+        };
+        this.channel.on(events.state, (newState) => {
+          let { onJoin, onLeave, onSync } = this.caller;
+          this.joinRef = this.channel.joinRef();
+          this.state = _Presence.syncState(this.state, newState, onJoin, onLeave);
           this.pendingDiffs.forEach((diff) => {
-            this.state = _RealtimePresence.syncDiff(this.state, diff, onJoin, onLeave);
+            this.state = _Presence.syncDiff(this.state, diff, onJoin, onLeave);
           });
           this.pendingDiffs = [];
           onSync();
         });
-        this.channel._on(events.diff, {}, (diff) => {
-          const { onJoin, onLeave, onSync } = this.caller;
+        this.channel.on(events.diff, (diff) => {
+          let { onJoin, onLeave, onSync } = this.caller;
           if (this.inPendingSyncState()) {
             this.pendingDiffs.push(diff);
           } else {
-            this.state = _RealtimePresence.syncDiff(this.state, diff, onJoin, onLeave);
+            this.state = _Presence.syncDiff(this.state, diff, onJoin, onLeave);
             onSync();
           }
         });
-        this.onJoin((key, currentPresences, newPresences) => {
-          this.channel._trigger("presence", {
-            event: "join",
-            key,
-            currentPresences,
-            newPresences
-          });
-        });
-        this.onLeave((key, currentPresences, leftPresences) => {
-          this.channel._trigger("presence", {
-            event: "leave",
-            key,
-            currentPresences,
-            leftPresences
-          });
-        });
-        this.onSync(() => {
-          this.channel._trigger("presence", { event: "sync" });
-        });
       }
       /**
-       * Used to sync the list of presences on the server with the
-       * client's state.
+       * @param {PresenceOnJoin} callback
+       */
+      onJoin(callback) {
+        this.caller.onJoin = callback;
+      }
+      /**
+       * @param {PresenceOnLeave} callback
+       */
+      onLeave(callback) {
+        this.caller.onLeave = callback;
+      }
+      /**
+       * @param {PresenceOnSync} callback
+       */
+      onSync(callback) {
+        this.caller.onSync = callback;
+      }
+      /**
+       * Returns the array of presences, with selected metadata.
        *
-       * An optional `onJoin` and `onLeave` callback can be provided to
-       * react to changes in the client's local presences across
+       * @template [T=PresenceState]
+       * @param {((key: string, obj: PresenceState) => T)} [by]
+       *
+       * @returns {T[]}
+       */
+      list(by) {
+        return _Presence.list(this.state, by);
+      }
+      inPendingSyncState() {
+        return !this.joinRef || this.joinRef !== this.channel.joinRef();
+      }
+      // lower-level public static API
+      /**
+       * Used to sync the list of presences on the server
+       * with the client's state. An optional `onJoin` and `onLeave` callback can
+       * be provided to react to changes in the client's local presences across
        * disconnects and reconnects with the server.
        *
-       * @internal
+       * @param {Record<string, PresenceState>} currentState
+       * @param {Record<string, PresenceState>} newState
+       * @param {PresenceOnJoin} onJoin
+       * @param {PresenceOnLeave} onLeave
+       *
+       * @returns {Record<string, PresenceState>}
        */
       static syncState(currentState, newState, onJoin, onLeave) {
-        const state = this.cloneDeep(currentState);
-        const transformedState = this.transformState(newState);
-        const joins = {};
-        const leaves = {};
-        this.map(state, (key, presences) => {
-          if (!transformedState[key]) {
-            leaves[key] = presences;
+        let state = this.clone(currentState);
+        let joins = {};
+        let leaves = {};
+        this.map(state, (key, presence) => {
+          if (!newState[key]) {
+            leaves[key] = presence;
           }
         });
-        this.map(transformedState, (key, newPresences) => {
-          const currentPresences = state[key];
-          if (currentPresences) {
-            const newPresenceRefs = newPresences.map((m) => m.presence_ref);
-            const curPresenceRefs = currentPresences.map((m) => m.presence_ref);
-            const joinedPresences = newPresences.filter((m) => curPresenceRefs.indexOf(m.presence_ref) < 0);
-            const leftPresences = currentPresences.filter((m) => newPresenceRefs.indexOf(m.presence_ref) < 0);
-            if (joinedPresences.length > 0) {
-              joins[key] = joinedPresences;
+        this.map(newState, (key, newPresence) => {
+          let currentPresence = state[key];
+          if (currentPresence) {
+            let newRefs = newPresence.metas.map((m) => m.phx_ref);
+            let curRefs = currentPresence.metas.map((m) => m.phx_ref);
+            let joinedMetas = newPresence.metas.filter((m) => curRefs.indexOf(m.phx_ref) < 0);
+            let leftMetas = currentPresence.metas.filter((m) => newRefs.indexOf(m.phx_ref) < 0);
+            if (joinedMetas.length > 0) {
+              joins[key] = newPresence;
+              joins[key].metas = joinedMetas;
             }
-            if (leftPresences.length > 0) {
-              leaves[key] = leftPresences;
+            if (leftMetas.length > 0) {
+              leaves[key] = this.clone(currentPresence);
+              leaves[key].metas = leftMetas;
             }
           } else {
-            joins[key] = newPresences;
+            joins[key] = newPresence;
           }
         });
         return this.syncDiff(state, { joins, leaves }, onJoin, onLeave);
       }
       /**
-       * Used to sync a diff of presence join and leave events from the
-       * server, as they happen.
        *
-       * Like `syncState`, `syncDiff` accepts optional `onJoin` and
-       * `onLeave` callbacks to react to a user joining or leaving from a
-       * device.
+       * Used to sync a diff of presence join and leave
+       * events from the server, as they happen. Like `syncState`, `syncDiff`
+       * accepts optional `onJoin` and `onLeave` callbacks to react to a user
+       * joining or leaving from a device.
        *
-       * @internal
+       * @param {Record<string, PresenceState>} state
+       * @param {PresenceDiff} diff
+       * @param {PresenceOnJoin} onJoin
+       * @param {PresenceOnLeave} onLeave
+       *
+       * @returns {Record<string, PresenceState>}
        */
       static syncDiff(state, diff, onJoin, onLeave) {
-        const { joins, leaves } = {
-          joins: this.transformState(diff.joins),
-          leaves: this.transformState(diff.leaves)
-        };
+        let { joins, leaves } = this.clone(diff);
         if (!onJoin) {
-          onJoin = () => {
+          onJoin = function() {
           };
         }
         if (!onLeave) {
-          onLeave = () => {
+          onLeave = function() {
           };
         }
-        this.map(joins, (key, newPresences) => {
-          var _a;
-          const currentPresences = (_a = state[key]) !== null && _a !== void 0 ? _a : [];
-          state[key] = this.cloneDeep(newPresences);
-          if (currentPresences.length > 0) {
-            const joinedPresenceRefs = state[key].map((m) => m.presence_ref);
-            const curPresences = currentPresences.filter((m) => joinedPresenceRefs.indexOf(m.presence_ref) < 0);
-            state[key].unshift(...curPresences);
+        this.map(joins, (key, newPresence) => {
+          let currentPresence = state[key];
+          state[key] = this.clone(newPresence);
+          if (currentPresence) {
+            let joinedRefs = state[key].metas.map((m) => m.phx_ref);
+            let curMetas = currentPresence.metas.filter((m) => joinedRefs.indexOf(m.phx_ref) < 0);
+            state[key].metas.unshift(...curMetas);
           }
-          onJoin(key, currentPresences, newPresences);
+          onJoin(key, currentPresence, newPresence);
         });
-        this.map(leaves, (key, leftPresences) => {
-          let currentPresences = state[key];
-          if (!currentPresences)
+        this.map(leaves, (key, leftPresence) => {
+          let currentPresence = state[key];
+          if (!currentPresence) {
             return;
-          const presenceRefsToRemove = leftPresences.map((m) => m.presence_ref);
-          currentPresences = currentPresences.filter((m) => presenceRefsToRemove.indexOf(m.presence_ref) < 0);
-          state[key] = currentPresences;
-          onLeave(key, currentPresences, leftPresences);
-          if (currentPresences.length === 0)
+          }
+          let refsToRemove = leftPresence.metas.map((m) => m.phx_ref);
+          currentPresence.metas = currentPresence.metas.filter((p) => {
+            return refsToRemove.indexOf(p.phx_ref) < 0;
+          });
+          onLeave(key, currentPresence, leftPresence);
+          if (currentPresence.metas.length === 0) {
             delete state[key];
+          }
         });
         return state;
       }
-      /** @internal */
+      /**
+       * Returns the array of presences, with selected metadata.
+       *
+       * @template [T=PresenceState]
+       * @param {Record<string, PresenceState>} presences
+       * @param {((key: string, obj: PresenceState) => T)} [chooser]
+       *
+       * @returns {T[]}
+       */
+      static list(presences, chooser) {
+        if (!chooser) {
+          chooser = function(key, pres) {
+            return pres;
+          };
+        }
+        return this.map(presences, (key, presence) => {
+          return chooser(key, presence);
+        });
+      }
+      // private
+      /**
+      * @template T
+      * @param {Record<string, PresenceState>} obj
+      * @param {(key: string, obj: PresenceState) => T} func
+      */
       static map(obj, func) {
         return Object.getOwnPropertyNames(obj).map((key) => func(key, obj[key]));
       }
       /**
+      * @template T
+      * @param {T} obj
+      * @returns {T}
+      */
+      static clone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+      }
+    };
+    var serializer_default = {
+      HEADER_LENGTH: 1,
+      META_LENGTH: 4,
+      KINDS: { push: 0, reply: 1, broadcast: 2 },
+      /**
+      * @template T
+      * @param {Message<Record<string, any>>} msg
+      * @param {(msg: ArrayBuffer | string) => T} callback
+      * @returns {T}
+      */
+      encode(msg, callback) {
+        if (msg.payload.constructor === ArrayBuffer) {
+          return callback(this.binaryEncode(msg));
+        } else {
+          let payload = [msg.join_ref, msg.ref, msg.topic, msg.event, msg.payload];
+          return callback(JSON.stringify(payload));
+        }
+      },
+      /**
+      * @template T
+      * @param {ArrayBuffer | string} rawPayload
+      * @param {(msg: Message<unknown>) => T} callback
+      * @returns {T}
+      */
+      decode(rawPayload, callback) {
+        if (rawPayload.constructor === ArrayBuffer) {
+          return callback(this.binaryDecode(rawPayload));
+        } else {
+          let [join_ref, ref, topic, event, payload] = JSON.parse(rawPayload);
+          return callback({ join_ref, ref, topic, event, payload });
+        }
+      },
+      /** @private */
+      binaryEncode(message) {
+        let { join_ref, ref, event, topic, payload } = message;
+        let metaLength = this.META_LENGTH + join_ref.length + ref.length + topic.length + event.length;
+        let header = new ArrayBuffer(this.HEADER_LENGTH + metaLength);
+        let view = new DataView(header);
+        let offset = 0;
+        view.setUint8(offset++, this.KINDS.push);
+        view.setUint8(offset++, join_ref.length);
+        view.setUint8(offset++, ref.length);
+        view.setUint8(offset++, topic.length);
+        view.setUint8(offset++, event.length);
+        Array.from(join_ref, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+        Array.from(ref, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+        Array.from(topic, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+        Array.from(event, (char) => view.setUint8(offset++, char.charCodeAt(0)));
+        var combined = new Uint8Array(header.byteLength + payload.byteLength);
+        combined.set(new Uint8Array(header), 0);
+        combined.set(new Uint8Array(payload), header.byteLength);
+        return combined.buffer;
+      },
+      /**
+      * @private
+      */
+      binaryDecode(buffer) {
+        let view = new DataView(buffer);
+        let kind = view.getUint8(0);
+        let decoder = new TextDecoder();
+        switch (kind) {
+          case this.KINDS.push:
+            return this.decodePush(buffer, view, decoder);
+          case this.KINDS.reply:
+            return this.decodeReply(buffer, view, decoder);
+          case this.KINDS.broadcast:
+            return this.decodeBroadcast(buffer, view, decoder);
+        }
+      },
+      /** @private */
+      decodePush(buffer, view, decoder) {
+        let joinRefSize = view.getUint8(1);
+        let topicSize = view.getUint8(2);
+        let eventSize = view.getUint8(3);
+        let offset = this.HEADER_LENGTH + this.META_LENGTH - 1;
+        let joinRef = decoder.decode(buffer.slice(offset, offset + joinRefSize));
+        offset = offset + joinRefSize;
+        let topic = decoder.decode(buffer.slice(offset, offset + topicSize));
+        offset = offset + topicSize;
+        let event = decoder.decode(buffer.slice(offset, offset + eventSize));
+        offset = offset + eventSize;
+        let data = buffer.slice(offset, buffer.byteLength);
+        return { join_ref: joinRef, ref: null, topic, event, payload: data };
+      },
+      /** @private */
+      decodeReply(buffer, view, decoder) {
+        let joinRefSize = view.getUint8(1);
+        let refSize = view.getUint8(2);
+        let topicSize = view.getUint8(3);
+        let eventSize = view.getUint8(4);
+        let offset = this.HEADER_LENGTH + this.META_LENGTH;
+        let joinRef = decoder.decode(buffer.slice(offset, offset + joinRefSize));
+        offset = offset + joinRefSize;
+        let ref = decoder.decode(buffer.slice(offset, offset + refSize));
+        offset = offset + refSize;
+        let topic = decoder.decode(buffer.slice(offset, offset + topicSize));
+        offset = offset + topicSize;
+        let event = decoder.decode(buffer.slice(offset, offset + eventSize));
+        offset = offset + eventSize;
+        let data = buffer.slice(offset, buffer.byteLength);
+        let payload = { status: event, response: data };
+        return { join_ref: joinRef, ref, topic, event: CHANNEL_EVENTS.reply, payload };
+      },
+      /** @private */
+      decodeBroadcast(buffer, view, decoder) {
+        let topicSize = view.getUint8(1);
+        let eventSize = view.getUint8(2);
+        let offset = this.HEADER_LENGTH + 2;
+        let topic = decoder.decode(buffer.slice(offset, offset + topicSize));
+        offset = offset + topicSize;
+        let event = decoder.decode(buffer.slice(offset, offset + eventSize));
+        offset = offset + eventSize;
+        let data = buffer.slice(offset, buffer.byteLength);
+        return { join_ref: null, ref: null, topic, event, payload: data };
+      }
+    };
+    var Socket = class {
+      /** Initializes the Socket *
+       *
+       * For IE8 support use an ES5-shim (https://github.com/es-shims/es5-shim)
+       *
+       * @constructor
+       * @param {string} endPoint - The string WebSocket endpoint, ie, `"ws://example.com/socket"`,
+       *                                               `"wss://example.com"`
+       *                                               `"/socket"` (inherited host & protocol)
+       * @param {SocketOptions} [opts] - Optional configuration
+       */
+      constructor(endPoint, opts = {}) {
+        this.stateChangeCallbacks = { open: [], close: [], error: [], message: [] };
+        this.channels = [];
+        this.sendBuffer = [];
+        this.ref = 0;
+        this.fallbackRef = null;
+        this.timeout = opts.timeout || DEFAULT_TIMEOUT;
+        this.transport = opts.transport || global2.WebSocket || LongPoll;
+        this.conn = void 0;
+        this.primaryPassedHealthCheck = false;
+        this.longPollFallbackMs = opts.longPollFallbackMs;
+        this.fallbackTimer = null;
+        let envSessionStorage = null;
+        try {
+          envSessionStorage = global2 && global2.sessionStorage;
+        } catch {
+        }
+        this.sessionStore = opts.sessionStorage || envSessionStorage;
+        this.establishedConnections = 0;
+        this.defaultEncoder = serializer_default.encode.bind(serializer_default);
+        this.defaultDecoder = serializer_default.decode.bind(serializer_default);
+        this.closeWasClean = true;
+        this.disconnecting = false;
+        this.binaryType = opts.binaryType || "arraybuffer";
+        this.connectClock = 1;
+        this.pageHidden = false;
+        this.encode = void 0;
+        this.decode = void 0;
+        if (this.transport !== LongPoll) {
+          this.encode = opts.encode || this.defaultEncoder;
+          this.decode = opts.decode || this.defaultDecoder;
+        } else {
+          this.encode = this.defaultEncoder;
+          this.decode = this.defaultDecoder;
+        }
+        let awaitingConnectionOnPageShow = null;
+        if (phxWindow && phxWindow.addEventListener) {
+          phxWindow.addEventListener("pagehide", (_e) => {
+            if (this.conn) {
+              this.disconnect();
+              awaitingConnectionOnPageShow = this.connectClock;
+            }
+          });
+          phxWindow.addEventListener("pageshow", (_e) => {
+            if (awaitingConnectionOnPageShow === this.connectClock) {
+              awaitingConnectionOnPageShow = null;
+              this.connect();
+            }
+          });
+          phxWindow.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") {
+              this.pageHidden = true;
+            } else {
+              this.pageHidden = false;
+              if (!this.isConnected() && !this.closeWasClean) {
+                this.teardown(() => this.connect());
+              }
+            }
+          });
+        }
+        this.heartbeatIntervalMs = opts.heartbeatIntervalMs || 3e4;
+        this.autoSendHeartbeat = opts.autoSendHeartbeat ?? true;
+        this.heartbeatCallback = opts.heartbeatCallback ?? (() => {
+        });
+        this.rejoinAfterMs = (tries) => {
+          if (opts.rejoinAfterMs) {
+            return opts.rejoinAfterMs(tries);
+          } else {
+            return [1e3, 2e3, 5e3][tries - 1] || 1e4;
+          }
+        };
+        this.reconnectAfterMs = (tries) => {
+          if (opts.reconnectAfterMs) {
+            return opts.reconnectAfterMs(tries);
+          } else {
+            return [10, 50, 100, 150, 200, 250, 500, 1e3, 2e3][tries - 1] || 5e3;
+          }
+        };
+        this.logger = opts.logger || null;
+        if (!this.logger && opts.debug) {
+          this.logger = (kind, msg, data) => {
+            console.log(`${kind}: ${msg}`, data);
+          };
+        }
+        this.longpollerTimeout = opts.longpollerTimeout || 2e4;
+        this.params = closure(opts.params || {});
+        this.endPoint = `${endPoint}/${TRANSPORTS.websocket}`;
+        this.vsn = opts.vsn || DEFAULT_VSN;
+        this.heartbeatTimeoutTimer = null;
+        this.heartbeatTimer = null;
+        this.heartbeatSentAt = null;
+        this.pendingHeartbeatRef = null;
+        this.reconnectTimer = new Timer(() => {
+          if (this.pageHidden) {
+            this.log("Not reconnecting as page is hidden!");
+            this.teardown();
+            return;
+          }
+          this.teardown(async () => {
+            if (opts.beforeReconnect) await opts.beforeReconnect();
+            this.connect();
+          });
+        }, this.reconnectAfterMs);
+        this.authToken = opts.authToken;
+      }
+      /**
+       * Returns the LongPoll transport reference
+       */
+      getLongPollTransport() {
+        return LongPoll;
+      }
+      /**
+       * Disconnects and replaces the active transport
+       *
+       * @param {SocketTransport} newTransport - The new transport class to instantiate
+       *
+       */
+      replaceTransport(newTransport) {
+        this.connectClock++;
+        this.closeWasClean = true;
+        clearTimeout(this.fallbackTimer);
+        this.reconnectTimer.reset();
+        if (this.conn) {
+          this.conn.close();
+          this.conn = null;
+        }
+        this.transport = newTransport;
+      }
+      /**
+       * Returns the socket protocol
+       *
+       * @returns {"wss" | "ws"}
+       */
+      protocol() {
+        return location.protocol.match(/^https/) ? "wss" : "ws";
+      }
+      /**
+       * The fully qualified socket url
+       *
+       * @returns {string}
+       */
+      endPointURL() {
+        let uri = Ajax.appendParams(
+          Ajax.appendParams(this.endPoint, this.params()),
+          { vsn: this.vsn }
+        );
+        if (uri.charAt(0) !== "/") {
+          return uri;
+        }
+        if (uri.charAt(1) === "/") {
+          return `${this.protocol()}:${uri}`;
+        }
+        return `${this.protocol()}://${location.host}${uri}`;
+      }
+      /**
+       * Disconnects the socket
+       *
+       * See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent#Status_codes for valid status codes.
+       *
+       * @param {() => void} [callback] - Optional callback which is called after socket is disconnected.
+       * @param {number} [code] - A status code for disconnection (Optional).
+       * @param {string} [reason] - A textual description of the reason to disconnect. (Optional)
+       */
+      disconnect(callback, code, reason) {
+        this.connectClock++;
+        this.disconnecting = true;
+        this.closeWasClean = true;
+        clearTimeout(this.fallbackTimer);
+        this.reconnectTimer.reset();
+        this.teardown(() => {
+          this.disconnecting = false;
+          callback && callback();
+        }, code, reason);
+      }
+      /**
+       * @param {Params} [params] - [DEPRECATED] The params to send when connecting, for example `{user_id: userToken}`
+       *
+       * Passing params to connect is deprecated; pass them in the Socket constructor instead:
+       * `new Socket("/socket", {params: {user_id: userToken}})`.
+       */
+      connect(params) {
+        if (params) {
+          console && console.log("passing params to connect is deprecated. Instead pass :params to the Socket constructor");
+          this.params = closure(params);
+        }
+        if (this.conn && !this.disconnecting) {
+          return;
+        }
+        if (this.longPollFallbackMs && this.transport !== LongPoll) {
+          this.connectWithFallback(LongPoll, this.longPollFallbackMs);
+        } else {
+          this.transportConnect();
+        }
+      }
+      /**
+       * Logs the message. Override `this.logger` for specialized logging. noops by default
+       * @param {string} kind
+       * @param {string} msg
+       * @param {Object} data
+       */
+      log(kind, msg, data) {
+        this.logger && this.logger(kind, msg, data);
+      }
+      /**
+       * Returns true if a logger has been set on this socket.
+       */
+      hasLogger() {
+        return this.logger !== null;
+      }
+      /**
+       * Registers callbacks for connection open events
+       *
+       * @example socket.onOpen(function(){ console.info("the socket was opened") })
+       *
+       * @param {SocketOnOpen} callback
+       */
+      onOpen(callback) {
+        let ref = this.makeRef();
+        this.stateChangeCallbacks.open.push([ref, callback]);
+        return ref;
+      }
+      /**
+       * Registers callbacks for connection close events
+       * @param {SocketOnClose} callback
+       * @returns {string}
+       */
+      onClose(callback) {
+        let ref = this.makeRef();
+        this.stateChangeCallbacks.close.push([ref, callback]);
+        return ref;
+      }
+      /**
+       * Registers callbacks for connection error events
+       *
+       * @example socket.onError(function(error){ alert("An error occurred") })
+       *
+       * @param {SocketOnError} callback
+       * @returns {string}
+       */
+      onError(callback) {
+        let ref = this.makeRef();
+        this.stateChangeCallbacks.error.push([ref, callback]);
+        return ref;
+      }
+      /**
+       * Registers callbacks for connection message events
+       * @param {SocketOnMessage} callback
+       * @returns {string}
+       */
+      onMessage(callback) {
+        let ref = this.makeRef();
+        this.stateChangeCallbacks.message.push([ref, callback]);
+        return ref;
+      }
+      /**
+       * Sets a callback that receives lifecycle events for internal heartbeat messages.
+       * Useful for instrumenting connection health (e.g. sent/ok/timeout/disconnected).
+       * @param {HeartbeatCallback} callback
+       */
+      onHeartbeat(callback) {
+        this.heartbeatCallback = callback;
+      }
+      /**
+       * Pings the server and invokes the callback with the RTT in milliseconds
+       * @param {(timeDelta: number) => void} callback
+       *
+       * Returns true if the ping was pushed or false if unable to be pushed.
+       */
+      ping(callback) {
+        if (!this.isConnected()) {
+          return false;
+        }
+        let ref = this.makeRef();
+        let startTime = Date.now();
+        this.push({ topic: "phoenix", event: "heartbeat", payload: {}, ref });
+        let onMsgRef = this.onMessage((msg) => {
+          if (msg.ref === ref) {
+            this.off([onMsgRef]);
+            callback(Date.now() - startTime);
+          }
+        });
+        return true;
+      }
+      /**
+       * @private
+       *
+       * @param {Function}
+       */
+      transportName(transport) {
+        switch (transport) {
+          case LongPoll:
+            return "LongPoll";
+          default:
+            return transport.name;
+        }
+      }
+      /**
+       * @private
+       */
+      transportConnect() {
+        this.connectClock++;
+        this.closeWasClean = false;
+        let protocols = void 0;
+        if (this.authToken) {
+          protocols = ["phoenix", `${AUTH_TOKEN_PREFIX}${btoa(this.authToken).replace(/=/g, "")}`];
+        }
+        this.conn = new this.transport(this.endPointURL(), protocols);
+        this.conn.binaryType = this.binaryType;
+        this.conn.timeout = this.longpollerTimeout;
+        this.conn.onopen = () => this.onConnOpen();
+        this.conn.onerror = (error) => this.onConnError(error);
+        this.conn.onmessage = (event) => this.onConnMessage(event);
+        this.conn.onclose = (event) => this.onConnClose(event);
+      }
+      getSession(key) {
+        return this.sessionStore && this.sessionStore.getItem(key);
+      }
+      storeSession(key, val) {
+        this.sessionStore && this.sessionStore.setItem(key, val);
+      }
+      connectWithFallback(fallbackTransport, fallbackThreshold = 2500) {
+        clearTimeout(this.fallbackTimer);
+        let established = false;
+        let primaryTransport = true;
+        let openRef, errorRef;
+        let fallbackTransportName = this.transportName(fallbackTransport);
+        let fallback = (reason) => {
+          this.log("transport", `falling back to ${fallbackTransportName}...`, reason);
+          this.off([openRef, errorRef]);
+          primaryTransport = false;
+          this.replaceTransport(fallbackTransport);
+          this.transportConnect();
+        };
+        if (this.getSession(`phx:fallback:${fallbackTransportName}`)) {
+          return fallback("memorized");
+        }
+        this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
+        errorRef = this.onError((reason) => {
+          this.log("transport", "error", reason);
+          if (primaryTransport && !established) {
+            clearTimeout(this.fallbackTimer);
+            fallback(reason);
+          }
+        });
+        if (this.fallbackRef) {
+          this.off([this.fallbackRef]);
+        }
+        this.fallbackRef = this.onOpen(() => {
+          established = true;
+          if (!primaryTransport) {
+            let fallbackTransportName2 = this.transportName(fallbackTransport);
+            if (!this.primaryPassedHealthCheck) {
+              this.storeSession(`phx:fallback:${fallbackTransportName2}`, "true");
+            }
+            return this.log("transport", `established ${fallbackTransportName2} fallback`);
+          }
+          clearTimeout(this.fallbackTimer);
+          this.fallbackTimer = setTimeout(fallback, fallbackThreshold);
+          this.ping((rtt) => {
+            this.log("transport", "connected to primary after", rtt);
+            this.primaryPassedHealthCheck = true;
+            clearTimeout(this.fallbackTimer);
+          });
+        });
+        this.transportConnect();
+      }
+      clearHeartbeats() {
+        clearTimeout(this.heartbeatTimer);
+        clearTimeout(this.heartbeatTimeoutTimer);
+      }
+      onConnOpen() {
+        if (this.hasLogger()) this.log("transport", `connected to ${this.endPointURL()}`);
+        this.closeWasClean = false;
+        this.disconnecting = false;
+        this.establishedConnections++;
+        this.flushSendBuffer();
+        this.reconnectTimer.reset();
+        if (this.autoSendHeartbeat) {
+          this.resetHeartbeat();
+        }
+        this.triggerStateCallbacks("open");
+      }
+      /**
+       * @private
+       */
+      heartbeatTimeout() {
+        if (this.pendingHeartbeatRef) {
+          this.pendingHeartbeatRef = null;
+          this.heartbeatSentAt = null;
+          if (this.hasLogger()) {
+            this.log("transport", "heartbeat timeout. Attempting to re-establish connection");
+          }
+          try {
+            this.heartbeatCallback("timeout");
+          } catch (e) {
+            this.log("error", "error in heartbeat callback", e);
+          }
+          this.triggerChanError(new Error("heartbeat timeout"));
+          this.closeWasClean = false;
+          this.teardown(() => this.reconnectTimer.scheduleTimeout(), WS_CLOSE_NORMAL, "heartbeat timeout");
+        }
+      }
+      resetHeartbeat() {
+        if (this.conn && this.conn.skipHeartbeat) {
+          return;
+        }
+        this.pendingHeartbeatRef = null;
+        this.clearHeartbeats();
+        this.heartbeatTimer = setTimeout(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
+      }
+      teardown(callback, code, reason) {
+        if (!this.conn) {
+          return callback && callback();
+        }
+        const connToClose = this.conn;
+        this.waitForBufferDone(connToClose, () => {
+          if (code) {
+            connToClose.close(code, reason || "");
+          } else {
+            connToClose.close();
+          }
+          this.waitForSocketClosed(connToClose, () => {
+            if (this.conn === connToClose) {
+              this.conn.onopen = function() {
+              };
+              this.conn.onerror = function() {
+              };
+              this.conn.onmessage = function() {
+              };
+              this.conn.onclose = function() {
+              };
+              this.conn = null;
+            }
+            callback && callback();
+          });
+        });
+      }
+      waitForBufferDone(conn, callback, tries = 1) {
+        if (tries === 5 || !conn.bufferedAmount) {
+          callback();
+          return;
+        }
+        setTimeout(() => {
+          this.waitForBufferDone(conn, callback, tries + 1);
+        }, 150 * tries);
+      }
+      waitForSocketClosed(conn, callback, tries = 1) {
+        if (tries === 5 || conn.readyState === SOCKET_STATES.closed) {
+          callback();
+          return;
+        }
+        setTimeout(() => {
+          this.waitForSocketClosed(conn, callback, tries + 1);
+        }, 150 * tries);
+      }
+      /**
+      * @param {CloseEvent} event
+      */
+      onConnClose(event) {
+        if (this.conn) this.conn.onclose = () => {
+        };
+        if (this.hasLogger()) this.log("transport", "close", event);
+        this.triggerChanError(event);
+        this.clearHeartbeats();
+        if (!this.closeWasClean) {
+          this.reconnectTimer.scheduleTimeout();
+        }
+        this.triggerStateCallbacks("close", event);
+      }
+      /**
+       * @private
+       * @param {Event} error
+       */
+      onConnError(error) {
+        if (this.hasLogger()) this.log("transport", "error", error);
+        let transportBefore = this.transport;
+        let establishedBefore = this.establishedConnections;
+        this.triggerStateCallbacks("error", error, transportBefore, establishedBefore);
+        if (transportBefore === this.transport || establishedBefore > 0) {
+          this.triggerChanError(error);
+        }
+      }
+      /**
+       * @private
+       * @param {unknown} [reason] underlying close/error event forwarded to channel error listeners
+       */
+      triggerChanError(reason) {
+        this.channels.forEach((channel) => {
+          if (!(channel.isErrored() || channel.isLeaving() || channel.isClosed())) {
+            channel.trigger(CHANNEL_EVENTS.error, reason);
+          }
+        });
+      }
+      /**
+       * @returns {string}
+       */
+      connectionState() {
+        switch (this.conn && this.conn.readyState) {
+          case SOCKET_STATES.connecting:
+            return "connecting";
+          case SOCKET_STATES.open:
+            return "open";
+          case SOCKET_STATES.closing:
+            return "closing";
+          default:
+            return "closed";
+        }
+      }
+      /**
+       * @returns {boolean}
+       */
+      isConnected() {
+        return this.connectionState() === "open";
+      }
+      /**
+       *
+       * @param {Channel} channel
+       */
+      remove(channel) {
+        this.off(channel.stateChangeRefs);
+        this.channels = this.channels.filter((c) => c !== channel);
+      }
+      /**
+       * Removes `onOpen`, `onClose`, `onError,` and `onMessage` registrations.
+       *
+       * @param {string[]} refs - list of refs returned by calls to
+       *                 `onOpen`, `onClose`, `onError,` and `onMessage`
+       */
+      off(refs) {
+        for (let key in this.stateChangeCallbacks) {
+          this.stateChangeCallbacks[key] = this.stateChangeCallbacks[key].filter(([ref]) => {
+            return refs.indexOf(ref) === -1;
+          });
+        }
+      }
+      /**
+       * Initiates a new channel for the given topic
+       *
+       * @param {string} topic
+       * @param {Params | (() => Params)} [chanParams]- Parameters for the channel
+       * @returns {Channel}
+       */
+      channel(topic, chanParams = {}) {
+        let chan = new Channel(topic, chanParams, this);
+        this.channels.push(chan);
+        return chan;
+      }
+      /**
+       * @param {Message<Record<string, any>>} data
+       */
+      push(data) {
+        if (this.hasLogger()) {
+          let { topic, event, payload, ref, join_ref } = data;
+          this.log("push", `${topic} ${event} (${join_ref}, ${ref})`, payload);
+        }
+        if (this.isConnected()) {
+          this.encode(data, (result) => this.conn.send(result));
+        } else {
+          this.sendBuffer.push(() => this.encode(data, (result) => this.conn.send(result)));
+        }
+      }
+      /**
+       * Return the next message ref, accounting for overflows
+       * @returns {string}
+       */
+      makeRef() {
+        let newRef = this.ref + 1;
+        if (newRef === this.ref) {
+          this.ref = 0;
+        } else {
+          this.ref = newRef;
+        }
+        return this.ref.toString();
+      }
+      sendHeartbeat() {
+        if (!this.isConnected()) {
+          try {
+            this.heartbeatCallback("disconnected");
+          } catch (e) {
+            this.log("error", "error in heartbeat callback", e);
+          }
+          return;
+        }
+        if (this.pendingHeartbeatRef) {
+          this.heartbeatTimeout();
+          return;
+        }
+        this.pendingHeartbeatRef = this.makeRef();
+        this.heartbeatSentAt = Date.now();
+        this.push({ topic: "phoenix", event: "heartbeat", payload: {}, ref: this.pendingHeartbeatRef });
+        try {
+          this.heartbeatCallback("sent");
+        } catch (e) {
+          this.log("error", "error in heartbeat callback", e);
+        }
+        this.heartbeatTimeoutTimer = setTimeout(() => this.heartbeatTimeout(), this.heartbeatIntervalMs);
+      }
+      flushSendBuffer() {
+        if (this.isConnected() && this.sendBuffer.length > 0) {
+          this.sendBuffer.forEach((callback) => callback());
+          this.sendBuffer = [];
+        }
+      }
+      /**
+      * @param {MessageEvent<any>} rawMessage
+      */
+      onConnMessage(rawMessage) {
+        this.decode(rawMessage.data, (msg) => {
+          let { topic, event, payload, ref, join_ref } = msg;
+          if (ref && ref === this.pendingHeartbeatRef) {
+            const latency = this.heartbeatSentAt ? Date.now() - this.heartbeatSentAt : void 0;
+            this.clearHeartbeats();
+            try {
+              this.heartbeatCallback(payload.status === "ok" ? "ok" : "error", latency);
+            } catch (e) {
+              this.log("error", "error in heartbeat callback", e);
+            }
+            this.pendingHeartbeatRef = null;
+            this.heartbeatSentAt = null;
+            if (this.autoSendHeartbeat) {
+              this.heartbeatTimer = setTimeout(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
+            }
+          }
+          if (this.hasLogger()) this.log("receive", `${payload.status || ""} ${topic} ${event} ${ref && "(" + ref + ")" || ""}`.trim(), payload);
+          for (let i = 0; i < this.channels.length; i++) {
+            const channel = this.channels[i];
+            if (!channel.isMember(topic, event, payload, join_ref)) {
+              continue;
+            }
+            channel.trigger(event, payload, ref, join_ref);
+          }
+          this.triggerStateCallbacks("message", msg);
+        });
+      }
+      /**
+       * @private
+       * @template {keyof SocketStateChangeCallbacks} K
+       * @param {K} event
+       * @param {...Parameters<SocketStateChangeCallbacks[K][number][1]>} args
+       * @returns {void}
+       */
+      triggerStateCallbacks(event, ...args) {
+        try {
+          this.stateChangeCallbacks[event].forEach(([_, callback]) => {
+            try {
+              callback(...args);
+            } catch (e) {
+              this.log("error", `error in ${event} callback`, e);
+            }
+          });
+        } catch (e) {
+          this.log("error", `error triggering ${event} callbacks`, e);
+        }
+      }
+      leaveOpenTopic(topic) {
+        let dupChannel = this.channels.find((c) => c.topic === topic && (c.isJoined() || c.isJoining()));
+        if (dupChannel) {
+          if (this.hasLogger()) this.log("transport", `leaving duplicate topic "${topic}"`);
+          dupChannel.leave();
+        }
+      }
+    };
+  }
+});
+
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/presenceAdapter.js
+var require_presenceAdapter = __commonJS({
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/presenceAdapter.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var phoenix_1 = require_phoenix_cjs();
+    var PresenceAdapter = class _PresenceAdapter {
+      constructor(channel, opts) {
+        const phoenixOptions = phoenixPresenceOptions(opts);
+        this.presence = new phoenix_1.Presence(channel.getChannel(), phoenixOptions);
+        this.presence.onJoin((key, currentPresence, newPresence) => {
+          const onJoinPayload = _PresenceAdapter.onJoinPayload(key, currentPresence, newPresence);
+          channel.getChannel().trigger("presence", onJoinPayload);
+        });
+        this.presence.onLeave((key, currentPresence, leftPresence) => {
+          const onLeavePayload = _PresenceAdapter.onLeavePayload(key, currentPresence, leftPresence);
+          channel.getChannel().trigger("presence", onLeavePayload);
+        });
+        this.presence.onSync(() => {
+          channel.getChannel().trigger("presence", { event: "sync" });
+        });
+      }
+      get state() {
+        return _PresenceAdapter.transformState(this.presence.state);
+      }
+      /**
+       * @private
        * Remove 'metas' key
        * Change 'phx_ref' to 'presence_ref'
        * Remove 'phx_ref' and 'phx_ref_prev'
        *
-       * @example
+       * @example Transform state
        * // returns {
        *  abc123: [
        *    { presence_ref: '2', user_id: 1 },
@@ -46663,63 +48522,247 @@ var require_RealtimePresence = __commonJS({
        *  }
        * })
        *
-       * @internal
        */
       static transformState(state) {
-        state = this.cloneDeep(state);
+        state = cloneState(state);
         return Object.getOwnPropertyNames(state).reduce((newState, key) => {
           const presences = state[key];
-          if ("metas" in presences) {
-            newState[key] = presences.metas.map((presence) => {
-              presence["presence_ref"] = presence["phx_ref"];
-              delete presence["phx_ref"];
-              delete presence["phx_ref_prev"];
-              return presence;
-            });
-          } else {
-            newState[key] = presences;
-          }
+          newState[key] = transformState(presences);
           return newState;
         }, {});
       }
-      /** @internal */
-      static cloneDeep(obj) {
-        return JSON.parse(JSON.stringify(obj));
+      static onJoinPayload(key, currentPresence, newPresence) {
+        const currentPresences = parseCurrentPresences(currentPresence);
+        const newPresences = transformState(newPresence);
+        return {
+          event: "join",
+          key,
+          currentPresences,
+          newPresences
+        };
       }
-      /** @internal */
-      onJoin(callback) {
-        this.caller.onJoin = callback;
+      static onLeavePayload(key, currentPresence, leftPresence) {
+        const currentPresences = parseCurrentPresences(currentPresence);
+        const leftPresences = transformState(leftPresence);
+        return {
+          event: "leave",
+          key,
+          currentPresences,
+          leftPresences
+        };
       }
-      /** @internal */
-      onLeave(callback) {
-        this.caller.onLeave = callback;
+    };
+    exports.default = PresenceAdapter;
+    function transformState(presences) {
+      return presences.metas.map((presence) => {
+        presence["presence_ref"] = presence["phx_ref"];
+        delete presence["phx_ref"];
+        delete presence["phx_ref_prev"];
+        return presence;
+      });
+    }
+    function cloneState(state) {
+      return JSON.parse(JSON.stringify(state));
+    }
+    function phoenixPresenceOptions(opts) {
+      return (opts === null || opts === void 0 ? void 0 : opts.events) && { events: opts.events };
+    }
+    function parseCurrentPresences(currentPresences) {
+      return (currentPresences === null || currentPresences === void 0 ? void 0 : currentPresences.metas) ? transformState(currentPresences) : [];
+    }
+  }
+});
+
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimePresence.js
+var require_RealtimePresence = __commonJS({
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimePresence.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.REALTIME_PRESENCE_LISTEN_EVENTS = void 0;
+    var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
+    var presenceAdapter_1 = tslib_1.__importDefault(require_presenceAdapter());
+    var REALTIME_PRESENCE_LISTEN_EVENTS;
+    (function(REALTIME_PRESENCE_LISTEN_EVENTS2) {
+      REALTIME_PRESENCE_LISTEN_EVENTS2["SYNC"] = "sync";
+      REALTIME_PRESENCE_LISTEN_EVENTS2["JOIN"] = "join";
+      REALTIME_PRESENCE_LISTEN_EVENTS2["LEAVE"] = "leave";
+    })(REALTIME_PRESENCE_LISTEN_EVENTS || (exports.REALTIME_PRESENCE_LISTEN_EVENTS = REALTIME_PRESENCE_LISTEN_EVENTS = {}));
+    var RealtimePresence = class {
+      get state() {
+        return this.presenceAdapter.state;
       }
-      /** @internal */
-      onSync(callback) {
-        this.caller.onSync = callback;
-      }
-      /** @internal */
-      inPendingSyncState() {
-        return !this.joinRef || this.joinRef !== this.channel._joinRef();
+      /**
+       * Creates a Presence helper that keeps the local presence state in sync with the server.
+       *
+       * @param channel - The realtime channel to bind to.
+       * @param opts - Optional custom event names, e.g. `{ events: { state: 'state', diff: 'diff' } }`.
+       *
+       * @category Realtime
+       *
+       * @example Example for a presence channel
+       * ```ts
+       * const presence = new RealtimePresence(channel)
+       *
+       * channel.on('presence', ({ event, key }) => {
+       *   console.log(`Presence ${event} on ${key}`)
+       * })
+       * ```
+       */
+      constructor(channel, opts) {
+        this.channel = channel;
+        this.presenceAdapter = new presenceAdapter_1.default(this.channel.channelAdapter, opts);
       }
     };
     exports.default = RealtimePresence;
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimeChannel.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/normalizeChannelError.js
+var require_normalizeChannelError = __commonJS({
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/lib/normalizeChannelError.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.normalizeChannelError = normalizeChannelError;
+    function normalizeChannelError(reason) {
+      if (reason instanceof Error) {
+        return reason;
+      }
+      if (typeof reason === "string") {
+        return new Error(reason);
+      }
+      if (reason && typeof reason === "object") {
+        const obj = reason;
+        if (typeof obj.code === "number") {
+          const detail = typeof obj.reason === "string" && obj.reason ? ` (${obj.reason})` : "";
+          return new Error(`socket closed: ${obj.code}${detail}`, { cause: reason });
+        }
+        return new Error("channel error: transport failure", { cause: reason });
+      }
+      return new Error("channel error: connection lost");
+    }
+  }
+});
+
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/channelAdapter.js
+var require_channelAdapter = __commonJS({
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/channelAdapter.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var constants_1 = require_constants2();
+    var ChannelAdapter = class {
+      constructor(socket, topic, params) {
+        const phoenixParams = phoenixChannelParams(params);
+        this.channel = socket.getSocket().channel(topic, phoenixParams);
+        this.socket = socket;
+      }
+      get state() {
+        return this.channel.state;
+      }
+      set state(state) {
+        this.channel.state = state;
+      }
+      get joinedOnce() {
+        return this.channel.joinedOnce;
+      }
+      get joinPush() {
+        return this.channel.joinPush;
+      }
+      get rejoinTimer() {
+        return this.channel.rejoinTimer;
+      }
+      on(event, callback) {
+        return this.channel.on(event, callback);
+      }
+      off(event, refNumber) {
+        this.channel.off(event, refNumber);
+      }
+      subscribe(timeout) {
+        return this.channel.join(timeout);
+      }
+      unsubscribe(timeout) {
+        return this.channel.leave(timeout);
+      }
+      teardown() {
+        this.channel.teardown();
+      }
+      onClose(callback) {
+        this.channel.onClose(callback);
+      }
+      onError(callback) {
+        return this.channel.onError(callback);
+      }
+      push(event, payload, timeout) {
+        let push;
+        try {
+          push = this.channel.push(event, payload, timeout);
+        } catch (error) {
+          throw new Error(`tried to push '${event}' to '${this.channel.topic}' before joining. Use channel.subscribe() before pushing events`);
+        }
+        if (this.channel.pushBuffer.length > constants_1.MAX_PUSH_BUFFER_SIZE) {
+          const removedPush = this.channel.pushBuffer.shift();
+          removedPush.cancelTimeout();
+          this.socket.log("channel", `discarded push due to buffer overflow: ${removedPush.event}`, removedPush.payload());
+        }
+        return push;
+      }
+      updateJoinPayload(payload) {
+        const oldPayload = this.channel.joinPush.payload();
+        this.channel.joinPush.payload = () => Object.assign(Object.assign({}, oldPayload), payload);
+      }
+      canPush() {
+        return this.socket.isConnected() && this.state === constants_1.CHANNEL_STATES.joined;
+      }
+      isJoined() {
+        return this.state === constants_1.CHANNEL_STATES.joined;
+      }
+      isJoining() {
+        return this.state === constants_1.CHANNEL_STATES.joining;
+      }
+      isClosed() {
+        return this.state === constants_1.CHANNEL_STATES.closed;
+      }
+      isLeaving() {
+        return this.state === constants_1.CHANNEL_STATES.leaving;
+      }
+      updateFilterBindings(filterBindings) {
+        this.channel.filterBindings = filterBindings;
+      }
+      updatePayloadTransform(callback) {
+        this.channel.onMessage = callback;
+      }
+      /**
+       * @internal
+       */
+      getChannel() {
+        return this.channel;
+      }
+    };
+    exports.default = ChannelAdapter;
+    function phoenixChannelParams(options) {
+      return {
+        config: Object.assign({
+          broadcast: { ack: false, self: false },
+          presence: { key: "", enabled: false },
+          private: false
+        }, options.config)
+      };
+    }
+  }
+});
+
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimeChannel.js
 var require_RealtimeChannel = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimeChannel.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimeChannel.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.REALTIME_CHANNEL_STATES = exports.REALTIME_SUBSCRIBE_STATES = exports.REALTIME_LISTEN_TYPES = exports.REALTIME_POSTGRES_CHANGES_LISTEN_EVENT = void 0;
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
     var constants_1 = require_constants2();
-    var push_1 = tslib_1.__importDefault(require_push());
-    var timer_1 = tslib_1.__importDefault(require_timer());
     var RealtimePresence_1 = tslib_1.__importDefault(require_RealtimePresence());
     var Transformers = tslib_1.__importStar(require_transformers());
     var transformers_1 = require_transformers();
+    var normalizeChannelError_1 = require_normalizeChannelError();
+    var channelAdapter_1 = tslib_1.__importDefault(require_channelAdapter());
     var REALTIME_POSTGRES_CHANGES_LISTEN_EVENT;
     (function(REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2) {
       REALTIME_POSTGRES_CHANGES_LISTEN_EVENT2["ALL"] = "*";
@@ -46743,18 +48786,49 @@ var require_RealtimeChannel = __commonJS({
     })(REALTIME_SUBSCRIBE_STATES || (exports.REALTIME_SUBSCRIBE_STATES = REALTIME_SUBSCRIBE_STATES = {}));
     exports.REALTIME_CHANNEL_STATES = constants_1.CHANNEL_STATES;
     var RealtimeChannel = class _RealtimeChannel {
+      get state() {
+        return this.channelAdapter.state;
+      }
+      set state(state) {
+        this.channelAdapter.state = state;
+      }
+      get joinedOnce() {
+        return this.channelAdapter.joinedOnce;
+      }
+      get timeout() {
+        return this.socket.timeout;
+      }
+      get joinPush() {
+        return this.channelAdapter.joinPush;
+      }
+      get rejoinTimer() {
+        return this.channelAdapter.rejoinTimer;
+      }
       /**
        * Creates a channel that can broadcast messages, sync presence, and listen to Postgres changes.
        *
        * The topic determines which realtime stream you are subscribing to. Config options let you
        * enable acknowledgement for broadcasts, presence tracking, or private channels.
        *
-       * @example
+       * @category Realtime
+       *
+       * @example Using supabase-js (recommended)
+       * ```ts
+       * import { createClient } from '@supabase/supabase-js'
+       *
+       * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+       * const channel = supabase.channel('room1')
+       * channel
+       *   .on('broadcast', { event: 'cursor-pos' }, (payload) => console.log(payload))
+       *   .subscribe()
+       * ```
+       *
+       * @example Standalone import for bundle-sensitive environments
        * ```ts
        * import RealtimeClient from '@supabase/realtime-js'
        *
        * const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
-       *   params: { apikey: 'public-anon-key' },
+       *   params: { apikey: 'your-publishable-key' },
        * })
        * const channel = new RealtimeChannel('realtime:public:messages', { config: {} }, client)
        * ```
@@ -46765,71 +48839,34 @@ var require_RealtimeChannel = __commonJS({
         this.params = params;
         this.socket = socket;
         this.bindings = {};
-        this.state = constants_1.CHANNEL_STATES.closed;
-        this.joinedOnce = false;
-        this.pushBuffer = [];
         this.subTopic = topic.replace(/^realtime:/i, "");
         this.params.config = Object.assign({
           broadcast: { ack: false, self: false },
           presence: { key: "", enabled: false },
           private: false
         }, params.config);
-        this.timeout = this.socket.timeout;
-        this.joinPush = new push_1.default(this, constants_1.CHANNEL_EVENTS.join, this.params, this.timeout);
-        this.rejoinTimer = new timer_1.default(() => this._rejoinUntilConnected(), this.socket.reconnectAfterMs);
-        this.joinPush.receive("ok", () => {
-          this.state = constants_1.CHANNEL_STATES.joined;
-          this.rejoinTimer.reset();
-          this.pushBuffer.forEach((pushEvent) => pushEvent.send());
-          this.pushBuffer = [];
-        });
+        this.channelAdapter = new channelAdapter_1.default(this.socket.socketAdapter, topic, this.params);
+        this.presence = new RealtimePresence_1.default(this);
         this._onClose(() => {
-          this.rejoinTimer.reset();
-          this.socket.log("channel", `close ${this.topic} ${this._joinRef()}`);
-          this.state = constants_1.CHANNEL_STATES.closed;
           this.socket._remove(this);
         });
-        this._onError((reason) => {
-          if (this._isLeaving() || this._isClosed()) {
-            return;
-          }
-          this.socket.log("channel", `error ${this.topic}`, reason);
-          this.state = constants_1.CHANNEL_STATES.errored;
-          this.rejoinTimer.scheduleTimeout();
-        });
-        this.joinPush.receive("timeout", () => {
-          if (!this._isJoining()) {
-            return;
-          }
-          this.socket.log("channel", `timeout ${this.topic}`, this.joinPush.timeout);
-          this.state = constants_1.CHANNEL_STATES.errored;
-          this.rejoinTimer.scheduleTimeout();
-        });
-        this.joinPush.receive("error", (reason) => {
-          if (this._isLeaving() || this._isClosed()) {
-            return;
-          }
-          this.socket.log("channel", `error ${this.topic}`, reason);
-          this.state = constants_1.CHANNEL_STATES.errored;
-          this.rejoinTimer.scheduleTimeout();
-        });
-        this._on(constants_1.CHANNEL_EVENTS.reply, {}, (payload, ref) => {
-          this._trigger(this._replyEventName(ref), payload);
-        });
-        this.presence = new RealtimePresence_1.default(this);
-        this.broadcastEndpointURL = (0, transformers_1.httpEndpointURL)(this.socket.endPoint);
+        this._updateFilterTransform();
+        this.broadcastEndpointURL = (0, transformers_1.httpEndpointURL)(this.socket.socketAdapter.endPointURL());
         this.private = this.params.config.private || false;
         if (!this.private && ((_b = (_a = this.params.config) === null || _a === void 0 ? void 0 : _a.broadcast) === null || _b === void 0 ? void 0 : _b.replay)) {
-          throw `tried to use replay on public channel '${this.topic}'. It must be a private channel.`;
+          throw new Error(`tried to use replay on public channel '${this.topic}'. It must be a private channel.`);
         }
       }
-      /** Subscribe registers your client with the server */
+      /**
+       * Subscribe registers your client with the server
+       * @category Realtime
+       */
       subscribe(callback, timeout = this.timeout) {
         var _a, _b, _c;
         if (!this.socket.isConnected()) {
           this.socket.connect();
         }
-        if (this.state == constants_1.CHANNEL_STATES.closed) {
+        if (this.channelAdapter.isClosed()) {
           const { config: { broadcast, presence, private: isPrivate } } = this.params;
           const postgres_changes = (_b = (_a = this.bindings.postgres_changes) === null || _a === void 0 ? void 0 : _a.map((r) => r.filter)) !== null && _b !== void 0 ? _b : [];
           const presence_enabled = !!this.bindings[REALTIME_LISTEN_TYPES.PRESENCE] && this.bindings[REALTIME_LISTEN_TYPES.PRESENCE].length > 0 || ((_c = this.params.config.presence) === null || _c === void 0 ? void 0 : _c.enabled) === true;
@@ -46843,56 +48880,61 @@ var require_RealtimeChannel = __commonJS({
           if (this.socket.accessTokenValue) {
             accessTokenPayload.access_token = this.socket.accessTokenValue;
           }
-          this._onError((e) => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, e));
+          this._onError((reason) => {
+            callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, (0, normalizeChannelError_1.normalizeChannelError)(reason));
+          });
           this._onClose(() => callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CLOSED));
           this.updateJoinPayload(Object.assign({ config }, accessTokenPayload));
-          this.joinedOnce = true;
-          this._rejoin(timeout);
-          this.joinPush.receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
-            var _a2;
+          this._updateFilterMessage();
+          this.channelAdapter.subscribe(timeout).receive("ok", async ({ postgres_changes: postgres_changes2 }) => {
             if (!this.socket._isManualToken()) {
               this.socket.setAuth();
             }
             if (postgres_changes2 === void 0) {
               callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
               return;
-            } else {
-              const clientPostgresBindings = this.bindings.postgres_changes;
-              const bindingsLen = (_a2 = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a2 !== void 0 ? _a2 : 0;
-              const newPostgresBindings = [];
-              for (let i = 0; i < bindingsLen; i++) {
-                const clientPostgresBinding = clientPostgresBindings[i];
-                const { filter: { event, schema, table, filter } } = clientPostgresBinding;
-                const serverPostgresFilter = postgres_changes2 && postgres_changes2[i];
-                if (serverPostgresFilter && serverPostgresFilter.event === event && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.schema, schema) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.table, table) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.filter, filter)) {
-                  newPostgresBindings.push(Object.assign(Object.assign({}, clientPostgresBinding), { id: serverPostgresFilter.id }));
-                } else {
-                  this.unsubscribe();
-                  this.state = constants_1.CHANNEL_STATES.errored;
-                  callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error("mismatch between server and client bindings for postgres changes"));
-                  return;
-                }
-              }
-              this.bindings.postgres_changes = newPostgresBindings;
-              callback && callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
-              return;
             }
+            this._updatePostgresBindings(postgres_changes2, callback);
           }).receive("error", (error) => {
             this.state = constants_1.CHANNEL_STATES.errored;
-            callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error(JSON.stringify(Object.values(error).join(", ") || "error")));
-            return;
+            const message = Object.values(error).join(", ") || "error";
+            callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error(message, { cause: error }));
           }).receive("timeout", () => {
             callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.TIMED_OUT);
-            return;
           });
         }
         return this;
+      }
+      _updatePostgresBindings(postgres_changes, callback) {
+        var _a;
+        const clientPostgresBindings = this.bindings.postgres_changes;
+        const bindingsLen = (_a = clientPostgresBindings === null || clientPostgresBindings === void 0 ? void 0 : clientPostgresBindings.length) !== null && _a !== void 0 ? _a : 0;
+        const newPostgresBindings = [];
+        for (let i = 0; i < bindingsLen; i++) {
+          const clientPostgresBinding = clientPostgresBindings[i];
+          const { filter: { event, schema, table, filter } } = clientPostgresBinding;
+          const serverPostgresFilter = postgres_changes && postgres_changes[i];
+          if (serverPostgresFilter && serverPostgresFilter.event === event && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.schema, schema) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.table, table) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.filter, filter)) {
+            newPostgresBindings.push(Object.assign(Object.assign({}, clientPostgresBinding), { id: serverPostgresFilter.id }));
+          } else {
+            this.unsubscribe();
+            this.state = constants_1.CHANNEL_STATES.errored;
+            callback === null || callback === void 0 ? void 0 : callback(REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR, new Error("mismatch between server and client bindings for postgres changes"));
+            return;
+          }
+        }
+        this.bindings.postgres_changes = newPostgresBindings;
+        if (this.state != constants_1.CHANNEL_STATES.errored && callback) {
+          callback(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
+        }
       }
       /**
        * Returns the current presence state for this channel.
        *
        * The shape is a map keyed by presence key (for example a user id) where each entry contains the
        * tracked metadata for that user.
+       *
+       * @category Realtime
        */
       presenceState() {
         return this.presence.state;
@@ -46900,6 +48942,8 @@ var require_RealtimeChannel = __commonJS({
       /**
        * Sends the supplied payload to the presence tracker so other subscribers can see that this
        * client is online. Use `untrack` to stop broadcasting presence for the same key.
+       *
+       * @category Realtime
        */
       async track(payload, opts = {}) {
         return await this.send({
@@ -46910,6 +48954,8 @@ var require_RealtimeChannel = __commonJS({
       }
       /**
        * Removes the current presence state for this client.
+       *
+       * @category Realtime
        */
       async untrack(opts = {}) {
         return await this.send({
@@ -46917,10 +48963,171 @@ var require_RealtimeChannel = __commonJS({
           event: "untrack"
         }, opts);
       }
+      /**
+       * Listen to realtime events on this channel.
+       * @category Realtime
+       *
+       * @remarks
+       * - By default, Broadcast and Presence are enabled for all projects.
+       * - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+       * - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+       * - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+       *
+       * @example Listen to broadcast messages
+       * ```js
+       * const channel = supabase.channel("room1")
+       *
+       * channel.on("broadcast", { event: "cursor-pos" }, (payload) => {
+       *   console.log("Cursor position received!", payload);
+       * }).subscribe((status) => {
+       *   if (status === "SUBSCRIBED") {
+       *     channel.send({
+       *       type: "broadcast",
+       *       event: "cursor-pos",
+       *       payload: { x: Math.random(), y: Math.random() },
+       *     });
+       *   }
+       * });
+       * ```
+       *
+       * @example Listen to presence sync
+       * ```js
+       * const channel = supabase.channel('room1')
+       * channel
+       *   .on('presence', { event: 'sync' }, () => {
+       *     console.log('Synced presence state: ', channel.presenceState())
+       *   })
+       *   .subscribe(async (status) => {
+       *     if (status === 'SUBSCRIBED') {
+       *       await channel.track({ online_at: new Date().toISOString() })
+       *     }
+       *   })
+       * ```
+       *
+       * @example Listen to presence join
+       * ```js
+       * const channel = supabase.channel('room1')
+       * channel
+       *   .on('presence', { event: 'join' }, ({ newPresences }) => {
+       *     console.log('Newly joined presences: ', newPresences)
+       *   })
+       *   .subscribe(async (status) => {
+       *     if (status === 'SUBSCRIBED') {
+       *       await channel.track({ online_at: new Date().toISOString() })
+       *     }
+       *   })
+       * ```
+       *
+       * @example Listen to presence leave
+       * ```js
+       * const channel = supabase.channel('room1')
+       * channel
+       *   .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+       *     console.log('Newly left presences: ', leftPresences)
+       *   })
+       *   .subscribe(async (status) => {
+       *     if (status === 'SUBSCRIBED') {
+       *       await channel.track({ online_at: new Date().toISOString() })
+       *       await channel.untrack()
+       *     }
+       *   })
+       * ```
+       *
+       * @example Listen to all database changes
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: '*', schema: '*' }, payload => {
+       *     console.log('Change received!', payload)
+       *   })
+       *   .subscribe()
+       * ```
+       *
+       * @example Listen to a specific table
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: '*', schema: 'public', table: 'countries' }, payload => {
+       *     console.log('Change received!', payload)
+       *   })
+       *   .subscribe()
+       * ```
+       *
+       * @example Listen to inserts
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, payload => {
+       *     console.log('Change received!', payload)
+       *   })
+       *   .subscribe()
+       * ```
+       *
+       * @exampleDescription Listen to updates
+       * By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+       * enable full replication for the table you are listening to:
+       *
+       * ```sql
+       * alter table "your_table" replica identity full;
+       * ```
+       *
+       * @example Listen to updates
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries' }, payload => {
+       *     console.log('Change received!', payload)
+       *   })
+       *   .subscribe()
+       * ```
+       *
+       * @exampleDescription Listen to deletes
+       * By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+       * enable full replication for the table you are listening to:
+       *
+       * ```sql
+       * alter table "your_table" replica identity full;
+       * ```
+       *
+       * @example Listen to deletes
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, payload => {
+       *     console.log('Change received!', payload)
+       *   })
+       *   .subscribe()
+       * ```
+       *
+       * @exampleDescription Listen to multiple events
+       * You can chain listeners if you want to listen to multiple events for each table.
+       *
+       * @example Listen to multiple events
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'countries' }, handleRecordInserted)
+       *   .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'countries' }, handleRecordDeleted)
+       *   .subscribe()
+       * ```
+       *
+       * @exampleDescription Listen to row level changes
+       * You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+       *
+       * @example Listen to row level changes
+       * ```js
+       * supabase
+       *   .channel('room1')
+       *   .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'countries', filter: 'id=eq.200' }, handleRecordUpdated)
+       *   .subscribe()
+       * ```
+       */
       on(type, filter, callback) {
-        if (this.state === constants_1.CHANNEL_STATES.joined && type === REALTIME_LISTEN_TYPES.PRESENCE) {
-          this.socket.log("channel", `resubscribe to ${this.topic} due to change in presence callbacks on joined channel`);
-          this.unsubscribe().then(async () => await this.subscribe());
+        const stateCheck = this.channelAdapter.isJoined() || this.channelAdapter.isJoining();
+        const typeCheck = type === REALTIME_LISTEN_TYPES.PRESENCE || type === REALTIME_LISTEN_TYPES.POSTGRES_CHANGES;
+        if (stateCheck && typeCheck) {
+          this.socket.log("channel", `cannot add \`${type}\` callbacks for ${this.topic} after \`subscribe()\`.`);
+          throw new Error(`cannot add \`${type}\` callbacks for ${this.topic} after \`subscribe()\`.`);
         }
         return this._on(type, filter, callback);
       }
@@ -46934,11 +49141,13 @@ var require_RealtimeChannel = __commonJS({
        * @param payload Payload to be sent (required)
        * @param opts Options including timeout
        * @returns Promise resolving to object with success status, and error details if failed
+       *
+       * @category Realtime
        */
       async httpSend(event, payload, opts = {}) {
         var _a;
         if (payload === void 0 || payload === null) {
-          return Promise.reject("Payload is required for httpSend()");
+          return Promise.reject(new Error("Payload is required for httpSend()"));
         }
         const headers = {
           apikey: this.socket.apiKey ? this.socket.apiKey : "",
@@ -46981,10 +49190,49 @@ var require_RealtimeChannel = __commonJS({
        * @param args.event The name of the event being sent
        * @param args.payload Payload to be sent
        * @param opts Options to be used during the send process
+       *
+       * @category Realtime
+       *
+       * @remarks
+       * - When using REST you don't need to subscribe to the channel
+       * - REST calls are only available from 2.37.0 onwards
+       * - If you create a channel only to send a REST broadcast, remove it from
+       *   the client when the send completes
+       *
+       * @example Send a message via websocket
+       * ```js
+       * const channel = supabase.channel('room1')
+       *
+       * channel.subscribe((status) => {
+       *   if (status === 'SUBSCRIBED') {
+       *     channel.send({
+       *       type: 'broadcast',
+       *       event: 'cursor-pos',
+       *       payload: { x: Math.random(), y: Math.random() },
+       *     })
+       *   }
+       * })
+       * ```
+       *
+       * @exampleResponse Send a message via websocket
+       * ```js
+       * ok | timed out | error
+       * ```
+       *
+       * @example Send a message via REST
+       * ```js
+       * const channel = supabase.channel('room1')
+       *
+       * try {
+       *   await channel.httpSend('cursor-pos', { x: Math.random(), y: Math.random() })
+       * } finally {
+       *   await supabase.removeChannel(channel)
+       * }
+       * ```
        */
       async send(args, opts = {}) {
         var _a, _b;
-        if (!this._canPush() && args.type === "broadcast") {
+        if (!this.channelAdapter.canPush() && args.type === "broadcast") {
           console.warn("Realtime send() is automatically falling back to REST API. This behavior will be deprecated in the future. Please use httpSend() explicitly for REST delivery.");
           const { event, payload: endpoint_payload } = args;
           const headers = {
@@ -47013,7 +49261,7 @@ var require_RealtimeChannel = __commonJS({
             await ((_b = response.body) === null || _b === void 0 ? void 0 : _b.cancel());
             return response.ok ? "ok" : "error";
           } catch (error) {
-            if (error.name === "AbortError") {
+            if (error instanceof Error && error.name === "AbortError") {
               return "timed out";
             } else {
               return "error";
@@ -47022,7 +49270,7 @@ var require_RealtimeChannel = __commonJS({
         } else {
           return new Promise((resolve) => {
             var _a2, _b2, _c;
-            const push = this._push(args.type, args, opts.timeout || this.timeout);
+            const push = this.channelAdapter.push(args.type, args, opts.timeout || this.timeout);
             if (args.type === "broadcast" && !((_c = (_b2 = (_a2 = this.params) === null || _a2 === void 0 ? void 0 : _a2.config) === null || _b2 === void 0 ? void 0 : _b2.broadcast) === null || _c === void 0 ? void 0 : _c.ack)) {
               resolve("ok");
             }
@@ -47035,9 +49283,11 @@ var require_RealtimeChannel = __commonJS({
       /**
        * Updates the payload that will be sent the next time the channel joins (reconnects).
        * Useful for rotating access tokens or updating config without re-creating the channel.
+       *
+       * @category Realtime
        */
       updateJoinPayload(payload) {
-        this.joinPush.updatePayload(payload);
+        this.channelAdapter.updateJoinPayload(payload);
       }
       /**
        * Leaves the channel.
@@ -47047,46 +49297,21 @@ var require_RealtimeChannel = __commonJS({
        *
        * To receive leave acknowledgements, use the a `receive` hook to bind to the server ack, ie:
        * channel.unsubscribe().receive("ok", () => alert("left!") )
+       *
+       * @category Realtime
        */
-      unsubscribe(timeout = this.timeout) {
-        this.state = constants_1.CHANNEL_STATES.leaving;
-        const onClose = () => {
-          this.socket.log("channel", `leave ${this.topic}`);
-          this._trigger(constants_1.CHANNEL_EVENTS.close, "leave", this._joinRef());
-        };
-        this.joinPush.destroy();
-        let leavePush = null;
+      async unsubscribe(timeout = this.timeout) {
         return new Promise((resolve) => {
-          leavePush = new push_1.default(this, constants_1.CHANNEL_EVENTS.leave, {}, timeout);
-          leavePush.receive("ok", () => {
-            onClose();
-            resolve("ok");
-          }).receive("timeout", () => {
-            onClose();
-            resolve("timed out");
-          }).receive("error", () => {
-            resolve("error");
-          });
-          leavePush.send();
-          if (!this._canPush()) {
-            leavePush.trigger("ok", {});
-          }
-        }).finally(() => {
-          leavePush === null || leavePush === void 0 ? void 0 : leavePush.destroy();
+          this.channelAdapter.unsubscribe(timeout).receive("ok", () => resolve("ok")).receive("timeout", () => resolve("timed out")).receive("error", () => resolve("error"));
         });
       }
       /**
-       * Teardown the channel.
-       *
        * Destroys and stops related timers.
+       *
+       * @category Realtime
        */
       teardown() {
-        this.pushBuffer.forEach((push) => push.destroy());
-        this.pushBuffer = [];
-        this.rejoinTimer.reset();
-        this.joinPush.destroy();
-        this.state = constants_1.CHANNEL_STATES.closed;
-        this.bindings = {};
+        this.channelAdapter.teardown();
       }
       /** @internal */
       async _fetchWithTimeout(url, options, timeout) {
@@ -47097,158 +49322,100 @@ var require_RealtimeChannel = __commonJS({
         return response;
       }
       /** @internal */
-      _push(event, payload, timeout = this.timeout) {
-        if (!this.joinedOnce) {
-          throw `tried to push '${event}' to '${this.topic}' before joining. Use channel.subscribe() before pushing events`;
-        }
-        let pushEvent = new push_1.default(this, event, payload, timeout);
-        if (this._canPush()) {
-          pushEvent.send();
-        } else {
-          this._addToPushBuffer(pushEvent);
-        }
-        return pushEvent;
-      }
-      /** @internal */
-      _addToPushBuffer(pushEvent) {
-        pushEvent.startTimeout();
-        this.pushBuffer.push(pushEvent);
-        if (this.pushBuffer.length > constants_1.MAX_PUSH_BUFFER_SIZE) {
-          const removedPush = this.pushBuffer.shift();
-          if (removedPush) {
-            removedPush.destroy();
-            this.socket.log("channel", `discarded push due to buffer overflow: ${removedPush.event}`, removedPush.payload);
-          }
-        }
-      }
-      /**
-       * Overridable message hook
-       *
-       * Receives all events for specialized message handling before dispatching to the channel callbacks.
-       * Must return the payload, modified or unmodified.
-       *
-       * @internal
-       */
-      _onMessage(_event, payload, _ref) {
-        return payload;
-      }
-      /** @internal */
-      _isMember(topic) {
-        return this.topic === topic;
-      }
-      /** @internal */
-      _joinRef() {
-        return this.joinPush.ref;
-      }
-      /** @internal */
-      _trigger(type, payload, ref) {
-        var _a, _b;
-        const typeLower = type.toLocaleLowerCase();
-        const { close, error, leave, join } = constants_1.CHANNEL_EVENTS;
-        const events = [close, error, leave, join];
-        if (ref && events.indexOf(typeLower) >= 0 && ref !== this._joinRef()) {
-          return;
-        }
-        let handledPayload = this._onMessage(typeLower, payload, ref);
-        if (payload && !handledPayload) {
-          throw "channel onMessage callbacks must return the payload, modified or unmodified";
-        }
-        if (["insert", "update", "delete"].includes(typeLower)) {
-          (_a = this.bindings.postgres_changes) === null || _a === void 0 ? void 0 : _a.filter((bind) => {
-            var _a2, _b2, _c;
-            return ((_a2 = bind.filter) === null || _a2 === void 0 ? void 0 : _a2.event) === "*" || ((_c = (_b2 = bind.filter) === null || _b2 === void 0 ? void 0 : _b2.event) === null || _c === void 0 ? void 0 : _c.toLocaleLowerCase()) === typeLower;
-          }).map((bind) => bind.callback(handledPayload, ref));
-        } else {
-          (_b = this.bindings[typeLower]) === null || _b === void 0 ? void 0 : _b.filter((bind) => {
-            var _a2, _b2, _c, _d, _e, _f;
-            if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
-              if ("id" in bind) {
-                const bindId = bind.id;
-                const bindEvent = (_a2 = bind.filter) === null || _a2 === void 0 ? void 0 : _a2.event;
-                return bindId && ((_b2 = payload.ids) === null || _b2 === void 0 ? void 0 : _b2.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_c = payload.data) === null || _c === void 0 ? void 0 : _c.type.toLocaleLowerCase()));
-              } else {
-                const bindEvent = (_e = (_d = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _d === void 0 ? void 0 : _d.event) === null || _e === void 0 ? void 0 : _e.toLocaleLowerCase();
-                return bindEvent === "*" || bindEvent === ((_f = payload === null || payload === void 0 ? void 0 : payload.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase());
-              }
-            } else {
-              return bind.type.toLocaleLowerCase() === typeLower;
-            }
-          }).map((bind) => {
-            if (typeof handledPayload === "object" && "ids" in handledPayload) {
-              const postgresChanges = handledPayload.data;
-              const { schema, table, commit_timestamp, type: type2, errors } = postgresChanges;
-              const enrichedPayload = {
-                schema,
-                table,
-                commit_timestamp,
-                eventType: type2,
-                new: {},
-                old: {},
-                errors
-              };
-              handledPayload = Object.assign(Object.assign({}, enrichedPayload), this._getPayloadRecords(postgresChanges));
-            }
-            bind.callback(handledPayload, ref);
-          });
-        }
-      }
-      /** @internal */
-      _isClosed() {
-        return this.state === constants_1.CHANNEL_STATES.closed;
-      }
-      /** @internal */
-      _isJoined() {
-        return this.state === constants_1.CHANNEL_STATES.joined;
-      }
-      /** @internal */
-      _isJoining() {
-        return this.state === constants_1.CHANNEL_STATES.joining;
-      }
-      /** @internal */
-      _isLeaving() {
-        return this.state === constants_1.CHANNEL_STATES.leaving;
-      }
-      /** @internal */
-      _replyEventName(ref) {
-        return `chan_reply_${ref}`;
-      }
-      /** @internal */
       _on(type, filter, callback) {
         const typeLower = type.toLocaleLowerCase();
+        const ref = this.channelAdapter.on(type, callback);
         const binding = {
           type: typeLower,
           filter,
-          callback
+          callback,
+          ref
         };
         if (this.bindings[typeLower]) {
           this.bindings[typeLower].push(binding);
         } else {
           this.bindings[typeLower] = [binding];
         }
+        this._updateFilterMessage();
         return this;
       }
-      /** @internal */
-      _off(type, filter) {
-        const typeLower = type.toLocaleLowerCase();
-        if (this.bindings[typeLower]) {
-          this.bindings[typeLower] = this.bindings[typeLower].filter((bind) => {
-            var _a;
-            return !(((_a = bind.type) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase()) === typeLower && _RealtimeChannel.isEqual(bind.filter, filter));
-          });
-        }
-        return this;
+      /**
+       * Registers a callback that will be executed when the channel closes.
+       *
+       * @internal
+       */
+      _onClose(callback) {
+        this.channelAdapter.onClose(callback);
+      }
+      /**
+       * Registers a callback that will be executed when the channel encounteres an error.
+       *
+       * @internal
+       */
+      _onError(callback) {
+        this.channelAdapter.onError(callback);
       }
       /** @internal */
-      static isEqual(obj1, obj2) {
-        if (Object.keys(obj1).length !== Object.keys(obj2).length) {
-          return false;
-        }
-        for (const k in obj1) {
-          if (obj1[k] !== obj2[k]) {
+      _updateFilterMessage() {
+        this.channelAdapter.updateFilterBindings((binding, payload, ref) => {
+          var _a, _b, _c, _d, _e, _f, _g;
+          const typeLower = binding.event.toLocaleLowerCase();
+          if (this._notThisChannelEvent(typeLower, ref)) {
             return false;
           }
+          const bind = (_a = this.bindings[typeLower]) === null || _a === void 0 ? void 0 : _a.find((bind2) => bind2.ref === binding.ref);
+          if (!bind) {
+            return true;
+          }
+          if (["broadcast", "presence", "postgres_changes"].includes(typeLower)) {
+            if ("id" in bind) {
+              const bindId = bind.id;
+              const bindEvent = (_b = bind.filter) === null || _b === void 0 ? void 0 : _b.event;
+              return bindId && ((_c = payload.ids) === null || _c === void 0 ? void 0 : _c.includes(bindId)) && (bindEvent === "*" || (bindEvent === null || bindEvent === void 0 ? void 0 : bindEvent.toLocaleLowerCase()) === ((_d = payload.data) === null || _d === void 0 ? void 0 : _d.type.toLocaleLowerCase()));
+            } else {
+              const bindEvent = (_f = (_e = bind === null || bind === void 0 ? void 0 : bind.filter) === null || _e === void 0 ? void 0 : _e.event) === null || _f === void 0 ? void 0 : _f.toLocaleLowerCase();
+              return bindEvent === "*" || bindEvent === ((_g = payload === null || payload === void 0 ? void 0 : payload.event) === null || _g === void 0 ? void 0 : _g.toLocaleLowerCase());
+            }
+          } else {
+            return bind.type.toLocaleLowerCase() === typeLower;
+          }
+        });
+      }
+      /** @internal */
+      _notThisChannelEvent(event, ref) {
+        const { close, error, leave, join } = constants_1.CHANNEL_EVENTS;
+        const events = [close, error, leave, join];
+        return ref && events.includes(event) && ref !== this.joinPush.ref;
+      }
+      /** @internal */
+      _updateFilterTransform() {
+        this.channelAdapter.updatePayloadTransform((event, payload, ref) => {
+          if (typeof payload === "object" && "ids" in payload) {
+            const postgresChanges = payload.data;
+            const { schema, table, commit_timestamp, type, errors } = postgresChanges;
+            const enrichedPayload = {
+              schema,
+              table,
+              commit_timestamp,
+              eventType: type,
+              new: {},
+              old: {},
+              errors
+            };
+            return Object.assign(Object.assign({}, enrichedPayload), this._getPayloadRecords(postgresChanges));
+          }
+          return payload;
+        });
+      }
+      copyBindings(other) {
+        if (this.joinedOnce) {
+          throw new Error("cannot copy bindings into joined channel");
         }
-        return true;
+        for (const kind in other.bindings) {
+          for (const binding of other.bindings[kind]) {
+            this._on(binding.type, binding.filter, binding.callback);
+          }
+        }
       }
       /**
        * Compares two optional filter values for equality.
@@ -47259,46 +49426,6 @@ var require_RealtimeChannel = __commonJS({
         const normalizedServer = serverValue !== null && serverValue !== void 0 ? serverValue : void 0;
         const normalizedClient = clientValue !== null && clientValue !== void 0 ? clientValue : void 0;
         return normalizedServer === normalizedClient;
-      }
-      /** @internal */
-      _rejoinUntilConnected() {
-        this.rejoinTimer.scheduleTimeout();
-        if (this.socket.isConnected()) {
-          this._rejoin();
-        }
-      }
-      /**
-       * Registers a callback that will be executed when the channel closes.
-       *
-       * @internal
-       */
-      _onClose(callback) {
-        this._on(constants_1.CHANNEL_EVENTS.close, {}, callback);
-      }
-      /**
-       * Registers a callback that will be executed when the channel encounteres an error.
-       *
-       * @internal
-       */
-      _onError(callback) {
-        this._on(constants_1.CHANNEL_EVENTS.error, {}, (reason) => callback(reason));
-      }
-      /**
-       * Returns `true` if the socket is connected and the channel has been joined.
-       *
-       * @internal
-       */
-      _canPush() {
-        return this.socket.isConnected() && this._isJoined();
-      }
-      /** @internal */
-      _rejoin(timeout = this.timeout) {
-        if (this._isLeaving()) {
-          return;
-        }
-        this.socket._leaveOpenTopic(this.topic);
-        this.state = constants_1.CHANNEL_STATES.joining;
-        this.joinPush.resend(timeout);
       }
       /** @internal */
       _getPayloadRecords(payload) {
@@ -47319,20 +49446,136 @@ var require_RealtimeChannel = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/socketAdapter.js
+var require_socketAdapter = __commonJS({
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/phoenix/socketAdapter.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    var phoenix_1 = require_phoenix_cjs();
+    var constants_1 = require_constants2();
+    var SocketAdapter = class {
+      constructor(endPoint, options) {
+        this.socket = new phoenix_1.Socket(endPoint, options);
+      }
+      get timeout() {
+        return this.socket.timeout;
+      }
+      get endPoint() {
+        return this.socket.endPoint;
+      }
+      get transport() {
+        return this.socket.transport;
+      }
+      get heartbeatIntervalMs() {
+        return this.socket.heartbeatIntervalMs;
+      }
+      get heartbeatCallback() {
+        return this.socket.heartbeatCallback;
+      }
+      set heartbeatCallback(callback) {
+        this.socket.heartbeatCallback = callback;
+      }
+      get heartbeatTimer() {
+        return this.socket.heartbeatTimer;
+      }
+      get pendingHeartbeatRef() {
+        return this.socket.pendingHeartbeatRef;
+      }
+      get reconnectTimer() {
+        return this.socket.reconnectTimer;
+      }
+      get vsn() {
+        return this.socket.vsn;
+      }
+      get encode() {
+        return this.socket.encode;
+      }
+      get decode() {
+        return this.socket.decode;
+      }
+      get reconnectAfterMs() {
+        return this.socket.reconnectAfterMs;
+      }
+      get sendBuffer() {
+        return this.socket.sendBuffer;
+      }
+      get stateChangeCallbacks() {
+        return this.socket.stateChangeCallbacks;
+      }
+      connect() {
+        this.socket.connect();
+      }
+      disconnect(callback, code, reason, timeout = 1e4) {
+        return new Promise((resolve) => {
+          setTimeout(() => resolve("timeout"), timeout);
+          this.socket.disconnect(() => {
+            callback();
+            resolve("ok");
+          }, code, reason);
+        });
+      }
+      push(data) {
+        this.socket.push(data);
+      }
+      log(kind, msg, data) {
+        this.socket.log(kind, msg, data);
+      }
+      makeRef() {
+        return this.socket.makeRef();
+      }
+      onOpen(callback) {
+        this.socket.onOpen(callback);
+      }
+      onClose(callback) {
+        this.socket.onClose(callback);
+      }
+      onError(callback) {
+        this.socket.onError(callback);
+      }
+      onMessage(callback) {
+        this.socket.onMessage(callback);
+      }
+      isConnected() {
+        return this.socket.isConnected();
+      }
+      isConnecting() {
+        return this.socket.connectionState() == constants_1.CONNECTION_STATE.connecting;
+      }
+      isDisconnecting() {
+        return this.socket.connectionState() == constants_1.CONNECTION_STATE.closing;
+      }
+      connectionState() {
+        return this.socket.connectionState();
+      }
+      endPointURL() {
+        return this.socket.endPointURL();
+      }
+      sendHeartbeat() {
+        this.socket.sendHeartbeat();
+      }
+      /**
+       * @internal
+       */
+      getSocket() {
+        return this.socket;
+      }
+    };
+    exports.default = SocketAdapter;
+  }
+});
+
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js
 var require_RealtimeClient = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/RealtimeClient.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
     var websocket_factory_1 = tslib_1.__importDefault(require_websocket_factory());
     var constants_1 = require_constants2();
     var serializer_1 = tslib_1.__importDefault(require_serializer());
-    var timer_1 = tslib_1.__importDefault(require_timer());
     var transformers_1 = require_transformers();
     var RealtimeChannel_1 = tslib_1.__importDefault(require_RealtimeChannel());
-    var noop = () => {
-    };
+    var socketAdapter_1 = tslib_1.__importDefault(require_socketAdapter());
     var CONNECTION_TIMEOUTS = {
       HEARTBEAT_INTERVAL: 25e3,
       RECONNECT_DELAY: 10,
@@ -47340,6 +49583,39 @@ var require_RealtimeClient = __commonJS({
     };
     var RECONNECT_INTERVALS = [1e3, 2e3, 5e3, 1e4];
     var DEFAULT_RECONNECT_FALLBACK = 1e4;
+    function createMemorySessionStorage() {
+      const store = /* @__PURE__ */ new Map();
+      return {
+        get length() {
+          return store.size;
+        },
+        clear() {
+          store.clear();
+        },
+        getItem(key) {
+          return store.has(key) ? store.get(key) : null;
+        },
+        key(index) {
+          var _a;
+          return (_a = Array.from(store.keys())[index]) !== null && _a !== void 0 ? _a : null;
+        },
+        removeItem(key) {
+          store.delete(key);
+        },
+        setItem(key, value) {
+          store.set(key, String(value));
+        }
+      };
+    }
+    function resolveSessionStorage() {
+      try {
+        if (typeof globalThis !== "undefined" && globalThis.sessionStorage) {
+          return globalThis.sessionStorage;
+        }
+      } catch (_a) {
+      }
+      return createMemorySessionStorage();
+    }
     var WORKER_SCRIPT = `
   addEventListener("message", (e) => {
     if (e.data.event === "start") {
@@ -47347,6 +49623,54 @@ var require_RealtimeClient = __commonJS({
     }
   });`;
     var RealtimeClient2 = class {
+      get endPoint() {
+        return this.socketAdapter.endPoint;
+      }
+      get timeout() {
+        return this.socketAdapter.timeout;
+      }
+      get transport() {
+        return this.socketAdapter.transport;
+      }
+      get heartbeatCallback() {
+        return this.socketAdapter.heartbeatCallback;
+      }
+      get heartbeatIntervalMs() {
+        return this.socketAdapter.heartbeatIntervalMs;
+      }
+      get heartbeatTimer() {
+        if (this.worker) {
+          return this._workerHeartbeatTimer;
+        }
+        return this.socketAdapter.heartbeatTimer;
+      }
+      get pendingHeartbeatRef() {
+        if (this.worker) {
+          return this._pendingWorkerHeartbeatRef;
+        }
+        return this.socketAdapter.pendingHeartbeatRef;
+      }
+      get reconnectTimer() {
+        return this.socketAdapter.reconnectTimer;
+      }
+      get vsn() {
+        return this.socketAdapter.vsn;
+      }
+      get encode() {
+        return this.socketAdapter.encode;
+      }
+      get decode() {
+        return this.socketAdapter.decode;
+      }
+      get reconnectAfterMs() {
+        return this.socketAdapter.reconnectAfterMs;
+      }
+      get sendBuffer() {
+        return this.socketAdapter.sendBuffer;
+      }
+      get stateChangeCallbacks() {
+        return this.socketAdapter.stateChangeCallbacks;
+      }
       /**
        * Initializes the Socket.
        *
@@ -47366,50 +49690,47 @@ var require_RealtimeClient = __commonJS({
        * @param options.worker Use Web Worker to set a side flow. Defaults to false.
        * @param options.workerUrl The URL of the worker script. Defaults to https://realtime.supabase.com/worker.js that includes a heartbeat event call to keep the connection alive.
        * @param options.vsn The protocol version to use when connecting. Supported versions are "1.0.0" and "2.0.0". Defaults to "2.0.0".
-       * @example
+       *
+       * @category Realtime
+       *
+       * @example Using supabase-js (recommended)
+       * ```ts
+       * import { createClient } from '@supabase/supabase-js'
+       *
+       * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+       * const channel = supabase.channel('room1')
+       * channel
+       *   .on('broadcast', { event: 'cursor-pos' }, (payload) => console.log(payload))
+       *   .subscribe()
+       * ```
+       *
+       * @example Standalone import for bundle-sensitive environments
        * ```ts
        * import RealtimeClient from '@supabase/realtime-js'
        *
        * const client = new RealtimeClient('https://xyzcompany.supabase.co/realtime/v1', {
-       *   params: { apikey: 'public-anon-key' },
+       *   params: { apikey: 'your-publishable-key' },
        * })
        * client.connect()
        * ```
        */
       constructor(endPoint, options) {
         var _a;
-        this.accessTokenValue = null;
-        this.apiKey = null;
-        this._manuallySetToken = false;
         this.channels = new Array();
-        this.endPoint = "";
+        this.accessTokenValue = null;
+        this.accessToken = null;
+        this.apiKey = null;
         this.httpEndpoint = "";
         this.headers = {};
         this.params = {};
-        this.timeout = constants_1.DEFAULT_TIMEOUT;
-        this.transport = null;
-        this.heartbeatIntervalMs = CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
-        this.heartbeatTimer = void 0;
-        this.pendingHeartbeatRef = null;
-        this.heartbeatCallback = noop;
         this.ref = 0;
-        this.reconnectTimer = null;
-        this.vsn = constants_1.DEFAULT_VSN;
-        this.logger = noop;
-        this.conn = null;
-        this.sendBuffer = [];
         this.serializer = new serializer_1.default();
-        this.stateChangeCallbacks = {
-          open: [],
-          close: [],
-          error: [],
-          message: []
-        };
-        this.accessToken = null;
-        this._connectionState = "disconnected";
-        this._wasManualDisconnect = false;
+        this._manuallySetToken = false;
         this._authPromise = null;
-        this._heartbeatSentAt = null;
+        this._workerHeartbeatTimer = void 0;
+        this._pendingWorkerHeartbeatRef = null;
+        this._pendingDisconnectTimer = null;
+        this._disconnectOnEmptyChannelsAfterMs = 0;
         this._resolveFetch = (customFetch) => {
           if (customFetch) {
             return (...args) => customFetch(...args);
@@ -47420,33 +49741,30 @@ var require_RealtimeClient = __commonJS({
           throw new Error("API key is required to connect to Realtime");
         }
         this.apiKey = options.params.apikey;
-        this.endPoint = `${endPoint}/${constants_1.TRANSPORTS.websocket}`;
+        const socketAdapterOptions = this._initializeOptions(options);
+        this.socketAdapter = new socketAdapter_1.default(endPoint, socketAdapterOptions);
         this.httpEndpoint = (0, transformers_1.httpEndpointURL)(endPoint);
-        this._initializeOptions(options);
-        this._setupReconnectionTimer();
         this.fetch = this._resolveFetch(options === null || options === void 0 ? void 0 : options.fetch);
       }
       /**
        * Connects the socket, unless already connected.
+       *
+       * @category Realtime
        */
       connect() {
-        if (this.isConnecting() || this.isDisconnecting() || this.conn !== null && this.isConnected()) {
+        if (this.isConnecting() || this.isDisconnecting() || this.isConnected()) {
           return;
         }
-        this._setConnectionState("connecting");
         if (this.accessToken && !this._authPromise) {
           this._setAuthSafely("connect");
         }
-        if (this.transport) {
-          this.conn = new this.transport(this.endpointURL());
-        } else {
-          try {
-            this.conn = websocket_factory_1.default.createWebSocket(this.endpointURL());
-          } catch (error) {
-            this._setConnectionState("disconnected");
-            const errorMessage = error.message;
-            if (errorMessage.includes("Node.js")) {
-              throw new Error(`${errorMessage}
+        this._setupConnectionHandlers();
+        try {
+          this.socketAdapter.connect();
+        } catch (error) {
+          const errorMessage = error.message;
+          if (errorMessage.includes("Node.js")) {
+            throw new Error(`${errorMessage}
 
 To use Realtime in Node.js, you need to provide a WebSocket implementation:
 
@@ -47460,116 +49778,115 @@ Option 2: Install and provide the "ws" package:
     ...options,
     transport: ws
   })`);
-            }
-            throw new Error(`WebSocket not available: ${errorMessage}`);
           }
+          throw new Error(`WebSocket not available: ${errorMessage}`);
         }
-        this._setupConnectionHandlers();
+        this._handleNodeJsRaceCondition();
       }
       /**
        * Returns the URL of the websocket.
        * @returns string The URL of the websocket.
+       *
+       * @category Realtime
        */
       endpointURL() {
-        return this._appendParams(this.endPoint, Object.assign({}, this.params, { vsn: this.vsn }));
+        return this.socketAdapter.endPointURL();
       }
       /**
        * Disconnects the socket.
        *
        * @param code A numeric status code to send on disconnect.
        * @param reason A custom reason for the disconnect.
+       *
+       * @category Realtime
        */
-      disconnect(code, reason) {
+      async disconnect(code, reason) {
+        this._cancelPendingDisconnect();
         if (this.isDisconnecting()) {
-          return;
+          return "ok";
         }
-        this._setConnectionState("disconnecting", true);
-        if (this.conn) {
-          const fallbackTimer = setTimeout(() => {
-            this._setConnectionState("disconnected");
-          }, 100);
-          this.conn.onclose = () => {
-            clearTimeout(fallbackTimer);
-            this._setConnectionState("disconnected");
-          };
-          if (typeof this.conn.close === "function") {
-            if (code) {
-              this.conn.close(code, reason !== null && reason !== void 0 ? reason : "");
-            } else {
-              this.conn.close();
-            }
-          }
-          this._teardownConnection();
-        } else {
-          this._setConnectionState("disconnected");
-        }
+        return await this.socketAdapter.disconnect(() => {
+          clearInterval(this._workerHeartbeatTimer);
+          this._terminateWorker();
+        }, code, reason);
       }
       /**
        * Returns all created channels
+       *
+       * @category Realtime
        */
       getChannels() {
         return this.channels;
       }
       /**
-       * Unsubscribes and removes a single channel
+       * Unsubscribes, removes and tears down a single channel
        * @param channel A RealtimeChannel instance
+       *
+       * @category Realtime
        */
       async removeChannel(channel) {
         const status = await channel.unsubscribe();
-        if (this.channels.length === 0) {
-          this.disconnect();
+        if (status === "ok") {
+          channel.teardown();
         }
         return status;
       }
       /**
-       * Unsubscribes and removes all channels
+       * Unsubscribes, removes and tears down all channels
+       *
+       * @category Realtime
        */
       async removeAllChannels() {
-        const values_1 = await Promise.all(this.channels.map((channel) => channel.unsubscribe()));
-        this.channels = [];
-        this.disconnect();
-        return values_1;
+        const promises = this.channels.map(async (channel) => {
+          const result2 = await channel.unsubscribe();
+          channel.teardown();
+          return result2;
+        });
+        const result = await Promise.all(promises);
+        await this.disconnect();
+        return result;
       }
       /**
        * Logs the message.
        *
-       * For customized logging, `this.logger` can be overridden.
+       * For customized logging, `this.logger` can be overridden in Client constructor.
+       *
+       * @category Realtime
        */
       log(kind, msg, data) {
-        this.logger(kind, msg, data);
+        this.socketAdapter.log(kind, msg, data);
       }
       /**
        * Returns the current state of the socket.
+       *
+       * @category Realtime
        */
       connectionState() {
-        switch (this.conn && this.conn.readyState) {
-          case constants_1.SOCKET_STATES.connecting:
-            return constants_1.CONNECTION_STATE.Connecting;
-          case constants_1.SOCKET_STATES.open:
-            return constants_1.CONNECTION_STATE.Open;
-          case constants_1.SOCKET_STATES.closing:
-            return constants_1.CONNECTION_STATE.Closing;
-          default:
-            return constants_1.CONNECTION_STATE.Closed;
-        }
+        return this.socketAdapter.connectionState() || constants_1.CONNECTION_STATE.closed;
       }
       /**
        * Returns `true` is the connection is open.
+       *
+       * @category Realtime
        */
       isConnected() {
-        return this.connectionState() === constants_1.CONNECTION_STATE.Open;
+        return this.socketAdapter.isConnected();
       }
       /**
        * Returns `true` if the connection is currently connecting.
+       *
+       * @category Realtime
        */
       isConnecting() {
-        return this._connectionState === "connecting";
+        return this.socketAdapter.isConnecting();
       }
       /**
        * Returns `true` if the connection is currently disconnecting.
+       *
+       * @category Realtime
        */
       isDisconnecting() {
-        return this._connectionState === "disconnecting";
+        return this.socketAdapter.isDisconnecting();
       }
       /**
        * Creates (or reuses) a {@link RealtimeChannel} for the provided topic.
@@ -47577,12 +49894,15 @@ Option 2: Install and provide the "ws" package:
        * Topics are automatically prefixed with `realtime:` to match the Realtime service.
        * If a channel with the same topic already exists it will be returned instead of creating
        * a duplicate connection.
+       *
+       * @category Realtime
        */
       channel(topic, params = { config: {} }) {
         const realtimeTopic = `realtime:${topic}`;
         const exists = this.getChannels().find((c) => c.topic === realtimeTopic);
         if (!exists) {
           const chan = new RealtimeChannel_1.default(`realtime:${topic}`, params, this);
+          this._cancelPendingDisconnect();
           this.channels.push(chan);
           return chan;
         } else {
@@ -47593,21 +49913,11 @@ Option 2: Install and provide the "ws" package:
        * Push out a message if the socket is connected.
        *
        * If the socket is not connected, the message gets enqueued within a local buffer, and sent out when a connection is next established.
+       *
+       * @category Realtime
        */
       push(data) {
-        const { topic, event, payload, ref } = data;
-        const callback = () => {
-          this.encode(data, (result) => {
-            var _a;
-            (_a = this.conn) === null || _a === void 0 ? void 0 : _a.send(result);
-          });
-        };
-        this.log("push", `${topic} ${event} (${ref})`, payload);
-        if (this.isConnected()) {
-          callback();
-        } else {
-          this.sendBuffer.push(callback);
-        }
+        this.socketAdapter.push(data);
       }
       /**
        * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
@@ -47622,12 +49932,14 @@ Option 2: Install and provide the "ws" package:
        *
        * @param token A JWT string to override the token set on the client.
        *
-       * @example
+       * @example Setting the authorization header
        * // Use a manual token (preserved across resubscribes, ignores accessToken callback)
        * client.realtime.setAuth('my-custom-jwt')
        *
        * // Switch back to using the accessToken callback
        * client.realtime.setAuth()
+       *
+       * @category Realtime
        */
       async setAuth(token = null) {
         this._authPromise = this._performAuth(token);
@@ -47647,66 +49959,20 @@ Option 2: Install and provide the "ws" package:
       }
       /**
        * Sends a heartbeat message if the socket is connected.
+       *
+       * @category Realtime
        */
       async sendHeartbeat() {
-        var _a;
-        if (!this.isConnected()) {
-          try {
-            this.heartbeatCallback("disconnected");
-          } catch (e) {
-            this.log("error", "error in heartbeat callback", e);
-          }
-          return;
-        }
-        if (this.pendingHeartbeatRef) {
-          this.pendingHeartbeatRef = null;
-          this._heartbeatSentAt = null;
-          this.log("transport", "heartbeat timeout. Attempting to re-establish connection");
-          try {
-            this.heartbeatCallback("timeout");
-          } catch (e) {
-            this.log("error", "error in heartbeat callback", e);
-          }
-          this._wasManualDisconnect = false;
-          (_a = this.conn) === null || _a === void 0 ? void 0 : _a.close(constants_1.WS_CLOSE_NORMAL, "heartbeat timeout");
-          setTimeout(() => {
-            var _a2;
-            if (!this.isConnected()) {
-              (_a2 = this.reconnectTimer) === null || _a2 === void 0 ? void 0 : _a2.scheduleTimeout();
-            }
-          }, CONNECTION_TIMEOUTS.HEARTBEAT_TIMEOUT_FALLBACK);
-          return;
-        }
-        this._heartbeatSentAt = Date.now();
-        this.pendingHeartbeatRef = this._makeRef();
-        this.push({
-          topic: "phoenix",
-          event: "heartbeat",
-          payload: {},
-          ref: this.pendingHeartbeatRef
-        });
-        try {
-          this.heartbeatCallback("sent");
-        } catch (e) {
-          this.log("error", "error in heartbeat callback", e);
-        }
-        this._setAuthSafely("heartbeat");
+        this.socketAdapter.sendHeartbeat();
       }
       /**
        * Sets a callback that receives lifecycle events for internal heartbeat messages.
        * Useful for instrumenting connection health (e.g. sent/ok/timeout/disconnected).
+       *
+       * @category Realtime
        */
       onHeartbeat(callback) {
-        this.heartbeatCallback = callback;
-      }
-      /**
-       * Flushes send buffer
-       */
-      flushSendBuffer() {
-        if (this.isConnected() && this.sendBuffer.length > 0) {
-          this.sendBuffer.forEach((callback) => callback());
-          this.sendBuffer = [];
-        }
+        this.socketAdapter.heartbeatCallback = this._wrapHeartbeatCallback(callback);
       }
       /**
        * Return the next message ref, accounting for overflows
@@ -47714,28 +49980,10 @@ Option 2: Install and provide the "ws" package:
        * @internal
        */
       _makeRef() {
-        let newRef = this.ref + 1;
-        if (newRef === this.ref) {
-          this.ref = 0;
-        } else {
-          this.ref = newRef;
-        }
-        return this.ref.toString();
+        return this.socketAdapter.makeRef();
       }
       /**
-       * Unsubscribe from channels with the specified topic.
-       *
-       * @internal
-       */
-      _leaveOpenTopic(topic) {
-        let dupChannel = this.channels.find((c) => c.topic === topic && (c._isJoined() || c._isJoining()));
-        if (dupChannel) {
-          this.log("transport", `leaving duplicate topic "${topic}"`);
-          dupChannel.unsubscribe();
-        }
-      }
-      /**
-       * Removes a subscription from the socket.
+       * Removes a channel from RealtimeClient
        *
        * @param channel An open subscription.
        *
@@ -47743,220 +49991,34 @@ Option 2: Install and provide the "ws" package:
        */
       _remove(channel) {
         this.channels = this.channels.filter((c) => c.topic !== channel.topic);
-      }
-      /** @internal */
-      _onConnMessage(rawMessage) {
-        this.decode(rawMessage.data, (msg) => {
-          if (msg.topic === "phoenix" && msg.event === "phx_reply" && msg.ref && msg.ref === this.pendingHeartbeatRef) {
-            const latency = this._heartbeatSentAt ? Date.now() - this._heartbeatSentAt : void 0;
-            try {
-              this.heartbeatCallback(msg.payload.status === "ok" ? "ok" : "error", latency);
-            } catch (e) {
-              this.log("error", "error in heartbeat callback", e);
-            }
-            this._heartbeatSentAt = null;
-            this.pendingHeartbeatRef = null;
-          }
-          const { topic, event, payload, ref } = msg;
-          const refString = ref ? `(${ref})` : "";
-          const status = payload.status || "";
-          this.log("receive", `${status} ${topic} ${event} ${refString}`.trim(), payload);
-          this.channels.filter((channel) => channel._isMember(topic)).forEach((channel) => channel._trigger(event, payload, ref));
-          this._triggerStateCallbacks("message", msg);
-        });
-      }
-      /**
-       * Clear specific timer
-       * @internal
-       */
-      _clearTimer(timer) {
-        var _a;
-        if (timer === "heartbeat" && this.heartbeatTimer) {
-          clearInterval(this.heartbeatTimer);
-          this.heartbeatTimer = void 0;
-        } else if (timer === "reconnect") {
-          (_a = this.reconnectTimer) === null || _a === void 0 ? void 0 : _a.reset();
+        if (this.channels.length === 0) {
+          this.log("transport", "no channels remaining, scheduling disconnect");
+          this._schedulePendingDisconnect();
         }
       }
-      /**
-       * Clear all timers
-       * @internal
-       */
-      _clearAllTimers() {
-        this._clearTimer("heartbeat");
-        this._clearTimer("reconnect");
-      }
-      /**
-       * Setup connection handlers for WebSocket events
-       * @internal
-       */
-      _setupConnectionHandlers() {
-        if (!this.conn)
+      /** @internal */
+      _schedulePendingDisconnect() {
+        this._cancelPendingDisconnect();
+        if (this._disconnectOnEmptyChannelsAfterMs === 0) {
+          this.log("transport", "disconnecting immediately - no channels");
+          this.disconnect();
           return;
-        if ("binaryType" in this.conn) {
-          ;
-          this.conn.binaryType = "arraybuffer";
         }
-        this.conn.onopen = () => this._onConnOpen();
-        this.conn.onerror = (error) => this._onConnError(error);
-        this.conn.onmessage = (event) => this._onConnMessage(event);
-        this.conn.onclose = (event) => this._onConnClose(event);
-        if (this.conn.readyState === constants_1.SOCKET_STATES.open) {
-          this._onConnOpen();
-        }
-      }
-      /**
-       * Teardown connection and cleanup resources
-       * @internal
-       */
-      _teardownConnection() {
-        if (this.conn) {
-          if (this.conn.readyState === constants_1.SOCKET_STATES.open || this.conn.readyState === constants_1.SOCKET_STATES.connecting) {
-            try {
-              this.conn.close();
-            } catch (e) {
-              this.log("error", "Error closing connection", e);
-            }
+        this._pendingDisconnectTimer = setTimeout(() => {
+          this._pendingDisconnectTimer = null;
+          if (this.channels.length === 0) {
+            this.log("transport", "deferred disconnect fired - no channels, disconnecting");
+            this.disconnect();
           }
-          this.conn.onopen = null;
-          this.conn.onerror = null;
-          this.conn.onmessage = null;
-          this.conn.onclose = null;
-          this.conn = null;
-        }
-        this._clearAllTimers();
-        this._terminateWorker();
-        this.channels.forEach((channel) => channel.teardown());
+        }, this._disconnectOnEmptyChannelsAfterMs);
+        this.log("transport", `deferred disconnect scheduled in ${this._disconnectOnEmptyChannelsAfterMs}ms`);
       }
       /** @internal */
-      _onConnOpen() {
-        this._setConnectionState("connected");
-        this.log("transport", `connected to ${this.endpointURL()}`);
-        const authPromise = this._authPromise || (this.accessToken && !this.accessTokenValue ? this.setAuth() : Promise.resolve());
-        authPromise.then(() => {
-          if (this.accessTokenValue) {
-            this.channels.forEach((channel) => {
-              channel.updateJoinPayload({ access_token: this.accessTokenValue });
-            });
-            this.sendBuffer = [];
-            this.channels.forEach((channel) => {
-              if (channel._isJoining()) {
-                channel.joinPush.sent = false;
-                channel.joinPush.send();
-              }
-            });
-          }
-          this.flushSendBuffer();
-        }).catch((e) => {
-          this.log("error", "error waiting for auth on connect", e);
-          this.flushSendBuffer();
-        });
-        this._clearTimer("reconnect");
-        if (!this.worker) {
-          this._startHeartbeat();
-        } else {
-          if (!this.workerRef) {
-            this._startWorkerHeartbeat();
-          }
-        }
-        this._triggerStateCallbacks("open");
-      }
-      /** @internal */
-      _startHeartbeat() {
-        this.heartbeatTimer && clearInterval(this.heartbeatTimer);
-        this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.heartbeatIntervalMs);
-      }
-      /** @internal */
-      _startWorkerHeartbeat() {
-        if (this.workerUrl) {
-          this.log("worker", `starting worker for from ${this.workerUrl}`);
-        } else {
-          this.log("worker", `starting default worker`);
-        }
-        const objectUrl = this._workerObjectUrl(this.workerUrl);
-        this.workerRef = new Worker(objectUrl);
-        this.workerRef.onerror = (error) => {
-          this.log("worker", "worker error", error.message);
-          this._terminateWorker();
-        };
-        this.workerRef.onmessage = (event) => {
-          if (event.data.event === "keepAlive") {
-            this.sendHeartbeat();
-          }
-        };
-        this.workerRef.postMessage({
-          event: "start",
-          interval: this.heartbeatIntervalMs
-        });
-      }
-      /**
-       * Terminate the Web Worker and clear the reference
-       * @internal
-       */
-      _terminateWorker() {
-        if (this.workerRef) {
-          this.log("worker", "terminating worker");
-          this.workerRef.terminate();
-          this.workerRef = void 0;
-        }
-      }
-      /** @internal */
-      _onConnClose(event) {
-        var _a;
-        this._setConnectionState("disconnected");
-        this.log("transport", "close", event);
-        this._triggerChanError();
-        this._clearTimer("heartbeat");
-        if (!this._wasManualDisconnect) {
-          (_a = this.reconnectTimer) === null || _a === void 0 ? void 0 : _a.scheduleTimeout();
-        }
-        this._triggerStateCallbacks("close", event);
-      }
-      /** @internal */
-      _onConnError(error) {
-        this._setConnectionState("disconnected");
-        this.log("transport", `${error}`);
-        this._triggerChanError();
-        this._triggerStateCallbacks("error", error);
-        try {
-          this.heartbeatCallback("error");
-        } catch (e) {
-          this.log("error", "error in heartbeat callback", e);
-        }
-      }
-      /** @internal */
-      _triggerChanError() {
-        this.channels.forEach((channel) => channel._trigger(constants_1.CHANNEL_EVENTS.error));
-      }
-      /** @internal */
-      _appendParams(url, params) {
-        if (Object.keys(params).length === 0) {
-          return url;
-        }
-        const prefix = url.match(/\?/) ? "&" : "?";
-        const query = new URLSearchParams(params);
-        return `${url}${prefix}${query}`;
-      }
-      _workerObjectUrl(url) {
-        let result_url;
-        if (url) {
-          result_url = url;
-        } else {
-          const blob = new Blob([WORKER_SCRIPT], { type: "application/javascript" });
-          result_url = URL.createObjectURL(blob);
-        }
-        return result_url;
-      }
-      /**
-       * Set connection state with proper state management
-       * @internal
-       */
-      _setConnectionState(state, manual = false) {
-        this._connectionState = state;
-        if (state === "connecting") {
-          this._wasManualDisconnect = false;
-        } else if (state === "disconnecting") {
-          this._wasManualDisconnect = manual;
+      _cancelPendingDisconnect() {
+        if (this._pendingDisconnectTimer !== null) {
+          this.log("transport", "pending disconnect cancelled - channel activity detected");
+          clearTimeout(this._pendingDisconnectTimer);
+          this._pendingDisconnectTimer = null;
         }
       }
       /**
@@ -47992,8 +50054,8 @@ Option 2: Install and provide the "ws" package:
               version: constants_1.DEFAULT_VERSION
             };
             tokenToSend && channel.updateJoinPayload(payload);
-            if (channel.joinedOnce && channel._isJoined()) {
-              channel._push(constants_1.CHANNEL_EVENTS.access_token, {
+            if (channel.joinedOnce && channel.channelAdapter.isJoined()) {
+              channel.channelAdapter.push(constants_1.CHANNEL_EVENTS.access_token, {
                 access_token: tokenToSend
               });
             }
@@ -48020,82 +50082,150 @@ Option 2: Install and provide the "ws" package:
           });
         }
       }
-      /**
-       * Trigger state change callbacks with proper error handling
-       * @internal
-       */
-      _triggerStateCallbacks(event, data) {
-        try {
-          this.stateChangeCallbacks[event].forEach((callback) => {
-            try {
-              callback(data);
-            } catch (e) {
-              this.log("error", `error in ${event} callback`, e);
-            }
+      /** @internal */
+      _setupConnectionHandlers() {
+        this.socketAdapter.onOpen(() => {
+          const authPromise = this._authPromise || (this.accessToken && !this.accessTokenValue ? this.setAuth() : Promise.resolve());
+          authPromise.catch((e) => {
+            this.log("error", "error waiting for auth on connect", e);
           });
-        } catch (e) {
-          this.log("error", `error triggering ${event} callbacks`, e);
+          if (this.worker && !this.workerRef) {
+            this._startWorkerHeartbeat();
+          }
+        });
+        this.socketAdapter.onClose(() => {
+          if (this.worker && this.workerRef) {
+            this._terminateWorker();
+          }
+        });
+        this.socketAdapter.onMessage((message) => {
+          if (message.ref && message.ref === this._pendingWorkerHeartbeatRef) {
+            this._pendingWorkerHeartbeatRef = null;
+          }
+        });
+      }
+      /** @internal */
+      _handleNodeJsRaceCondition() {
+        if (this.socketAdapter.isConnected()) {
+          this.socketAdapter.getSocket().onConnOpen();
         }
       }
-      /**
-       * Setup reconnection timer with proper configuration
-       * @internal
-       */
-      _setupReconnectionTimer() {
-        this.reconnectTimer = new timer_1.default(async () => {
-          setTimeout(async () => {
-            await this._waitForAuthIfNeeded();
-            if (!this.isConnected()) {
-              this.connect();
-            }
-          }, CONNECTION_TIMEOUTS.RECONNECT_DELAY);
-        }, this.reconnectAfterMs);
+      /** @internal */
+      _wrapHeartbeatCallback(heartbeatCallback) {
+        return (status, latency) => {
+          if (status == "sent")
+            this._setAuthSafely();
+          if (heartbeatCallback)
+            heartbeatCallback(status, latency);
+        };
+      }
+      /** @internal */
+      _startWorkerHeartbeat() {
+        if (this.workerUrl) {
+          this.log("worker", `starting worker for from ${this.workerUrl}`);
+        } else {
+          this.log("worker", `starting default worker`);
+        }
+        const objectUrl = this._workerObjectUrl(this.workerUrl);
+        this.workerRef = new Worker(objectUrl);
+        this.workerRef.onerror = (error) => {
+          this.log("worker", "worker error", error.message);
+          this._terminateWorker();
+          this.disconnect();
+        };
+        this.workerRef.onmessage = (event) => {
+          if (event.data.event === "keepAlive") {
+            this.sendHeartbeat();
+          }
+        };
+        this.workerRef.postMessage({
+          event: "start",
+          interval: this.heartbeatIntervalMs
+        });
       }
       /**
-       * Initialize client options with defaults
+       * Terminate the Web Worker and clear the reference
+       * @internal
+       */
+      _terminateWorker() {
+        if (this.workerRef) {
+          this.log("worker", "terminating worker");
+          this.workerRef.terminate();
+          this.workerRef = void 0;
+        }
+      }
+      /** @internal */
+      _workerObjectUrl(url) {
+        let result_url;
+        if (url) {
+          result_url = url;
+        } else {
+          const blob = new Blob([WORKER_SCRIPT], { type: "application/javascript" });
+          result_url = URL.createObjectURL(blob);
+        }
+        return result_url;
+      }
+      /**
+       * Initialize socket options with defaults
        * @internal
        */
       _initializeOptions(options) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
-        this.transport = (_a = options === null || options === void 0 ? void 0 : options.transport) !== null && _a !== void 0 ? _a : null;
-        this.timeout = (_b = options === null || options === void 0 ? void 0 : options.timeout) !== null && _b !== void 0 ? _b : constants_1.DEFAULT_TIMEOUT;
-        this.heartbeatIntervalMs = (_c = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _c !== void 0 ? _c : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
-        this.worker = (_d = options === null || options === void 0 ? void 0 : options.worker) !== null && _d !== void 0 ? _d : false;
-        this.accessToken = (_e = options === null || options === void 0 ? void 0 : options.accessToken) !== null && _e !== void 0 ? _e : null;
-        this.heartbeatCallback = (_f = options === null || options === void 0 ? void 0 : options.heartbeatCallback) !== null && _f !== void 0 ? _f : noop;
-        this.vsn = (_g = options === null || options === void 0 ? void 0 : options.vsn) !== null && _g !== void 0 ? _g : constants_1.DEFAULT_VSN;
-        if (options === null || options === void 0 ? void 0 : options.params)
-          this.params = options.params;
-        if (options === null || options === void 0 ? void 0 : options.logger)
-          this.logger = options.logger;
-        if ((options === null || options === void 0 ? void 0 : options.logLevel) || (options === null || options === void 0 ? void 0 : options.log_level)) {
-          this.logLevel = options.logLevel || options.log_level;
-          this.params = Object.assign(Object.assign({}, this.params), { log_level: this.logLevel });
-        }
-        this.reconnectAfterMs = (_h = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _h !== void 0 ? _h : ((tries) => {
+        this.worker = (_a = options === null || options === void 0 ? void 0 : options.worker) !== null && _a !== void 0 ? _a : false;
+        this.accessToken = (_b = options === null || options === void 0 ? void 0 : options.accessToken) !== null && _b !== void 0 ? _b : null;
+        const result = {};
+        result.timeout = (_c = options === null || options === void 0 ? void 0 : options.timeout) !== null && _c !== void 0 ? _c : constants_1.DEFAULT_TIMEOUT;
+        result.heartbeatIntervalMs = (_d = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _d !== void 0 ? _d : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL;
+        this._disconnectOnEmptyChannelsAfterMs = (_e = options === null || options === void 0 ? void 0 : options.disconnectOnEmptyChannelsAfterMs) !== null && _e !== void 0 ? _e : 2 * ((_f = options === null || options === void 0 ? void 0 : options.heartbeatIntervalMs) !== null && _f !== void 0 ? _f : CONNECTION_TIMEOUTS.HEARTBEAT_INTERVAL);
+        result.transport = (_g = options === null || options === void 0 ? void 0 : options.transport) !== null && _g !== void 0 ? _g : websocket_factory_1.default.getWebSocketConstructor();
+        result.params = options === null || options === void 0 ? void 0 : options.params;
+        result.logger = options === null || options === void 0 ? void 0 : options.logger;
+        result.heartbeatCallback = this._wrapHeartbeatCallback(options === null || options === void 0 ? void 0 : options.heartbeatCallback);
+        result.sessionStorage = (_h = options === null || options === void 0 ? void 0 : options.sessionStorage) !== null && _h !== void 0 ? _h : resolveSessionStorage();
+        result.reconnectAfterMs = (_j = options === null || options === void 0 ? void 0 : options.reconnectAfterMs) !== null && _j !== void 0 ? _j : ((tries) => {
           return RECONNECT_INTERVALS[tries - 1] || DEFAULT_RECONNECT_FALLBACK;
         });
-        switch (this.vsn) {
+        let defaultEncode;
+        let defaultDecode;
+        const vsn = (_k = options === null || options === void 0 ? void 0 : options.vsn) !== null && _k !== void 0 ? _k : constants_1.DEFAULT_VSN;
+        switch (vsn) {
           case constants_1.VSN_1_0_0:
-            this.encode = (_j = options === null || options === void 0 ? void 0 : options.encode) !== null && _j !== void 0 ? _j : ((payload, callback) => {
+            defaultEncode = (payload, callback) => {
               return callback(JSON.stringify(payload));
-            });
-            this.decode = (_k = options === null || options === void 0 ? void 0 : options.decode) !== null && _k !== void 0 ? _k : ((payload, callback) => {
+            };
+            defaultDecode = (payload, callback) => {
               return callback(JSON.parse(payload));
-            });
+            };
             break;
           case constants_1.VSN_2_0_0:
-            this.encode = (_l = options === null || options === void 0 ? void 0 : options.encode) !== null && _l !== void 0 ? _l : this.serializer.encode.bind(this.serializer);
-            this.decode = (_m = options === null || options === void 0 ? void 0 : options.decode) !== null && _m !== void 0 ? _m : this.serializer.decode.bind(this.serializer);
+            defaultEncode = this.serializer.encode.bind(this.serializer);
+            defaultDecode = this.serializer.decode.bind(this.serializer);
             break;
           default:
-            throw new Error(`Unsupported serializer version: ${this.vsn}`);
+            throw new Error(`Unsupported serializer version: ${result.vsn}`);
+        }
+        result.vsn = vsn;
+        result.encode = (_l = options === null || options === void 0 ? void 0 : options.encode) !== null && _l !== void 0 ? _l : defaultEncode;
+        result.decode = (_m = options === null || options === void 0 ? void 0 : options.decode) !== null && _m !== void 0 ? _m : defaultDecode;
+        result.beforeReconnect = this._reconnectAuth.bind(this);
+        if ((options === null || options === void 0 ? void 0 : options.logLevel) || (options === null || options === void 0 ? void 0 : options.log_level)) {
+          this.logLevel = options.logLevel || options.log_level;
+          result.params = Object.assign(Object.assign({}, result.params), { log_level: this.logLevel });
         }
         if (this.worker) {
           if (typeof window !== "undefined" && !window.Worker) {
             throw new Error("Web Worker is not supported");
           }
           this.workerUrl = options === null || options === void 0 ? void 0 : options.workerUrl;
+          result.autoSendHeartbeat = !this.worker;
+        }
+        return result;
+      }
+      /** @internal */
+      async _reconnectAuth() {
+        await this._waitForAuthIfNeeded();
+        if (!this.isConnected()) {
+          this.connect();
         }
       }
     };
@@ -48103,9 +50233,9 @@ Option 2: Install and provide the "ws" package:
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/index.js
+// node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/index.js
 var require_main2 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+realtime-js@2.99.3/node_modules/@supabase/realtime-js/dist/main/index.js"(exports) {
+  "node_modules/.pnpm/@supabase+realtime-js@2.106.2/node_modules/@supabase/realtime-js/dist/main/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WebSocketFactory = exports.REALTIME_CHANNEL_STATES = exports.REALTIME_SUBSCRIBE_STATES = exports.REALTIME_PRESENCE_LISTEN_EVENTS = exports.REALTIME_POSTGRES_CHANGES_LISTEN_EVENT = exports.REALTIME_LISTEN_TYPES = exports.RealtimeClient = exports.RealtimeChannel = exports.RealtimePresence = void 0;
@@ -48136,19 +50266,19 @@ var require_main2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/version.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/version.js
 var require_version2 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/version.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/version.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.version = void 0;
-    exports.version = "2.99.3";
+    exports.version = "2.106.2";
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/constants.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/constants.js
 var require_constants3 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/constants.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/constants.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.JWKS_TTL = exports.BASE64URL_REGEX = exports.API_VERSIONS = exports.API_VERSION_HEADER_NAME = exports.NETWORK_FAILURE = exports.DEFAULT_HEADERS = exports.AUDIENCE = exports.STORAGE_KEY = exports.GOTRUE_URL = exports.EXPIRY_MARGIN_MS = exports.AUTO_REFRESH_TICK_THRESHOLD = exports.AUTO_REFRESH_TICK_DURATION_MS = void 0;
@@ -48177,9 +50307,9 @@ var require_constants3 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/errors.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/errors.js
 var require_errors2 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/errors.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/errors.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.AuthInvalidJwtError = exports.AuthWeakPasswordError = exports.AuthRetryableFetchError = exports.AuthPKCECodeVerifierMissingError = exports.AuthPKCEGrantCodeExchangeError = exports.AuthImplicitGrantRedirectError = exports.AuthInvalidCredentialsError = exports.AuthInvalidTokenResponseError = exports.AuthSessionMissingError = exports.CustomAuthError = exports.AuthUnknownError = exports.AuthApiError = exports.AuthError = void 0;
@@ -48197,6 +50327,14 @@ var require_errors2 = __commonJS({
         this.name = "AuthError";
         this.status = status;
         this.code = code;
+      }
+      toJSON() {
+        return {
+          name: this.name,
+          message: this.message,
+          status: this.status,
+          code: this.code
+        };
       }
     };
     exports.AuthError = AuthError;
@@ -48259,12 +50397,7 @@ var require_errors2 = __commonJS({
         this.details = details;
       }
       toJSON() {
-        return {
-          name: this.name,
-          message: this.message,
-          status: this.status,
-          details: this.details
-        };
+        return Object.assign(Object.assign({}, super.toJSON()), { details: this.details });
       }
     };
     exports.AuthImplicitGrantRedirectError = AuthImplicitGrantRedirectError;
@@ -48278,12 +50411,7 @@ var require_errors2 = __commonJS({
         this.details = details;
       }
       toJSON() {
-        return {
-          name: this.name,
-          message: this.message,
-          status: this.status,
-          details: this.details
-        };
+        return Object.assign(Object.assign({}, super.toJSON()), { details: this.details });
       }
     };
     exports.AuthPKCEGrantCodeExchangeError = AuthPKCEGrantCodeExchangeError;
@@ -48310,6 +50438,9 @@ var require_errors2 = __commonJS({
         super(message, "AuthWeakPasswordError", status, "weak_password");
         this.reasons = reasons;
       }
+      toJSON() {
+        return Object.assign(Object.assign({}, super.toJSON()), { reasons: this.reasons });
+      }
     };
     exports.AuthWeakPasswordError = AuthWeakPasswordError;
     function isAuthWeakPasswordError(error) {
@@ -48324,9 +50455,9 @@ var require_errors2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/base64url.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/base64url.js
 var require_base64url = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/base64url.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/base64url.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.byteToBase64URL = byteToBase64URL;
@@ -48514,9 +50645,9 @@ var require_base64url = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/helpers.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/helpers.js
 var require_helpers = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/helpers.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/helpers.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Deferred = exports.removeItemAsync = exports.getItemAsync = exports.setItemAsync = exports.looksLikeFetchResponse = exports.resolveFetch = exports.supportsLocalStorage = exports.isBrowser = void 0;
@@ -48524,7 +50655,7 @@ var require_helpers = __commonJS({
     exports.generateCallbackId = generateCallbackId;
     exports.parseParametersFromURL = parseParametersFromURL;
     exports.decodeJWT = decodeJWT;
-    exports.sleep = sleep;
+    exports.sleep = sleep2;
     exports.retryable = retryable;
     exports.generatePKCEVerifier = generatePKCEVerifier;
     exports.generatePKCEChallenge = generatePKCEChallenge;
@@ -48533,6 +50664,7 @@ var require_helpers = __commonJS({
     exports.validateExp = validateExp;
     exports.getAlgorithm = getAlgorithm;
     exports.validateUUID = validateUUID;
+    exports.assertPasskeyExperimentalEnabled = assertPasskeyExperimentalEnabled;
     exports.userNotAvailableProxy = userNotAvailableProxy;
     exports.insecureUserWarningProxy = insecureUserWarningProxy;
     exports.deepClone = deepClone;
@@ -48588,7 +50720,7 @@ var require_helpers = __commonJS({
           hashSearchParams.forEach((value, key) => {
             result[key] = value;
           });
-        } catch (e) {
+        } catch (_e) {
         }
       }
       url.searchParams.forEach((value, key) => {
@@ -48619,7 +50751,7 @@ var require_helpers = __commonJS({
       try {
         return JSON.parse(value);
       } catch (_a) {
-        return value;
+        return null;
       }
     };
     exports.getItemAsync = getItemAsync;
@@ -48661,7 +50793,7 @@ var require_helpers = __commonJS({
       };
       return data;
     }
-    async function sleep(time) {
+    async function sleep2(time) {
       return await new Promise((accept) => {
         setTimeout(() => accept(null), time);
       });
@@ -48726,7 +50858,7 @@ var require_helpers = __commonJS({
       const codeVerifier = generatePKCEVerifier();
       let storedCodeVerifier = codeVerifier;
       if (isPasswordRecovery) {
-        storedCodeVerifier += "/PASSWORD_RECOVERY";
+        storedCodeVerifier += "/recovery";
       }
       await (0, exports.setItemAsync)(storage, `${storageKey}-code-verifier`, storedCodeVerifier);
       const codeChallenge = await generatePKCEChallenge(codeVerifier);
@@ -48745,7 +50877,7 @@ var require_helpers = __commonJS({
       try {
         const date = /* @__PURE__ */ new Date(`${apiVersion}T00:00:00.0Z`);
         return date;
-      } catch (e) {
+      } catch (_e) {
         return null;
       }
     }
@@ -48779,6 +50911,11 @@ var require_helpers = __commonJS({
     function validateUUID(str) {
       if (!UUID_REGEX.test(str)) {
         throw new Error("@supabase/auth-js: Expected parameter to be UUID but is not");
+      }
+    }
+    function assertPasskeyExperimentalEnabled(experimental) {
+      if (!experimental.passkey) {
+        throw new Error("@supabase/auth-js: the passkey API is experimental and disabled by default. Enable it by passing `auth: { experimental: { passkey: true } }` to createClient (or to the GoTrueClient constructor).");
       }
     }
     function userNotAvailableProxy() {
@@ -48830,9 +50967,9 @@ var require_helpers = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/fetch.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/fetch.js
 var require_fetch = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/fetch.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/fetch.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.handleError = handleError2;
@@ -48847,8 +50984,21 @@ var require_fetch = __commonJS({
     var constants_1 = require_constants3();
     var helpers_1 = require_helpers();
     var errors_1 = require_errors2();
-    var _getErrorMessage2 = (err) => err.msg || err.message || err.error_description || err.error || JSON.stringify(err);
-    var NETWORK_ERROR_CODES = [502, 503, 504];
+    var _getErrorMessage2 = (err) => {
+      if (typeof err === "object" && err !== null) {
+        const e = err;
+        if (typeof e.msg === "string")
+          return e.msg;
+        if (typeof e.message === "string")
+          return e.message;
+        if (typeof e.error_description === "string")
+          return e.error_description;
+        if (typeof e.error === "string")
+          return e.error;
+      }
+      return JSON.stringify(err);
+    };
+    var NETWORK_ERROR_CODES = [502, 503, 504, 520, 521, 522, 523, 524, 530];
     async function handleError2(error) {
       var _a;
       if (!(0, helpers_1.looksLikeFetchResponse)(error)) {
@@ -48940,7 +51090,7 @@ var require_fetch = __commonJS({
           session.expires_at = (0, helpers_1.expiresAt)(data.expires_in);
         }
       }
-      const user = (_a = data.user) !== null && _a !== void 0 ? _a : data;
+      const user = (_a = data.user) !== null && _a !== void 0 ? _a : typeof (data === null || data === void 0 ? void 0 : data.id) === "string" ? data : null;
       return { data: { session, user }, error: null };
     }
     function _sessionResponsePassword(data) {
@@ -48980,14 +51130,14 @@ var require_fetch = __commonJS({
       return data;
     }
     function hasSession(data) {
-      return data.access_token && data.refresh_token && data.expires_in;
+      return !!data.access_token && !!data.refresh_token && !!data.expires_in;
     }
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/types.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/types.js
 var require_types2 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/types.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/types.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.SIGN_OUT_SCOPES = void 0;
@@ -48995,9 +51145,9 @@ var require_types2 = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/GoTrueAdminApi.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/GoTrueAdminApi.js
 var require_GoTrueAdminApi = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/GoTrueAdminApi.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/GoTrueAdminApi.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
@@ -49006,23 +51156,38 @@ var require_GoTrueAdminApi = __commonJS({
     var types_1 = require_types2();
     var errors_1 = require_errors2();
     var GoTrueAdminApi = class {
+      _encodePathSegment(segment) {
+        if (segment === "." || segment === "..") {
+          throw new errors_1.AuthError("Invalid path segment");
+        }
+        return encodeURIComponent(segment);
+      }
       /**
        * Creates an admin API client that can be used to manage users and OAuth clients.
        *
-       * @example
+       * @example Using supabase-js (recommended)
+       * ```ts
+       * import { createClient } from '@supabase/supabase-js'
+       *
+       * const supabase = createClient('https://xyzcompany.supabase.co', 'your-secret-key')
+       * const { data, error } = await supabase.auth.admin.listUsers()
+       * ```
+       *
+       * @example Standalone import for bundle-sensitive environments
        * ```ts
        * import { GoTrueAdminApi } from '@supabase/auth-js'
        *
        * const admin = new GoTrueAdminApi({
        *   url: 'https://xyzcompany.supabase.co/auth/v1',
-       *   headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+       *   headers: { Authorization: `Bearer ${process.env.SUPABASE_SECRET_KEY}` },
        * })
        * ```
        */
-      constructor({ url = "", headers = {}, fetch: fetch2 }) {
+      constructor({ url = "", headers = {}, fetch: fetch2, experimental }) {
         this.url = url;
         this.headers = headers;
         this.fetch = (0, helpers_1.resolveFetch)(fetch2);
+        this.experimental = experimental !== null && experimental !== void 0 ? experimental : {};
         this.mfa = {
           listFactors: this._listFactors.bind(this),
           deleteFactor: this._deleteFactor.bind(this)
@@ -49042,11 +51207,18 @@ var require_GoTrueAdminApi = __commonJS({
           updateProvider: this._updateCustomProvider.bind(this),
           deleteProvider: this._deleteCustomProvider.bind(this)
         };
+        this.passkey = {
+          listPasskeys: this._adminListPasskeys.bind(this),
+          deletePasskey: this._adminDeletePasskey.bind(this)
+        };
       }
       /**
        * Removes a logged-in session.
        * @param jwt A valid, logged-in JWT.
        * @param scope The logout sope.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
        */
       async signOut(jwt, scope = types_1.SIGN_OUT_SCOPES[0]) {
         if (types_1.SIGN_OUT_SCOPES.indexOf(scope) < 0) {
@@ -49070,6 +51242,65 @@ var require_GoTrueAdminApi = __commonJS({
        * Sends an invite link to an email address.
        * @param email The email address of the user.
        * @param options Additional options to be included when inviting.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - Sends an invite link to the user's email address.
+       * - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
+       * - Note that PKCE is not supported when using `inviteUserByEmail`. This is because the browser initiating the invite is often different from the browser accepting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
+       *
+       * @example Invite a user
+       * ```js
+       * const { data, error } = await supabase.auth.admin.inviteUserByEmail('email@example.com')
+       * ```
+       *
+       * @exampleResponse Invite a user
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "invited_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmation_sent_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {},
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async inviteUserByEmail(email, options = {}) {
         try {
@@ -49092,6 +51323,116 @@ var require_GoTrueAdminApi = __commonJS({
        * @param options.password User password. For signup only.
        * @param options.data Optional user metadata. For signup only.
        * @param options.redirectTo The redirect url which should be appended to the generated link
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
+       * - `generateLink()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+       * - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+       *
+       * @example Generate a signup link
+       * ```js
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'signup',
+       *   email: 'email@example.com',
+       *   password: 'secret'
+       * })
+       * ```
+       *
+       * @exampleResponse Generate a signup link
+       * ```json
+       * {
+       *   "data": {
+       *     "properties": {
+       *       "action_link": "<LINK_TO_SEND_TO_USER>",
+       *       "email_otp": "999999",
+       *       "hashed_token": "<HASHED_TOKEN",
+       *       "redirect_to": "<REDIRECT_URL>",
+       *       "verification_type": "signup"
+       *     },
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "email@example.com",
+       *       "phone": "",
+       *       "confirmation_sent_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {},
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "email@example.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "email@example.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Generate an invite link
+       * ```js
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'invite',
+       *   email: 'email@example.com'
+       * })
+       * ```
+       *
+       * @example Generate a magic link
+       * ```js
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'magiclink',
+       *   email: 'email@example.com'
+       * })
+       * ```
+       *
+       * @example Generate a recovery link
+       * ```js
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'recovery',
+       *   email: 'email@example.com'
+       * })
+       * ```
+       *
+       * @example Generate links to change current email address
+       * ```js
+       * // generate an email change link to be sent to the current email address
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'email_change_current',
+       *   email: 'current.email@example.com',
+       *   newEmail: 'new.email@example.com'
+       * })
+       *
+       * // generate an email change link to be sent to the new email address
+       * const { data, error } = await supabase.auth.admin.generateLink({
+       *   type: 'email_change_new',
+       *   email: 'current.email@example.com',
+       *   newEmail: 'new.email@example.com'
+       * })
+       * ```
        */
       async generateLink(params) {
         try {
@@ -49124,6 +51465,82 @@ var require_GoTrueAdminApi = __commonJS({
       /**
        * Creates a new user.
        * This function should only be called on a server. Never expose your `service_role` key in the browser.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
+       * - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
+       * - If you are sure that the created user's email or phone number is legitimate and verified, you can set the `email_confirm` or `phone_confirm` param to `true`.
+       *
+       * @example With custom user metadata
+       * ```js
+       * const { data, error } = await supabase.auth.admin.createUser({
+       *   email: 'user@email.com',
+       *   password: 'password',
+       *   user_metadata: { name: 'Yoda' }
+       * })
+       * ```
+       *
+       * @exampleResponse With custom user metadata
+       * ```json
+       * {
+       *   data: {
+       *     user: {
+       *       id: '1',
+       *       aud: 'authenticated',
+       *       role: 'authenticated',
+       *       email: 'example@email.com',
+       *       email_confirmed_at: '2024-01-01T00:00:00Z',
+       *       phone: '',
+       *       confirmation_sent_at: '2024-01-01T00:00:00Z',
+       *       confirmed_at: '2024-01-01T00:00:00Z',
+       *       last_sign_in_at: '2024-01-01T00:00:00Z',
+       *       app_metadata: {},
+       *       user_metadata: {},
+       *       identities: [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "1",
+       *           "user_id": "1",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": true,
+       *             "phone_verified": false,
+       *             "sub": "1"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "email@example.com"
+       *         },
+       *       ],
+       *       created_at: '2024-01-01T00:00:00Z',
+       *       updated_at: '2024-01-01T00:00:00Z',
+       *       is_anonymous: false,
+       *     }
+       *   }
+       *   error: null
+       * }
+       * ```
+       *
+       * @example Auto-confirm the user's email
+       * ```js
+       * const { data, error } = await supabase.auth.admin.createUser({
+       *   email: 'user@email.com',
+       *   email_confirm: true
+       * })
+       * ```
+       *
+       * @example Auto-confirm the user's phone number
+       * ```js
+       * const { data, error } = await supabase.auth.admin.createUser({
+       *   phone: '1234567890',
+       *   phone_confirm: true
+       * })
+       * ```
        */
       async createUser(attributes) {
         try {
@@ -49144,6 +51561,25 @@ var require_GoTrueAdminApi = __commonJS({
        *
        * This function should only be called on a server. Never expose your `service_role` key in the browser.
        * @param params An object which supports `page` and `perPage` as numbers, to alter the paginated results.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - Defaults to return 50 users per page.
+       *
+       * @example Get a page of users
+       * ```js
+       * const { data: { users }, error } = await supabase.auth.admin.listUsers()
+       * ```
+       *
+       * @example Paginated list of users
+       * ```js
+       * const { data: { users }, error } = await supabase.auth.admin.listUsers({
+       *   page: 1,
+       *   perPage: 1000
+       * })
+       * ```
        */
       async listUsers(params) {
         var _a, _b, _c, _d, _e, _f, _g;
@@ -49185,6 +51621,61 @@ var require_GoTrueAdminApi = __commonJS({
        * @param uid The user's unique identifier
        *
        * This function should only be called on a server. Never expose your `service_role` key in the browser.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - Fetches the user object from the database based on the user's id.
+       * - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
+       *
+       * @example Fetch the user object using the access_token jwt
+       * ```js
+       * const { data, error } = await supabase.auth.admin.getUserById(1)
+       * ```
+       *
+       * @exampleResponse Fetch the user object using the access_token jwt
+       * ```json
+       * {
+       *   data: {
+       *     user: {
+       *       id: '1',
+       *       aud: 'authenticated',
+       *       role: 'authenticated',
+       *       email: 'example@email.com',
+       *       email_confirmed_at: '2024-01-01T00:00:00Z',
+       *       phone: '',
+       *       confirmation_sent_at: '2024-01-01T00:00:00Z',
+       *       confirmed_at: '2024-01-01T00:00:00Z',
+       *       last_sign_in_at: '2024-01-01T00:00:00Z',
+       *       app_metadata: {},
+       *       user_metadata: {},
+       *       identities: [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "1",
+       *           "user_id": "1",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": true,
+       *             "phone_verified": false,
+       *             "sub": "1"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "email@example.com"
+       *         },
+       *       ],
+       *       created_at: '2024-01-01T00:00:00Z',
+       *       updated_at: '2024-01-01T00:00:00Z',
+       *       is_anonymous: false,
+       *     }
+       *   }
+       *   error: null
+       * }
+       * ```
        */
       async getUserById(uid) {
         (0, helpers_1.validateUUID)(uid);
@@ -49231,6 +51722,118 @@ var require_GoTrueAdminApi = __commonJS({
        *
        * @see {@link GoTrueClient.refreshSession} for syncing admin changes to the client
        * @see {@link GoTrueClient.updateUser} for client-side user updates (triggers listeners automatically)
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @example Updates a user's email
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '11111111-1111-1111-1111-111111111111',
+       *   { email: 'new@email.com' }
+       * )
+       * ```
+       *
+       * @exampleResponse Updates a user's email
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "new@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "recovery_sent_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Updates a user's password
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { password: 'new_password' }
+       * )
+       * ```
+       *
+       * @example Updates a user's metadata
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { user_metadata: { hello: 'world' } }
+       * )
+       * ```
+       *
+       * @example Updates a user's app_metadata
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { app_metadata: { plan: 'trial' } }
+       * )
+       * ```
+       *
+       * @example Confirms a user's email address
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { email_confirm: true }
+       * )
+       * ```
+       *
+       * @example Confirms a user's phone number
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { phone_confirm: true }
+       * )
+       * ```
+       *
+       * @example Ban a user for 100 years
+       * ```js
+       * const { data: user, error } = await supabase.auth.admin.updateUserById(
+       *   '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+       *   { ban_duration: '876000h' }
+       * )
+       * ```
        */
       async updateUserById(uid, attributes) {
         (0, helpers_1.validateUUID)(uid);
@@ -49255,6 +51858,29 @@ var require_GoTrueAdminApi = __commonJS({
        * Defaults to false for backward compatibility.
        *
        * This function should only be called on a server. Never expose your `service_role` key in the browser.
+       *
+       * @category Auth
+       * @subcategory Auth Admin
+       *
+       * @remarks
+       * - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+       *
+       * @example Removes a user
+       * ```js
+       * const { data, error } = await supabase.auth.admin.deleteUser(
+       *   '715ed5db-f090-4b8c-a067-640ecee36aa0'
+       * )
+       * ```
+       *
+       * @exampleResponse Removes a user
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {}
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async deleteUser(id, shouldSoftDelete = false) {
         (0, helpers_1.validateUUID)(id);
@@ -49375,7 +52001,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _getOAuthClient(clientId) {
         try {
-          return await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/admin/oauth/clients/${clientId}`, {
+          const encodedClientId = this._encodePathSegment(clientId);
+          return await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/admin/oauth/clients/${encodedClientId}`, {
             headers: this.headers,
             xform: (client) => {
               return { data: client, error: null };
@@ -49396,7 +52023,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _updateOAuthClient(clientId, params) {
         try {
-          return await (0, fetch_1._request)(this.fetch, "PUT", `${this.url}/admin/oauth/clients/${clientId}`, {
+          const encodedClientId = this._encodePathSegment(clientId);
+          return await (0, fetch_1._request)(this.fetch, "PUT", `${this.url}/admin/oauth/clients/${encodedClientId}`, {
             body: params,
             headers: this.headers,
             xform: (client) => {
@@ -49418,7 +52046,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _deleteOAuthClient(clientId) {
         try {
-          await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/admin/oauth/clients/${clientId}`, {
+          const encodedClientId = this._encodePathSegment(clientId);
+          await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/admin/oauth/clients/${encodedClientId}`, {
             headers: this.headers,
             noResolveJson: true
           });
@@ -49438,7 +52067,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _regenerateOAuthClientSecret(clientId) {
         try {
-          return await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/admin/oauth/clients/${clientId}/regenerate_secret`, {
+          const encodedClientId = this._encodePathSegment(clientId);
+          return await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/admin/oauth/clients/${encodedClientId}/regenerate_secret`, {
             headers: this.headers,
             xform: (client) => {
               return { data: client, error: null };
@@ -49511,7 +52141,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _getCustomProvider(identifier) {
         try {
-          return await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/admin/custom-providers/${identifier}`, {
+          const encodedIdentifier = this._encodePathSegment(identifier);
+          return await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/admin/custom-providers/${encodedIdentifier}`, {
             headers: this.headers,
             xform: (provider) => {
               return { data: provider, error: null };
@@ -49536,7 +52167,8 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _updateCustomProvider(identifier, params) {
         try {
-          return await (0, fetch_1._request)(this.fetch, "PUT", `${this.url}/admin/custom-providers/${identifier}`, {
+          const encodedIdentifier = this._encodePathSegment(identifier);
+          return await (0, fetch_1._request)(this.fetch, "PUT", `${this.url}/admin/custom-providers/${encodedIdentifier}`, {
             body: params,
             headers: this.headers,
             xform: (provider) => {
@@ -49557,10 +52189,51 @@ var require_GoTrueAdminApi = __commonJS({
        */
       async _deleteCustomProvider(identifier) {
         try {
-          await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/admin/custom-providers/${identifier}`, {
+          const encodedIdentifier = this._encodePathSegment(identifier);
+          await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/admin/custom-providers/${encodedIdentifier}`, {
             headers: this.headers,
             noResolveJson: true
           });
+          return { data: null, error: null };
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return { data: null, error };
+          }
+          throw error;
+        }
+      }
+      /**
+       * Lists all passkeys for a user.
+       *
+       * This function should only be called on a server. Never expose your secret key in the browser.
+       *
+       * Requires `auth.experimental.passkey: true`.
+       */
+      async _adminListPasskeys(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        (0, helpers_1.validateUUID)(params.userId);
+        try {
+          return await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/admin/users/${params.userId}/passkeys`, { headers: this.headers, xform: (data) => ({ data, error: null }) });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return { data: null, error };
+          }
+          throw error;
+        }
+      }
+      /**
+       * Deletes a user's passkey.
+       *
+       * This function should only be called on a server. Never expose your secret key in the browser.
+       *
+       * Requires `auth.experimental.passkey: true`.
+       */
+      async _adminDeletePasskey(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        (0, helpers_1.validateUUID)(params.userId);
+        (0, helpers_1.validateUUID)(params.passkeyId);
+        try {
+          await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/admin/users/${params.userId}/passkeys/${params.passkeyId}`, { headers: this.headers, noResolveJson: true });
           return { data: null, error: null };
         } catch (error) {
           if ((0, errors_1.isAuthError)(error)) {
@@ -49574,9 +52247,9 @@ var require_GoTrueAdminApi = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/local-storage.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/local-storage.js
 var require_local_storage = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/local-storage.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/local-storage.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.memoryLocalStorageAdapter = memoryLocalStorageAdapter;
@@ -49596,9 +52269,9 @@ var require_local_storage = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/locks.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/locks.js
 var require_locks = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/locks.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/locks.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.ProcessLockAcquireTimeoutError = exports.NavigatorLockAcquireTimeoutError = exports.LockAcquireTimeoutError = exports.internals = void 0;
@@ -49684,7 +52357,7 @@ var require_locks = __commonJS({
         if (acquireTimeout > 0) {
           clearTimeout(acquireTimeoutTimer);
         }
-        if ((e === null || e === void 0 ? void 0 : e.name) === "AbortError" && acquireTimeout > 0) {
+        if (e !== null && typeof e === "object" && "name" in e && e.name === "AbortError" && acquireTimeout > 0) {
           if (abortController.signal.aborted) {
             if (exports.internals.debug) {
               console.log("@supabase/gotrue-js: navigatorLock: acquire timeout, recovering by stealing lock", name);
@@ -49749,7 +52422,7 @@ var require_locks = __commonJS({
           if (timeoutId !== null) {
             clearTimeout(timeoutId);
           }
-          if (e && e.isAcquireTimeout) {
+          if (e instanceof LockAcquireTimeoutError) {
             throw e;
           }
         }
@@ -49759,7 +52432,7 @@ var require_locks = __commonJS({
         try {
           return await currentOperation;
         } catch (e) {
-          if (e && e.isAcquireTimeout) {
+          if (e instanceof LockAcquireTimeoutError) {
             try {
               await previousOperation;
             } catch (prevError) {
@@ -49774,9 +52447,9 @@ var require_locks = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/polyfills.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/polyfills.js
 var require_polyfills = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/polyfills.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/polyfills.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.polyfillGlobalThis = polyfillGlobalThis;
@@ -49801,9 +52474,9 @@ var require_polyfills = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/web3/ethereum.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/web3/ethereum.js
 var require_ethereum = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/web3/ethereum.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/web3/ethereum.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.getAddress = getAddress;
@@ -49879,9 +52552,9 @@ ${suffix}`;
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/webauthn.errors.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/webauthn.errors.js
 var require_webauthn_errors = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/webauthn.errors.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/webauthn.errors.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WebAuthnUnknownError = exports.WebAuthnError = void 0;
@@ -49896,6 +52569,13 @@ var require_webauthn_errors = __commonJS({
         this.__isWebAuthnError = true;
         this.name = (_a = name !== null && name !== void 0 ? name : cause instanceof Error ? cause.name : void 0) !== null && _a !== void 0 ? _a : "Unknown Error";
         this.code = code;
+      }
+      toJSON() {
+        return {
+          name: this.name,
+          message: this.message,
+          code: this.code
+        };
       }
     };
     exports.WebAuthnError = WebAuthnError;
@@ -50063,9 +52743,9 @@ var require_webauthn_errors = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js
 var require_webauthn = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/lib/webauthn.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.WebAuthnApi = exports.DEFAULT_REQUEST_OPTIONS = exports.DEFAULT_CREATION_OPTIONS = exports.webAuthnAbortService = exports.WebAuthnAbortService = exports.identifyAuthenticationError = exports.identifyRegistrationError = exports.isWebAuthnError = exports.WebAuthnError = void 0;
@@ -50074,6 +52754,7 @@ var require_webauthn = __commonJS({
     exports.serializeCredentialCreationResponse = serializeCredentialCreationResponse;
     exports.serializeCredentialRequestResponse = serializeCredentialRequestResponse;
     exports.isValidDomain = isValidDomain;
+    exports.browserSupportsWebAuthn = browserSupportsWebAuthn;
     exports.createCredential = createCredential;
     exports.getCredential = getCredential;
     exports.mergeCredentialCreationOptions = mergeCredentialCreationOptions;
@@ -50621,9 +53302,9 @@ var require_webauthn = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js
 var require_GoTrueClient = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/GoTrueClient.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
@@ -50653,7 +53334,8 @@ var require_GoTrueClient = __commonJS({
       throwOnError: false,
       lockAcquireTimeout: 5e3,
       // 5 seconds
-      skipAutoInitialize: false
+      skipAutoInitialize: false,
+      experimental: {}
     };
     async function lockNoOp(name, acquireTimeout, fn) {
       return await fn();
@@ -50680,19 +53362,27 @@ var require_GoTrueClient = __commonJS({
       /**
        * Create a new client for use in the browser.
        *
-       * @example
+       * @example Using supabase-js (recommended)
+       * ```ts
+       * import { createClient } from '@supabase/supabase-js'
+       *
+       * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+       * const { data, error } = await supabase.auth.getUser()
+       * ```
+       *
+       * @example Standalone import for bundle-sensitive environments
        * ```ts
        * import { GoTrueClient } from '@supabase/auth-js'
        *
        * const auth = new GoTrueClient({
        *   url: 'https://xyzcompany.supabase.co/auth/v1',
-       *   headers: { apikey: 'public-anon-key' },
+       *   headers: { apikey: 'your-publishable-key' },
        *   storageKey: 'supabase-auth',
        * })
        * ```
        */
       constructor(options) {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         this.userStorage = null;
         this.memoryStorage = null;
         this.stateChangeEmitters = /* @__PURE__ */ new Map();
@@ -50725,10 +53415,12 @@ var require_GoTrueClient = __commonJS({
         }
         this.persistSession = settings.persistSession;
         this.autoRefreshToken = settings.autoRefreshToken;
+        this.experimental = (_b = settings.experimental) !== null && _b !== void 0 ? _b : {};
         this.admin = new GoTrueAdminApi_1.default({
           url: settings.url,
           headers: settings.headers,
-          fetch: settings.fetch
+          fetch: settings.fetch,
+          experimental: this.experimental
         });
         this.url = settings.url;
         this.headers = settings.headers;
@@ -50741,7 +53433,7 @@ var require_GoTrueClient = __commonJS({
         this.lockAcquireTimeout = settings.lockAcquireTimeout;
         if (settings.lock) {
           this.lock = settings.lock;
-        } else if (this.persistSession && (0, helpers_1.isBrowser)() && ((_b = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _b === void 0 ? void 0 : _b.locks)) {
+        } else if (this.persistSession && (0, helpers_1.isBrowser)() && ((_c = globalThis === null || globalThis === void 0 ? void 0 : globalThis.navigator) === null || _c === void 0 ? void 0 : _c.locks)) {
           this.lock = locks_1.navigatorLock;
         } else {
           this.lock = lockNoOp;
@@ -50767,6 +53459,15 @@ var require_GoTrueClient = __commonJS({
           listGrants: this._listOAuthGrants.bind(this),
           revokeGrant: this._revokeOAuthGrant.bind(this)
         };
+        this.passkey = {
+          startRegistration: this._startPasskeyRegistration.bind(this),
+          verifyRegistration: this._verifyPasskeyRegistration.bind(this),
+          startAuthentication: this._startPasskeyAuthentication.bind(this),
+          verifyAuthentication: this._verifyPasskeyAuthentication.bind(this),
+          list: this._listPasskeys.bind(this),
+          update: this._updatePasskey.bind(this),
+          delete: this._deletePasskey.bind(this)
+        };
         if (this.persistSession) {
           if (settings.storage) {
             this.storage = settings.storage;
@@ -50791,7 +53492,7 @@ var require_GoTrueClient = __commonJS({
           } catch (e) {
             console.error("Failed to create a new BroadcastChannel, multi-tab state changes will not be available", e);
           }
-          (_c = this.broadcastChannel) === null || _c === void 0 ? void 0 : _c.addEventListener("message", async (event) => {
+          (_d = this.broadcastChannel) === null || _d === void 0 ? void 0 : _d.addEventListener("message", async (event) => {
             this._debug("received broadcast notification from other tab or client", event);
             try {
               await this._notifyAllSubscribers(event.data.event, event.data.session, false);
@@ -50836,6 +53537,8 @@ var require_GoTrueClient = __commonJS({
        * Initializes the client session either from the url or from storage.
        * This method is automatically called when instantiating the client, but should also be called
        * manually when checking for an error from an auth redirect (oauth, magiclink, password recovery, etc).
+       *
+       * @category Auth
        */
       async initialize() {
         if (this.initializePromise) {
@@ -50909,6 +53612,74 @@ var require_GoTrueClient = __commonJS({
        * Creates a new anonymous user.
        *
        * @returns A session where the is_anonymous claim in the access token JWT set to true
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Returns an anonymous user
+       * - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+       *
+       * @example Create an anonymous user
+       * ```js
+       * const { data, error } = await supabase.auth.signInAnonymously({
+       *   options: {
+       *     captchaToken
+       *   }
+       * });
+       * ```
+       *
+       * @exampleResponse Create an anonymous user
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "",
+       *       "phone": "",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {},
+       *       "user_metadata": {},
+       *       "identities": [],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": true
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "",
+       *         "phone": "",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {},
+       *         "user_metadata": {},
+       *         "identities": [],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "is_anonymous": true
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Create an anonymous user with custom user metadata
+       * ```js
+       * const { data, error } = await supabase.auth.signInAnonymously({
+       *   options: {
+       *     data
+       *   }
+       * })
+       * ```
        */
       async signInAnonymously(credentials) {
         var _a, _b, _c;
@@ -51184,6 +53955,115 @@ var require_GoTrueClient = __commonJS({
        * between the cases where the account does not exist or that the
        * email/phone and password combination is wrong or that the account can only
        * be accessed via social login.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Requires either an email and password or a phone number and password.
+       *
+       * @example Sign in with email and password
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithPassword({
+       *   email: 'example@email.com',
+       *   password: 'example-password',
+       * })
+       * ```
+       *
+       * @exampleResponse Sign in with email and password
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {},
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z"
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "example@email.com",
+       *         "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *         "phone": "",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email"
+       *           ]
+       *         },
+       *         "user_metadata": {},
+       *         "identities": [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z"
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Sign in with phone and password
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithPassword({
+       *   phone: '+13334445555',
+       *   password: 'some-password',
+       * })
+       * ```
        */
       async signInWithPassword(credentials) {
         try {
@@ -51238,6 +54118,81 @@ var require_GoTrueClient = __commonJS({
       /**
        * Log in an existing user via a third-party provider.
        * This method supports the PKCE flow.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - This method is used for signing in using [Social Login (OAuth) providers](/docs/guides/auth#configure-third-party-providers).
+       * - It works by redirecting your application to the provider's authorization screen, before bringing back the user to your app.
+       *
+       * @example Sign in using a third-party provider
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithOAuth({
+       *   provider: 'github'
+       * })
+       * ```
+       *
+       * @exampleResponse Sign in using a third-party provider
+       * ```json
+       * {
+       *   data: {
+       *     provider: 'github',
+       *     url: <PROVIDER_URL_TO_REDIRECT_TO>
+       *   },
+       *   error: null
+       * }
+       * ```
+       *
+       * @exampleDescription Sign in using a third-party provider with redirect
+       * - When the OAuth provider successfully authenticates the user, they are redirected to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls). It does not redirect the user immediately after invoking this method.
+       * - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
+       *
+       * @example Sign in using a third-party provider with redirect
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithOAuth({
+       *   provider: 'github',
+       *   options: {
+       *     redirectTo: 'https://example.com/welcome'
+       *   }
+       * })
+       * ```
+       *
+       * @exampleDescription Sign in with scopes and access provider tokens
+       * If you need additional access from an OAuth provider, in order to access provider specific APIs in the name of the user, you can do this by passing in the scopes the user should authorize for your application. Note that the `scopes` option takes in **a space-separated list** of scopes.
+       *
+       * Because OAuth sign-in often includes redirects, you should register an `onAuthStateChange` callback immediately after you create the Supabase client. This callback will listen for the presence of `provider_token` and `provider_refresh_token` properties on the `session` object and store them in local storage. The client library will emit these values **only once** immediately after the user signs in. You can then access them by looking them up in local storage, or send them to your backend servers for further processing.
+       *
+       * Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
+       *
+       * @example Sign in with scopes and access provider tokens
+       * ```js
+       * // Register this immediately after calling createClient!
+       * // Because signInWithOAuth causes a redirect, you need to fetch the
+       * // provider tokens from the callback.
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (session && session.provider_token) {
+       *     window.localStorage.setItem('oauth_provider_token', session.provider_token)
+       *   }
+       *
+       *   if (session && session.provider_refresh_token) {
+       *     window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+       *   }
+       *
+       *   if (event === 'SIGNED_OUT') {
+       *     window.localStorage.removeItem('oauth_provider_token')
+       *     window.localStorage.removeItem('oauth_provider_refresh_token')
+       *   }
+       * })
+       *
+       * // Call this on your Sign in with GitHub button to initiate OAuth
+       * // with GitHub with the requested elevated scopes.
+       * await supabase.auth.signInWithOAuth({
+       *   provider: 'github',
+       *   options: {
+       *     scopes: 'repo gist notifications'
+       *   }
+       * })
+       * ```
        */
       async signInWithOAuth(credentials) {
         var _a, _b, _c, _d;
@@ -51250,6 +54205,173 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Log in an existing user by exchanging an Auth Code issued during the PKCE flow.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Used when `flowType` is set to `pkce` in client options.
+       *
+       * @example Exchange Auth Code
+       * ```js
+       * supabase.auth.exchangeCodeForSession('34e770dd-9ff9-416c-87fa-43b31d7ef225')
+       * ```
+       *
+       * @exampleResponse Exchange Auth Code
+       * ```json
+       * {
+       *   "data": {
+       *     session: {
+       *       access_token: '<ACCESS_TOKEN>',
+       *       token_type: 'bearer',
+       *       expires_in: 3600,
+       *       expires_at: 1700000000,
+       *       refresh_token: '<REFRESH_TOKEN>',
+       *       user: {
+       *         id: '11111111-1111-1111-1111-111111111111',
+       *         aud: 'authenticated',
+       *         role: 'authenticated',
+       *         email: 'example@email.com'
+       *         email_confirmed_at: '2024-01-01T00:00:00Z',
+       *         phone: '',
+       *         confirmation_sent_at: '2024-01-01T00:00:00Z',
+       *         confirmed_at: '2024-01-01T00:00:00Z',
+       *         last_sign_in_at: '2024-01-01T00:00:00Z',
+       *         app_metadata: {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email",
+       *             "<OTHER_PROVIDER>"
+       *           ]
+       *         },
+       *         user_metadata: {
+       *           email: 'email@email.com',
+       *           email_verified: true,
+       *           full_name: 'User Name',
+       *           iss: '<ISS>',
+       *           name: 'User Name',
+       *           phone_verified: false,
+       *           provider_id: '<PROVIDER_ID>',
+       *           sub: '<SUB>'
+       *         },
+       *         identities: [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "email@example.com"
+       *           },
+       *           {
+       *             "identity_id": "33333333-3333-3333-3333-333333333333",
+       *             "id": "<ID>",
+       *             "user_id": "<USER_ID>",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": true,
+       *               "full_name": "User Name",
+       *               "iss": "<ISS>",
+       *               "name": "User Name",
+       *               "phone_verified": false,
+       *               "provider_id": "<PROVIDER_ID>",
+       *               "sub": "<SUB>"
+       *             },
+       *             "provider": "<PROVIDER>",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         created_at: '2024-01-01T00:00:00Z',
+       *         updated_at: '2024-01-01T00:00:00Z',
+       *         is_anonymous: false
+       *       },
+       *       provider_token: '<PROVIDER_TOKEN>',
+       *       provider_refresh_token: '<PROVIDER_REFRESH_TOKEN>'
+       *     },
+       *     user: {
+       *       id: '11111111-1111-1111-1111-111111111111',
+       *       aud: 'authenticated',
+       *       role: 'authenticated',
+       *       email: 'example@email.com',
+       *       email_confirmed_at: '2024-01-01T00:00:00Z',
+       *       phone: '',
+       *       confirmation_sent_at: '2024-01-01T00:00:00Z',
+       *       confirmed_at: '2024-01-01T00:00:00Z',
+       *       last_sign_in_at: '2024-01-01T00:00:00Z',
+       *       app_metadata: {
+       *         provider: 'email',
+       *         providers: [
+       *           "email",
+       *           "<OTHER_PROVIDER>"
+       *         ]
+       *       },
+       *       user_metadata: {
+       *         email: 'email@email.com',
+       *         email_verified: true,
+       *         full_name: 'User Name',
+       *         iss: '<ISS>',
+       *         name: 'User Name',
+       *         phone_verified: false,
+       *         provider_id: '<PROVIDER_ID>',
+       *         sub: '<SUB>'
+       *       },
+       *       identities: [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "email@example.com"
+       *         },
+       *         {
+       *           "identity_id": "33333333-3333-3333-3333-333333333333",
+       *           "id": "<ID>",
+       *           "user_id": "<USER_ID>",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": true,
+       *             "full_name": "User Name",
+       *             "iss": "<ISS>",
+       *             "name": "User Name",
+       *             "phone_verified": false,
+       *             "provider_id": "<PROVIDER_ID>",
+       *             "sub": "<SUB>"
+       *           },
+       *           "provider": "<PROVIDER>",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       created_at: '2024-01-01T00:00:00Z',
+       *       updated_at: '2024-01-01T00:00:00Z',
+       *       is_anonymous: false
+       *     },
+       *     redirectType: null
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async exchangeCodeForSession(authCode) {
         await this.initializePromise;
@@ -51263,6 +54385,87 @@ var require_GoTrueClient = __commonJS({
        * both of which derive from the EIP-4361 standard
        * With slight variation on Solana's side.
        * @reference https://eips.ethereum.org/EIPS/eip-4361
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Uses a Web3 (Ethereum, Solana) wallet to sign a user in.
+       * - Read up on the [potential for abuse](/docs/guides/auth/auth-web3#potential-for-abuse) before using it.
+       *
+       * @example Sign in with Solana or Ethereum (Window API)
+       * ```js
+       *   // uses window.ethereum for the wallet
+       *   const { data, error } = await supabase.auth.signInWithWeb3({
+       *     chain: 'ethereum',
+       *     statement: 'I accept the Terms of Service at https://example.com/tos'
+       *   })
+       *
+       *   // uses window.solana for the wallet
+       *   const { data, error } = await supabase.auth.signInWithWeb3({
+       *     chain: 'solana',
+       *     statement: 'I accept the Terms of Service at https://example.com/tos'
+       *   })
+       * ```
+       *
+       * @example Sign in with Ethereum (Message and Signature)
+       * ```js
+       *   const { data, error } = await supabase.auth.signInWithWeb3({
+       *     chain: 'ethereum',
+       *     message: '<sign in with ethereum message>',
+       *     signature: '<hex of the ethereum signature over the message>',
+       *   })
+       * ```
+       *
+       * @example Sign in with Solana (Brave)
+       * ```js
+       *   const { data, error } = await supabase.auth.signInWithWeb3({
+       *     chain: 'solana',
+       *     statement: 'I accept the Terms of Service at https://example.com/tos',
+       *     wallet: window.braveSolana
+       *   })
+       * ```
+       *
+       * @example Sign in with Solana (Wallet Adapter)
+       * ```jsx
+       *   function SignInButton() {
+       *   const wallet = useWallet()
+       *
+       *   return (
+       *     <>
+       *       {wallet.connected ? (
+       *         <button
+       *           onClick={() => {
+       *             supabase.auth.signInWithWeb3({
+       *               chain: 'solana',
+       *               statement: 'I accept the Terms of Service at https://example.com/tos',
+       *               wallet,
+       *             })
+       *           }}
+       *         >
+       *           Sign in with Solana
+       *         </button>
+       *       ) : (
+       *         <WalletMultiButton />
+       *       )}
+       *     </>
+       *   )
+       * }
+       *
+       * function App() {
+       *   const endpoint = clusterApiUrl('devnet')
+       *   const wallets = useMemo(() => [], [])
+       *
+       *   return (
+       *     <ConnectionProvider endpoint={endpoint}>
+       *       <WalletProvider wallets={wallets}>
+       *         <WalletModalProvider>
+       *           <SignInButton />
+       *         </WalletModalProvider>
+       *       </WalletProvider>
+       *     </ConnectionProvider>
+       *   )
+       * }
+       * ```
        */
       async signInWithWeb3(credentials) {
         const { chain } = credentials;
@@ -51276,7 +54479,7 @@ var require_GoTrueClient = __commonJS({
         }
       }
       async signInWithEthereum(credentials) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _f, _g, _h, _j, _k, _l, _m;
         let message;
         let signature;
         if ("message" in credentials) {
@@ -51325,11 +54528,11 @@ var require_GoTrueClient = __commonJS({
             version: "1",
             chainId,
             nonce: (_c = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _c === void 0 ? void 0 : _c.nonce,
-            issuedAt: (_e = (_d = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _d === void 0 ? void 0 : _d.issuedAt) !== null && _e !== void 0 ? _e : /* @__PURE__ */ new Date(),
-            expirationTime: (_f = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _f === void 0 ? void 0 : _f.expirationTime,
-            notBefore: (_g = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _g === void 0 ? void 0 : _g.notBefore,
-            requestId: (_h = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _h === void 0 ? void 0 : _h.requestId,
-            resources: (_j = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _j === void 0 ? void 0 : _j.resources
+            issuedAt: (_f = (_d = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _d === void 0 ? void 0 : _d.issuedAt) !== null && _f !== void 0 ? _f : /* @__PURE__ */ new Date(),
+            expirationTime: (_g = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _g === void 0 ? void 0 : _g.expirationTime,
+            notBefore: (_h = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _h === void 0 ? void 0 : _h.notBefore,
+            requestId: (_j = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _j === void 0 ? void 0 : _j.requestId,
+            resources: (_k = options === null || options === void 0 ? void 0 : options.signInWithEthereum) === null || _k === void 0 ? void 0 : _k.resources
           };
           message = (0, ethereum_1.createSiweMessage)(siweMessage);
           signature = await resolvedWallet.request({
@@ -51344,7 +54547,7 @@ var require_GoTrueClient = __commonJS({
               chain: "ethereum",
               message,
               signature
-            }, ((_k = credentials.options) === null || _k === void 0 ? void 0 : _k.captchaToken) ? { gotrue_meta_security: { captcha_token: (_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken } } : null),
+            }, ((_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken) ? { gotrue_meta_security: { captcha_token: (_m = credentials.options) === null || _m === void 0 ? void 0 : _m.captchaToken } } : null),
             xform: fetch_1._sessionResponse
           });
           if (error) {
@@ -51367,7 +54570,7 @@ var require_GoTrueClient = __commonJS({
         }
       }
       async signInWithSolana(credentials) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+        var _a, _b, _c, _d, _f, _g, _h, _j, _k, _l, _m, _o;
         let message;
         let signature;
         if ("message" in credentials) {
@@ -51425,11 +54628,11 @@ var require_GoTrueClient = __commonJS({
               `URI: ${url.href}`,
               `Issued At: ${(_c = (_b = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _b === void 0 ? void 0 : _b.issuedAt) !== null && _c !== void 0 ? _c : (/* @__PURE__ */ new Date()).toISOString()}`,
               ...((_d = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _d === void 0 ? void 0 : _d.notBefore) ? [`Not Before: ${options.signInWithSolana.notBefore}`] : [],
-              ...((_e = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _e === void 0 ? void 0 : _e.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
-              ...((_f = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _f === void 0 ? void 0 : _f.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
-              ...((_g = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _g === void 0 ? void 0 : _g.nonce) ? [`Nonce: ${options.signInWithSolana.nonce}`] : [],
-              ...((_h = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _h === void 0 ? void 0 : _h.requestId) ? [`Request ID: ${options.signInWithSolana.requestId}`] : [],
-              ...((_k = (_j = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _j === void 0 ? void 0 : _j.resources) === null || _k === void 0 ? void 0 : _k.length) ? [
+              ...((_f = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _f === void 0 ? void 0 : _f.expirationTime) ? [`Expiration Time: ${options.signInWithSolana.expirationTime}`] : [],
+              ...((_g = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _g === void 0 ? void 0 : _g.chainId) ? [`Chain ID: ${options.signInWithSolana.chainId}`] : [],
+              ...((_h = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _h === void 0 ? void 0 : _h.nonce) ? [`Nonce: ${options.signInWithSolana.nonce}`] : [],
+              ...((_j = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _j === void 0 ? void 0 : _j.requestId) ? [`Request ID: ${options.signInWithSolana.requestId}`] : [],
+              ...((_l = (_k = options === null || options === void 0 ? void 0 : options.signInWithSolana) === null || _k === void 0 ? void 0 : _k.resources) === null || _l === void 0 ? void 0 : _l.length) ? [
                 "Resources",
                 ...options.signInWithSolana.resources.map((resource) => `- ${resource}`)
               ] : []
@@ -51444,7 +54647,7 @@ var require_GoTrueClient = __commonJS({
         try {
           const { data, error } = await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/token?grant_type=web3`, {
             headers: this.headers,
-            body: Object.assign({ chain: "solana", message, signature: (0, base64url_1.bytesToBase64URL)(signature) }, ((_l = credentials.options) === null || _l === void 0 ? void 0 : _l.captchaToken) ? { gotrue_meta_security: { captcha_token: (_m = credentials.options) === null || _m === void 0 ? void 0 : _m.captchaToken } } : null),
+            body: Object.assign({ chain: "solana", message, signature: (0, base64url_1.bytesToBase64URL)(signature) }, ((_m = credentials.options) === null || _m === void 0 ? void 0 : _m.captchaToken) ? { gotrue_meta_security: { captcha_token: (_o = credentials.options) === null || _o === void 0 ? void 0 : _o.captchaToken } } : null),
             xform: fetch_1._sessionResponse
           });
           if (error) {
@@ -51494,7 +54697,7 @@ var require_GoTrueClient = __commonJS({
           }
           if (data.session) {
             await this._saveSession(data.session);
-            await this._notifyAllSubscribers("SIGNED_IN", data.session);
+            await this._notifyAllSubscribers(redirectType === "recovery" ? "PASSWORD_RECOVERY" : "SIGNED_IN", data.session);
           }
           return this._returnResult({ data: Object.assign(Object.assign({}, data), { redirectType: redirectType !== null && redirectType !== void 0 ? redirectType : null }), error });
         } catch (error) {
@@ -51511,6 +54714,77 @@ var require_GoTrueClient = __commonJS({
       /**
        * Allows signing in with an OIDC ID token. The authentication provider used
        * should be enabled and configured.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Use an ID token to sign in.
+       * - Especially useful when implementing sign in using native platform dialogs in mobile or desktop apps using Sign in with Apple or Sign in with Google on iOS and Android.
+       * - You can also use Google's [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [Automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) via this API.
+       *
+       * @example Sign In using ID Token
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithIdToken({
+       *   provider: 'google',
+       *   token: 'your-id-token'
+       * })
+       * ```
+       *
+       * @exampleResponse Sign In using ID Token
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         ...
+       *       },
+       *       "user_metadata": {
+       *         ...
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "provider": "google",
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {
+       *           ...
+       *         },
+       *         "user_metadata": {
+       *           ...
+       *         },
+       *         "identities": [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "provider": "google",
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async signInWithIdToken(credentials) {
         try {
@@ -51561,9 +54835,69 @@ var require_GoTrueClient = __commonJS({
        * channel is not supported on other providers
        * at this time.
        * This method supports PKCE when an email is passed.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Requires either an email or phone number.
+       * - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+       * - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+       * - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+       * - If you're using phone, you can configure whether you want the user to receive a OTP.
+       * - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls).
+       * - See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
+       * - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+       * - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login?showSMSProvider=Twilio) for details about configuring WhatsApp sign in.
+       *
+       * @exampleDescription Sign in with email
+       * The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+       *
+       * @example Sign in with email
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithOtp({
+       *   email: 'example@email.com',
+       *   options: {
+       *     emailRedirectTo: 'https://example.com/welcome'
+       *   }
+       * })
+       * ```
+       *
+       * @exampleResponse Sign in with email
+       * ```json
+       * {
+       *   "data": {
+       *     "user": null,
+       *     "session": null
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @exampleDescription Sign in with SMS OTP
+       * The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+       *
+       * @example Sign in with SMS OTP
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithOtp({
+       *   phone: '+13334445555',
+       * })
+       * ```
+       *
+       * @exampleDescription Sign in with WhatsApp OTP
+       * The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+       *
+       * @example Sign in with WhatsApp OTP
+       * ```js
+       * const { data, error } = await supabase.auth.signInWithOtp({
+       *   phone: '+13334445555',
+       *   options: {
+       *     channel:'whatsapp',
+       *   }
+       * })
+       * ```
        */
       async signInWithOtp(credentials) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _f;
         try {
           if ("email" in credentials) {
             const { email, options } = credentials;
@@ -51596,7 +54930,7 @@ var require_GoTrueClient = __commonJS({
                 data: (_c = options === null || options === void 0 ? void 0 : options.data) !== null && _c !== void 0 ? _c : {},
                 create_user: (_d = options === null || options === void 0 ? void 0 : options.shouldCreateUser) !== null && _d !== void 0 ? _d : true,
                 gotrue_meta_security: { captcha_token: options === null || options === void 0 ? void 0 : options.captchaToken },
-                channel: (_e = options === null || options === void 0 ? void 0 : options.channel) !== null && _e !== void 0 ? _e : "sms"
+                channel: (_f = options === null || options === void 0 ? void 0 : options.channel) !== null && _f !== void 0 ? _f : "sms"
               }
             });
             return this._returnResult({
@@ -51615,6 +54949,140 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Log in a user given a User supplied OTP or TokenHash received through mobile or email.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - The `verifyOtp` method takes in different verification types.
+       * - If a phone number is used, the type can either be:
+       *   1. `sms` – Used when verifying a one-time password (OTP) sent via SMS during sign-up or sign-in.
+       *   2. `phone_change` – Used when verifying an OTP sent to a new phone number during a phone number update process.
+       * - If an email address is used, the type can be one of the following (note: `signup` and `magiclink` types are deprecated):
+       *   1. `email` – Used when verifying an OTP sent to the user's email during sign-up or sign-in.
+       *   2. `recovery` – Used when verifying an OTP sent for account recovery, typically after a password reset request.
+       *   3. `invite` – Used when verifying an OTP sent as part of an invitation to join a project or organization.
+       *   4. `email_change` – Used when verifying an OTP sent to a new email address during an email update process.
+       * - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+       * - The `TokenHash` is contained in the [email templates](/docs/guides/auth/auth-email-templates) and can be used to sign in.  You may wish to use the hash for the PKCE flow for Server Side Auth. Read [the Password-based Auth guide](/docs/guides/auth/passwords) for more details.
+       *
+       * @example Verify Signup One-Time Password (OTP)
+       * ```js
+       * const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'email'})
+       * ```
+       *
+       * @exampleResponse Verify Signup One-Time Password (OTP)
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "recovery_sent_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "example@email.com",
+       *         "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *         "phone": "",
+       *         "confirmed_at": "2024-01-01T00:00:00Z",
+       *         "recovery_sent_at": "2024-01-01T00:00:00Z",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email"
+       *           ]
+       *         },
+       *         "user_metadata": {
+       *           "email": "example@email.com",
+       *           "email_verified": false,
+       *           "phone_verified": false,
+       *           "sub": "11111111-1111-1111-1111-111111111111"
+       *         },
+       *         "identities": [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "is_anonymous": false
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Verify SMS One-Time Password (OTP)
+       * ```js
+       * const { data, error } = await supabase.auth.verifyOtp({ phone, token, type: 'sms'})
+       * ```
+       *
+       * @example Verify Email Auth (Token Hash)
+       * ```js
+       * const { data, error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'email'})
+       * ```
        */
       async verifyOtp(params) {
         var _a, _b;
@@ -51665,9 +55133,48 @@ var require_GoTrueClient = __commonJS({
        *
        * If you have built an organization-specific login page, you can use the
        * organization's SSO Identity Provider UUID directly instead.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+       * - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+       * - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+       *     - Mapping specific user email addresses with an identity provider.
+       *     - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
+       *
+       * @example Sign in with email domain
+       * ```js
+       *   // You can extract the user's email domain and use it to trigger the
+       *   // authentication flow with the correct identity provider.
+       *
+       *   const { data, error } = await supabase.auth.signInWithSSO({
+       *     domain: 'company.com'
+       *   })
+       *
+       *   if (data?.url) {
+       *     // redirect the user to the identity provider's authentication flow
+       *     window.location.href = data.url
+       *   }
+       * ```
+       *
+       * @example Sign in with provider UUID
+       * ```js
+       *   // Useful when you need to map a user's sign in request according
+       *   // to different rules that can't use email domains.
+       *
+       *   const { data, error } = await supabase.auth.signInWithSSO({
+       *     providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92'
+       *   })
+       *
+       *   if (data?.url) {
+       *     // redirect the user to the identity provider's authentication flow
+       *     window.location.href = data.url
+       *   }
+       * ```
        */
       async signInWithSSO(params) {
-        var _a, _b, _c, _d, _e;
+        var _a, _b, _c, _d, _f;
         try {
           let codeChallenge = null;
           let codeChallengeMethod = null;
@@ -51680,7 +55187,7 @@ var require_GoTrueClient = __commonJS({
             headers: this.headers,
             xform: fetch_1._ssoResponse
           });
-          if (((_d = result.data) === null || _d === void 0 ? void 0 : _d.url) && (0, helpers_1.isBrowser)() && !((_e = params.options) === null || _e === void 0 ? void 0 : _e.skipBrowserRedirect)) {
+          if (((_d = result.data) === null || _d === void 0 ? void 0 : _d.url) && (0, helpers_1.isBrowser)() && !((_f = params.options) === null || _f === void 0 ? void 0 : _f.skipBrowserRedirect)) {
             window.location.assign(result.data.url);
           }
           return this._returnResult(result);
@@ -51695,6 +55202,23 @@ var require_GoTrueClient = __commonJS({
       /**
        * Sends a reauthentication OTP to the user's email or phone number.
        * Requires the user to be signed-in.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - This method is used together with `updateUser()` when a user's password needs to be updated.
+       * - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+       * - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+       * - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+       * - After receiving the OTP, include it as the `nonce` in your `updateUser()` call to finalize the password change.
+       *
+       * @exampleDescription Send reauthentication nonce
+       * Sends a reauthentication nonce to the user's email or phone number.
+       *
+       * @example Send reauthentication nonce
+       * ```js
+       * const { error } = await supabase.auth.reauthenticate()
+       * ```
        */
       async reauthenticate() {
         await this.initializePromise;
@@ -51725,6 +55249,62 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Resends an existing signup confirmation email, email change email, SMS OTP or phone change OTP.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Resends a signup confirmation, email change or phone change email to the user.
+       * - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
+       * - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
+       * - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made(note: For existing users signing in with OTP, you should use `signInWithOtp()` again to resend the OTP).
+       * - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
+       *
+       * @exampleDescription Resend an email signup confirmation
+       * Resends the email signup confirmation to the user
+       *
+       * @example Resend an email signup confirmation
+       * ```js
+       * const { error } = await supabase.auth.resend({
+       *   type: 'signup',
+       *   email: 'email@example.com',
+       *   options: {
+       *     emailRedirectTo: 'https://example.com/welcome'
+       *   }
+       * })
+       * ```
+       *
+       * @exampleDescription Resend a phone signup confirmation
+       * Resends the phone signup confirmation email to the user
+       *
+       * @example Resend a phone signup confirmation
+       * ```js
+       * const { error } = await supabase.auth.resend({
+       *   type: 'sms',
+       *   phone: '1234567890'
+       * })
+       * ```
+       *
+       * @exampleDescription Resend email change email
+       * Resends the email change email to the user
+       *
+       * @example Resend email change email
+       * ```js
+       * const { error } = await supabase.auth.resend({
+       *   type: 'email_change',
+       *   email: 'email@example.com'
+       * })
+       * ```
+       *
+       * @exampleDescription Resend phone change OTP
+       * Resends the phone change OTP to the user
+       *
+       * @example Resend phone change OTP
+       * ```js
+       * const { error } = await supabase.auth.resend({
+       *   type: 'phone_change',
+       *   phone: '1234567890'
+       * })
+       * ```
        */
       async resend(credentials) {
         try {
@@ -51774,6 +55354,80 @@ var require_GoTrueClient = __commonJS({
        * the values in it may not be authentic and therefore it's strongly advised
        * against using this method and its results in such circumstances. A warning
        * will be emitted if this is detected. Use {@link #getUser()} instead.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Since the introduction of [asymmetric JWT signing keys](/docs/guides/auth/signing-keys), this method is considered low-level and we encourage you to use `getClaims()` or `getUser()` instead.
+       * - Retrieves the current [user session](/docs/guides/auth/sessions) from the storage medium (local storage, cookies).
+       * - The session contains an access token (signed JWT), a refresh token and the user object.
+       * - If the session's access token is expired or is about to expire, this method will use the refresh token to refresh the session.
+       * - When using in a browser, or you've called `startAutoRefresh()` in your environment (React Native, etc.) this function always returns a valid access token without refreshing the session itself, as this is done in the background. This function returns very fast.
+       * - **IMPORTANT SECURITY NOTICE:** If using an insecure storage medium, such as cookies or request headers, the user object returned by this function **must not be trusted**. Always verify the JWT using `getClaims()` or your own JWT verification library to securely establish the user's identity and access. You can also use `getUser()` to fetch the user object directly from the Auth server for this purpose.
+       * - When using in a browser, this function is synchronized across all tabs using the [LockManager](https://developer.mozilla.org/en-US/docs/Web/API/LockManager) API. In other environments make sure you've defined a proper `lock` property, if necessary, to make sure there are no race conditions while the session is being refreshed.
+       *
+       * @example Get the session data
+       * ```js
+       * const { data, error } = await supabase.auth.getSession()
+       * ```
+       *
+       * @exampleResponse Get the session data
+       * ```json
+       * {
+       *   "data": {
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "example@email.com",
+       *         "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *         "phone": "",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email"
+       *           ]
+       *         },
+       *         "user_metadata": {
+       *           "email": "example@email.com",
+       *           "email_verified": false,
+       *           "phone_verified": false,
+       *           "sub": "11111111-1111-1111-1111-111111111111"
+       *         },
+       *         "identities": [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "is_anonymous": false
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async getSession() {
         await this.initializePromise;
@@ -51799,7 +55453,7 @@ var require_GoTrueClient = __commonJS({
             this.pendingInLock.push((async () => {
               try {
                 await result;
-              } catch (e) {
+              } catch (_e) {
               }
             })());
             return result;
@@ -51906,6 +55560,75 @@ var require_GoTrueClient = __commonJS({
        * value is authentic and can be used to base authorization rules on.
        *
        * @param jwt Takes in an optional access token JWT. If no JWT is provided, the JWT from the current session is used.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - This method fetches the user object from the database instead of local session.
+       * - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
+       * - Should always be used when checking for user authorization on the server. On the client, you can instead use `getSession().session.user` for faster results. `getSession` is insecure on the server.
+       *
+       * @example Get the logged in user with the current existing session
+       * ```js
+       * const { data: { user } } = await supabase.auth.getUser()
+       * ```
+       *
+       * @exampleResponse Get the logged in user with the current existing session
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Get the logged in user with a custom access token jwt
+       * ```js
+       * const { data: { user } } = await supabase.auth.getUser(jwt)
+       * ```
        */
       async getUser(jwt) {
         if (jwt) {
@@ -51957,6 +55680,117 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Updates user data for a logged in user.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - In order to use the `updateUser()` method, the user needs to be signed in first.
+       * - By default, email updates sends a confirmation link to both the user's current and new email.
+       * To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
+       *
+       * @exampleDescription Update the email for an authenticated user
+       * Sends a "Confirm Email Change" email to the new address. If **Secure Email Change** is enabled (default), confirmation is also required from the **old email** before the change is applied. To skip dual confirmation and apply the change after only the new email is verified, disable **Secure Email Change** in the [Email Auth Provider settings](/dashboard/project/_/auth/providers?provider=Email).
+       *
+       * @example Update the email for an authenticated user
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   email: 'new@email.com'
+       * })
+       * ```
+       *
+       * @exampleResponse Update the email for an authenticated user
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "new_email": "new@email.com",
+       *       "email_change_sent_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @exampleDescription Update the phone number for an authenticated user
+       * Sends a one-time password (OTP) to the new phone number.
+       *
+       * @example Update the phone number for an authenticated user
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   phone: '123456789'
+       * })
+       * ```
+       *
+       * @example Update the password for an authenticated user
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   password: 'new password'
+       * })
+       * ```
+       *
+       * @exampleDescription Update the user's metadata
+       * Updates the user's custom metadata.
+       *
+       * **Note**: The `data` field maps to the `auth.users.raw_user_meta_data` column in your Supabase database. When calling `getUser()`, the data will be available as `user.user_metadata`.
+       *
+       * @example Update the user's metadata
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   data: { hello: 'world' }
+       * })
+       * ```
+       *
+       * @exampleDescription Update the user's password with a nonce
+       * If **Secure password change** is enabled in your [project's email provider settings](/dashboard/project/_/auth/providers), updating the user's password would require a nonce if the user **hasn't recently signed in**. The nonce is sent to the user's email or phone number. A user is deemed recently signed in if the session was created in the last 24 hours.
+       *
+       * @example Update the user's password with a nonce
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   password: 'new password',
+       *   nonce: '123456'
+       * })
+       * ```
        */
       async updateUser(attributes, options = {}) {
         await this.initializePromise;
@@ -52008,6 +55842,125 @@ var require_GoTrueClient = __commonJS({
        * Sets the session data from the current session. If the current session is expired, setSession will take care of refreshing it to obtain a new session.
        * If the refresh token or access token in the current session is invalid, an error will be thrown.
        * @param currentSession The current session that minimally contains an access token and refresh token.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - This method sets the session using an `access_token` and `refresh_token`.
+       * - If successful, a `SIGNED_IN` event is emitted.
+       *
+       * @exampleDescription Set the session
+       * Sets the session data from an access_token and refresh_token, then returns an auth response or error.
+       *
+       * @example Set the session
+       * ```js
+       *   const { data, error } = await supabase.auth.setSession({
+       *     access_token,
+       *     refresh_token
+       *   })
+       * ```
+       *
+       * @exampleResponse Set the session
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "example@email.com",
+       *         "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *         "phone": "",
+       *         "confirmed_at": "2024-01-01T00:00:00Z",
+       *         "last_sign_in_at": "11111111-1111-1111-1111-111111111111",
+       *         "app_metadata": {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email"
+       *           ]
+       *         },
+       *         "user_metadata": {
+       *           "email": "example@email.com",
+       *           "email_verified": false,
+       *           "phone_verified": false,
+       *           "sub": "11111111-1111-1111-1111-111111111111"
+       *         },
+       *         "identities": [
+       *           {
+       *             "identity_id": "2024-01-01T00:00:00Z",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "is_anonymous": false
+       *       },
+       *       "token_type": "bearer",
+       *       "expires_in": 3500,
+       *       "expires_at": 1700000000
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async setSession(currentSession) {
         await this.initializePromise;
@@ -52067,6 +56020,125 @@ var require_GoTrueClient = __commonJS({
        * Takes in an optional current session. If not passed in, then refreshSession() will attempt to retrieve it from getSession().
        * If the current session's refresh token is invalid, an error will be thrown.
        * @param currentSession The current session. If passed in, it must contain a refresh token.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - This method will refresh and return a new session whether the current one is expired or not.
+       *
+       * @example Refresh session using the current session
+       * ```js
+       * const { data, error } = await supabase.auth.refreshSession()
+       * const { session, user } = data
+       * ```
+       *
+       * @exampleResponse Refresh session using the current session
+       * ```json
+       * {
+       *   "data": {
+       *     "user": {
+       *       "id": "11111111-1111-1111-1111-111111111111",
+       *       "aud": "authenticated",
+       *       "role": "authenticated",
+       *       "email": "example@email.com",
+       *       "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *       "phone": "",
+       *       "confirmed_at": "2024-01-01T00:00:00Z",
+       *       "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *       "app_metadata": {
+       *         "provider": "email",
+       *         "providers": [
+       *           "email"
+       *         ]
+       *       },
+       *       "user_metadata": {
+       *         "email": "example@email.com",
+       *         "email_verified": false,
+       *         "phone_verified": false,
+       *         "sub": "11111111-1111-1111-1111-111111111111"
+       *       },
+       *       "identities": [
+       *         {
+       *           "identity_id": "22222222-2222-2222-2222-222222222222",
+       *           "id": "11111111-1111-1111-1111-111111111111",
+       *           "user_id": "11111111-1111-1111-1111-111111111111",
+       *           "identity_data": {
+       *             "email": "example@email.com",
+       *             "email_verified": false,
+       *             "phone_verified": false,
+       *             "sub": "11111111-1111-1111-1111-111111111111"
+       *           },
+       *           "provider": "email",
+       *           "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *           "created_at": "2024-01-01T00:00:00Z",
+       *           "updated_at": "2024-01-01T00:00:00Z",
+       *           "email": "example@email.com"
+       *         }
+       *       ],
+       *       "created_at": "2024-01-01T00:00:00Z",
+       *       "updated_at": "2024-01-01T00:00:00Z",
+       *       "is_anonymous": false
+       *     },
+       *     "session": {
+       *       "access_token": "<ACCESS_TOKEN>",
+       *       "token_type": "bearer",
+       *       "expires_in": 3600,
+       *       "expires_at": 1700000000,
+       *       "refresh_token": "<REFRESH_TOKEN>",
+       *       "user": {
+       *         "id": "11111111-1111-1111-1111-111111111111",
+       *         "aud": "authenticated",
+       *         "role": "authenticated",
+       *         "email": "example@email.com",
+       *         "email_confirmed_at": "2024-01-01T00:00:00Z",
+       *         "phone": "",
+       *         "confirmed_at": "2024-01-01T00:00:00Z",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "app_metadata": {
+       *           "provider": "email",
+       *           "providers": [
+       *             "email"
+       *           ]
+       *         },
+       *         "user_metadata": {
+       *           "email": "example@email.com",
+       *           "email_verified": false,
+       *           "phone_verified": false,
+       *           "sub": "11111111-1111-1111-1111-111111111111"
+       *         },
+       *         "identities": [
+       *           {
+       *             "identity_id": "22222222-2222-2222-2222-222222222222",
+       *             "id": "11111111-1111-1111-1111-111111111111",
+       *             "user_id": "11111111-1111-1111-1111-111111111111",
+       *             "identity_data": {
+       *               "email": "example@email.com",
+       *               "email_verified": false,
+       *               "phone_verified": false,
+       *               "sub": "11111111-1111-1111-1111-111111111111"
+       *             },
+       *             "provider": "email",
+       *             "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *             "created_at": "2024-01-01T00:00:00Z",
+       *             "updated_at": "2024-01-01T00:00:00Z",
+       *             "email": "example@email.com"
+       *           }
+       *         ],
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "is_anonymous": false
+       *       }
+       *     }
+       *   },
+       *   "error": null
+       * }
+       * ```
+       *
+       * @example Refresh session using a refresh token
+       * ```js
+       * const { data, error } = await supabase.auth.refreshSession({ refresh_token })
+       * const { session, user } = data
+       * ```
        */
       async refreshSession(currentSession) {
         await this.initializePromise;
@@ -52108,6 +56180,7 @@ var require_GoTrueClient = __commonJS({
        * Gets the session data from a URL string
        */
       async _getSessionFromURL(params, callbackUrlType) {
+        var _a;
         try {
           if (!(0, helpers_1.isBrowser)())
             throw new errors_1.AuthImplicitGrantRedirectError("No browser detected.");
@@ -52140,7 +56213,10 @@ var require_GoTrueClient = __commonJS({
             const url = new URL(window.location.href);
             url.searchParams.delete("code");
             window.history.replaceState(window.history.state, "", url.toString());
-            return { data: { session: data2.session, redirectType: null }, error: null };
+            return {
+              data: { session: data2.session, redirectType: (_a = data2.redirectType) !== null && _a !== void 0 ? _a : null },
+              error: null
+            };
           }
           const { provider_token, provider_refresh_token, access_token, refresh_token, expires_in, expires_at, token_type } = params;
           if (!access_token || !expires_in || !refresh_token || !token_type) {
@@ -52212,6 +56288,39 @@ var require_GoTrueClient = __commonJS({
        * There is no way to revoke a user's access token jwt until it expires. It is recommended to set a shorter expiry on the jwt for this reason.
        *
        * If using `others` scope, no `SIGNED_OUT` event is fired!
+       *
+       * **Warning:** the default `scope` is `'global'`. This signs the user out of
+       * **every device they are currently signed in on**, not just the current
+       * tab/session. If you only want to sign the user out of the current session
+       * (the behavior most other auth libraries default to), pass
+       * `{ scope: 'local' }` explicitly.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - In order to use the `signOut()` method, the user needs to be signed in first.
+       * - By default, `signOut()` uses the **global** scope, which signs out the user
+       *   on every device they are signed in on (not just the current one). Pass
+       *   `{ scope: 'local' }` to only sign out the current session. This is
+       *   usually what apps want on a "Sign out" button, especially when users
+       *   sign in from multiple devices and do not expect signing out of one to
+       *   terminate the others.
+       * - Since Supabase Auth uses JWTs for authentication, the access token JWT will be valid until it's expired. When the user signs out, Supabase revokes the refresh token and deletes the JWT from the client-side. This does not revoke the JWT and it will still be valid until it expires.
+       *
+       * @example Sign out of every device (global – default)
+       * ```js
+       * const { error } = await supabase.auth.signOut()
+       * ```
+       *
+       * @example Sign out only the current session (recommended for most apps)
+       * ```js
+       * const { error } = await supabase.auth.signOut({ scope: 'local' })
+       * ```
+       *
+       * @example Sign out of all other sessions, keep the current one
+       * ```js
+       * const { error } = await supabase.auth.signOut({ scope: 'others' })
+       * ```
        */
       async signOut(options = { scope: "global" }) {
         await this.initializePromise;
@@ -52242,6 +56351,193 @@ var require_GoTrueClient = __commonJS({
           return this._returnResult({ error: null });
         });
       }
+      /**  *
+       * @category Auth
+       *
+       * @remarks
+       * - Subscribes to important events occurring on the user's session.
+       * - Use on the frontend/client. It is less useful on the server.
+       * - Events are emitted across tabs to keep your application's UI up-to-date. Some events can fire very frequently, based on the number of tabs open. Use a quick and efficient callback function, and defer or debounce as many operations as you can to be performed outside of the callback.
+       * - **Important:** A callback can be an `async` function and it runs synchronously during the processing of the changes causing the event. You can easily create a dead-lock by using `await` on a call to another method of the Supabase library.
+       *   - Avoid using `async` functions as callbacks.
+       *   - Limit the number of `await` calls in `async` callbacks.
+       *   - Do not use other Supabase functions in the callback function. If you must, dispatch the functions once the callback has finished executing. Use this as a quick way to achieve this:
+       *     ```js
+       *     supabase.auth.onAuthStateChange((event, session) => {
+       *       setTimeout(async () => {
+       *         // await on other Supabase function here
+       *         // this runs right after the callback has finished
+       *       }, 0)
+       *     })
+       *     ```
+       * - Emitted events:
+       *   - `INITIAL_SESSION`
+       *     - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
+       *   - `SIGNED_IN`
+       *     - Emitted each time a user session is confirmed or re-established, including on user sign in and when refocusing a tab.
+       *     - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
+       *     - This event can fire very frequently depending on the number of tabs open in your application.
+       *   - `SIGNED_OUT`
+       *     - Emitted when the user signs out. This can be after:
+       *       - A call to `supabase.auth.signOut()`.
+       *       - After the user's session has expired for any reason:
+       *         - User has signed out on another device.
+       *         - The session has reached its timebox limit or inactivity timeout.
+       *         - User has signed in on another device with single session per user enabled.
+       *         - Check the [User Sessions](/docs/guides/auth/sessions) docs for more information.
+       *     - Use this to clean up any local storage your application has associated with the user.
+       *   - `TOKEN_REFRESHED`
+       *     - Emitted each time a new access and refresh token are fetched for the signed in user.
+       *     - It's best practice and highly recommended to extract the access token (JWT) and store it in memory for further use in your application.
+       *       - Avoid frequent calls to `supabase.auth.getSession()` for the same purpose.
+       *     - There is a background process that keeps track of when the session should be refreshed so you will always receive valid tokens by listening to this event.
+       *     - The frequency of this event is related to the JWT expiry limit configured on your project.
+       *   - `USER_UPDATED`
+       *     - Emitted each time the `supabase.auth.updateUser()` method finishes successfully. Listen to it to update your application's UI based on new profile information.
+       *   - `PASSWORD_RECOVERY`
+       *     - Emitted instead of the `SIGNED_IN` event when the user lands on a page that includes a password recovery link in the URL.
+       *     - Use it to show a UI to the user where they can [reset their password](/docs/guides/auth/passwords#resetting-a-users-password-forgot-password).
+       *
+       * @example Listen to auth changes
+       * ```js
+       * const { data } = supabase.auth.onAuthStateChange((event, session) => {
+       *   console.log(event, session)
+       *
+       *   if (event === 'INITIAL_SESSION') {
+       *     // handle initial session
+       *   } else if (event === 'SIGNED_IN') {
+       *     // handle sign in event
+       *   } else if (event === 'SIGNED_OUT') {
+       *     // handle sign out event
+       *   } else if (event === 'PASSWORD_RECOVERY') {
+       *     // handle password recovery event
+       *   } else if (event === 'TOKEN_REFRESHED') {
+       *     // handle token refreshed event
+       *   } else if (event === 'USER_UPDATED') {
+       *     // handle user updated event
+       *   }
+       * })
+       *
+       * // call unsubscribe to remove the callback
+       * data.subscription.unsubscribe()
+       * ```
+       *
+       * @exampleDescription Listen to sign out
+       * Make sure you clear out any local data, such as local and session storage, after the client library has detected the user's sign out.
+       *
+       * @example Listen to sign out
+       * ```js
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (event === 'SIGNED_OUT') {
+       *     console.log('SIGNED_OUT', session)
+       *
+       *     // clear local and session storage
+       *     [
+       *       window.localStorage,
+       *       window.sessionStorage,
+       *     ].forEach((storage) => {
+       *       Object.entries(storage)
+       *         .forEach(([key]) => {
+       *           storage.removeItem(key)
+       *         })
+       *     })
+       *   }
+       * })
+       * ```
+       *
+       * @exampleDescription Store OAuth provider tokens on sign in
+       * When using [OAuth (Social Login)](/docs/guides/auth/social-login) you sometimes wish to get access to the provider's access token and refresh token, in order to call provider APIs in the name of the user.
+       *
+       * For example, if you are using [Sign in with Google](/docs/guides/auth/social-login/auth-google) you may want to use the provider token to call Google APIs on behalf of the user. Supabase Auth does not keep track of the provider access and refresh token, but does return them for you once, immediately after sign in. You can use the `onAuthStateChange` method to listen for the presence of the provider tokens and store them in local storage. You can further send them to your server's APIs for use on the backend.
+       *
+       * Finally, make sure you remove them from local storage on the `SIGNED_OUT` event. If the OAuth provider supports token revocation, make sure you call those APIs either from the frontend or schedule them to be called on the backend.
+       *
+       * @example Store OAuth provider tokens on sign in
+       * ```js
+       * // Register this immediately after calling createClient!
+       * // Because signInWithOAuth causes a redirect, you need to fetch the
+       * // provider tokens from the callback.
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (session && session.provider_token) {
+       *     window.localStorage.setItem('oauth_provider_token', session.provider_token)
+       *   }
+       *
+       *   if (session && session.provider_refresh_token) {
+       *     window.localStorage.setItem('oauth_provider_refresh_token', session.provider_refresh_token)
+       *   }
+       *
+       *   if (event === 'SIGNED_OUT') {
+       *     window.localStorage.removeItem('oauth_provider_token')
+       *     window.localStorage.removeItem('oauth_provider_refresh_token')
+       *   }
+       * })
+       * ```
+       *
+       * @exampleDescription Use React Context for the User's session
+       * Instead of relying on `supabase.auth.getSession()` within your React components, you can use a [React Context](https://react.dev/reference/react/createContext) to store the latest session information from the `onAuthStateChange` callback and access it that way.
+       *
+       * @example Use React Context for the User's session
+       * ```js
+       * const SessionContext = React.createContext(null)
+       *
+       * function main() {
+       *   const [session, setSession] = React.useState(null)
+       *
+       *   React.useEffect(() => {
+       *     const {data: { subscription }} = supabase.auth.onAuthStateChange(
+       *       (event, session) => {
+       *         if (event === 'SIGNED_OUT') {
+       *           setSession(null)
+       *         } else if (session) {
+       *           setSession(session)
+       *         }
+       *       })
+       *
+       *     return () => {
+       *       subscription.unsubscribe()
+       *     }
+       *   }, [])
+       *
+       *   return (
+       *     <SessionContext.Provider value={session}>
+       *       <App />
+       *     </SessionContext.Provider>
+       *   )
+       * }
+       * ```
+       *
+       * @example Listen to password recovery events
+       * ```js
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (event === 'PASSWORD_RECOVERY') {
+       *     console.log('PASSWORD_RECOVERY', session)
+       *     // show screen to update user's password
+       *     showPasswordResetScreen(true)
+       *   }
+       * })
+       * ```
+       *
+       * @example Listen to sign in
+       * ```js
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (event === 'SIGNED_IN') console.log('SIGNED_IN', session)
+       * })
+       * ```
+       *
+       * @example Listen to token refresh
+       * ```js
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (event === 'TOKEN_REFRESHED') console.log('TOKEN_REFRESHED', session)
+       * })
+       * ```
+       *
+       * @example Listen to user updates
+       * ```js
+       * supabase.auth.onAuthStateChange((event, session) => {
+       *   if (event === 'USER_UPDATED') console.log('USER_UPDATED', session)
+       * })
+       * ```
+       */
       onAuthStateChange(callback) {
         const id = (0, helpers_1.generateCallbackId)();
         const subscription = {
@@ -52274,7 +56570,11 @@ var require_GoTrueClient = __commonJS({
           } catch (err) {
             await ((_b = this.stateChangeEmitters.get(id)) === null || _b === void 0 ? void 0 : _b.callback("INITIAL_SESSION", null));
             this._debug("INITIAL_SESSION", "callback id", id, "error", err);
-            console.error(err);
+            if ((0, errors_1.isAuthSessionMissingError)(err)) {
+              console.warn(err);
+            } else {
+              console.error(err);
+            }
           }
         });
       }
@@ -52284,6 +56584,66 @@ var require_GoTrueClient = __commonJS({
        * @param email The email address of the user.
        * @param options.redirectTo The URL to send the user to after they click the password reset link.
        * @param options.captchaToken Verification token received when the user completes the captcha on the site.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
+       * - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
+       * To update the user's password, see [`updateUser()`](/docs/reference/javascript/auth-updateuser).
+       * - A `PASSWORD_RECOVERY` event will be emitted when the password recovery link is clicked.
+       * You can use [`onAuthStateChange()`](/docs/reference/javascript/auth-onauthstatechange) to listen and invoke a callback function on these events.
+       * - When the user clicks the reset link in the email they are redirected back to your application.
+       * You can configure the URL that the user is redirected to with the `redirectTo` parameter.
+       * See [redirect URLs and wildcards](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) to add additional redirect URLs to your project.
+       * - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
+       * ```js
+       * const { data, error } = await supabase.auth.updateUser({
+       *   password: new_password
+       * })
+       * ```
+       *
+       * @example Reset password
+       * ```js
+       * const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+       *   redirectTo: 'https://example.com/update-password',
+       * })
+       * ```
+       *
+       * @exampleResponse Reset password
+       * ```json
+       * {
+       *   data: {}
+       *   error: null
+       * }
+       * ```
+       *
+       * @example Reset password (React)
+       * ```js
+       * /**
+       *  * Step 1: Send the user an email to get a password reset token.
+       *  * This email contains a link which sends the user back to your application.
+       *  *\/
+       * const { data, error } = await supabase.auth
+       *   .resetPasswordForEmail('user@email.com')
+       *
+       * /**
+       *  * Step 2: Once the user is redirected back to your application,
+       *  * ask the user to reset their password.
+       *  *\/
+       *  useEffect(() => {
+       *    supabase.auth.onAuthStateChange(async (event, session) => {
+       *      if (event == "PASSWORD_RECOVERY") {
+       *        const newPassword = prompt("What would you like your new password to be?");
+       *        const { data, error } = await supabase.auth
+       *          .updateUser({ password: newPassword })
+       *
+       *        if (data) alert("Password updated successfully!")
+       *        if (error) alert("There was an error updating your password.")
+       *      }
+       *    })
+       *  }, [])
+       * ```
        */
       async resetPasswordForEmail(email, options = {}) {
         let codeChallenge = null;
@@ -52318,6 +56678,43 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Gets all the identities linked to a user.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - The user needs to be signed in to call `getUserIdentities()`.
+       *
+       * @example Returns a list of identities linked to the user
+       * ```js
+       * const { data, error } = await supabase.auth.getUserIdentities()
+       * ```
+       *
+       * @exampleResponse Returns a list of identities linked to the user
+       * ```json
+       * {
+       *   "data": {
+       *     "identities": [
+       *       {
+       *         "identity_id": "22222222-2222-2222-2222-222222222222",
+       *         "id": "2024-01-01T00:00:00Z",
+       *         "user_id": "2024-01-01T00:00:00Z",
+       *         "identity_data": {
+       *           "email": "example@email.com",
+       *           "email_verified": false,
+       *           "phone_verified": false,
+       *           "sub": "11111111-1111-1111-1111-111111111111"
+       *         },
+       *         "provider": "email",
+       *         "last_sign_in_at": "2024-01-01T00:00:00Z",
+       *         "created_at": "2024-01-01T00:00:00Z",
+       *         "updated_at": "2024-01-01T00:00:00Z",
+       *         "email": "example@email.com"
+       *       }
+       *     ]
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async getUserIdentities() {
         var _a;
@@ -52333,6 +56730,33 @@ var require_GoTrueClient = __commonJS({
           throw error;
         }
       }
+      /**  *
+       * @category Auth
+       *
+       * @remarks
+       * - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
+       * - The user needs to be signed in to call `linkIdentity()`.
+       * - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+       * - If `linkIdentity` is run in the browser, the user is automatically redirected to the returned URL. On the server, you should handle the redirect.
+       *
+       * @example Link an identity to a user
+       * ```js
+       * const { data, error } = await supabase.auth.linkIdentity({
+       *   provider: 'github'
+       * })
+       * ```
+       *
+       * @exampleResponse Link an identity to a user
+       * ```json
+       * {
+       *   data: {
+       *     provider: 'github',
+       *     url: <PROVIDER_URL_TO_REDIRECT_TO>
+       *   },
+       *   error: null
+       * }
+       * ```
+       */
       async linkIdentity(credentials) {
         if ("token" in credentials) {
           return this.linkIdentityIdToken(credentials);
@@ -52343,7 +56767,7 @@ var require_GoTrueClient = __commonJS({
         var _a;
         try {
           const { data, error } = await this._useSession(async (result) => {
-            var _a2, _b, _c, _d, _e;
+            var _a2, _b, _c, _d, _f;
             const { data: data2, error: error2 } = result;
             if (error2)
               throw error2;
@@ -52355,7 +56779,7 @@ var require_GoTrueClient = __commonJS({
             });
             return await (0, fetch_1._request)(this.fetch, "GET", url, {
               headers: this.headers,
-              jwt: (_e = (_d = data2.session) === null || _d === void 0 ? void 0 : _d.access_token) !== null && _e !== void 0 ? _e : void 0
+              jwt: (_f = (_d = data2.session) === null || _d === void 0 ? void 0 : _d.access_token) !== null && _f !== void 0 ? _f : void 0
             });
           });
           if (error)
@@ -52420,6 +56844,28 @@ var require_GoTrueClient = __commonJS({
       }
       /**
        * Unlinks an identity from a user by deleting it. The user will no longer be able to sign in with that identity once it's unlinked.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
+       * - The user needs to be signed in to call `unlinkIdentity()`.
+       * - The user must have at least 2 identities in order to unlink an identity.
+       * - The identity to be unlinked must belong to the user.
+       *
+       * @example Unlink an identity
+       * ```js
+       * // retrieve all identities linked to a user
+       * const identities = await supabase.auth.getUserIdentities()
+       *
+       * // find the google identity
+       * const googleIdentity = identities.find(
+       *   identity => identity.provider === 'google'
+       * )
+       *
+       * // unlink the google identity
+       * const { error } = await supabase.auth.unlinkIdentity(googleIdentity)
+       * ```
        */
       async unlinkIdentity(identity) {
         try {
@@ -52749,6 +57195,28 @@ var require_GoTrueClient = __commonJS({
        * appropriately to conserve resources.
        *
        * {@see #stopAutoRefresh}
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Only useful in non-browser environments such as React Native or Electron.
+       * - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+       * - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+       * - To give this hint to the application, you should be calling this method when the app is in focus and calling `supabase.auth.stopAutoRefresh()` when it's out of focus.
+       *
+       * @example Start and stop auto refresh in React Native
+       * ```js
+       * import { AppState } from 'react-native'
+       *
+       * // make sure you register this only once!
+       * AppState.addEventListener('change', (state) => {
+       *   if (state === 'active') {
+       *     supabase.auth.startAutoRefresh()
+       *   } else {
+       *     supabase.auth.stopAutoRefresh()
+       *   }
+       * })
+       * ```
        */
       async startAutoRefresh() {
         this._removeVisibilityChangedCallback();
@@ -52761,6 +57229,28 @@ var require_GoTrueClient = __commonJS({
        * removed and you must manage visibility changes on your own.
        *
        * See {@link #startAutoRefresh} for more details.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Only useful in non-browser environments such as React Native or Electron.
+       * - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+       * - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+       * - When your application goes in the background or out of focus, call this method to stop the proactive refreshing of the session.
+       *
+       * @example Start and stop auto refresh in React Native
+       * ```js
+       * import { AppState } from 'react-native'
+       *
+       * // make sure you register this only once!
+       * AppState.addEventListener('change', (state) => {
+       *   if (state === 'active') {
+       *     supabase.auth.startAutoRefresh()
+       *   } else {
+       *     supabase.auth.stopAutoRefresh()
+       *   }
+       * })
+       * ```
        */
       async stopAutoRefresh() {
         this._removeVisibilityChangedCallback();
@@ -52796,7 +57286,7 @@ var require_GoTrueClient = __commonJS({
             }
           });
         } catch (e) {
-          if (e.isAcquireTimeout || e instanceof locks_1.LockAcquireTimeoutError) {
+          if (e instanceof locks_1.LockAcquireTimeoutError) {
             this._debug("auto refresh token tick lock not available");
           } else {
             throw e;
@@ -53303,6 +57793,55 @@ var require_GoTrueClient = __commonJS({
        *            can obtain from {@link #getSession}.
        * @param options Various additional options that allow you to customize the
        *                behavior of this method.
+       *
+       * @category Auth
+       *
+       * @remarks
+       * - Parses the user's [access token](/docs/guides/auth/sessions#access-token-jwt-claims) as a [JSON Web Token (JWT)](/docs/guides/auth/jwts) and returns its components if valid and not expired.
+       * - If your project is using asymmetric JWT signing keys, then the verification is done locally usually without a network request using the [WebCrypto API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API).
+       * - A network request is sent to your project's JWT signing key discovery endpoint `https://project-id.supabase.co/auth/v1/.well-known/jwks.json`, which is cached locally. If your environment is ephemeral, such as a Lambda function that is destroyed after every request, a network request will be sent for each new invocation. Supabase provides a network-edge cache providing fast responses for these situations.
+       * - If the user's access token is about to expire when calling this function, the user's session will first be refreshed before validating the JWT.
+       * - If your project is using a symmetric secret to sign the JWT, it always sends a request similar to `getUser()` to validate the JWT at the server before returning the decoded token. This is also used if the WebCrypto API is not available in the environment. Make sure you polyfill it in such situations.
+       * - The returned claims can be customized per project using the [Custom Access Token Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook).
+       *
+       * @example Get JWT claims, header and signature
+       * ```js
+       * const { data, error } = await supabase.auth.getClaims()
+       * ```
+       *
+       * @exampleResponse Get JWT claims, header and signature
+       * ```json
+       * {
+       *   "data": {
+       *     "claims": {
+       *       "aal": "aal1",
+       *       "amr": [{
+       *         "method": "email",
+       *         "timestamp": 1715766000
+       *       }],
+       *       "app_metadata": {},
+       *       "aud": "authenticated",
+       *       "email": "example@email.com",
+       *       "exp": 1715769600,
+       *       "iat": 1715766000,
+       *       "is_anonymous": false,
+       *       "iss": "https://project-id.supabase.co/auth/v1",
+       *       "phone": "+13334445555",
+       *       "role": "authenticated",
+       *       "session_id": "11111111-1111-1111-1111-111111111111",
+       *       "sub": "11111111-1111-1111-1111-111111111111",
+       *       "user_metadata": {}
+       *     },
+       *     "header": {
+       *       "alg": "RS256",
+       *       "typ": "JWT",
+       *       "kid": "11111111-1111-1111-1111-111111111111"
+       *     },
+       *     "signature": [/** Uint8Array *\/],
+       *   },
+       *   "error": null
+       * }
+       * ```
        */
       async getClaims(jwt, options = {}) {
         try {
@@ -53337,8 +57876,8 @@ var require_GoTrueClient = __commonJS({
           const publicKey = await crypto.subtle.importKey("jwk", signingKey, algorithm, true, [
             "verify"
           ]);
-          const isValid2 = await crypto.subtle.verify(algorithm, publicKey, signature, (0, base64url_1.stringToUint8Array)(`${rawHeader}.${rawPayload}`));
-          if (!isValid2) {
+          const isValid = await crypto.subtle.verify(algorithm, publicKey, signature, (0, base64url_1.stringToUint8Array)(`${rawHeader}.${rawPayload}`));
+          if (!isValid) {
             throw new errors_1.AuthInvalidJwtError("Invalid JWT signature");
           }
           return {
@@ -53356,15 +57895,329 @@ var require_GoTrueClient = __commonJS({
           throw error;
         }
       }
+      // --- Passkey Methods ---
+      /**
+       * Sign in with a passkey. Handles the full WebAuthn ceremony:
+       * 1. Fetches authentication challenge from server
+       * 2. Prompts user via navigator.credentials.get()
+       * 3. Verifies credential with server and creates session
+       *
+       * Requires `auth.experimental.passkey: true`.
+       *
+       * @category Auth
+       */
+      async signInWithPasskey(credentials) {
+        var _a, _b, _c;
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          if (!(0, webauthn_1.browserSupportsWebAuthn)()) {
+            return this._returnResult({
+              data: null,
+              error: new errors_1.AuthUnknownError("Browser does not support WebAuthn", null)
+            });
+          }
+          const { data: options, error: optionsError } = await this._startPasskeyAuthentication({
+            options: { captchaToken: (_a = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a === void 0 ? void 0 : _a.captchaToken }
+          });
+          if (optionsError || !options) {
+            return this._returnResult({ data: null, error: optionsError });
+          }
+          const publicKeyOptions = (0, webauthn_1.deserializeCredentialRequestOptions)(options.options);
+          const signal = (_c = (_b = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _b === void 0 ? void 0 : _b.signal) !== null && _c !== void 0 ? _c : webauthn_1.webAuthnAbortService.createNewAbortSignal();
+          const { data: credential, error: credentialError } = await (0, webauthn_1.getCredential)({
+            publicKey: publicKeyOptions,
+            signal
+          });
+          if (credentialError || !credential) {
+            return this._returnResult({
+              data: null,
+              error: credentialError !== null && credentialError !== void 0 ? credentialError : new errors_1.AuthUnknownError("WebAuthn ceremony failed", null)
+            });
+          }
+          const serialized = (0, webauthn_1.serializeCredentialRequestResponse)(credential);
+          return this._verifyPasskeyAuthentication({
+            challengeId: options.challenge_id,
+            credential: serialized
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Register a passkey for the current authenticated user. Handles the full WebAuthn ceremony:
+       * 1. Fetches registration challenge from server
+       * 2. Prompts user via navigator.credentials.create()
+       * 3. Verifies credential with server
+       *
+       * Requires an active session. Requires `auth.experimental.passkey: true`.
+       *
+       * @category Auth
+       */
+      async registerPasskey(credentials) {
+        var _a, _b;
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          if (!(0, webauthn_1.browserSupportsWebAuthn)()) {
+            return this._returnResult({
+              data: null,
+              error: new errors_1.AuthUnknownError("Browser does not support WebAuthn", null)
+            });
+          }
+          const { data: options, error: optionsError } = await this._startPasskeyRegistration();
+          if (optionsError || !options) {
+            return this._returnResult({ data: null, error: optionsError });
+          }
+          const publicKeyOptions = (0, webauthn_1.deserializeCredentialCreationOptions)(options.options);
+          const signal = (_b = (_a = credentials === null || credentials === void 0 ? void 0 : credentials.options) === null || _a === void 0 ? void 0 : _a.signal) !== null && _b !== void 0 ? _b : webauthn_1.webAuthnAbortService.createNewAbortSignal();
+          const { data: credential, error: credentialError } = await (0, webauthn_1.createCredential)({
+            publicKey: publicKeyOptions,
+            signal
+          });
+          if (credentialError || !credential) {
+            return this._returnResult({
+              data: null,
+              error: credentialError !== null && credentialError !== void 0 ? credentialError : new errors_1.AuthUnknownError("WebAuthn ceremony failed", null)
+            });
+          }
+          const serialized = (0, webauthn_1.serializeCredentialCreationResponse)(credential);
+          return this._verifyPasskeyRegistration({
+            challengeId: options.challenge_id,
+            credential: serialized
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Start passkey registration for the current authenticated user.
+       * Returns WebAuthn credential creation options to pass to navigator.credentials.create().
+       */
+      async _startPasskeyRegistration() {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          return await this._useSession(async (result) => {
+            const { data: { session }, error: sessionError } = result;
+            if (sessionError) {
+              return this._returnResult({ data: null, error: sessionError });
+            }
+            if (!session) {
+              return this._returnResult({ data: null, error: new errors_1.AuthSessionMissingError() });
+            }
+            const { data, error } = await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/passkeys/registration/options`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              body: {}
+            });
+            if (error) {
+              return this._returnResult({ data: null, error });
+            }
+            return this._returnResult({ data, error: null });
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Verify passkey registration with the credential response.
+       * The credentialResponse should be the serialized output of navigator.credentials.create().
+       */
+      async _verifyPasskeyRegistration(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          return await this._useSession(async (result) => {
+            const { data: { session }, error: sessionError } = result;
+            if (sessionError) {
+              return this._returnResult({ data: null, error: sessionError });
+            }
+            if (!session) {
+              return this._returnResult({ data: null, error: new errors_1.AuthSessionMissingError() });
+            }
+            const { data, error } = await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/passkeys/registration/verify`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              body: {
+                challenge_id: params.challengeId,
+                credential: params.credential
+              }
+            });
+            if (error) {
+              return this._returnResult({ data: null, error });
+            }
+            return this._returnResult({ data, error: null });
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Start passkey authentication.
+       * Returns WebAuthn credential request options to pass to navigator.credentials.get().
+       */
+      async _startPasskeyAuthentication(params) {
+        var _a;
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          const { data, error } = await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/passkeys/authentication/options`, {
+            headers: this.headers,
+            body: {
+              gotrue_meta_security: { captcha_token: (_a = params === null || params === void 0 ? void 0 : params.options) === null || _a === void 0 ? void 0 : _a.captchaToken }
+            }
+          });
+          if (error) {
+            return this._returnResult({ data: null, error });
+          }
+          return this._returnResult({ data, error: null });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Verify passkey authentication and create a session.
+       * The credential should be the serialized output of navigator.credentials.get().
+       */
+      async _verifyPasskeyAuthentication(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          const { data, error } = await (0, fetch_1._request)(this.fetch, "POST", `${this.url}/passkeys/authentication/verify`, {
+            headers: this.headers,
+            body: {
+              challenge_id: params.challengeId,
+              credential: params.credential
+            },
+            xform: fetch_1._sessionResponse
+          });
+          if (error) {
+            return this._returnResult({ data: null, error });
+          }
+          if (data.session) {
+            await this._saveSession(data.session);
+            await this._notifyAllSubscribers("SIGNED_IN", data.session);
+          }
+          return this._returnResult({ data, error: null });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * List all passkeys for the current user.
+       */
+      async _listPasskeys() {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          return await this._useSession(async (result) => {
+            const { data: { session }, error: sessionError } = result;
+            if (sessionError) {
+              return this._returnResult({ data: null, error: sessionError });
+            }
+            if (!session) {
+              return this._returnResult({ data: null, error: new errors_1.AuthSessionMissingError() });
+            }
+            const { data, error } = await (0, fetch_1._request)(this.fetch, "GET", `${this.url}/passkeys`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              xform: (data2) => ({ data: data2, error: null })
+            });
+            if (error) {
+              return this._returnResult({ data: null, error });
+            }
+            return this._returnResult({ data, error: null });
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Update a passkey.
+       */
+      async _updatePasskey(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          return await this._useSession(async (result) => {
+            const { data: { session }, error: sessionError } = result;
+            if (sessionError) {
+              return this._returnResult({ data: null, error: sessionError });
+            }
+            if (!session) {
+              return this._returnResult({ data: null, error: new errors_1.AuthSessionMissingError() });
+            }
+            const { data, error } = await (0, fetch_1._request)(this.fetch, "PATCH", `${this.url}/passkeys/${params.passkeyId}`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              body: { friendly_name: params.friendlyName }
+            });
+            if (error) {
+              return this._returnResult({ data: null, error });
+            }
+            return this._returnResult({ data, error: null });
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
+      /**
+       * Delete a passkey.
+       */
+      async _deletePasskey(params) {
+        (0, helpers_1.assertPasskeyExperimentalEnabled)(this.experimental);
+        try {
+          return await this._useSession(async (result) => {
+            const { data: { session }, error: sessionError } = result;
+            if (sessionError) {
+              return this._returnResult({ data: null, error: sessionError });
+            }
+            if (!session) {
+              return this._returnResult({ data: null, error: new errors_1.AuthSessionMissingError() });
+            }
+            const { error } = await (0, fetch_1._request)(this.fetch, "DELETE", `${this.url}/passkeys/${params.passkeyId}`, {
+              headers: this.headers,
+              jwt: session.access_token,
+              noResolveJson: true
+            });
+            if (error) {
+              return this._returnResult({ data: null, error });
+            }
+            return this._returnResult({ data: null, error: null });
+          });
+        } catch (error) {
+          if ((0, errors_1.isAuthError)(error)) {
+            return this._returnResult({ data: null, error });
+          }
+          throw error;
+        }
+      }
     };
     GoTrueClient.nextInstanceID = {};
     exports.default = GoTrueClient;
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/AuthAdminApi.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/AuthAdminApi.js
 var require_AuthAdminApi = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/AuthAdminApi.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/AuthAdminApi.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
@@ -53374,9 +58227,9 @@ var require_AuthAdminApi = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/AuthClient.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/AuthClient.js
 var require_AuthClient = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/AuthClient.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/AuthClient.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = (init_tslib_es6(), __toCommonJS(tslib_es6_exports));
@@ -53386,9 +58239,9 @@ var require_AuthClient = __commonJS({
   }
 });
 
-// ../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/index.js
+// node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/index.js
 var require_main3 = __commonJS({
-  "../../node_modules/.pnpm/@supabase+auth-js@2.99.3/node_modules/@supabase/auth-js/dist/main/index.js"(exports) {
+  "node_modules/.pnpm/@supabase+auth-js@2.106.2/node_modules/@supabase/auth-js/dist/main/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.processLock = exports.lockInternals = exports.NavigatorLockAcquireTimeoutError = exports.navigatorLock = exports.AuthClient = exports.AuthAdminApi = exports.GoTrueClient = exports.GoTrueAdminApi = void 0;
@@ -53431,3893 +58284,9 @@ var import_express7 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/util.js
-var util;
-(function(util2) {
-  util2.assertEqual = (_) => {
-  };
-  function assertIs(_arg) {
-  }
-  util2.assertIs = assertIs;
-  function assertNever(_x) {
-    throw new Error();
-  }
-  util2.assertNever = assertNever;
-  util2.arrayToEnum = (items) => {
-    const obj = {};
-    for (const item of items) {
-      obj[item] = item;
-    }
-    return obj;
-  };
-  util2.getValidEnumValues = (obj) => {
-    const validKeys = util2.objectKeys(obj).filter((k) => typeof obj[obj[k]] !== "number");
-    const filtered = {};
-    for (const k of validKeys) {
-      filtered[k] = obj[k];
-    }
-    return util2.objectValues(filtered);
-  };
-  util2.objectValues = (obj) => {
-    return util2.objectKeys(obj).map(function(e) {
-      return obj[e];
-    });
-  };
-  util2.objectKeys = typeof Object.keys === "function" ? (obj) => Object.keys(obj) : (object) => {
-    const keys = [];
-    for (const key in object) {
-      if (Object.prototype.hasOwnProperty.call(object, key)) {
-        keys.push(key);
-      }
-    }
-    return keys;
-  };
-  util2.find = (arr, checker) => {
-    for (const item of arr) {
-      if (checker(item))
-        return item;
-    }
-    return void 0;
-  };
-  util2.isInteger = typeof Number.isInteger === "function" ? (val) => Number.isInteger(val) : (val) => typeof val === "number" && Number.isFinite(val) && Math.floor(val) === val;
-  function joinValues(array, separator = " | ") {
-    return array.map((val) => typeof val === "string" ? `'${val}'` : val).join(separator);
-  }
-  util2.joinValues = joinValues;
-  util2.jsonStringifyReplacer = (_, value) => {
-    if (typeof value === "bigint") {
-      return value.toString();
-    }
-    return value;
-  };
-})(util || (util = {}));
-var objectUtil;
-(function(objectUtil2) {
-  objectUtil2.mergeShapes = (first, second) => {
-    return {
-      ...first,
-      ...second
-      // second overwrites first
-    };
-  };
-})(objectUtil || (objectUtil = {}));
-var ZodParsedType = util.arrayToEnum([
-  "string",
-  "nan",
-  "number",
-  "integer",
-  "float",
-  "boolean",
-  "date",
-  "bigint",
-  "symbol",
-  "function",
-  "undefined",
-  "null",
-  "array",
-  "object",
-  "unknown",
-  "promise",
-  "void",
-  "never",
-  "map",
-  "set"
-]);
-var getParsedType = (data) => {
-  const t = typeof data;
-  switch (t) {
-    case "undefined":
-      return ZodParsedType.undefined;
-    case "string":
-      return ZodParsedType.string;
-    case "number":
-      return Number.isNaN(data) ? ZodParsedType.nan : ZodParsedType.number;
-    case "boolean":
-      return ZodParsedType.boolean;
-    case "function":
-      return ZodParsedType.function;
-    case "bigint":
-      return ZodParsedType.bigint;
-    case "symbol":
-      return ZodParsedType.symbol;
-    case "object":
-      if (Array.isArray(data)) {
-        return ZodParsedType.array;
-      }
-      if (data === null) {
-        return ZodParsedType.null;
-      }
-      if (data.then && typeof data.then === "function" && data.catch && typeof data.catch === "function") {
-        return ZodParsedType.promise;
-      }
-      if (typeof Map !== "undefined" && data instanceof Map) {
-        return ZodParsedType.map;
-      }
-      if (typeof Set !== "undefined" && data instanceof Set) {
-        return ZodParsedType.set;
-      }
-      if (typeof Date !== "undefined" && data instanceof Date) {
-        return ZodParsedType.date;
-      }
-      return ZodParsedType.object;
-    default:
-      return ZodParsedType.unknown;
-  }
-};
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/ZodError.js
-var ZodIssueCode = util.arrayToEnum([
-  "invalid_type",
-  "invalid_literal",
-  "custom",
-  "invalid_union",
-  "invalid_union_discriminator",
-  "invalid_enum_value",
-  "unrecognized_keys",
-  "invalid_arguments",
-  "invalid_return_type",
-  "invalid_date",
-  "invalid_string",
-  "too_small",
-  "too_big",
-  "invalid_intersection_types",
-  "not_multiple_of",
-  "not_finite"
-]);
-var ZodError = class _ZodError extends Error {
-  get errors() {
-    return this.issues;
-  }
-  constructor(issues) {
-    super();
-    this.issues = [];
-    this.addIssue = (sub) => {
-      this.issues = [...this.issues, sub];
-    };
-    this.addIssues = (subs = []) => {
-      this.issues = [...this.issues, ...subs];
-    };
-    const actualProto = new.target.prototype;
-    if (Object.setPrototypeOf) {
-      Object.setPrototypeOf(this, actualProto);
-    } else {
-      this.__proto__ = actualProto;
-    }
-    this.name = "ZodError";
-    this.issues = issues;
-  }
-  format(_mapper) {
-    const mapper = _mapper || function(issue) {
-      return issue.message;
-    };
-    const fieldErrors = { _errors: [] };
-    const processError = (error) => {
-      for (const issue of error.issues) {
-        if (issue.code === "invalid_union") {
-          issue.unionErrors.map(processError);
-        } else if (issue.code === "invalid_return_type") {
-          processError(issue.returnTypeError);
-        } else if (issue.code === "invalid_arguments") {
-          processError(issue.argumentsError);
-        } else if (issue.path.length === 0) {
-          fieldErrors._errors.push(mapper(issue));
-        } else {
-          let curr = fieldErrors;
-          let i = 0;
-          while (i < issue.path.length) {
-            const el = issue.path[i];
-            const terminal = i === issue.path.length - 1;
-            if (!terminal) {
-              curr[el] = curr[el] || { _errors: [] };
-            } else {
-              curr[el] = curr[el] || { _errors: [] };
-              curr[el]._errors.push(mapper(issue));
-            }
-            curr = curr[el];
-            i++;
-          }
-        }
-      }
-    };
-    processError(this);
-    return fieldErrors;
-  }
-  static assert(value) {
-    if (!(value instanceof _ZodError)) {
-      throw new Error(`Not a ZodError: ${value}`);
-    }
-  }
-  toString() {
-    return this.message;
-  }
-  get message() {
-    return JSON.stringify(this.issues, util.jsonStringifyReplacer, 2);
-  }
-  get isEmpty() {
-    return this.issues.length === 0;
-  }
-  flatten(mapper = (issue) => issue.message) {
-    const fieldErrors = {};
-    const formErrors = [];
-    for (const sub of this.issues) {
-      if (sub.path.length > 0) {
-        const firstEl = sub.path[0];
-        fieldErrors[firstEl] = fieldErrors[firstEl] || [];
-        fieldErrors[firstEl].push(mapper(sub));
-      } else {
-        formErrors.push(mapper(sub));
-      }
-    }
-    return { formErrors, fieldErrors };
-  }
-  get formErrors() {
-    return this.flatten();
-  }
-};
-ZodError.create = (issues) => {
-  const error = new ZodError(issues);
-  return error;
-};
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/locales/en.js
-var errorMap = (issue, _ctx) => {
-  let message;
-  switch (issue.code) {
-    case ZodIssueCode.invalid_type:
-      if (issue.received === ZodParsedType.undefined) {
-        message = "Required";
-      } else {
-        message = `Expected ${issue.expected}, received ${issue.received}`;
-      }
-      break;
-    case ZodIssueCode.invalid_literal:
-      message = `Invalid literal value, expected ${JSON.stringify(issue.expected, util.jsonStringifyReplacer)}`;
-      break;
-    case ZodIssueCode.unrecognized_keys:
-      message = `Unrecognized key(s) in object: ${util.joinValues(issue.keys, ", ")}`;
-      break;
-    case ZodIssueCode.invalid_union:
-      message = `Invalid input`;
-      break;
-    case ZodIssueCode.invalid_union_discriminator:
-      message = `Invalid discriminator value. Expected ${util.joinValues(issue.options)}`;
-      break;
-    case ZodIssueCode.invalid_enum_value:
-      message = `Invalid enum value. Expected ${util.joinValues(issue.options)}, received '${issue.received}'`;
-      break;
-    case ZodIssueCode.invalid_arguments:
-      message = `Invalid function arguments`;
-      break;
-    case ZodIssueCode.invalid_return_type:
-      message = `Invalid function return type`;
-      break;
-    case ZodIssueCode.invalid_date:
-      message = `Invalid date`;
-      break;
-    case ZodIssueCode.invalid_string:
-      if (typeof issue.validation === "object") {
-        if ("includes" in issue.validation) {
-          message = `Invalid input: must include "${issue.validation.includes}"`;
-          if (typeof issue.validation.position === "number") {
-            message = `${message} at one or more positions greater than or equal to ${issue.validation.position}`;
-          }
-        } else if ("startsWith" in issue.validation) {
-          message = `Invalid input: must start with "${issue.validation.startsWith}"`;
-        } else if ("endsWith" in issue.validation) {
-          message = `Invalid input: must end with "${issue.validation.endsWith}"`;
-        } else {
-          util.assertNever(issue.validation);
-        }
-      } else if (issue.validation !== "regex") {
-        message = `Invalid ${issue.validation}`;
-      } else {
-        message = "Invalid";
-      }
-      break;
-    case ZodIssueCode.too_small:
-      if (issue.type === "array")
-        message = `Array must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `more than`} ${issue.minimum} element(s)`;
-      else if (issue.type === "string")
-        message = `String must contain ${issue.exact ? "exactly" : issue.inclusive ? `at least` : `over`} ${issue.minimum} character(s)`;
-      else if (issue.type === "number")
-        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-      else if (issue.type === "bigint")
-        message = `Number must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${issue.minimum}`;
-      else if (issue.type === "date")
-        message = `Date must be ${issue.exact ? `exactly equal to ` : issue.inclusive ? `greater than or equal to ` : `greater than `}${new Date(Number(issue.minimum))}`;
-      else
-        message = "Invalid input";
-      break;
-    case ZodIssueCode.too_big:
-      if (issue.type === "array")
-        message = `Array must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `less than`} ${issue.maximum} element(s)`;
-      else if (issue.type === "string")
-        message = `String must contain ${issue.exact ? `exactly` : issue.inclusive ? `at most` : `under`} ${issue.maximum} character(s)`;
-      else if (issue.type === "number")
-        message = `Number must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-      else if (issue.type === "bigint")
-        message = `BigInt must be ${issue.exact ? `exactly` : issue.inclusive ? `less than or equal to` : `less than`} ${issue.maximum}`;
-      else if (issue.type === "date")
-        message = `Date must be ${issue.exact ? `exactly` : issue.inclusive ? `smaller than or equal to` : `smaller than`} ${new Date(Number(issue.maximum))}`;
-      else
-        message = "Invalid input";
-      break;
-    case ZodIssueCode.custom:
-      message = `Invalid input`;
-      break;
-    case ZodIssueCode.invalid_intersection_types:
-      message = `Intersection results could not be merged`;
-      break;
-    case ZodIssueCode.not_multiple_of:
-      message = `Number must be a multiple of ${issue.multipleOf}`;
-      break;
-    case ZodIssueCode.not_finite:
-      message = "Number must be finite";
-      break;
-    default:
-      message = _ctx.defaultError;
-      util.assertNever(issue);
-  }
-  return { message };
-};
-var en_default = errorMap;
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/errors.js
-var overrideErrorMap = en_default;
-function getErrorMap() {
-  return overrideErrorMap;
-}
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/parseUtil.js
-var makeIssue = (params) => {
-  const { data, path: path4, errorMaps, issueData } = params;
-  const fullPath = [...path4, ...issueData.path || []];
-  const fullIssue = {
-    ...issueData,
-    path: fullPath
-  };
-  if (issueData.message !== void 0) {
-    return {
-      ...issueData,
-      path: fullPath,
-      message: issueData.message
-    };
-  }
-  let errorMessage = "";
-  const maps = errorMaps.filter((m) => !!m).slice().reverse();
-  for (const map of maps) {
-    errorMessage = map(fullIssue, { data, defaultError: errorMessage }).message;
-  }
-  return {
-    ...issueData,
-    path: fullPath,
-    message: errorMessage
-  };
-};
-function addIssueToContext(ctx, issueData) {
-  const overrideMap = getErrorMap();
-  const issue = makeIssue({
-    issueData,
-    data: ctx.data,
-    path: ctx.path,
-    errorMaps: [
-      ctx.common.contextualErrorMap,
-      // contextual error map is first priority
-      ctx.schemaErrorMap,
-      // then schema-bound map if available
-      overrideMap,
-      // then global override map
-      overrideMap === en_default ? void 0 : en_default
-      // then global default map
-    ].filter((x) => !!x)
-  });
-  ctx.common.issues.push(issue);
-}
-var ParseStatus = class _ParseStatus {
-  constructor() {
-    this.value = "valid";
-  }
-  dirty() {
-    if (this.value === "valid")
-      this.value = "dirty";
-  }
-  abort() {
-    if (this.value !== "aborted")
-      this.value = "aborted";
-  }
-  static mergeArray(status, results) {
-    const arrayValue = [];
-    for (const s of results) {
-      if (s.status === "aborted")
-        return INVALID;
-      if (s.status === "dirty")
-        status.dirty();
-      arrayValue.push(s.value);
-    }
-    return { status: status.value, value: arrayValue };
-  }
-  static async mergeObjectAsync(status, pairs) {
-    const syncPairs = [];
-    for (const pair of pairs) {
-      const key = await pair.key;
-      const value = await pair.value;
-      syncPairs.push({
-        key,
-        value
-      });
-    }
-    return _ParseStatus.mergeObjectSync(status, syncPairs);
-  }
-  static mergeObjectSync(status, pairs) {
-    const finalObject = {};
-    for (const pair of pairs) {
-      const { key, value } = pair;
-      if (key.status === "aborted")
-        return INVALID;
-      if (value.status === "aborted")
-        return INVALID;
-      if (key.status === "dirty")
-        status.dirty();
-      if (value.status === "dirty")
-        status.dirty();
-      if (key.value !== "__proto__" && (typeof value.value !== "undefined" || pair.alwaysSet)) {
-        finalObject[key.value] = value.value;
-      }
-    }
-    return { status: status.value, value: finalObject };
-  }
-};
-var INVALID = Object.freeze({
-  status: "aborted"
-});
-var DIRTY = (value) => ({ status: "dirty", value });
-var OK = (value) => ({ status: "valid", value });
-var isAborted = (x) => x.status === "aborted";
-var isDirty = (x) => x.status === "dirty";
-var isValid = (x) => x.status === "valid";
-var isAsync = (x) => typeof Promise !== "undefined" && x instanceof Promise;
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/helpers/errorUtil.js
-var errorUtil;
-(function(errorUtil2) {
-  errorUtil2.errToObj = (message) => typeof message === "string" ? { message } : message || {};
-  errorUtil2.toString = (message) => typeof message === "string" ? message : message?.message;
-})(errorUtil || (errorUtil = {}));
-
-// ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v3/types.js
-var ParseInputLazyPath = class {
-  constructor(parent, value, path4, key) {
-    this._cachedPath = [];
-    this.parent = parent;
-    this.data = value;
-    this._path = path4;
-    this._key = key;
-  }
-  get path() {
-    if (!this._cachedPath.length) {
-      if (Array.isArray(this._key)) {
-        this._cachedPath.push(...this._path, ...this._key);
-      } else {
-        this._cachedPath.push(...this._path, this._key);
-      }
-    }
-    return this._cachedPath;
-  }
-};
-var handleResult = (ctx, result) => {
-  if (isValid(result)) {
-    return { success: true, data: result.value };
-  } else {
-    if (!ctx.common.issues.length) {
-      throw new Error("Validation failed but no issues detected.");
-    }
-    return {
-      success: false,
-      get error() {
-        if (this._error)
-          return this._error;
-        const error = new ZodError(ctx.common.issues);
-        this._error = error;
-        return this._error;
-      }
-    };
-  }
-};
-function processCreateParams(params) {
-  if (!params)
-    return {};
-  const { errorMap: errorMap2, invalid_type_error, required_error, description } = params;
-  if (errorMap2 && (invalid_type_error || required_error)) {
-    throw new Error(`Can't use "invalid_type_error" or "required_error" in conjunction with custom error map.`);
-  }
-  if (errorMap2)
-    return { errorMap: errorMap2, description };
-  const customMap = (iss, ctx) => {
-    const { message } = params;
-    if (iss.code === "invalid_enum_value") {
-      return { message: message ?? ctx.defaultError };
-    }
-    if (typeof ctx.data === "undefined") {
-      return { message: message ?? required_error ?? ctx.defaultError };
-    }
-    if (iss.code !== "invalid_type")
-      return { message: ctx.defaultError };
-    return { message: message ?? invalid_type_error ?? ctx.defaultError };
-  };
-  return { errorMap: customMap, description };
-}
-var ZodType = class {
-  get description() {
-    return this._def.description;
-  }
-  _getType(input) {
-    return getParsedType(input.data);
-  }
-  _getOrReturnCtx(input, ctx) {
-    return ctx || {
-      common: input.parent.common,
-      data: input.data,
-      parsedType: getParsedType(input.data),
-      schemaErrorMap: this._def.errorMap,
-      path: input.path,
-      parent: input.parent
-    };
-  }
-  _processInputParams(input) {
-    return {
-      status: new ParseStatus(),
-      ctx: {
-        common: input.parent.common,
-        data: input.data,
-        parsedType: getParsedType(input.data),
-        schemaErrorMap: this._def.errorMap,
-        path: input.path,
-        parent: input.parent
-      }
-    };
-  }
-  _parseSync(input) {
-    const result = this._parse(input);
-    if (isAsync(result)) {
-      throw new Error("Synchronous parse encountered promise.");
-    }
-    return result;
-  }
-  _parseAsync(input) {
-    const result = this._parse(input);
-    return Promise.resolve(result);
-  }
-  parse(data, params) {
-    const result = this.safeParse(data, params);
-    if (result.success)
-      return result.data;
-    throw result.error;
-  }
-  safeParse(data, params) {
-    const ctx = {
-      common: {
-        issues: [],
-        async: params?.async ?? false,
-        contextualErrorMap: params?.errorMap
-      },
-      path: params?.path || [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    const result = this._parseSync({ data, path: ctx.path, parent: ctx });
-    return handleResult(ctx, result);
-  }
-  "~validate"(data) {
-    const ctx = {
-      common: {
-        issues: [],
-        async: !!this["~standard"].async
-      },
-      path: [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    if (!this["~standard"].async) {
-      try {
-        const result = this._parseSync({ data, path: [], parent: ctx });
-        return isValid(result) ? {
-          value: result.value
-        } : {
-          issues: ctx.common.issues
-        };
-      } catch (err) {
-        if (err?.message?.toLowerCase()?.includes("encountered")) {
-          this["~standard"].async = true;
-        }
-        ctx.common = {
-          issues: [],
-          async: true
-        };
-      }
-    }
-    return this._parseAsync({ data, path: [], parent: ctx }).then((result) => isValid(result) ? {
-      value: result.value
-    } : {
-      issues: ctx.common.issues
-    });
-  }
-  async parseAsync(data, params) {
-    const result = await this.safeParseAsync(data, params);
-    if (result.success)
-      return result.data;
-    throw result.error;
-  }
-  async safeParseAsync(data, params) {
-    const ctx = {
-      common: {
-        issues: [],
-        contextualErrorMap: params?.errorMap,
-        async: true
-      },
-      path: params?.path || [],
-      schemaErrorMap: this._def.errorMap,
-      parent: null,
-      data,
-      parsedType: getParsedType(data)
-    };
-    const maybeAsyncResult = this._parse({ data, path: ctx.path, parent: ctx });
-    const result = await (isAsync(maybeAsyncResult) ? maybeAsyncResult : Promise.resolve(maybeAsyncResult));
-    return handleResult(ctx, result);
-  }
-  refine(check, message) {
-    const getIssueProperties = (val) => {
-      if (typeof message === "string" || typeof message === "undefined") {
-        return { message };
-      } else if (typeof message === "function") {
-        return message(val);
-      } else {
-        return message;
-      }
-    };
-    return this._refinement((val, ctx) => {
-      const result = check(val);
-      const setError = () => ctx.addIssue({
-        code: ZodIssueCode.custom,
-        ...getIssueProperties(val)
-      });
-      if (typeof Promise !== "undefined" && result instanceof Promise) {
-        return result.then((data) => {
-          if (!data) {
-            setError();
-            return false;
-          } else {
-            return true;
-          }
-        });
-      }
-      if (!result) {
-        setError();
-        return false;
-      } else {
-        return true;
-      }
-    });
-  }
-  refinement(check, refinementData) {
-    return this._refinement((val, ctx) => {
-      if (!check(val)) {
-        ctx.addIssue(typeof refinementData === "function" ? refinementData(val, ctx) : refinementData);
-        return false;
-      } else {
-        return true;
-      }
-    });
-  }
-  _refinement(refinement) {
-    return new ZodEffects({
-      schema: this,
-      typeName: ZodFirstPartyTypeKind.ZodEffects,
-      effect: { type: "refinement", refinement }
-    });
-  }
-  superRefine(refinement) {
-    return this._refinement(refinement);
-  }
-  constructor(def) {
-    this.spa = this.safeParseAsync;
-    this._def = def;
-    this.parse = this.parse.bind(this);
-    this.safeParse = this.safeParse.bind(this);
-    this.parseAsync = this.parseAsync.bind(this);
-    this.safeParseAsync = this.safeParseAsync.bind(this);
-    this.spa = this.spa.bind(this);
-    this.refine = this.refine.bind(this);
-    this.refinement = this.refinement.bind(this);
-    this.superRefine = this.superRefine.bind(this);
-    this.optional = this.optional.bind(this);
-    this.nullable = this.nullable.bind(this);
-    this.nullish = this.nullish.bind(this);
-    this.array = this.array.bind(this);
-    this.promise = this.promise.bind(this);
-    this.or = this.or.bind(this);
-    this.and = this.and.bind(this);
-    this.transform = this.transform.bind(this);
-    this.brand = this.brand.bind(this);
-    this.default = this.default.bind(this);
-    this.catch = this.catch.bind(this);
-    this.describe = this.describe.bind(this);
-    this.pipe = this.pipe.bind(this);
-    this.readonly = this.readonly.bind(this);
-    this.isNullable = this.isNullable.bind(this);
-    this.isOptional = this.isOptional.bind(this);
-    this["~standard"] = {
-      version: 1,
-      vendor: "zod",
-      validate: (data) => this["~validate"](data)
-    };
-  }
-  optional() {
-    return ZodOptional.create(this, this._def);
-  }
-  nullable() {
-    return ZodNullable.create(this, this._def);
-  }
-  nullish() {
-    return this.nullable().optional();
-  }
-  array() {
-    return ZodArray.create(this);
-  }
-  promise() {
-    return ZodPromise.create(this, this._def);
-  }
-  or(option) {
-    return ZodUnion.create([this, option], this._def);
-  }
-  and(incoming) {
-    return ZodIntersection.create(this, incoming, this._def);
-  }
-  transform(transform) {
-    return new ZodEffects({
-      ...processCreateParams(this._def),
-      schema: this,
-      typeName: ZodFirstPartyTypeKind.ZodEffects,
-      effect: { type: "transform", transform }
-    });
-  }
-  default(def) {
-    const defaultValueFunc = typeof def === "function" ? def : () => def;
-    return new ZodDefault({
-      ...processCreateParams(this._def),
-      innerType: this,
-      defaultValue: defaultValueFunc,
-      typeName: ZodFirstPartyTypeKind.ZodDefault
-    });
-  }
-  brand() {
-    return new ZodBranded({
-      typeName: ZodFirstPartyTypeKind.ZodBranded,
-      type: this,
-      ...processCreateParams(this._def)
-    });
-  }
-  catch(def) {
-    const catchValueFunc = typeof def === "function" ? def : () => def;
-    return new ZodCatch({
-      ...processCreateParams(this._def),
-      innerType: this,
-      catchValue: catchValueFunc,
-      typeName: ZodFirstPartyTypeKind.ZodCatch
-    });
-  }
-  describe(description) {
-    const This = this.constructor;
-    return new This({
-      ...this._def,
-      description
-    });
-  }
-  pipe(target) {
-    return ZodPipeline.create(this, target);
-  }
-  readonly() {
-    return ZodReadonly.create(this);
-  }
-  isOptional() {
-    return this.safeParse(void 0).success;
-  }
-  isNullable() {
-    return this.safeParse(null).success;
-  }
-};
-var cuidRegex = /^c[^\s-]{8,}$/i;
-var cuid2Regex = /^[0-9a-z]+$/;
-var ulidRegex = /^[0-9A-HJKMNP-TV-Z]{26}$/i;
-var uuidRegex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/i;
-var nanoidRegex = /^[a-z0-9_-]{21}$/i;
-var jwtRegex = /^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]*$/;
-var durationRegex = /^[-+]?P(?!$)(?:(?:[-+]?\d+Y)|(?:[-+]?\d+[.,]\d+Y$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:(?:[-+]?\d+W)|(?:[-+]?\d+[.,]\d+W$))?(?:(?:[-+]?\d+D)|(?:[-+]?\d+[.,]\d+D$))?(?:T(?=[\d+-])(?:(?:[-+]?\d+H)|(?:[-+]?\d+[.,]\d+H$))?(?:(?:[-+]?\d+M)|(?:[-+]?\d+[.,]\d+M$))?(?:[-+]?\d+(?:[.,]\d+)?S)?)??$/;
-var emailRegex = /^(?!\.)(?!.*\.\.)([A-Z0-9_'+\-\.]*)[A-Z0-9_+-]@([A-Z0-9][A-Z0-9\-]*\.)+[A-Z]{2,}$/i;
-var _emojiRegex = `^(\\p{Extended_Pictographic}|\\p{Emoji_Component})+$`;
-var emojiRegex;
-var ipv4Regex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])$/;
-var ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])\/(3[0-2]|[12]?[0-9])$/;
-var ipv6Regex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))$/;
-var ipv6CidrRegex = /^(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))\/(12[0-8]|1[01][0-9]|[1-9]?[0-9])$/;
-var base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
-var base64urlRegex = /^([0-9a-zA-Z-_]{4})*(([0-9a-zA-Z-_]{2}(==)?)|([0-9a-zA-Z-_]{3}(=)?))?$/;
-var dateRegexSource = `((\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-((0[13578]|1[02])-(0[1-9]|[12]\\d|3[01])|(0[469]|11)-(0[1-9]|[12]\\d|30)|(02)-(0[1-9]|1\\d|2[0-8])))`;
-var dateRegex = new RegExp(`^${dateRegexSource}$`);
-function timeRegexSource(args) {
-  let secondsRegexSource = `[0-5]\\d`;
-  if (args.precision) {
-    secondsRegexSource = `${secondsRegexSource}\\.\\d{${args.precision}}`;
-  } else if (args.precision == null) {
-    secondsRegexSource = `${secondsRegexSource}(\\.\\d+)?`;
-  }
-  const secondsQuantifier = args.precision ? "+" : "?";
-  return `([01]\\d|2[0-3]):[0-5]\\d(:${secondsRegexSource})${secondsQuantifier}`;
-}
-function timeRegex(args) {
-  return new RegExp(`^${timeRegexSource(args)}$`);
-}
-function datetimeRegex(args) {
-  let regex = `${dateRegexSource}T${timeRegexSource(args)}`;
-  const opts = [];
-  opts.push(args.local ? `Z?` : `Z`);
-  if (args.offset)
-    opts.push(`([+-]\\d{2}:?\\d{2})`);
-  regex = `${regex}(${opts.join("|")})`;
-  return new RegExp(`^${regex}$`);
-}
-function isValidIP(ip, version3) {
-  if ((version3 === "v4" || !version3) && ipv4Regex.test(ip)) {
-    return true;
-  }
-  if ((version3 === "v6" || !version3) && ipv6Regex.test(ip)) {
-    return true;
-  }
-  return false;
-}
-function isValidJWT(jwt, alg) {
-  if (!jwtRegex.test(jwt))
-    return false;
-  try {
-    const [header] = jwt.split(".");
-    if (!header)
-      return false;
-    const base64 = header.replace(/-/g, "+").replace(/_/g, "/").padEnd(header.length + (4 - header.length % 4) % 4, "=");
-    const decoded = JSON.parse(atob(base64));
-    if (typeof decoded !== "object" || decoded === null)
-      return false;
-    if ("typ" in decoded && decoded?.typ !== "JWT")
-      return false;
-    if (!decoded.alg)
-      return false;
-    if (alg && decoded.alg !== alg)
-      return false;
-    return true;
-  } catch {
-    return false;
-  }
-}
-function isValidCidr(ip, version3) {
-  if ((version3 === "v4" || !version3) && ipv4CidrRegex.test(ip)) {
-    return true;
-  }
-  if ((version3 === "v6" || !version3) && ipv6CidrRegex.test(ip)) {
-    return true;
-  }
-  return false;
-}
-var ZodString = class _ZodString extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = String(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.string) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.string,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    const status = new ParseStatus();
-    let ctx = void 0;
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        if (input.data.length < check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            minimum: check.value,
-            type: "string",
-            inclusive: true,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        if (input.data.length > check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            maximum: check.value,
-            type: "string",
-            inclusive: true,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "length") {
-        const tooBig = input.data.length > check.value;
-        const tooSmall = input.data.length < check.value;
-        if (tooBig || tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          if (tooBig) {
-            addIssueToContext(ctx, {
-              code: ZodIssueCode.too_big,
-              maximum: check.value,
-              type: "string",
-              inclusive: true,
-              exact: true,
-              message: check.message
-            });
-          } else if (tooSmall) {
-            addIssueToContext(ctx, {
-              code: ZodIssueCode.too_small,
-              minimum: check.value,
-              type: "string",
-              inclusive: true,
-              exact: true,
-              message: check.message
-            });
-          }
-          status.dirty();
-        }
-      } else if (check.kind === "email") {
-        if (!emailRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "email",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "emoji") {
-        if (!emojiRegex) {
-          emojiRegex = new RegExp(_emojiRegex, "u");
-        }
-        if (!emojiRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "emoji",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "uuid") {
-        if (!uuidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "uuid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "nanoid") {
-        if (!nanoidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "nanoid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cuid") {
-        if (!cuidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cuid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cuid2") {
-        if (!cuid2Regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cuid2",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "ulid") {
-        if (!ulidRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "ulid",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "url") {
-        try {
-          new URL(input.data);
-        } catch {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "url",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "regex") {
-        check.regex.lastIndex = 0;
-        const testResult = check.regex.test(input.data);
-        if (!testResult) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "regex",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "trim") {
-        input.data = input.data.trim();
-      } else if (check.kind === "includes") {
-        if (!input.data.includes(check.value, check.position)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { includes: check.value, position: check.position },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "toLowerCase") {
-        input.data = input.data.toLowerCase();
-      } else if (check.kind === "toUpperCase") {
-        input.data = input.data.toUpperCase();
-      } else if (check.kind === "startsWith") {
-        if (!input.data.startsWith(check.value)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { startsWith: check.value },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "endsWith") {
-        if (!input.data.endsWith(check.value)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: { endsWith: check.value },
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "datetime") {
-        const regex = datetimeRegex(check);
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "datetime",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "date") {
-        const regex = dateRegex;
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "date",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "time") {
-        const regex = timeRegex(check);
-        if (!regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_string,
-            validation: "time",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "duration") {
-        if (!durationRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "duration",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "ip") {
-        if (!isValidIP(input.data, check.version)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "ip",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "jwt") {
-        if (!isValidJWT(input.data, check.alg)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "jwt",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "cidr") {
-        if (!isValidCidr(input.data, check.version)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "cidr",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "base64") {
-        if (!base64Regex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "base64",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "base64url") {
-        if (!base64urlRegex.test(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            validation: "base64url",
-            code: ZodIssueCode.invalid_string,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return { status: status.value, value: input.data };
-  }
-  _regex(regex, validation, message) {
-    return this.refinement((data) => regex.test(data), {
-      validation,
-      code: ZodIssueCode.invalid_string,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  _addCheck(check) {
-    return new _ZodString({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  email(message) {
-    return this._addCheck({ kind: "email", ...errorUtil.errToObj(message) });
-  }
-  url(message) {
-    return this._addCheck({ kind: "url", ...errorUtil.errToObj(message) });
-  }
-  emoji(message) {
-    return this._addCheck({ kind: "emoji", ...errorUtil.errToObj(message) });
-  }
-  uuid(message) {
-    return this._addCheck({ kind: "uuid", ...errorUtil.errToObj(message) });
-  }
-  nanoid(message) {
-    return this._addCheck({ kind: "nanoid", ...errorUtil.errToObj(message) });
-  }
-  cuid(message) {
-    return this._addCheck({ kind: "cuid", ...errorUtil.errToObj(message) });
-  }
-  cuid2(message) {
-    return this._addCheck({ kind: "cuid2", ...errorUtil.errToObj(message) });
-  }
-  ulid(message) {
-    return this._addCheck({ kind: "ulid", ...errorUtil.errToObj(message) });
-  }
-  base64(message) {
-    return this._addCheck({ kind: "base64", ...errorUtil.errToObj(message) });
-  }
-  base64url(message) {
-    return this._addCheck({
-      kind: "base64url",
-      ...errorUtil.errToObj(message)
-    });
-  }
-  jwt(options) {
-    return this._addCheck({ kind: "jwt", ...errorUtil.errToObj(options) });
-  }
-  ip(options) {
-    return this._addCheck({ kind: "ip", ...errorUtil.errToObj(options) });
-  }
-  cidr(options) {
-    return this._addCheck({ kind: "cidr", ...errorUtil.errToObj(options) });
-  }
-  datetime(options) {
-    if (typeof options === "string") {
-      return this._addCheck({
-        kind: "datetime",
-        precision: null,
-        offset: false,
-        local: false,
-        message: options
-      });
-    }
-    return this._addCheck({
-      kind: "datetime",
-      precision: typeof options?.precision === "undefined" ? null : options?.precision,
-      offset: options?.offset ?? false,
-      local: options?.local ?? false,
-      ...errorUtil.errToObj(options?.message)
-    });
-  }
-  date(message) {
-    return this._addCheck({ kind: "date", message });
-  }
-  time(options) {
-    if (typeof options === "string") {
-      return this._addCheck({
-        kind: "time",
-        precision: null,
-        message: options
-      });
-    }
-    return this._addCheck({
-      kind: "time",
-      precision: typeof options?.precision === "undefined" ? null : options?.precision,
-      ...errorUtil.errToObj(options?.message)
-    });
-  }
-  duration(message) {
-    return this._addCheck({ kind: "duration", ...errorUtil.errToObj(message) });
-  }
-  regex(regex, message) {
-    return this._addCheck({
-      kind: "regex",
-      regex,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  includes(value, options) {
-    return this._addCheck({
-      kind: "includes",
-      value,
-      position: options?.position,
-      ...errorUtil.errToObj(options?.message)
-    });
-  }
-  startsWith(value, message) {
-    return this._addCheck({
-      kind: "startsWith",
-      value,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  endsWith(value, message) {
-    return this._addCheck({
-      kind: "endsWith",
-      value,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  min(minLength, message) {
-    return this._addCheck({
-      kind: "min",
-      value: minLength,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  max(maxLength, message) {
-    return this._addCheck({
-      kind: "max",
-      value: maxLength,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  length(len, message) {
-    return this._addCheck({
-      kind: "length",
-      value: len,
-      ...errorUtil.errToObj(message)
-    });
-  }
-  /**
-   * Equivalent to `.min(1)`
-   */
-  nonempty(message) {
-    return this.min(1, errorUtil.errToObj(message));
-  }
-  trim() {
-    return new _ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "trim" }]
-    });
-  }
-  toLowerCase() {
-    return new _ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "toLowerCase" }]
-    });
-  }
-  toUpperCase() {
-    return new _ZodString({
-      ...this._def,
-      checks: [...this._def.checks, { kind: "toUpperCase" }]
-    });
-  }
-  get isDatetime() {
-    return !!this._def.checks.find((ch) => ch.kind === "datetime");
-  }
-  get isDate() {
-    return !!this._def.checks.find((ch) => ch.kind === "date");
-  }
-  get isTime() {
-    return !!this._def.checks.find((ch) => ch.kind === "time");
-  }
-  get isDuration() {
-    return !!this._def.checks.find((ch) => ch.kind === "duration");
-  }
-  get isEmail() {
-    return !!this._def.checks.find((ch) => ch.kind === "email");
-  }
-  get isURL() {
-    return !!this._def.checks.find((ch) => ch.kind === "url");
-  }
-  get isEmoji() {
-    return !!this._def.checks.find((ch) => ch.kind === "emoji");
-  }
-  get isUUID() {
-    return !!this._def.checks.find((ch) => ch.kind === "uuid");
-  }
-  get isNANOID() {
-    return !!this._def.checks.find((ch) => ch.kind === "nanoid");
-  }
-  get isCUID() {
-    return !!this._def.checks.find((ch) => ch.kind === "cuid");
-  }
-  get isCUID2() {
-    return !!this._def.checks.find((ch) => ch.kind === "cuid2");
-  }
-  get isULID() {
-    return !!this._def.checks.find((ch) => ch.kind === "ulid");
-  }
-  get isIP() {
-    return !!this._def.checks.find((ch) => ch.kind === "ip");
-  }
-  get isCIDR() {
-    return !!this._def.checks.find((ch) => ch.kind === "cidr");
-  }
-  get isBase64() {
-    return !!this._def.checks.find((ch) => ch.kind === "base64");
-  }
-  get isBase64url() {
-    return !!this._def.checks.find((ch) => ch.kind === "base64url");
-  }
-  get minLength() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min;
-  }
-  get maxLength() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max;
-  }
-};
-ZodString.create = (params) => {
-  return new ZodString({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodString,
-    coerce: params?.coerce ?? false,
-    ...processCreateParams(params)
-  });
-};
-function floatSafeRemainder(val, step) {
-  const valDecCount = (val.toString().split(".")[1] || "").length;
-  const stepDecCount = (step.toString().split(".")[1] || "").length;
-  const decCount = valDecCount > stepDecCount ? valDecCount : stepDecCount;
-  const valInt = Number.parseInt(val.toFixed(decCount).replace(".", ""));
-  const stepInt = Number.parseInt(step.toFixed(decCount).replace(".", ""));
-  return valInt % stepInt / 10 ** decCount;
-}
-var ZodNumber = class _ZodNumber extends ZodType {
-  constructor() {
-    super(...arguments);
-    this.min = this.gte;
-    this.max = this.lte;
-    this.step = this.multipleOf;
-  }
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = Number(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.number) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.number,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    let ctx = void 0;
-    const status = new ParseStatus();
-    for (const check of this._def.checks) {
-      if (check.kind === "int") {
-        if (!util.isInteger(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.invalid_type,
-            expected: "integer",
-            received: "float",
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "min") {
-        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-        if (tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            minimum: check.value,
-            type: "number",
-            inclusive: check.inclusive,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-        if (tooBig) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            maximum: check.value,
-            type: "number",
-            inclusive: check.inclusive,
-            exact: false,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "multipleOf") {
-        if (floatSafeRemainder(input.data, check.value) !== 0) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_multiple_of,
-            multipleOf: check.value,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "finite") {
-        if (!Number.isFinite(input.data)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_finite,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return { status: status.value, value: input.data };
-  }
-  gte(value, message) {
-    return this.setLimit("min", value, true, errorUtil.toString(message));
-  }
-  gt(value, message) {
-    return this.setLimit("min", value, false, errorUtil.toString(message));
-  }
-  lte(value, message) {
-    return this.setLimit("max", value, true, errorUtil.toString(message));
-  }
-  lt(value, message) {
-    return this.setLimit("max", value, false, errorUtil.toString(message));
-  }
-  setLimit(kind, value, inclusive, message) {
-    return new _ZodNumber({
-      ...this._def,
-      checks: [
-        ...this._def.checks,
-        {
-          kind,
-          value,
-          inclusive,
-          message: errorUtil.toString(message)
-        }
-      ]
-    });
-  }
-  _addCheck(check) {
-    return new _ZodNumber({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  int(message) {
-    return this._addCheck({
-      kind: "int",
-      message: errorUtil.toString(message)
-    });
-  }
-  positive(message) {
-    return this._addCheck({
-      kind: "min",
-      value: 0,
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  negative(message) {
-    return this._addCheck({
-      kind: "max",
-      value: 0,
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonpositive(message) {
-    return this._addCheck({
-      kind: "max",
-      value: 0,
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonnegative(message) {
-    return this._addCheck({
-      kind: "min",
-      value: 0,
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  multipleOf(value, message) {
-    return this._addCheck({
-      kind: "multipleOf",
-      value,
-      message: errorUtil.toString(message)
-    });
-  }
-  finite(message) {
-    return this._addCheck({
-      kind: "finite",
-      message: errorUtil.toString(message)
-    });
-  }
-  safe(message) {
-    return this._addCheck({
-      kind: "min",
-      inclusive: true,
-      value: Number.MIN_SAFE_INTEGER,
-      message: errorUtil.toString(message)
-    })._addCheck({
-      kind: "max",
-      inclusive: true,
-      value: Number.MAX_SAFE_INTEGER,
-      message: errorUtil.toString(message)
-    });
-  }
-  get minValue() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min;
-  }
-  get maxValue() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max;
-  }
-  get isInt() {
-    return !!this._def.checks.find((ch) => ch.kind === "int" || ch.kind === "multipleOf" && util.isInteger(ch.value));
-  }
-  get isFinite() {
-    let max = null;
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "finite" || ch.kind === "int" || ch.kind === "multipleOf") {
-        return true;
-      } else if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      } else if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return Number.isFinite(min) && Number.isFinite(max);
-  }
-};
-ZodNumber.create = (params) => {
-  return new ZodNumber({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodNumber,
-    coerce: params?.coerce || false,
-    ...processCreateParams(params)
-  });
-};
-var ZodBigInt = class _ZodBigInt extends ZodType {
-  constructor() {
-    super(...arguments);
-    this.min = this.gte;
-    this.max = this.lte;
-  }
-  _parse(input) {
-    if (this._def.coerce) {
-      try {
-        input.data = BigInt(input.data);
-      } catch {
-        return this._getInvalidInput(input);
-      }
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.bigint) {
-      return this._getInvalidInput(input);
-    }
-    let ctx = void 0;
-    const status = new ParseStatus();
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        const tooSmall = check.inclusive ? input.data < check.value : input.data <= check.value;
-        if (tooSmall) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            type: "bigint",
-            minimum: check.value,
-            inclusive: check.inclusive,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        const tooBig = check.inclusive ? input.data > check.value : input.data >= check.value;
-        if (tooBig) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            type: "bigint",
-            maximum: check.value,
-            inclusive: check.inclusive,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "multipleOf") {
-        if (input.data % check.value !== BigInt(0)) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.not_multiple_of,
-            multipleOf: check.value,
-            message: check.message
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return { status: status.value, value: input.data };
-  }
-  _getInvalidInput(input) {
-    const ctx = this._getOrReturnCtx(input);
-    addIssueToContext(ctx, {
-      code: ZodIssueCode.invalid_type,
-      expected: ZodParsedType.bigint,
-      received: ctx.parsedType
-    });
-    return INVALID;
-  }
-  gte(value, message) {
-    return this.setLimit("min", value, true, errorUtil.toString(message));
-  }
-  gt(value, message) {
-    return this.setLimit("min", value, false, errorUtil.toString(message));
-  }
-  lte(value, message) {
-    return this.setLimit("max", value, true, errorUtil.toString(message));
-  }
-  lt(value, message) {
-    return this.setLimit("max", value, false, errorUtil.toString(message));
-  }
-  setLimit(kind, value, inclusive, message) {
-    return new _ZodBigInt({
-      ...this._def,
-      checks: [
-        ...this._def.checks,
-        {
-          kind,
-          value,
-          inclusive,
-          message: errorUtil.toString(message)
-        }
-      ]
-    });
-  }
-  _addCheck(check) {
-    return new _ZodBigInt({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  positive(message) {
-    return this._addCheck({
-      kind: "min",
-      value: BigInt(0),
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  negative(message) {
-    return this._addCheck({
-      kind: "max",
-      value: BigInt(0),
-      inclusive: false,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonpositive(message) {
-    return this._addCheck({
-      kind: "max",
-      value: BigInt(0),
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  nonnegative(message) {
-    return this._addCheck({
-      kind: "min",
-      value: BigInt(0),
-      inclusive: true,
-      message: errorUtil.toString(message)
-    });
-  }
-  multipleOf(value, message) {
-    return this._addCheck({
-      kind: "multipleOf",
-      value,
-      message: errorUtil.toString(message)
-    });
-  }
-  get minValue() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min;
-  }
-  get maxValue() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max;
-  }
-};
-ZodBigInt.create = (params) => {
-  return new ZodBigInt({
-    checks: [],
-    typeName: ZodFirstPartyTypeKind.ZodBigInt,
-    coerce: params?.coerce ?? false,
-    ...processCreateParams(params)
-  });
-};
-var ZodBoolean = class extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = Boolean(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.boolean) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.boolean,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-};
-ZodBoolean.create = (params) => {
-  return new ZodBoolean({
-    typeName: ZodFirstPartyTypeKind.ZodBoolean,
-    coerce: params?.coerce || false,
-    ...processCreateParams(params)
-  });
-};
-var ZodDate = class _ZodDate extends ZodType {
-  _parse(input) {
-    if (this._def.coerce) {
-      input.data = new Date(input.data);
-    }
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.date) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.date,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    if (Number.isNaN(input.data.getTime())) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_date
-      });
-      return INVALID;
-    }
-    const status = new ParseStatus();
-    let ctx = void 0;
-    for (const check of this._def.checks) {
-      if (check.kind === "min") {
-        if (input.data.getTime() < check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_small,
-            message: check.message,
-            inclusive: true,
-            exact: false,
-            minimum: check.value,
-            type: "date"
-          });
-          status.dirty();
-        }
-      } else if (check.kind === "max") {
-        if (input.data.getTime() > check.value) {
-          ctx = this._getOrReturnCtx(input, ctx);
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.too_big,
-            message: check.message,
-            inclusive: true,
-            exact: false,
-            maximum: check.value,
-            type: "date"
-          });
-          status.dirty();
-        }
-      } else {
-        util.assertNever(check);
-      }
-    }
-    return {
-      status: status.value,
-      value: new Date(input.data.getTime())
-    };
-  }
-  _addCheck(check) {
-    return new _ZodDate({
-      ...this._def,
-      checks: [...this._def.checks, check]
-    });
-  }
-  min(minDate, message) {
-    return this._addCheck({
-      kind: "min",
-      value: minDate.getTime(),
-      message: errorUtil.toString(message)
-    });
-  }
-  max(maxDate, message) {
-    return this._addCheck({
-      kind: "max",
-      value: maxDate.getTime(),
-      message: errorUtil.toString(message)
-    });
-  }
-  get minDate() {
-    let min = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "min") {
-        if (min === null || ch.value > min)
-          min = ch.value;
-      }
-    }
-    return min != null ? new Date(min) : null;
-  }
-  get maxDate() {
-    let max = null;
-    for (const ch of this._def.checks) {
-      if (ch.kind === "max") {
-        if (max === null || ch.value < max)
-          max = ch.value;
-      }
-    }
-    return max != null ? new Date(max) : null;
-  }
-};
-ZodDate.create = (params) => {
-  return new ZodDate({
-    checks: [],
-    coerce: params?.coerce || false,
-    typeName: ZodFirstPartyTypeKind.ZodDate,
-    ...processCreateParams(params)
-  });
-};
-var ZodSymbol = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.symbol) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.symbol,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-};
-ZodSymbol.create = (params) => {
-  return new ZodSymbol({
-    typeName: ZodFirstPartyTypeKind.ZodSymbol,
-    ...processCreateParams(params)
-  });
-};
-var ZodUndefined = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.undefined) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.undefined,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-};
-ZodUndefined.create = (params) => {
-  return new ZodUndefined({
-    typeName: ZodFirstPartyTypeKind.ZodUndefined,
-    ...processCreateParams(params)
-  });
-};
-var ZodNull = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.null) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.null,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-};
-ZodNull.create = (params) => {
-  return new ZodNull({
-    typeName: ZodFirstPartyTypeKind.ZodNull,
-    ...processCreateParams(params)
-  });
-};
-var ZodAny = class extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._any = true;
-  }
-  _parse(input) {
-    return OK(input.data);
-  }
-};
-ZodAny.create = (params) => {
-  return new ZodAny({
-    typeName: ZodFirstPartyTypeKind.ZodAny,
-    ...processCreateParams(params)
-  });
-};
-var ZodUnknown = class extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._unknown = true;
-  }
-  _parse(input) {
-    return OK(input.data);
-  }
-};
-ZodUnknown.create = (params) => {
-  return new ZodUnknown({
-    typeName: ZodFirstPartyTypeKind.ZodUnknown,
-    ...processCreateParams(params)
-  });
-};
-var ZodNever = class extends ZodType {
-  _parse(input) {
-    const ctx = this._getOrReturnCtx(input);
-    addIssueToContext(ctx, {
-      code: ZodIssueCode.invalid_type,
-      expected: ZodParsedType.never,
-      received: ctx.parsedType
-    });
-    return INVALID;
-  }
-};
-ZodNever.create = (params) => {
-  return new ZodNever({
-    typeName: ZodFirstPartyTypeKind.ZodNever,
-    ...processCreateParams(params)
-  });
-};
-var ZodVoid = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.undefined) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.void,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-};
-ZodVoid.create = (params) => {
-  return new ZodVoid({
-    typeName: ZodFirstPartyTypeKind.ZodVoid,
-    ...processCreateParams(params)
-  });
-};
-var ZodArray = class _ZodArray extends ZodType {
-  _parse(input) {
-    const { ctx, status } = this._processInputParams(input);
-    const def = this._def;
-    if (ctx.parsedType !== ZodParsedType.array) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.array,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    if (def.exactLength !== null) {
-      const tooBig = ctx.data.length > def.exactLength.value;
-      const tooSmall = ctx.data.length < def.exactLength.value;
-      if (tooBig || tooSmall) {
-        addIssueToContext(ctx, {
-          code: tooBig ? ZodIssueCode.too_big : ZodIssueCode.too_small,
-          minimum: tooSmall ? def.exactLength.value : void 0,
-          maximum: tooBig ? def.exactLength.value : void 0,
-          type: "array",
-          inclusive: true,
-          exact: true,
-          message: def.exactLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (def.minLength !== null) {
-      if (ctx.data.length < def.minLength.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_small,
-          minimum: def.minLength.value,
-          type: "array",
-          inclusive: true,
-          exact: false,
-          message: def.minLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (def.maxLength !== null) {
-      if (ctx.data.length > def.maxLength.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_big,
-          maximum: def.maxLength.value,
-          type: "array",
-          inclusive: true,
-          exact: false,
-          message: def.maxLength.message
-        });
-        status.dirty();
-      }
-    }
-    if (ctx.common.async) {
-      return Promise.all([...ctx.data].map((item, i) => {
-        return def.type._parseAsync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-      })).then((result2) => {
-        return ParseStatus.mergeArray(status, result2);
-      });
-    }
-    const result = [...ctx.data].map((item, i) => {
-      return def.type._parseSync(new ParseInputLazyPath(ctx, item, ctx.path, i));
-    });
-    return ParseStatus.mergeArray(status, result);
-  }
-  get element() {
-    return this._def.type;
-  }
-  min(minLength, message) {
-    return new _ZodArray({
-      ...this._def,
-      minLength: { value: minLength, message: errorUtil.toString(message) }
-    });
-  }
-  max(maxLength, message) {
-    return new _ZodArray({
-      ...this._def,
-      maxLength: { value: maxLength, message: errorUtil.toString(message) }
-    });
-  }
-  length(len, message) {
-    return new _ZodArray({
-      ...this._def,
-      exactLength: { value: len, message: errorUtil.toString(message) }
-    });
-  }
-  nonempty(message) {
-    return this.min(1, message);
-  }
-};
-ZodArray.create = (schema, params) => {
-  return new ZodArray({
-    type: schema,
-    minLength: null,
-    maxLength: null,
-    exactLength: null,
-    typeName: ZodFirstPartyTypeKind.ZodArray,
-    ...processCreateParams(params)
-  });
-};
-function deepPartialify(schema) {
-  if (schema instanceof ZodObject) {
-    const newShape = {};
-    for (const key in schema.shape) {
-      const fieldSchema = schema.shape[key];
-      newShape[key] = ZodOptional.create(deepPartialify(fieldSchema));
-    }
-    return new ZodObject({
-      ...schema._def,
-      shape: () => newShape
-    });
-  } else if (schema instanceof ZodArray) {
-    return new ZodArray({
-      ...schema._def,
-      type: deepPartialify(schema.element)
-    });
-  } else if (schema instanceof ZodOptional) {
-    return ZodOptional.create(deepPartialify(schema.unwrap()));
-  } else if (schema instanceof ZodNullable) {
-    return ZodNullable.create(deepPartialify(schema.unwrap()));
-  } else if (schema instanceof ZodTuple) {
-    return ZodTuple.create(schema.items.map((item) => deepPartialify(item)));
-  } else {
-    return schema;
-  }
-}
-var ZodObject = class _ZodObject extends ZodType {
-  constructor() {
-    super(...arguments);
-    this._cached = null;
-    this.nonstrict = this.passthrough;
-    this.augment = this.extend;
-  }
-  _getCached() {
-    if (this._cached !== null)
-      return this._cached;
-    const shape = this._def.shape();
-    const keys = util.objectKeys(shape);
-    this._cached = { shape, keys };
-    return this._cached;
-  }
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.object) {
-      const ctx2 = this._getOrReturnCtx(input);
-      addIssueToContext(ctx2, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx2.parsedType
-      });
-      return INVALID;
-    }
-    const { status, ctx } = this._processInputParams(input);
-    const { shape, keys: shapeKeys } = this._getCached();
-    const extraKeys = [];
-    if (!(this._def.catchall instanceof ZodNever && this._def.unknownKeys === "strip")) {
-      for (const key in ctx.data) {
-        if (!shapeKeys.includes(key)) {
-          extraKeys.push(key);
-        }
-      }
-    }
-    const pairs = [];
-    for (const key of shapeKeys) {
-      const keyValidator = shape[key];
-      const value = ctx.data[key];
-      pairs.push({
-        key: { status: "valid", value: key },
-        value: keyValidator._parse(new ParseInputLazyPath(ctx, value, ctx.path, key)),
-        alwaysSet: key in ctx.data
-      });
-    }
-    if (this._def.catchall instanceof ZodNever) {
-      const unknownKeys = this._def.unknownKeys;
-      if (unknownKeys === "passthrough") {
-        for (const key of extraKeys) {
-          pairs.push({
-            key: { status: "valid", value: key },
-            value: { status: "valid", value: ctx.data[key] }
-          });
-        }
-      } else if (unknownKeys === "strict") {
-        if (extraKeys.length > 0) {
-          addIssueToContext(ctx, {
-            code: ZodIssueCode.unrecognized_keys,
-            keys: extraKeys
-          });
-          status.dirty();
-        }
-      } else if (unknownKeys === "strip") {
-      } else {
-        throw new Error(`Internal ZodObject error: invalid unknownKeys value.`);
-      }
-    } else {
-      const catchall = this._def.catchall;
-      for (const key of extraKeys) {
-        const value = ctx.data[key];
-        pairs.push({
-          key: { status: "valid", value: key },
-          value: catchall._parse(
-            new ParseInputLazyPath(ctx, value, ctx.path, key)
-            //, ctx.child(key), value, getParsedType(value)
-          ),
-          alwaysSet: key in ctx.data
-        });
-      }
-    }
-    if (ctx.common.async) {
-      return Promise.resolve().then(async () => {
-        const syncPairs = [];
-        for (const pair of pairs) {
-          const key = await pair.key;
-          const value = await pair.value;
-          syncPairs.push({
-            key,
-            value,
-            alwaysSet: pair.alwaysSet
-          });
-        }
-        return syncPairs;
-      }).then((syncPairs) => {
-        return ParseStatus.mergeObjectSync(status, syncPairs);
-      });
-    } else {
-      return ParseStatus.mergeObjectSync(status, pairs);
-    }
-  }
-  get shape() {
-    return this._def.shape();
-  }
-  strict(message) {
-    errorUtil.errToObj;
-    return new _ZodObject({
-      ...this._def,
-      unknownKeys: "strict",
-      ...message !== void 0 ? {
-        errorMap: (issue, ctx) => {
-          const defaultError = this._def.errorMap?.(issue, ctx).message ?? ctx.defaultError;
-          if (issue.code === "unrecognized_keys")
-            return {
-              message: errorUtil.errToObj(message).message ?? defaultError
-            };
-          return {
-            message: defaultError
-          };
-        }
-      } : {}
-    });
-  }
-  strip() {
-    return new _ZodObject({
-      ...this._def,
-      unknownKeys: "strip"
-    });
-  }
-  passthrough() {
-    return new _ZodObject({
-      ...this._def,
-      unknownKeys: "passthrough"
-    });
-  }
-  // const AugmentFactory =
-  //   <Def extends ZodObjectDef>(def: Def) =>
-  //   <Augmentation extends ZodRawShape>(
-  //     augmentation: Augmentation
-  //   ): ZodObject<
-  //     extendShape<ReturnType<Def["shape"]>, Augmentation>,
-  //     Def["unknownKeys"],
-  //     Def["catchall"]
-  //   > => {
-  //     return new ZodObject({
-  //       ...def,
-  //       shape: () => ({
-  //         ...def.shape(),
-  //         ...augmentation,
-  //       }),
-  //     }) as any;
-  //   };
-  extend(augmentation) {
-    return new _ZodObject({
-      ...this._def,
-      shape: () => ({
-        ...this._def.shape(),
-        ...augmentation
-      })
-    });
-  }
-  /**
-   * Prior to zod@1.0.12 there was a bug in the
-   * inferred type of merged objects. Please
-   * upgrade if you are experiencing issues.
-   */
-  merge(merging) {
-    const merged = new _ZodObject({
-      unknownKeys: merging._def.unknownKeys,
-      catchall: merging._def.catchall,
-      shape: () => ({
-        ...this._def.shape(),
-        ...merging._def.shape()
-      }),
-      typeName: ZodFirstPartyTypeKind.ZodObject
-    });
-    return merged;
-  }
-  // merge<
-  //   Incoming extends AnyZodObject,
-  //   Augmentation extends Incoming["shape"],
-  //   NewOutput extends {
-  //     [k in keyof Augmentation | keyof Output]: k extends keyof Augmentation
-  //       ? Augmentation[k]["_output"]
-  //       : k extends keyof Output
-  //       ? Output[k]
-  //       : never;
-  //   },
-  //   NewInput extends {
-  //     [k in keyof Augmentation | keyof Input]: k extends keyof Augmentation
-  //       ? Augmentation[k]["_input"]
-  //       : k extends keyof Input
-  //       ? Input[k]
-  //       : never;
-  //   }
-  // >(
-  //   merging: Incoming
-  // ): ZodObject<
-  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-  //   Incoming["_def"]["unknownKeys"],
-  //   Incoming["_def"]["catchall"],
-  //   NewOutput,
-  //   NewInput
-  // > {
-  //   const merged: any = new ZodObject({
-  //     unknownKeys: merging._def.unknownKeys,
-  //     catchall: merging._def.catchall,
-  //     shape: () =>
-  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-  //     typeName: ZodFirstPartyTypeKind.ZodObject,
-  //   }) as any;
-  //   return merged;
-  // }
-  setKey(key, schema) {
-    return this.augment({ [key]: schema });
-  }
-  // merge<Incoming extends AnyZodObject>(
-  //   merging: Incoming
-  // ): //ZodObject<T & Incoming["_shape"], UnknownKeys, Catchall> = (merging) => {
-  // ZodObject<
-  //   extendShape<T, ReturnType<Incoming["_def"]["shape"]>>,
-  //   Incoming["_def"]["unknownKeys"],
-  //   Incoming["_def"]["catchall"]
-  // > {
-  //   // const mergedShape = objectUtil.mergeShapes(
-  //   //   this._def.shape(),
-  //   //   merging._def.shape()
-  //   // );
-  //   const merged: any = new ZodObject({
-  //     unknownKeys: merging._def.unknownKeys,
-  //     catchall: merging._def.catchall,
-  //     shape: () =>
-  //       objectUtil.mergeShapes(this._def.shape(), merging._def.shape()),
-  //     typeName: ZodFirstPartyTypeKind.ZodObject,
-  //   }) as any;
-  //   return merged;
-  // }
-  catchall(index) {
-    return new _ZodObject({
-      ...this._def,
-      catchall: index
-    });
-  }
-  pick(mask) {
-    const shape = {};
-    for (const key of util.objectKeys(mask)) {
-      if (mask[key] && this.shape[key]) {
-        shape[key] = this.shape[key];
-      }
-    }
-    return new _ZodObject({
-      ...this._def,
-      shape: () => shape
-    });
-  }
-  omit(mask) {
-    const shape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      if (!mask[key]) {
-        shape[key] = this.shape[key];
-      }
-    }
-    return new _ZodObject({
-      ...this._def,
-      shape: () => shape
-    });
-  }
-  /**
-   * @deprecated
-   */
-  deepPartial() {
-    return deepPartialify(this);
-  }
-  partial(mask) {
-    const newShape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      const fieldSchema = this.shape[key];
-      if (mask && !mask[key]) {
-        newShape[key] = fieldSchema;
-      } else {
-        newShape[key] = fieldSchema.optional();
-      }
-    }
-    return new _ZodObject({
-      ...this._def,
-      shape: () => newShape
-    });
-  }
-  required(mask) {
-    const newShape = {};
-    for (const key of util.objectKeys(this.shape)) {
-      if (mask && !mask[key]) {
-        newShape[key] = this.shape[key];
-      } else {
-        const fieldSchema = this.shape[key];
-        let newField = fieldSchema;
-        while (newField instanceof ZodOptional) {
-          newField = newField._def.innerType;
-        }
-        newShape[key] = newField;
-      }
-    }
-    return new _ZodObject({
-      ...this._def,
-      shape: () => newShape
-    });
-  }
-  keyof() {
-    return createZodEnum(util.objectKeys(this.shape));
-  }
-};
-ZodObject.create = (shape, params) => {
-  return new ZodObject({
-    shape: () => shape,
-    unknownKeys: "strip",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-ZodObject.strictCreate = (shape, params) => {
-  return new ZodObject({
-    shape: () => shape,
-    unknownKeys: "strict",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-ZodObject.lazycreate = (shape, params) => {
-  return new ZodObject({
-    shape,
-    unknownKeys: "strip",
-    catchall: ZodNever.create(),
-    typeName: ZodFirstPartyTypeKind.ZodObject,
-    ...processCreateParams(params)
-  });
-};
-var ZodUnion = class extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const options = this._def.options;
-    function handleResults(results) {
-      for (const result of results) {
-        if (result.result.status === "valid") {
-          return result.result;
-        }
-      }
-      for (const result of results) {
-        if (result.result.status === "dirty") {
-          ctx.common.issues.push(...result.ctx.common.issues);
-          return result.result;
-        }
-      }
-      const unionErrors = results.map((result) => new ZodError(result.ctx.common.issues));
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_union,
-        unionErrors
-      });
-      return INVALID;
-    }
-    if (ctx.common.async) {
-      return Promise.all(options.map(async (option) => {
-        const childCtx = {
-          ...ctx,
-          common: {
-            ...ctx.common,
-            issues: []
-          },
-          parent: null
-        };
-        return {
-          result: await option._parseAsync({
-            data: ctx.data,
-            path: ctx.path,
-            parent: childCtx
-          }),
-          ctx: childCtx
-        };
-      })).then(handleResults);
-    } else {
-      let dirty = void 0;
-      const issues = [];
-      for (const option of options) {
-        const childCtx = {
-          ...ctx,
-          common: {
-            ...ctx.common,
-            issues: []
-          },
-          parent: null
-        };
-        const result = option._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: childCtx
-        });
-        if (result.status === "valid") {
-          return result;
-        } else if (result.status === "dirty" && !dirty) {
-          dirty = { result, ctx: childCtx };
-        }
-        if (childCtx.common.issues.length) {
-          issues.push(childCtx.common.issues);
-        }
-      }
-      if (dirty) {
-        ctx.common.issues.push(...dirty.ctx.common.issues);
-        return dirty.result;
-      }
-      const unionErrors = issues.map((issues2) => new ZodError(issues2));
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_union,
-        unionErrors
-      });
-      return INVALID;
-    }
-  }
-  get options() {
-    return this._def.options;
-  }
-};
-ZodUnion.create = (types, params) => {
-  return new ZodUnion({
-    options: types,
-    typeName: ZodFirstPartyTypeKind.ZodUnion,
-    ...processCreateParams(params)
-  });
-};
-var getDiscriminator = (type) => {
-  if (type instanceof ZodLazy) {
-    return getDiscriminator(type.schema);
-  } else if (type instanceof ZodEffects) {
-    return getDiscriminator(type.innerType());
-  } else if (type instanceof ZodLiteral) {
-    return [type.value];
-  } else if (type instanceof ZodEnum) {
-    return type.options;
-  } else if (type instanceof ZodNativeEnum) {
-    return util.objectValues(type.enum);
-  } else if (type instanceof ZodDefault) {
-    return getDiscriminator(type._def.innerType);
-  } else if (type instanceof ZodUndefined) {
-    return [void 0];
-  } else if (type instanceof ZodNull) {
-    return [null];
-  } else if (type instanceof ZodOptional) {
-    return [void 0, ...getDiscriminator(type.unwrap())];
-  } else if (type instanceof ZodNullable) {
-    return [null, ...getDiscriminator(type.unwrap())];
-  } else if (type instanceof ZodBranded) {
-    return getDiscriminator(type.unwrap());
-  } else if (type instanceof ZodReadonly) {
-    return getDiscriminator(type.unwrap());
-  } else if (type instanceof ZodCatch) {
-    return getDiscriminator(type._def.innerType);
-  } else {
-    return [];
-  }
-};
-var ZodDiscriminatedUnion = class _ZodDiscriminatedUnion extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.object) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const discriminator = this.discriminator;
-    const discriminatorValue = ctx.data[discriminator];
-    const option = this.optionsMap.get(discriminatorValue);
-    if (!option) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_union_discriminator,
-        options: Array.from(this.optionsMap.keys()),
-        path: [discriminator]
-      });
-      return INVALID;
-    }
-    if (ctx.common.async) {
-      return option._parseAsync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      });
-    } else {
-      return option._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      });
-    }
-  }
-  get discriminator() {
-    return this._def.discriminator;
-  }
-  get options() {
-    return this._def.options;
-  }
-  get optionsMap() {
-    return this._def.optionsMap;
-  }
-  /**
-   * The constructor of the discriminated union schema. Its behaviour is very similar to that of the normal z.union() constructor.
-   * However, it only allows a union of objects, all of which need to share a discriminator property. This property must
-   * have a different value for each object in the union.
-   * @param discriminator the name of the discriminator property
-   * @param types an array of object schemas
-   * @param params
-   */
-  static create(discriminator, options, params) {
-    const optionsMap = /* @__PURE__ */ new Map();
-    for (const type of options) {
-      const discriminatorValues = getDiscriminator(type.shape[discriminator]);
-      if (!discriminatorValues.length) {
-        throw new Error(`A discriminator value for key \`${discriminator}\` could not be extracted from all schema options`);
-      }
-      for (const value of discriminatorValues) {
-        if (optionsMap.has(value)) {
-          throw new Error(`Discriminator property ${String(discriminator)} has duplicate value ${String(value)}`);
-        }
-        optionsMap.set(value, type);
-      }
-    }
-    return new _ZodDiscriminatedUnion({
-      typeName: ZodFirstPartyTypeKind.ZodDiscriminatedUnion,
-      discriminator,
-      options,
-      optionsMap,
-      ...processCreateParams(params)
-    });
-  }
-};
-function mergeValues(a, b) {
-  const aType = getParsedType(a);
-  const bType = getParsedType(b);
-  if (a === b) {
-    return { valid: true, data: a };
-  } else if (aType === ZodParsedType.object && bType === ZodParsedType.object) {
-    const bKeys = util.objectKeys(b);
-    const sharedKeys = util.objectKeys(a).filter((key) => bKeys.indexOf(key) !== -1);
-    const newObj = { ...a, ...b };
-    for (const key of sharedKeys) {
-      const sharedValue = mergeValues(a[key], b[key]);
-      if (!sharedValue.valid) {
-        return { valid: false };
-      }
-      newObj[key] = sharedValue.data;
-    }
-    return { valid: true, data: newObj };
-  } else if (aType === ZodParsedType.array && bType === ZodParsedType.array) {
-    if (a.length !== b.length) {
-      return { valid: false };
-    }
-    const newArray = [];
-    for (let index = 0; index < a.length; index++) {
-      const itemA = a[index];
-      const itemB = b[index];
-      const sharedValue = mergeValues(itemA, itemB);
-      if (!sharedValue.valid) {
-        return { valid: false };
-      }
-      newArray.push(sharedValue.data);
-    }
-    return { valid: true, data: newArray };
-  } else if (aType === ZodParsedType.date && bType === ZodParsedType.date && +a === +b) {
-    return { valid: true, data: a };
-  } else {
-    return { valid: false };
-  }
-}
-var ZodIntersection = class extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    const handleParsed = (parsedLeft, parsedRight) => {
-      if (isAborted(parsedLeft) || isAborted(parsedRight)) {
-        return INVALID;
-      }
-      const merged = mergeValues(parsedLeft.value, parsedRight.value);
-      if (!merged.valid) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.invalid_intersection_types
-        });
-        return INVALID;
-      }
-      if (isDirty(parsedLeft) || isDirty(parsedRight)) {
-        status.dirty();
-      }
-      return { status: status.value, value: merged.data };
-    };
-    if (ctx.common.async) {
-      return Promise.all([
-        this._def.left._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        }),
-        this._def.right._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        })
-      ]).then(([left, right]) => handleParsed(left, right));
-    } else {
-      return handleParsed(this._def.left._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      }), this._def.right._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      }));
-    }
-  }
-};
-ZodIntersection.create = (left, right, params) => {
-  return new ZodIntersection({
-    left,
-    right,
-    typeName: ZodFirstPartyTypeKind.ZodIntersection,
-    ...processCreateParams(params)
-  });
-};
-var ZodTuple = class _ZodTuple extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.array) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.array,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    if (ctx.data.length < this._def.items.length) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.too_small,
-        minimum: this._def.items.length,
-        inclusive: true,
-        exact: false,
-        type: "array"
-      });
-      return INVALID;
-    }
-    const rest = this._def.rest;
-    if (!rest && ctx.data.length > this._def.items.length) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.too_big,
-        maximum: this._def.items.length,
-        inclusive: true,
-        exact: false,
-        type: "array"
-      });
-      status.dirty();
-    }
-    const items = [...ctx.data].map((item, itemIndex) => {
-      const schema = this._def.items[itemIndex] || this._def.rest;
-      if (!schema)
-        return null;
-      return schema._parse(new ParseInputLazyPath(ctx, item, ctx.path, itemIndex));
-    }).filter((x) => !!x);
-    if (ctx.common.async) {
-      return Promise.all(items).then((results) => {
-        return ParseStatus.mergeArray(status, results);
-      });
-    } else {
-      return ParseStatus.mergeArray(status, items);
-    }
-  }
-  get items() {
-    return this._def.items;
-  }
-  rest(rest) {
-    return new _ZodTuple({
-      ...this._def,
-      rest
-    });
-  }
-};
-ZodTuple.create = (schemas, params) => {
-  if (!Array.isArray(schemas)) {
-    throw new Error("You must pass an array of schemas to z.tuple([ ... ])");
-  }
-  return new ZodTuple({
-    items: schemas,
-    typeName: ZodFirstPartyTypeKind.ZodTuple,
-    rest: null,
-    ...processCreateParams(params)
-  });
-};
-var ZodRecord = class _ZodRecord extends ZodType {
-  get keySchema() {
-    return this._def.keyType;
-  }
-  get valueSchema() {
-    return this._def.valueType;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.object) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.object,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const pairs = [];
-    const keyType = this._def.keyType;
-    const valueType = this._def.valueType;
-    for (const key in ctx.data) {
-      pairs.push({
-        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, key)),
-        value: valueType._parse(new ParseInputLazyPath(ctx, ctx.data[key], ctx.path, key)),
-        alwaysSet: key in ctx.data
-      });
-    }
-    if (ctx.common.async) {
-      return ParseStatus.mergeObjectAsync(status, pairs);
-    } else {
-      return ParseStatus.mergeObjectSync(status, pairs);
-    }
-  }
-  get element() {
-    return this._def.valueType;
-  }
-  static create(first, second, third) {
-    if (second instanceof ZodType) {
-      return new _ZodRecord({
-        keyType: first,
-        valueType: second,
-        typeName: ZodFirstPartyTypeKind.ZodRecord,
-        ...processCreateParams(third)
-      });
-    }
-    return new _ZodRecord({
-      keyType: ZodString.create(),
-      valueType: first,
-      typeName: ZodFirstPartyTypeKind.ZodRecord,
-      ...processCreateParams(second)
-    });
-  }
-};
-var ZodMap = class extends ZodType {
-  get keySchema() {
-    return this._def.keyType;
-  }
-  get valueSchema() {
-    return this._def.valueType;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.map) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.map,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const keyType = this._def.keyType;
-    const valueType = this._def.valueType;
-    const pairs = [...ctx.data.entries()].map(([key, value], index) => {
-      return {
-        key: keyType._parse(new ParseInputLazyPath(ctx, key, ctx.path, [index, "key"])),
-        value: valueType._parse(new ParseInputLazyPath(ctx, value, ctx.path, [index, "value"]))
-      };
-    });
-    if (ctx.common.async) {
-      const finalMap = /* @__PURE__ */ new Map();
-      return Promise.resolve().then(async () => {
-        for (const pair of pairs) {
-          const key = await pair.key;
-          const value = await pair.value;
-          if (key.status === "aborted" || value.status === "aborted") {
-            return INVALID;
-          }
-          if (key.status === "dirty" || value.status === "dirty") {
-            status.dirty();
-          }
-          finalMap.set(key.value, value.value);
-        }
-        return { status: status.value, value: finalMap };
-      });
-    } else {
-      const finalMap = /* @__PURE__ */ new Map();
-      for (const pair of pairs) {
-        const key = pair.key;
-        const value = pair.value;
-        if (key.status === "aborted" || value.status === "aborted") {
-          return INVALID;
-        }
-        if (key.status === "dirty" || value.status === "dirty") {
-          status.dirty();
-        }
-        finalMap.set(key.value, value.value);
-      }
-      return { status: status.value, value: finalMap };
-    }
-  }
-};
-ZodMap.create = (keyType, valueType, params) => {
-  return new ZodMap({
-    valueType,
-    keyType,
-    typeName: ZodFirstPartyTypeKind.ZodMap,
-    ...processCreateParams(params)
-  });
-};
-var ZodSet = class _ZodSet extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.set) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.set,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const def = this._def;
-    if (def.minSize !== null) {
-      if (ctx.data.size < def.minSize.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_small,
-          minimum: def.minSize.value,
-          type: "set",
-          inclusive: true,
-          exact: false,
-          message: def.minSize.message
-        });
-        status.dirty();
-      }
-    }
-    if (def.maxSize !== null) {
-      if (ctx.data.size > def.maxSize.value) {
-        addIssueToContext(ctx, {
-          code: ZodIssueCode.too_big,
-          maximum: def.maxSize.value,
-          type: "set",
-          inclusive: true,
-          exact: false,
-          message: def.maxSize.message
-        });
-        status.dirty();
-      }
-    }
-    const valueType = this._def.valueType;
-    function finalizeSet(elements2) {
-      const parsedSet = /* @__PURE__ */ new Set();
-      for (const element of elements2) {
-        if (element.status === "aborted")
-          return INVALID;
-        if (element.status === "dirty")
-          status.dirty();
-        parsedSet.add(element.value);
-      }
-      return { status: status.value, value: parsedSet };
-    }
-    const elements = [...ctx.data.values()].map((item, i) => valueType._parse(new ParseInputLazyPath(ctx, item, ctx.path, i)));
-    if (ctx.common.async) {
-      return Promise.all(elements).then((elements2) => finalizeSet(elements2));
-    } else {
-      return finalizeSet(elements);
-    }
-  }
-  min(minSize, message) {
-    return new _ZodSet({
-      ...this._def,
-      minSize: { value: minSize, message: errorUtil.toString(message) }
-    });
-  }
-  max(maxSize, message) {
-    return new _ZodSet({
-      ...this._def,
-      maxSize: { value: maxSize, message: errorUtil.toString(message) }
-    });
-  }
-  size(size, message) {
-    return this.min(size, message).max(size, message);
-  }
-  nonempty(message) {
-    return this.min(1, message);
-  }
-};
-ZodSet.create = (valueType, params) => {
-  return new ZodSet({
-    valueType,
-    minSize: null,
-    maxSize: null,
-    typeName: ZodFirstPartyTypeKind.ZodSet,
-    ...processCreateParams(params)
-  });
-};
-var ZodFunction = class _ZodFunction extends ZodType {
-  constructor() {
-    super(...arguments);
-    this.validate = this.implement;
-  }
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.function) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.function,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    function makeArgsIssue(args, error) {
-      return makeIssue({
-        data: args,
-        path: ctx.path,
-        errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
-        issueData: {
-          code: ZodIssueCode.invalid_arguments,
-          argumentsError: error
-        }
-      });
-    }
-    function makeReturnsIssue(returns, error) {
-      return makeIssue({
-        data: returns,
-        path: ctx.path,
-        errorMaps: [ctx.common.contextualErrorMap, ctx.schemaErrorMap, getErrorMap(), en_default].filter((x) => !!x),
-        issueData: {
-          code: ZodIssueCode.invalid_return_type,
-          returnTypeError: error
-        }
-      });
-    }
-    const params = { errorMap: ctx.common.contextualErrorMap };
-    const fn = ctx.data;
-    if (this._def.returns instanceof ZodPromise) {
-      const me = this;
-      return OK(async function(...args) {
-        const error = new ZodError([]);
-        const parsedArgs = await me._def.args.parseAsync(args, params).catch((e) => {
-          error.addIssue(makeArgsIssue(args, e));
-          throw error;
-        });
-        const result = await Reflect.apply(fn, this, parsedArgs);
-        const parsedReturns = await me._def.returns._def.type.parseAsync(result, params).catch((e) => {
-          error.addIssue(makeReturnsIssue(result, e));
-          throw error;
-        });
-        return parsedReturns;
-      });
-    } else {
-      const me = this;
-      return OK(function(...args) {
-        const parsedArgs = me._def.args.safeParse(args, params);
-        if (!parsedArgs.success) {
-          throw new ZodError([makeArgsIssue(args, parsedArgs.error)]);
-        }
-        const result = Reflect.apply(fn, this, parsedArgs.data);
-        const parsedReturns = me._def.returns.safeParse(result, params);
-        if (!parsedReturns.success) {
-          throw new ZodError([makeReturnsIssue(result, parsedReturns.error)]);
-        }
-        return parsedReturns.data;
-      });
-    }
-  }
-  parameters() {
-    return this._def.args;
-  }
-  returnType() {
-    return this._def.returns;
-  }
-  args(...items) {
-    return new _ZodFunction({
-      ...this._def,
-      args: ZodTuple.create(items).rest(ZodUnknown.create())
-    });
-  }
-  returns(returnType) {
-    return new _ZodFunction({
-      ...this._def,
-      returns: returnType
-    });
-  }
-  implement(func) {
-    const validatedFunc = this.parse(func);
-    return validatedFunc;
-  }
-  strictImplement(func) {
-    const validatedFunc = this.parse(func);
-    return validatedFunc;
-  }
-  static create(args, returns, params) {
-    return new _ZodFunction({
-      args: args ? args : ZodTuple.create([]).rest(ZodUnknown.create()),
-      returns: returns || ZodUnknown.create(),
-      typeName: ZodFirstPartyTypeKind.ZodFunction,
-      ...processCreateParams(params)
-    });
-  }
-};
-var ZodLazy = class extends ZodType {
-  get schema() {
-    return this._def.getter();
-  }
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const lazySchema = this._def.getter();
-    return lazySchema._parse({ data: ctx.data, path: ctx.path, parent: ctx });
-  }
-};
-ZodLazy.create = (getter, params) => {
-  return new ZodLazy({
-    getter,
-    typeName: ZodFirstPartyTypeKind.ZodLazy,
-    ...processCreateParams(params)
-  });
-};
-var ZodLiteral = class extends ZodType {
-  _parse(input) {
-    if (input.data !== this._def.value) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_literal,
-        expected: this._def.value
-      });
-      return INVALID;
-    }
-    return { status: "valid", value: input.data };
-  }
-  get value() {
-    return this._def.value;
-  }
-};
-ZodLiteral.create = (value, params) => {
-  return new ZodLiteral({
-    value,
-    typeName: ZodFirstPartyTypeKind.ZodLiteral,
-    ...processCreateParams(params)
-  });
-};
-function createZodEnum(values, params) {
-  return new ZodEnum({
-    values,
-    typeName: ZodFirstPartyTypeKind.ZodEnum,
-    ...processCreateParams(params)
-  });
-}
-var ZodEnum = class _ZodEnum extends ZodType {
-  _parse(input) {
-    if (typeof input.data !== "string") {
-      const ctx = this._getOrReturnCtx(input);
-      const expectedValues = this._def.values;
-      addIssueToContext(ctx, {
-        expected: util.joinValues(expectedValues),
-        received: ctx.parsedType,
-        code: ZodIssueCode.invalid_type
-      });
-      return INVALID;
-    }
-    if (!this._cache) {
-      this._cache = new Set(this._def.values);
-    }
-    if (!this._cache.has(input.data)) {
-      const ctx = this._getOrReturnCtx(input);
-      const expectedValues = this._def.values;
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_enum_value,
-        options: expectedValues
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-  get options() {
-    return this._def.values;
-  }
-  get enum() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  get Values() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  get Enum() {
-    const enumValues = {};
-    for (const val of this._def.values) {
-      enumValues[val] = val;
-    }
-    return enumValues;
-  }
-  extract(values, newDef = this._def) {
-    return _ZodEnum.create(values, {
-      ...this._def,
-      ...newDef
-    });
-  }
-  exclude(values, newDef = this._def) {
-    return _ZodEnum.create(this.options.filter((opt) => !values.includes(opt)), {
-      ...this._def,
-      ...newDef
-    });
-  }
-};
-ZodEnum.create = createZodEnum;
-var ZodNativeEnum = class extends ZodType {
-  _parse(input) {
-    const nativeEnumValues = util.getValidEnumValues(this._def.values);
-    const ctx = this._getOrReturnCtx(input);
-    if (ctx.parsedType !== ZodParsedType.string && ctx.parsedType !== ZodParsedType.number) {
-      const expectedValues = util.objectValues(nativeEnumValues);
-      addIssueToContext(ctx, {
-        expected: util.joinValues(expectedValues),
-        received: ctx.parsedType,
-        code: ZodIssueCode.invalid_type
-      });
-      return INVALID;
-    }
-    if (!this._cache) {
-      this._cache = new Set(util.getValidEnumValues(this._def.values));
-    }
-    if (!this._cache.has(input.data)) {
-      const expectedValues = util.objectValues(nativeEnumValues);
-      addIssueToContext(ctx, {
-        received: ctx.data,
-        code: ZodIssueCode.invalid_enum_value,
-        options: expectedValues
-      });
-      return INVALID;
-    }
-    return OK(input.data);
-  }
-  get enum() {
-    return this._def.values;
-  }
-};
-ZodNativeEnum.create = (values, params) => {
-  return new ZodNativeEnum({
-    values,
-    typeName: ZodFirstPartyTypeKind.ZodNativeEnum,
-    ...processCreateParams(params)
-  });
-};
-var ZodPromise = class extends ZodType {
-  unwrap() {
-    return this._def.type;
-  }
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    if (ctx.parsedType !== ZodParsedType.promise && ctx.common.async === false) {
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.promise,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    const promisified = ctx.parsedType === ZodParsedType.promise ? ctx.data : Promise.resolve(ctx.data);
-    return OK(promisified.then((data) => {
-      return this._def.type.parseAsync(data, {
-        path: ctx.path,
-        errorMap: ctx.common.contextualErrorMap
-      });
-    }));
-  }
-};
-ZodPromise.create = (schema, params) => {
-  return new ZodPromise({
-    type: schema,
-    typeName: ZodFirstPartyTypeKind.ZodPromise,
-    ...processCreateParams(params)
-  });
-};
-var ZodEffects = class extends ZodType {
-  innerType() {
-    return this._def.schema;
-  }
-  sourceType() {
-    return this._def.schema._def.typeName === ZodFirstPartyTypeKind.ZodEffects ? this._def.schema.sourceType() : this._def.schema;
-  }
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    const effect = this._def.effect || null;
-    const checkCtx = {
-      addIssue: (arg) => {
-        addIssueToContext(ctx, arg);
-        if (arg.fatal) {
-          status.abort();
-        } else {
-          status.dirty();
-        }
-      },
-      get path() {
-        return ctx.path;
-      }
-    };
-    checkCtx.addIssue = checkCtx.addIssue.bind(checkCtx);
-    if (effect.type === "preprocess") {
-      const processed = effect.transform(ctx.data, checkCtx);
-      if (ctx.common.async) {
-        return Promise.resolve(processed).then(async (processed2) => {
-          if (status.value === "aborted")
-            return INVALID;
-          const result = await this._def.schema._parseAsync({
-            data: processed2,
-            path: ctx.path,
-            parent: ctx
-          });
-          if (result.status === "aborted")
-            return INVALID;
-          if (result.status === "dirty")
-            return DIRTY(result.value);
-          if (status.value === "dirty")
-            return DIRTY(result.value);
-          return result;
-        });
-      } else {
-        if (status.value === "aborted")
-          return INVALID;
-        const result = this._def.schema._parseSync({
-          data: processed,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (result.status === "aborted")
-          return INVALID;
-        if (result.status === "dirty")
-          return DIRTY(result.value);
-        if (status.value === "dirty")
-          return DIRTY(result.value);
-        return result;
-      }
-    }
-    if (effect.type === "refinement") {
-      const executeRefinement = (acc) => {
-        const result = effect.refinement(acc, checkCtx);
-        if (ctx.common.async) {
-          return Promise.resolve(result);
-        }
-        if (result instanceof Promise) {
-          throw new Error("Async refinement encountered during synchronous parse operation. Use .parseAsync instead.");
-        }
-        return acc;
-      };
-      if (ctx.common.async === false) {
-        const inner = this._def.schema._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (inner.status === "aborted")
-          return INVALID;
-        if (inner.status === "dirty")
-          status.dirty();
-        executeRefinement(inner.value);
-        return { status: status.value, value: inner.value };
-      } else {
-        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((inner) => {
-          if (inner.status === "aborted")
-            return INVALID;
-          if (inner.status === "dirty")
-            status.dirty();
-          return executeRefinement(inner.value).then(() => {
-            return { status: status.value, value: inner.value };
-          });
-        });
-      }
-    }
-    if (effect.type === "transform") {
-      if (ctx.common.async === false) {
-        const base = this._def.schema._parseSync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (!isValid(base))
-          return INVALID;
-        const result = effect.transform(base.value, checkCtx);
-        if (result instanceof Promise) {
-          throw new Error(`Asynchronous transform encountered during synchronous parse operation. Use .parseAsync instead.`);
-        }
-        return { status: status.value, value: result };
-      } else {
-        return this._def.schema._parseAsync({ data: ctx.data, path: ctx.path, parent: ctx }).then((base) => {
-          if (!isValid(base))
-            return INVALID;
-          return Promise.resolve(effect.transform(base.value, checkCtx)).then((result) => ({
-            status: status.value,
-            value: result
-          }));
-        });
-      }
-    }
-    util.assertNever(effect);
-  }
-};
-ZodEffects.create = (schema, effect, params) => {
-  return new ZodEffects({
-    schema,
-    typeName: ZodFirstPartyTypeKind.ZodEffects,
-    effect,
-    ...processCreateParams(params)
-  });
-};
-ZodEffects.createWithPreprocess = (preprocess, schema, params) => {
-  return new ZodEffects({
-    schema,
-    effect: { type: "preprocess", transform: preprocess },
-    typeName: ZodFirstPartyTypeKind.ZodEffects,
-    ...processCreateParams(params)
-  });
-};
-var ZodOptional = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType === ZodParsedType.undefined) {
-      return OK(void 0);
-    }
-    return this._def.innerType._parse(input);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
-};
-ZodOptional.create = (type, params) => {
-  return new ZodOptional({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodOptional,
-    ...processCreateParams(params)
-  });
-};
-var ZodNullable = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType === ZodParsedType.null) {
-      return OK(null);
-    }
-    return this._def.innerType._parse(input);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
-};
-ZodNullable.create = (type, params) => {
-  return new ZodNullable({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodNullable,
-    ...processCreateParams(params)
-  });
-};
-var ZodDefault = class extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    let data = ctx.data;
-    if (ctx.parsedType === ZodParsedType.undefined) {
-      data = this._def.defaultValue();
-    }
-    return this._def.innerType._parse({
-      data,
-      path: ctx.path,
-      parent: ctx
-    });
-  }
-  removeDefault() {
-    return this._def.innerType;
-  }
-};
-ZodDefault.create = (type, params) => {
-  return new ZodDefault({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodDefault,
-    defaultValue: typeof params.default === "function" ? params.default : () => params.default,
-    ...processCreateParams(params)
-  });
-};
-var ZodCatch = class extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const newCtx = {
-      ...ctx,
-      common: {
-        ...ctx.common,
-        issues: []
-      }
-    };
-    const result = this._def.innerType._parse({
-      data: newCtx.data,
-      path: newCtx.path,
-      parent: {
-        ...newCtx
-      }
-    });
-    if (isAsync(result)) {
-      return result.then((result2) => {
-        return {
-          status: "valid",
-          value: result2.status === "valid" ? result2.value : this._def.catchValue({
-            get error() {
-              return new ZodError(newCtx.common.issues);
-            },
-            input: newCtx.data
-          })
-        };
-      });
-    } else {
-      return {
-        status: "valid",
-        value: result.status === "valid" ? result.value : this._def.catchValue({
-          get error() {
-            return new ZodError(newCtx.common.issues);
-          },
-          input: newCtx.data
-        })
-      };
-    }
-  }
-  removeCatch() {
-    return this._def.innerType;
-  }
-};
-ZodCatch.create = (type, params) => {
-  return new ZodCatch({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodCatch,
-    catchValue: typeof params.catch === "function" ? params.catch : () => params.catch,
-    ...processCreateParams(params)
-  });
-};
-var ZodNaN = class extends ZodType {
-  _parse(input) {
-    const parsedType = this._getType(input);
-    if (parsedType !== ZodParsedType.nan) {
-      const ctx = this._getOrReturnCtx(input);
-      addIssueToContext(ctx, {
-        code: ZodIssueCode.invalid_type,
-        expected: ZodParsedType.nan,
-        received: ctx.parsedType
-      });
-      return INVALID;
-    }
-    return { status: "valid", value: input.data };
-  }
-};
-ZodNaN.create = (params) => {
-  return new ZodNaN({
-    typeName: ZodFirstPartyTypeKind.ZodNaN,
-    ...processCreateParams(params)
-  });
-};
-var ZodBranded = class extends ZodType {
-  _parse(input) {
-    const { ctx } = this._processInputParams(input);
-    const data = ctx.data;
-    return this._def.type._parse({
-      data,
-      path: ctx.path,
-      parent: ctx
-    });
-  }
-  unwrap() {
-    return this._def.type;
-  }
-};
-var ZodPipeline = class _ZodPipeline extends ZodType {
-  _parse(input) {
-    const { status, ctx } = this._processInputParams(input);
-    if (ctx.common.async) {
-      const handleAsync = async () => {
-        const inResult = await this._def.in._parseAsync({
-          data: ctx.data,
-          path: ctx.path,
-          parent: ctx
-        });
-        if (inResult.status === "aborted")
-          return INVALID;
-        if (inResult.status === "dirty") {
-          status.dirty();
-          return DIRTY(inResult.value);
-        } else {
-          return this._def.out._parseAsync({
-            data: inResult.value,
-            path: ctx.path,
-            parent: ctx
-          });
-        }
-      };
-      return handleAsync();
-    } else {
-      const inResult = this._def.in._parseSync({
-        data: ctx.data,
-        path: ctx.path,
-        parent: ctx
-      });
-      if (inResult.status === "aborted")
-        return INVALID;
-      if (inResult.status === "dirty") {
-        status.dirty();
-        return {
-          status: "dirty",
-          value: inResult.value
-        };
-      } else {
-        return this._def.out._parseSync({
-          data: inResult.value,
-          path: ctx.path,
-          parent: ctx
-        });
-      }
-    }
-  }
-  static create(a, b) {
-    return new _ZodPipeline({
-      in: a,
-      out: b,
-      typeName: ZodFirstPartyTypeKind.ZodPipeline
-    });
-  }
-};
-var ZodReadonly = class extends ZodType {
-  _parse(input) {
-    const result = this._def.innerType._parse(input);
-    const freeze = (data) => {
-      if (isValid(data)) {
-        data.value = Object.freeze(data.value);
-      }
-      return data;
-    };
-    return isAsync(result) ? result.then((data) => freeze(data)) : freeze(result);
-  }
-  unwrap() {
-    return this._def.innerType;
-  }
-};
-ZodReadonly.create = (type, params) => {
-  return new ZodReadonly({
-    innerType: type,
-    typeName: ZodFirstPartyTypeKind.ZodReadonly,
-    ...processCreateParams(params)
-  });
-};
-var late = {
-  object: ZodObject.lazycreate
-};
-var ZodFirstPartyTypeKind;
-(function(ZodFirstPartyTypeKind2) {
-  ZodFirstPartyTypeKind2["ZodString"] = "ZodString";
-  ZodFirstPartyTypeKind2["ZodNumber"] = "ZodNumber";
-  ZodFirstPartyTypeKind2["ZodNaN"] = "ZodNaN";
-  ZodFirstPartyTypeKind2["ZodBigInt"] = "ZodBigInt";
-  ZodFirstPartyTypeKind2["ZodBoolean"] = "ZodBoolean";
-  ZodFirstPartyTypeKind2["ZodDate"] = "ZodDate";
-  ZodFirstPartyTypeKind2["ZodSymbol"] = "ZodSymbol";
-  ZodFirstPartyTypeKind2["ZodUndefined"] = "ZodUndefined";
-  ZodFirstPartyTypeKind2["ZodNull"] = "ZodNull";
-  ZodFirstPartyTypeKind2["ZodAny"] = "ZodAny";
-  ZodFirstPartyTypeKind2["ZodUnknown"] = "ZodUnknown";
-  ZodFirstPartyTypeKind2["ZodNever"] = "ZodNever";
-  ZodFirstPartyTypeKind2["ZodVoid"] = "ZodVoid";
-  ZodFirstPartyTypeKind2["ZodArray"] = "ZodArray";
-  ZodFirstPartyTypeKind2["ZodObject"] = "ZodObject";
-  ZodFirstPartyTypeKind2["ZodUnion"] = "ZodUnion";
-  ZodFirstPartyTypeKind2["ZodDiscriminatedUnion"] = "ZodDiscriminatedUnion";
-  ZodFirstPartyTypeKind2["ZodIntersection"] = "ZodIntersection";
-  ZodFirstPartyTypeKind2["ZodTuple"] = "ZodTuple";
-  ZodFirstPartyTypeKind2["ZodRecord"] = "ZodRecord";
-  ZodFirstPartyTypeKind2["ZodMap"] = "ZodMap";
-  ZodFirstPartyTypeKind2["ZodSet"] = "ZodSet";
-  ZodFirstPartyTypeKind2["ZodFunction"] = "ZodFunction";
-  ZodFirstPartyTypeKind2["ZodLazy"] = "ZodLazy";
-  ZodFirstPartyTypeKind2["ZodLiteral"] = "ZodLiteral";
-  ZodFirstPartyTypeKind2["ZodEnum"] = "ZodEnum";
-  ZodFirstPartyTypeKind2["ZodEffects"] = "ZodEffects";
-  ZodFirstPartyTypeKind2["ZodNativeEnum"] = "ZodNativeEnum";
-  ZodFirstPartyTypeKind2["ZodOptional"] = "ZodOptional";
-  ZodFirstPartyTypeKind2["ZodNullable"] = "ZodNullable";
-  ZodFirstPartyTypeKind2["ZodDefault"] = "ZodDefault";
-  ZodFirstPartyTypeKind2["ZodCatch"] = "ZodCatch";
-  ZodFirstPartyTypeKind2["ZodPromise"] = "ZodPromise";
-  ZodFirstPartyTypeKind2["ZodBranded"] = "ZodBranded";
-  ZodFirstPartyTypeKind2["ZodPipeline"] = "ZodPipeline";
-  ZodFirstPartyTypeKind2["ZodReadonly"] = "ZodReadonly";
-})(ZodFirstPartyTypeKind || (ZodFirstPartyTypeKind = {}));
-var stringType = ZodString.create;
-var numberType = ZodNumber.create;
-var nanType = ZodNaN.create;
-var bigIntType = ZodBigInt.create;
-var booleanType = ZodBoolean.create;
-var dateType = ZodDate.create;
-var symbolType = ZodSymbol.create;
-var undefinedType = ZodUndefined.create;
-var nullType = ZodNull.create;
-var anyType = ZodAny.create;
-var unknownType = ZodUnknown.create;
-var neverType = ZodNever.create;
-var voidType = ZodVoid.create;
-var arrayType = ZodArray.create;
-var objectType = ZodObject.create;
-var strictObjectType = ZodObject.strictCreate;
-var unionType = ZodUnion.create;
-var discriminatedUnionType = ZodDiscriminatedUnion.create;
-var intersectionType = ZodIntersection.create;
-var tupleType = ZodTuple.create;
-var recordType = ZodRecord.create;
-var mapType = ZodMap.create;
-var setType = ZodSet.create;
-var functionType = ZodFunction.create;
-var lazyType = ZodLazy.create;
-var literalType = ZodLiteral.create;
-var enumType = ZodEnum.create;
-var nativeEnumType = ZodNativeEnum.create;
-var promiseType = ZodPromise.create;
-var effectsType = ZodEffects.create;
-var optionalType = ZodOptional.create;
-var nullableType = ZodNullable.create;
-var preprocessType = ZodEffects.createWithPreprocess;
-var pipelineType = ZodPipeline.create;
-
-// ../../lib/api-zod/src/generated/api.ts
-var HealthCheckResponse = objectType({
-  status: stringType()
-});
-
-// src/routes/health.ts
 var router = (0, import_express.Router)();
 router.get("/healthz", (_req, res) => {
-  const data = HealthCheckResponse.parse({ status: "ok" });
-  res.json(data);
+  res.json({ status: "ok" });
 });
 var health_default = router;
 
@@ -57326,7 +58295,7 @@ var import_express2 = __toESM(require_express2(), 1);
 var import_multer = __toESM(require_multer(), 1);
 import path from "path";
 
-// ../../node_modules/.pnpm/@supabase+supabase-js@2.99.3/node_modules/@supabase/supabase-js/dist/index.mjs
+// node_modules/.pnpm/@supabase+supabase-js@2.106.2/node_modules/@supabase/supabase-js/dist/index.mjs
 var dist_exports = {};
 __export(dist_exports, {
   FunctionRegion: () => import_functions_js.FunctionRegion,
@@ -57335,12 +58304,21 @@ __export(dist_exports, {
   FunctionsHttpError: () => import_functions_js.FunctionsHttpError,
   FunctionsRelayError: () => import_functions_js.FunctionsRelayError,
   PostgrestError: () => PostgrestError,
+  StorageApiError: () => StorageApiError,
   SupabaseClient: () => SupabaseClient,
   createClient: () => createClient
 });
 var import_functions_js = __toESM(require_main(), 1);
 
-// ../../node_modules/.pnpm/@supabase+postgrest-js@2.99.3/node_modules/@supabase/postgrest-js/dist/index.mjs
+// node_modules/.pnpm/@supabase+postgrest-js@2.106.2/node_modules/@supabase/postgrest-js/dist/index.mjs
+var DEFAULT_MAX_RETRIES = 3;
+var getRetryDelay = (attemptIndex) => Math.min(1e3 * 2 ** attemptIndex, 3e4);
+var RETRYABLE_STATUS_CODES = [520, 503];
+var RETRYABLE_METHODS = [
+  "GET",
+  "HEAD",
+  "OPTIONS"
+];
 var PostgrestError = class extends Error {
   /**
   * @example
@@ -57362,36 +58340,67 @@ var PostgrestError = class extends Error {
     this.hint = context.hint;
     this.code = context.code;
   }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      details: this.details,
+      hint: this.hint,
+      code: this.code
+    };
+  }
 };
+function sleep(ms, signal) {
+  return new Promise((resolve) => {
+    if (signal === null || signal === void 0 ? void 0 : signal.aborted) {
+      resolve();
+      return;
+    }
+    const id = setTimeout(() => {
+      signal === null || signal === void 0 || signal.removeEventListener("abort", onAbort);
+      resolve();
+    }, ms);
+    function onAbort() {
+      clearTimeout(id);
+      resolve();
+    }
+    signal === null || signal === void 0 || signal.addEventListener("abort", onAbort);
+  });
+}
+function shouldRetry(method, status, attemptCount, retryEnabled) {
+  if (!retryEnabled || attemptCount >= DEFAULT_MAX_RETRIES) return false;
+  if (!RETRYABLE_METHODS.includes(method)) return false;
+  if (!RETRYABLE_STATUS_CODES.includes(status)) return false;
+  return true;
+}
 var PostgrestBuilder = class {
   /**
   * Creates a builder configured for a specific PostgREST request.
   *
-  * @example
+  * @example Using supabase-js (recommended)
   * ```ts
-  * import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
+  * import { createClient } from '@supabase/supabase-js'
   *
-  * const builder = new PostgrestQueryBuilder(
-  *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
-  *   { headers: new Headers({ apikey: 'public-anon-key' }) }
-  * )
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const { data, error } = await supabase.from('users').select('*')
   * ```
   *
   * @category Database
   *
-  * @example Example 1
+  * @example Standalone import for bundle-sensitive environments
   * ```ts
   * import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
   *
   * const builder = new PostgrestQueryBuilder(
   *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
-  *   { headers: new Headers({ apikey: 'public-anon-key' }) }
+  *   { headers: new Headers({ apikey: 'your-publishable-key' }) }
   * )
   * ```
   */
   constructor(builder) {
-    var _builder$shouldThrowO, _builder$isMaybeSingl, _builder$urlLengthLim;
+    var _builder$shouldThrowO, _builder$isMaybeSingl, _builder$shouldStripN, _builder$urlLengthLim, _builder$retry;
     this.shouldThrowOnError = false;
+    this.retryEnabled = true;
     this.method = builder.method;
     this.url = builder.url;
     this.headers = new Headers(builder.headers);
@@ -57400,7 +58409,9 @@ var PostgrestBuilder = class {
     this.shouldThrowOnError = (_builder$shouldThrowO = builder.shouldThrowOnError) !== null && _builder$shouldThrowO !== void 0 ? _builder$shouldThrowO : false;
     this.signal = builder.signal;
     this.isMaybeSingle = (_builder$isMaybeSingl = builder.isMaybeSingle) !== null && _builder$isMaybeSingl !== void 0 ? _builder$isMaybeSingl : false;
+    this.shouldStripNulls = (_builder$shouldStripN = builder.shouldStripNulls) !== null && _builder$shouldStripN !== void 0 ? _builder$shouldStripN : false;
     this.urlLengthLimit = (_builder$urlLengthLim = builder.urlLengthLimit) !== null && _builder$urlLengthLim !== void 0 ? _builder$urlLengthLim : 8e3;
+    this.retryEnabled = (_builder$retry = builder.retry) !== null && _builder$retry !== void 0 ? _builder$retry : true;
     if (builder.fetch) this.fetch = builder.fetch;
     else this.fetch = fetch;
   }
@@ -57417,6 +58428,61 @@ var PostgrestBuilder = class {
     return this;
   }
   /**
+  * Strip null values from the response data. Properties with `null` values
+  * will be omitted from the returned JSON objects.
+  *
+  * Requires PostgREST 11.2.0+.
+  *
+  * {@link https://docs.postgrest.org/en/stable/references/api/resource_representation.html#stripped-nulls}
+  *
+  * @category Database
+  * @subcategory Using modifiers
+  *
+  * @example With `select()`
+  * ```ts
+  * const { data, error } = await supabase
+  *   .from('characters')
+  *   .select()
+  *   .stripNulls()
+  * ```
+  *
+  * @exampleSql With `select()`
+  * ```sql
+  * create table
+  *   characters (id int8 primary key, name text, bio text);
+  *
+  * insert into
+  *   characters (id, name, bio)
+  * values
+  *   (1, 'Luke', null),
+  *   (2, 'Leia', 'Princess of Alderaan');
+  * ```
+  *
+  * @exampleResponse With `select()`
+  * ```json
+  * {
+  *   "data": [
+  *     {
+  *       "id": 1,
+  *       "name": "Luke"
+  *     },
+  *     {
+  *       "id": 2,
+  *       "name": "Leia",
+  *       "bio": "Princess of Alderaan"
+  *     }
+  *   ],
+  *   "status": 200,
+  *   "statusText": "OK"
+  * }
+  * ```
+  */
+  stripNulls() {
+    if (this.headers.get("Accept") === "text/csv") throw new Error("stripNulls() cannot be used with csv()");
+    this.shouldStripNulls = true;
+    return this;
+  }
+  /**
   * Set an HTTP header for the request.
   *
   * @category Database
@@ -57426,85 +58492,79 @@ var PostgrestBuilder = class {
     this.headers.set(name, value);
     return this;
   }
-  /**  *
+  /**
   * @category Database
+  *
+  * Configure retry behavior for this request.
+  *
+  * By default, retries are enabled for idempotent requests (GET, HEAD, OPTIONS)
+  * that fail with network errors or specific HTTP status codes (503, 520).
+  * Retries use exponential backoff (1s, 2s, 4s) with a maximum of 3 attempts.
+  *
+  * @param enabled - Whether to enable retries for this request
+  *
+  * @example
+  * ```ts
+  * // Disable retries for a specific query
+  * const { data, error } = await supabase
+  *   .from('users')
+  *   .select()
+  *   .retry(false)
+  * ```
   */
+  retry(enabled) {
+    this.retryEnabled = enabled;
+    return this;
+  }
   then(onfulfilled, onrejected) {
     var _this = this;
     if (this.schema === void 0) {
     } else if (["GET", "HEAD"].includes(this.method)) this.headers.set("Accept-Profile", this.schema);
     else this.headers.set("Content-Profile", this.schema);
     if (this.method !== "GET" && this.method !== "HEAD") this.headers.set("Content-Type", "application/json");
+    if (this.shouldStripNulls) {
+      const currentAccept = this.headers.get("Accept");
+      if (currentAccept === "application/vnd.pgrst.object+json") this.headers.set("Accept", "application/vnd.pgrst.object+json;nulls=stripped");
+      else if (!currentAccept || currentAccept === "application/json") this.headers.set("Accept", "application/vnd.pgrst.array+json;nulls=stripped");
+    }
     const _fetch = this.fetch;
-    let res = _fetch(this.url.toString(), {
-      method: this.method,
-      headers: this.headers,
-      body: JSON.stringify(this.body),
-      signal: this.signal
-    }).then(async (res$1) => {
-      let error = null;
-      let data = null;
-      let count = null;
-      let status = res$1.status;
-      let statusText = res$1.statusText;
-      if (res$1.ok) {
-        var _this$headers$get2, _res$headers$get;
-        if (_this.method !== "HEAD") {
-          var _this$headers$get;
-          const body = await res$1.text();
-          if (body === "") {
-          } else if (_this.headers.get("Accept") === "text/csv") data = body;
-          else if (_this.headers.get("Accept") && ((_this$headers$get = _this.headers.get("Accept")) === null || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text"))) data = body;
-          else data = JSON.parse(body);
-        }
-        const countHeader = (_this$headers$get2 = _this.headers.get("Prefer")) === null || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
-        const contentRange = (_res$headers$get = res$1.headers.get("content-range")) === null || _res$headers$get === void 0 ? void 0 : _res$headers$get.split("/");
-        if (countHeader && contentRange && contentRange.length > 1) count = parseInt(contentRange[1]);
-        if (_this.isMaybeSingle && _this.method === "GET" && Array.isArray(data)) if (data.length > 1) {
-          error = {
-            code: "PGRST116",
-            details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
-            hint: null,
-            message: "JSON object requested, multiple (or no) rows returned"
-          };
-          data = null;
-          count = null;
-          status = 406;
-          statusText = "Not Acceptable";
-        } else if (data.length === 1) data = data[0];
-        else data = null;
-      } else {
-        var _error$details;
-        const body = await res$1.text();
+    const executeWithRetry = async () => {
+      let attemptCount = 0;
+      while (true) {
+        const requestHeaders = new Headers(_this.headers);
+        if (attemptCount > 0) requestHeaders.set("X-Retry-Count", String(attemptCount));
+        let res$1;
         try {
-          error = JSON.parse(body);
-          if (Array.isArray(error) && res$1.status === 404) {
-            data = [];
-            error = null;
-            status = 200;
-            statusText = "OK";
+          res$1 = await _fetch(_this.url.toString(), {
+            method: _this.method,
+            headers: requestHeaders,
+            body: JSON.stringify(_this.body, (_, value) => typeof value === "bigint" ? value.toString() : value),
+            signal: _this.signal
+          });
+        } catch (fetchError) {
+          if ((fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) === "AbortError" || (fetchError === null || fetchError === void 0 ? void 0 : fetchError.code) === "ABORT_ERR") throw fetchError;
+          if (!RETRYABLE_METHODS.includes(_this.method)) throw fetchError;
+          if (_this.retryEnabled && attemptCount < DEFAULT_MAX_RETRIES) {
+            const delay = getRetryDelay(attemptCount);
+            attemptCount++;
+            await sleep(delay, _this.signal);
+            continue;
           }
-        } catch (_unused) {
-          if (res$1.status === 404 && body === "") {
-            status = 204;
-            statusText = "No Content";
-          } else error = { message: body };
+          throw fetchError;
         }
-        if (error && _this.isMaybeSingle && (error === null || error === void 0 || (_error$details = error.details) === null || _error$details === void 0 ? void 0 : _error$details.includes("0 rows"))) {
-          error = null;
-          status = 200;
-          statusText = "OK";
+        if (shouldRetry(_this.method, res$1.status, attemptCount, _this.retryEnabled)) {
+          var _res$headers$get, _res$headers;
+          const retryAfterHeader = (_res$headers$get = (_res$headers = res$1.headers) === null || _res$headers === void 0 ? void 0 : _res$headers.get("Retry-After")) !== null && _res$headers$get !== void 0 ? _res$headers$get : null;
+          const delay = retryAfterHeader !== null ? Math.max(0, parseInt(retryAfterHeader, 10) || 0) * 1e3 : getRetryDelay(attemptCount);
+          await res$1.text();
+          attemptCount++;
+          await sleep(delay, _this.signal);
+          continue;
         }
-        if (error && _this.shouldThrowOnError) throw new PostgrestError(error);
+        return await _this.processResponse(res$1);
       }
-      return {
-        error,
-        data,
-        count,
-        status,
-        statusText
-      };
-    });
+    };
+    let res = executeWithRetry();
     if (!this.shouldThrowOnError) res = res.catch((fetchError) => {
       var _fetchError$name2;
       let errorDetails = "";
@@ -57537,6 +58597,7 @@ ${cause.stack}`;
         if (urlLength > this.urlLengthLimit) hint += `. Your request URL is ${urlLength} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`;
       }
       return {
+        success: false,
         error: {
           message: `${(_fetchError$name2 = fetchError === null || fetchError === void 0 ? void 0 : fetchError.name) !== null && _fetchError$name2 !== void 0 ? _fetchError$name2 : "FetchError"}: ${fetchError === null || fetchError === void 0 ? void 0 : fetchError.message}`,
           details: errorDetails,
@@ -57550,6 +58611,69 @@ ${cause.stack}`;
       };
     });
     return res.then(onfulfilled, onrejected);
+  }
+  /**
+  * Process a fetch response and return the standardized postgrest response.
+  */
+  async processResponse(res) {
+    var _this2 = this;
+    let error = null;
+    let data = null;
+    let count = null;
+    let status = res.status;
+    let statusText = res.statusText;
+    if (res.ok) {
+      var _this$headers$get2, _res$headers$get2;
+      if (_this2.method !== "HEAD") {
+        var _this$headers$get;
+        const body = await res.text();
+        if (body === "") {
+        } else if (_this2.headers.get("Accept") === "text/csv") data = body;
+        else if (_this2.headers.get("Accept") && ((_this$headers$get = _this2.headers.get("Accept")) === null || _this$headers$get === void 0 ? void 0 : _this$headers$get.includes("application/vnd.pgrst.plan+text"))) data = body;
+        else data = JSON.parse(body);
+      }
+      const countHeader = (_this$headers$get2 = _this2.headers.get("Prefer")) === null || _this$headers$get2 === void 0 ? void 0 : _this$headers$get2.match(/count=(exact|planned|estimated)/);
+      const contentRange = (_res$headers$get2 = res.headers.get("content-range")) === null || _res$headers$get2 === void 0 ? void 0 : _res$headers$get2.split("/");
+      if (countHeader && contentRange && contentRange.length > 1) count = parseInt(contentRange[1]);
+      if (_this2.isMaybeSingle && Array.isArray(data)) if (data.length > 1) {
+        error = {
+          code: "PGRST116",
+          details: `Results contain ${data.length} rows, application/vnd.pgrst.object+json requires 1 row`,
+          hint: null,
+          message: "JSON object requested, multiple (or no) rows returned"
+        };
+        data = null;
+        count = null;
+        status = 406;
+        statusText = "Not Acceptable";
+      } else if (data.length === 1) data = data[0];
+      else data = null;
+    } else {
+      const body = await res.text();
+      try {
+        error = JSON.parse(body);
+        if (Array.isArray(error) && res.status === 404) {
+          data = [];
+          error = null;
+          status = 200;
+          statusText = "OK";
+        }
+      } catch (_unused) {
+        if (res.status === 404 && body === "") {
+          status = 204;
+          statusText = "No Content";
+        } else error = { message: body };
+      }
+      if (error && _this2.shouldThrowOnError) throw new PostgrestError(error);
+    }
+    return {
+      success: error === null,
+      error,
+      data,
+      count,
+      status,
+      statusText
+    };
   }
   /**
   * Override the type of the returned `data`.
@@ -57585,6 +58709,7 @@ ${cause.stack}`;
   * @returns A PostgrestBuilder instance with the new type
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example Complete Override type of successful response
   * ```ts
@@ -57640,7 +58765,7 @@ ${cause.stack}`;
   * let x: typeof data // CountryRowProperties & { status: "A" | "B" } | null
   * ```
   *
-  * @example Example 5
+  * @example Merge vs replace existing types
   * ```typescript
   * // Merge with existing types (default behavior)
   * const query = supabase
@@ -57670,6 +58795,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * @param columns - The columns to retrieve, separated by commas
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `upsert()`
   * ```ts
@@ -57734,6 +58860,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * instead
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `select()`
   * ```ts
@@ -57920,6 +59047,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * instead
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `select()`
   * ```ts
@@ -58029,6 +59157,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * instead
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `select()`
   * ```ts
@@ -58080,6 +59209,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * @param signal - The AbortSignal to use for the fetch request
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @remarks
   * You can use this to set a timeout for the request.
@@ -58150,6 +59280,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * returns an error.
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `select()`
   * ```ts
@@ -58195,6 +59326,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * this returns an error.
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @example With `select()`
   * ```ts
@@ -58227,8 +59359,6 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * ```
   */
   maybeSingle() {
-    if (this.method === "GET") this.headers.set("Accept", "application/json");
-    else this.headers.set("Accept", "application/vnd.pgrst.object+json");
     this.isMaybeSingle = true;
     return this;
   }
@@ -58236,6 +59366,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * Return `data` as a string in CSV format.
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @exampleDescription Return data as CSV
   * By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
@@ -58309,6 +59440,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * or `"json"`
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @exampleDescription Get the execution plan
   * By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
@@ -58410,6 +59542,7 @@ var PostgrestTransformBuilder = class extends PostgrestBuilder {
   * @deprecated Use overrideTypes<yourType, { merge: false }>() method at the end of your call chain instead
   *
   * @category Database
+  * @subcategory Using modifiers
   *
   * @remarks
   * - Deprecated: use overrideTypes method instead
@@ -58469,6 +59602,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58512,10 +59646,14 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   /**
   * Match only rows where `column` is not equal to `value`.
   *
+  * This filter does not include rows where `column` is `NULL`. To match null
+  * values, use `.is(column, null)` instead.
+  *
   * @param column - The column to filter on
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58567,6 +59705,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * When using [reserved words](https://www.postgresql.org/docs/current/sql-keywords-appendix.html) for column names you need
@@ -58618,6 +59757,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58669,6 +59809,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58716,6 +59857,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58767,6 +59909,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param pattern - The pattern to match with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58814,6 +59957,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param patterns - The patterns to match with
   *
   * @category Database
+  * @subcategory Using filters
   */
   likeAllOf(column, patterns) {
     this.url.searchParams.append(column, `like(all).{${patterns.join(",")}}`);
@@ -58826,6 +59970,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param patterns - The patterns to match with
   *
   * @category Database
+  * @subcategory Using filters
   */
   likeAnyOf(column, patterns) {
     this.url.searchParams.append(column, `like(any).{${patterns.join(",")}}`);
@@ -58838,6 +59983,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param pattern - The pattern to match with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -58885,6 +60031,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param patterns - The patterns to match with
   *
   * @category Database
+  * @subcategory Using filters
   */
   ilikeAllOf(column, patterns) {
     this.url.searchParams.append(column, `ilike(all).{${patterns.join(",")}}`);
@@ -58897,6 +60044,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param patterns - The patterns to match with
   *
   * @category Database
+  * @subcategory Using filters
   */
   ilikeAnyOf(column, patterns) {
     this.url.searchParams.append(column, `ilike(any).{${patterns.join(",")}}`);
@@ -58937,6 +60085,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription Checking for nullness, true or false
   * Using the `eq()` filter doesn't work when filtering for `null`.
@@ -59002,6 +60151,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param values - The values array to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -59072,6 +60222,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The jsonb, array, or range value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example On array columns
   * ```ts
@@ -59206,6 +60357,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The jsonb, array, or range value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example On array columns
   * ```ts
@@ -59341,6 +60493,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param range - The range to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * Postgres supports a number of [range
@@ -59401,6 +60554,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param range - The range to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * Postgres supports a number of [range
@@ -59460,6 +60614,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param range - The range to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * Postgres supports a number of [range
@@ -59519,6 +60674,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param range - The range to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * Postgres supports a number of [range
@@ -59579,6 +60735,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param range - The range to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @exampleDescription With `select()`
   * Postgres supports a number of [range
@@ -59637,6 +60794,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The array or range value to filter with
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example On array columns
   * ```ts
@@ -59736,6 +60894,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param options.type - Change how the `query` text is interpreted
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @remarks
   * - For more information, see [Postgres full text search](/docs/guides/database/full-text-search).
@@ -59845,6 +61004,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * to their filter values
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @example With `select()`
   * ```ts
@@ -59900,6 +61060,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with, following PostgREST syntax
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @remarks
   * not() expects you to use the raw PostgREST syntax for the filter values.
@@ -59964,6 +61125,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param options.foreignTable - Deprecated, use `referencedTable` instead
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @remarks
   * or() expects you to use the raw PostgREST syntax for the filter names and values.
@@ -60117,6 +61279,7 @@ var PostgrestFilterBuilder = class extends PostgrestTransformBuilder {
   * @param value - The value to filter with, following PostgREST syntax
   *
   * @category Database
+  * @subcategory Using filters
   *
   * @remarks
   * filter() expects you to use the raw PostgREST syntax for the filter values.
@@ -60224,34 +61387,41 @@ var PostgrestQueryBuilder = class {
   /**
   * Creates a query builder scoped to a Postgres table or view.
   *
-  * @example
-  * ```ts
-  * import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
-  *
-  * const query = new PostgrestQueryBuilder(
-  *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
-  *   { headers: { apikey: 'public-anon-key' } }
-  * )
-  * ```
-  *
   * @category Database
   *
-  * @example Example 1
+  * @param url - The URL for the query
+  * @param options - Named parameters
+  * @param options.headers - Custom headers
+  * @param options.schema - Postgres schema to use
+  * @param options.fetch - Custom fetch implementation
+  * @param options.urlLengthLimit - Maximum URL length before warning
+  * @param options.retry - Enable automatic retries for transient errors (default: true)
+  *
+  * @example Using supabase-js (recommended)
+  * ```ts
+  * import { createClient } from '@supabase/supabase-js'
+  *
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const { data, error } = await supabase.from('users').select('*')
+  * ```
+  *
+  * @example Standalone import for bundle-sensitive environments
   * ```ts
   * import { PostgrestQueryBuilder } from '@supabase/postgrest-js'
   *
   * const query = new PostgrestQueryBuilder(
   *   new URL('https://xyzcompany.supabase.co/rest/v1/users'),
-  *   { headers: { apikey: 'public-anon-key' } }
+  *   { headers: { apikey: 'your-publishable-key' }, retry: true }
   * )
   * ```
   */
-  constructor(url, { headers = {}, schema, fetch: fetch$1, urlLengthLimit = 8e3 }) {
+  constructor(url, { headers = {}, schema, fetch: fetch$1, urlLengthLimit = 8e3, retry }) {
     this.url = url;
     this.headers = new Headers(headers);
     this.schema = schema;
     this.fetch = fetch$1;
     this.urlLengthLimit = urlLengthLimit;
+    this.retry = retry;
   }
   /**
   * Clone URL and headers to prevent shared state between operations.
@@ -61059,7 +62229,8 @@ var PostgrestQueryBuilder = class {
       headers,
       schema: this.schema,
       fetch: this.fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -61193,7 +62364,8 @@ var PostgrestQueryBuilder = class {
       schema: this.schema,
       body: values,
       fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -61426,7 +62598,8 @@ var PostgrestQueryBuilder = class {
       schema: this.schema,
       body: values,
       fetch: (_this$fetch2 = this.fetch) !== null && _this$fetch2 !== void 0 ? _this$fetch2 : fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -61580,7 +62753,8 @@ var PostgrestQueryBuilder = class {
       schema: this.schema,
       body: values,
       fetch: (_this$fetch3 = this.fetch) !== null && _this$fetch3 !== void 0 ? _this$fetch3 : fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -61712,7 +62886,8 @@ var PostgrestQueryBuilder = class {
       headers,
       schema: this.schema,
       fetch: (_this$fetch4 = this.fetch) !== null && _this$fetch4 !== void 0 ? _this$fetch4 : fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
 };
@@ -61778,15 +62953,16 @@ var PostgrestClient = class PostgrestClient2 {
   * @param options.fetch - Custom fetch
   * @param options.timeout - Optional timeout in milliseconds for all requests. When set, requests will automatically abort after this duration to prevent indefinite hangs.
   * @param options.urlLengthLimit - Maximum URL length in characters before warnings/errors are triggered. Defaults to 8000.
-  * @example
+  * @param options.retry - Enable or disable automatic retries for transient errors.
+  *   When enabled, idempotent requests (GET, HEAD, OPTIONS) that fail with network
+  *   errors or HTTP 503/520 responses will be automatically retried up to 3 times
+  *   with exponential backoff (1s, 2s, 4s). Defaults to `true`.
+  * @example Using supabase-js (recommended)
   * ```ts
-  * import { PostgrestClient } from '@supabase/postgrest-js'
+  * import { createClient } from '@supabase/supabase-js'
   *
-  * const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
-  *   headers: { apikey: 'public-anon-key' },
-  *   schema: 'public',
-  *   timeout: 30000, // 30 second timeout
-  * })
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const { data, error } = await supabase.from('profiles').select('*')
   * ```
   *
   * @category Database
@@ -61795,28 +62971,18 @@ var PostgrestClient = class PostgrestClient2 {
   * - A `timeout` option (in milliseconds) can be set to automatically abort requests that take too long.
   * - A `urlLengthLimit` option (default: 8000) can be set to control when URL length warnings are included in error messages for aborted requests.
   *
-  * @example Example 1
+  * @example Standalone import for bundle-sensitive environments
   * ```ts
   * import { PostgrestClient } from '@supabase/postgrest-js'
   *
   * const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
-  *   headers: { apikey: 'public-anon-key' },
-  *   schema: 'public',
-  * })
-  * ```
-  *
-  * @example With timeout
-  * ```ts
-  * import { PostgrestClient } from '@supabase/postgrest-js'
-  *
-  * const postgrest = new PostgrestClient('https://xyzcompany.supabase.co/rest/v1', {
-  *   headers: { apikey: 'public-anon-key' },
+  *   headers: { apikey: 'your-publishable-key' },
   *   schema: 'public',
   *   timeout: 30000, // 30 second timeout
   * })
   * ```
   */
-  constructor(url, { headers = {}, schema, fetch: fetch$1, timeout, urlLengthLimit = 8e3 } = {}) {
+  constructor(url, { headers = {}, schema, fetch: fetch$1, timeout, urlLengthLimit = 8e3, retry } = {}) {
     this.url = url;
     this.headers = new Headers(headers);
     this.schemaName = schema;
@@ -61844,6 +63010,7 @@ var PostgrestClient = class PostgrestClient2 {
       return originalFetch(input, _objectSpread2(_objectSpread2({}, init), {}, { signal: controller.signal })).finally(() => clearTimeout(timeoutId));
     };
     else this.fetch = originalFetch;
+    this.retry = retry;
   }
   /**
   * Perform a query on a table or a view.
@@ -61858,7 +63025,8 @@ var PostgrestClient = class PostgrestClient2 {
       headers: new Headers(this.headers),
       schema: this.schemaName,
       fetch: this.fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -61875,7 +63043,8 @@ var PostgrestClient = class PostgrestClient2 {
       headers: this.headers,
       schema,
       fetch: this.fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
   /**
@@ -62072,15 +63241,16 @@ var PostgrestClient = class PostgrestClient2 {
       schema: this.schemaName,
       body,
       fetch: (_this$fetch = this.fetch) !== null && _this$fetch !== void 0 ? _this$fetch : fetch,
-      urlLengthLimit: this.urlLengthLimit
+      urlLengthLimit: this.urlLengthLimit,
+      retry: this.retry
     });
   }
 };
 
-// ../../node_modules/.pnpm/@supabase+supabase-js@2.99.3/node_modules/@supabase/supabase-js/dist/index.mjs
+// node_modules/.pnpm/@supabase+supabase-js@2.106.2/node_modules/@supabase/supabase-js/dist/index.mjs
 var import_realtime_js = __toESM(require_main2(), 1);
 
-// ../../node_modules/.pnpm/iceberg-js@0.8.1/node_modules/iceberg-js/dist/index.mjs
+// node_modules/.pnpm/iceberg-js@0.8.1/node_modules/iceberg-js/dist/index.mjs
 var IcebergError = class extends Error {
   constructor(message, opts) {
     super(message);
@@ -62613,69 +63783,7 @@ var IcebergRestCatalog = class {
   }
 };
 
-// ../../node_modules/.pnpm/@supabase+storage-js@2.99.3/node_modules/@supabase/storage-js/dist/index.mjs
-var StorageError = class extends Error {
-  constructor(message, namespace = "storage", status, statusCode) {
-    super(message);
-    this.__isStorageError = true;
-    this.namespace = namespace;
-    this.name = namespace === "vectors" ? "StorageVectorsError" : "StorageError";
-    this.status = status;
-    this.statusCode = statusCode;
-  }
-};
-function isStorageError(error) {
-  return typeof error === "object" && error !== null && "__isStorageError" in error;
-}
-var StorageApiError = class extends StorageError {
-  constructor(message, status, statusCode, namespace = "storage") {
-    super(message, namespace, status, statusCode);
-    this.name = namespace === "vectors" ? "StorageVectorsApiError" : "StorageApiError";
-    this.status = status;
-    this.statusCode = statusCode;
-  }
-  toJSON() {
-    return {
-      name: this.name,
-      message: this.message,
-      status: this.status,
-      statusCode: this.statusCode
-    };
-  }
-};
-var StorageUnknownError = class extends StorageError {
-  constructor(message, originalError, namespace = "storage") {
-    super(message, namespace);
-    this.name = namespace === "vectors" ? "StorageVectorsUnknownError" : "StorageUnknownError";
-    this.originalError = originalError;
-  }
-};
-var resolveFetch = (customFetch) => {
-  if (customFetch) return (...args) => customFetch(...args);
-  return (...args) => fetch(...args);
-};
-var isPlainObject = (value) => {
-  if (typeof value !== "object" || value === null) return false;
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-};
-var recursiveToCamel = (item) => {
-  if (Array.isArray(item)) return item.map((el) => recursiveToCamel(el));
-  else if (typeof item === "function" || item !== Object(item)) return item;
-  const result = {};
-  Object.entries(item).forEach(([key, value]) => {
-    const newKey = key.replace(/([-_][a-z])/gi, (c) => c.toUpperCase().replace(/[-_]/g, ""));
-    result[newKey] = recursiveToCamel(value);
-  });
-  return result;
-};
-var isValidBucketName = (bucketName) => {
-  if (!bucketName || typeof bucketName !== "string") return false;
-  if (bucketName.length === 0 || bucketName.length > 100) return false;
-  if (bucketName.trim() !== bucketName) return false;
-  if (bucketName.includes("/") || bucketName.includes("\\")) return false;
-  return /^[\w!.\*'() &$@=;:+,?-]+$/.test(bucketName);
-};
+// node_modules/.pnpm/@supabase+storage-js@2.106.2/node_modules/@supabase/storage-js/dist/index.mjs
 function _typeof2(o) {
   "@babel/helpers - typeof";
   return _typeof2 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
@@ -62727,14 +63835,101 @@ function _objectSpread22(e) {
   }
   return e;
 }
+var StorageError = class extends Error {
+  constructor(message, namespace = "storage", status, statusCode) {
+    super(message);
+    this.__isStorageError = true;
+    this.namespace = namespace;
+    this.name = namespace === "vectors" ? "StorageVectorsError" : "StorageError";
+    this.status = status;
+    this.statusCode = statusCode;
+  }
+  toJSON() {
+    return {
+      name: this.name,
+      message: this.message,
+      status: this.status,
+      statusCode: this.statusCode
+    };
+  }
+};
+function isStorageError(error) {
+  return typeof error === "object" && error !== null && "__isStorageError" in error;
+}
+var StorageApiError = class extends StorageError {
+  constructor(message, status, statusCode, namespace = "storage") {
+    super(message, namespace, status, statusCode);
+    this.name = namespace === "vectors" ? "StorageVectorsApiError" : "StorageApiError";
+    this.status = status;
+    this.statusCode = statusCode;
+  }
+  toJSON() {
+    return _objectSpread22({}, super.toJSON());
+  }
+};
+var StorageUnknownError = class extends StorageError {
+  constructor(message, originalError, namespace = "storage") {
+    super(message, namespace);
+    this.name = namespace === "vectors" ? "StorageVectorsUnknownError" : "StorageUnknownError";
+    this.originalError = originalError;
+  }
+};
+function setHeader(headers, name, value) {
+  const result = _objectSpread22({}, headers);
+  const nameLower = name.toLowerCase();
+  for (const key of Object.keys(result)) if (key.toLowerCase() === nameLower) delete result[key];
+  result[nameLower] = value;
+  return result;
+}
+function normalizeHeaders(headers) {
+  const result = {};
+  for (const [key, value] of Object.entries(headers)) result[key.toLowerCase()] = value;
+  return result;
+}
+var resolveFetch = (customFetch) => {
+  if (customFetch) return (...args) => customFetch(...args);
+  return (...args) => fetch(...args);
+};
+var isPlainObject = (value) => {
+  if (typeof value !== "object" || value === null) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+};
+var recursiveToCamel = (item) => {
+  if (Array.isArray(item)) return item.map((el) => recursiveToCamel(el));
+  else if (typeof item === "function" || item !== Object(item)) return item;
+  const result = {};
+  Object.entries(item).forEach(([key, value]) => {
+    const newKey = key.replace(/([-_][a-z])/gi, (c) => c.toUpperCase().replace(/[-_]/g, ""));
+    result[newKey] = recursiveToCamel(value);
+  });
+  return result;
+};
+var isValidBucketName = (bucketName) => {
+  if (!bucketName || typeof bucketName !== "string") return false;
+  if (bucketName.length === 0 || bucketName.length > 100) return false;
+  if (bucketName.trim() !== bucketName) return false;
+  if (bucketName.includes("/") || bucketName.includes("\\")) return false;
+  return /^[\w!.\*'() &$@=;:+,?-]+$/.test(bucketName);
+};
 var _getErrorMessage = (err) => {
-  var _err$error;
-  return err.msg || err.message || err.error_description || (typeof err.error === "string" ? err.error : (_err$error = err.error) === null || _err$error === void 0 ? void 0 : _err$error.message) || JSON.stringify(err);
+  if (typeof err === "object" && err !== null) {
+    const e = err;
+    if (typeof e.msg === "string") return e.msg;
+    if (typeof e.message === "string") return e.message;
+    if (typeof e.error_description === "string") return e.error_description;
+    if (typeof e.error === "string") return e.error;
+    if (typeof e.error === "object" && e.error !== null) {
+      const nested = e.error;
+      if (typeof nested.message === "string") return nested.message;
+    }
+  }
+  return JSON.stringify(err);
 };
 var handleError = async (error, reject, options, namespace) => {
-  if (error !== null && typeof error === "object" && typeof error.json === "function") {
+  if (error !== null && typeof error === "object" && "json" in error && typeof error.json === "function") {
     const responseError = error;
-    let status = parseInt(responseError.status, 10);
+    let status = parseInt(String(responseError.status), 10);
     if (!Number.isFinite(status)) status = 500;
     responseError.json().then((err) => {
       const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
@@ -62752,7 +63947,11 @@ var _getRequestParams = (method, options, parameters, body) => {
   };
   if (method === "GET" || method === "HEAD" || !body) return _objectSpread22(_objectSpread22({}, params), parameters);
   if (isPlainObject(body)) {
-    params.headers = _objectSpread22({ "Content-Type": "application/json" }, options === null || options === void 0 ? void 0 : options.headers);
+    var _contentType;
+    const headers = (options === null || options === void 0 ? void 0 : options.headers) || {};
+    let contentType;
+    for (const [key, value] of Object.entries(headers)) if (key.toLowerCase() === "content-type") contentType = value;
+    params.headers = setHeader(headers, "Content-Type", (_contentType = contentType) !== null && _contentType !== void 0 ? _contentType : "application/json");
     params.body = JSON.stringify(body);
   } else params.body = body;
   if (options === null || options === void 0 ? void 0 : options.duplex) params.duplex = options.duplex;
@@ -62805,7 +64004,7 @@ var BaseApiClient = class {
   constructor(url, headers = {}, fetch$1, namespace = "storage") {
     this.shouldThrowOnError = false;
     this.url = url;
-    this.headers = headers;
+    this.headers = normalizeHeaders(headers);
     this.fetch = resolveFetch(fetch$1);
     this.namespace = namespace;
   }
@@ -62828,7 +64027,7 @@ var BaseApiClient = class {
   * @returns this - For method chaining
   */
   setHeader(name, value) {
-    this.headers = _objectSpread22(_objectSpread22({}, this.headers), {}, { [name]: value });
+    this.headers = setHeader(this.headers, name, value);
     return this;
   }
   /**
@@ -62845,7 +64044,7 @@ var BaseApiClient = class {
   * @param operation - Async function that performs the API call
   * @returns Promise with { data, error } tuple
   *
-  * @example
+  * @example Handling an operation
   * ```typescript
   * async listBuckets() {
   *   return this.handleOperation(async () => {
@@ -62873,13 +64072,27 @@ var BaseApiClient = class {
     }
   }
 };
+var _Symbol$toStringTag$1;
+_Symbol$toStringTag$1 = Symbol.toStringTag;
 var StreamDownloadBuilder = class {
   constructor(downloadFn, shouldThrowOnError) {
     this.downloadFn = downloadFn;
     this.shouldThrowOnError = shouldThrowOnError;
+    this[_Symbol$toStringTag$1] = "StreamDownloadBuilder";
+    this.promise = null;
   }
   then(onfulfilled, onrejected) {
-    return this.execute().then(onfulfilled, onrejected);
+    return this.getPromise().then(onfulfilled, onrejected);
+  }
+  catch(onrejected) {
+    return this.getPromise().catch(onrejected);
+  }
+  finally(onfinally) {
+    return this.getPromise().finally(onfinally);
+  }
+  getPromise() {
+    if (!this.promise) this.promise = this.execute();
+    return this.promise;
   }
   async execute() {
     var _this = this;
@@ -62988,7 +64201,7 @@ var StorageFileApi = class extends BaseApiClient {
         if (metadata) headers["x-metadata"] = _this.toBase64(_this.encodeMetadata(metadata));
         if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
       }
-      if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) headers = _objectSpread22(_objectSpread22({}, headers), fileOptions.headers);
+      if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
       const cleanPath = _this._removeEmptyFolders(path4);
       const _path = _this._getFinalPath(cleanPath);
       const data = await (method == "PUT" ? put : post)(_this.fetch, `${_this.url}/object/${_path}`, body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}));
@@ -63002,7 +64215,8 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Uploads a file to an existing bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
   * @param fileBody The body of the file to be stored in the bucket.
   * @param fileOptions Optional file upload options including cacheControl, contentType, upsert, and metadata.
@@ -63042,6 +64256,13 @@ var StorageFileApi = class extends BaseApiClient {
   *     contentType: 'image/png'
   *   })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+  * - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Upload file using `ArrayBuffer` from base64 file data instead, see example below.
   */
   async upload(path4, fileBody, fileOptions) {
     return this.uploadOrUpdate("POST", path4, fileBody, fileOptions);
@@ -63049,7 +64270,8 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Upload a file with a token generated from `createSignedUploadUrl`.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
   * @param token The token generated from `createSignedUploadUrl`
   * @param fileBody The body of the file to be stored in the bucket.
@@ -63076,6 +64298,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async uploadToSignedUrl(path4, token, fileBody, fileOptions) {
     var _this3 = this;
@@ -63085,23 +64313,29 @@ var StorageFileApi = class extends BaseApiClient {
     url.searchParams.set("token", token);
     return _this3.handleOperation(async () => {
       let body;
-      const options = _objectSpread22({ upsert: DEFAULT_FILE_OPTIONS.upsert }, fileOptions);
-      const headers = _objectSpread22(_objectSpread22({}, _this3.headers), { "x-upsert": String(options.upsert) });
+      const options = _objectSpread22(_objectSpread22({}, DEFAULT_FILE_OPTIONS), fileOptions);
+      let headers = _objectSpread22(_objectSpread22({}, _this3.headers), { "x-upsert": String(options.upsert) });
+      const metadata = options.metadata;
       if (typeof Blob !== "undefined" && fileBody instanceof Blob) {
         body = new FormData();
         body.append("cacheControl", options.cacheControl);
+        if (metadata) body.append("metadata", _this3.encodeMetadata(metadata));
         body.append("", fileBody);
       } else if (typeof FormData !== "undefined" && fileBody instanceof FormData) {
         body = fileBody;
-        body.append("cacheControl", options.cacheControl);
+        if (!body.has("cacheControl")) body.append("cacheControl", options.cacheControl);
+        if (metadata && !body.has("metadata")) body.append("metadata", _this3.encodeMetadata(metadata));
       } else {
         body = fileBody;
         headers["cache-control"] = `max-age=${options.cacheControl}`;
         headers["content-type"] = options.contentType;
+        if (metadata) headers["x-metadata"] = _this3.toBase64(_this3.encodeMetadata(metadata));
+        if ((typeof ReadableStream !== "undefined" && body instanceof ReadableStream || body && typeof body === "object" && "pipe" in body && typeof body.pipe === "function") && !options.duplex) options.duplex = "half";
       }
+      if (fileOptions === null || fileOptions === void 0 ? void 0 : fileOptions.headers) for (const [key, value] of Object.entries(fileOptions.headers)) headers = setHeader(headers, key, value);
       return {
         path: cleanPath,
-        fullPath: (await put(_this3.fetch, url.toString(), body, { headers })).Key
+        fullPath: (await put(_this3.fetch, url.toString(), body, _objectSpread22({ headers }, (options === null || options === void 0 ? void 0 : options.duplex) ? { duplex: options.duplex } : {}))).Key
       };
     });
   }
@@ -63110,7 +64344,8 @@ var StorageFileApi = class extends BaseApiClient {
   * Signed upload URLs can be used to upload files to the bucket without further authentication.
   * They are valid for 2 hours.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the current file name. For example `folder/image.png`.
   * @param options.upsert If set to true, allows the file to be overwritten if it already exists.
   * @returns Promise with response containing signed upload URL, token, and path or error
@@ -63134,6 +64369,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `insert`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async createSignedUploadUrl(path4, options) {
     var _this4 = this;
@@ -63155,10 +64396,14 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Replaces an existing file at the specified path with a new one.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The relative file path. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to update.
   * @param fileBody The body of the file to be stored in the bucket.
-  * @param fileOptions Optional file upload options including cacheControl, contentType, upsert, and metadata.
+  * @param fileOptions Optional file upload options including cacheControl, contentType, and metadata.
+  * **Note:** The `upsert` option has no effect here. `update()` always replaces the
+  * file at the given path, so the `x-upsert` header is not sent. To control upsert
+  * behavior, use `upload()` instead.
   * @returns Promise with response containing file path, id, and fullPath or error
   *
   * @example Update file
@@ -63168,8 +64413,7 @@ var StorageFileApi = class extends BaseApiClient {
   *   .storage
   *   .from('avatars')
   *   .update('public/avatar1.png', avatarFile, {
-  *     cacheControl: '3600',
-  *     upsert: true
+  *     cacheControl: '3600'
   *   })
   * ```
   *
@@ -63195,6 +64439,14 @@ var StorageFileApi = class extends BaseApiClient {
   *     contentType: 'image/png'
   *   })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `update` and `select`
+  * - `update()` always replaces the file at the given path regardless of the `upsert` option.
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+  * - For React Native, using either `Blob`, `File` or `FormData` does not work as intended. Update file using `ArrayBuffer` from base64 file data instead, see example below.
   */
   async update(path4, fileBody, fileOptions) {
     return this.uploadOrUpdate("PUT", path4, fileBody, fileOptions);
@@ -63202,7 +64454,8 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Moves an existing file to a new path in the same bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
   * @param toPath The new file path, including the new file name. For example `folder/image-new.png`.
   * @param options The destination options.
@@ -63225,6 +64478,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `update` and `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async move(fromPath, toPath, options) {
     var _this6 = this;
@@ -63240,7 +64499,8 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Copies an existing file to a new path in the same bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param fromPath The original file path, including the current file name. For example `folder/image.png`.
   * @param toPath The new file path, including the new file name. For example `folder/image-copy.png`.
   * @param options The destination options.
@@ -63263,6 +64523,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `insert` and `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async copy(fromPath, toPath, options) {
     var _this7 = this;
@@ -63278,11 +64544,13 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Creates a signed URL. Use a signed URL to share a file for a fixed amount of time.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the current file name. For example `folder/image.png`.
   * @param expiresIn The number of seconds until the signed URL expires. For example, `60` for a URL which is valid for one minute.
   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
   * @param options.transform Transform the asset before serving it to the client.
+  * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
   * @returns Promise with response containing signed URL or error
   *
   * @example Create Signed URL
@@ -63325,6 +64593,12 @@ var StorageFileApi = class extends BaseApiClient {
   *     download: true,
   *   })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async createSignedUrl(path4, expiresIn, options) {
     var _this8 = this;
@@ -63332,18 +64606,22 @@ var StorageFileApi = class extends BaseApiClient {
       let _path = _this8._getFinalPath(path4);
       const hasTransform = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0;
       let data = await post(_this8.fetch, `${_this8.url}/object/sign/${_path}`, _objectSpread22({ expiresIn }, hasTransform ? { transform: options.transform } : {}), { headers: _this8.headers });
-      const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
-      const returnedPath = hasTransform && data.signedURL.includes("/object/sign/") ? data.signedURL.replace("/object/sign/", "/render/image/sign/") : data.signedURL;
-      return { signedUrl: encodeURI(`${_this8.url}${returnedPath}${downloadQueryParam}`) };
+      const query = new URLSearchParams();
+      if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+      const queryString = query.toString();
+      return { signedUrl: encodeURI(`${_this8.url}${data.signedURL}${queryString ? `&${queryString}` : ""}`) };
     });
   }
   /**
   * Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param paths The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
   * @param expiresIn The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
   * @param options.download triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+  * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
   * @returns Promise with response containing array of objects with signedUrl, path, and error or error
   *
   * @example Create Signed URLs
@@ -63374,6 +64652,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async createSignedUrls(paths, expiresIn, options) {
     var _this9 = this;
@@ -63382,16 +64666,21 @@ var StorageFileApi = class extends BaseApiClient {
         expiresIn,
         paths
       }, { headers: _this9.headers });
-      const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `&download=${options.download === true ? "" : options.download}` : "";
-      return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${downloadQueryParam}`) : null }));
+      const query = new URLSearchParams();
+      if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+      if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+      const queryString = query.toString();
+      return data.map((datum) => _objectSpread22(_objectSpread22({}, datum), {}, { signedUrl: datum.signedURL ? encodeURI(`${_this9.url}${datum.signedURL}${queryString ? `&${queryString}` : ""}`) : null }));
     });
   }
   /**
   * Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `getPublicUrl` instead.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The full path and file name of the file to be downloaded. For example `folder/image.png`.
   * @param options.transform Transform the asset before serving it to the client.
+  * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
   * @param parameters Additional fetch parameters like signal for cancellation. Supports standard fetch options including cache control.
   * @returns BlobDownloadBuilder instance for downloading the file
   *
@@ -63443,13 +64732,21 @@ var StorageFileApi = class extends BaseApiClient {
   *   .from('avatars')
   *   .download('folder/avatar1.png', {}, { signal: controller.signal })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   download(path4, options, parameters) {
-    const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined" ? "render/image/authenticated" : "object";
-    const transformationQuery = this.transformOptsToQueryString((options === null || options === void 0 ? void 0 : options.transform) || {});
-    const queryString = transformationQuery ? `?${transformationQuery}` : "";
+    const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0 ? "render/image/authenticated" : "object";
+    const query = new URLSearchParams();
+    if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+    if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+    const queryString = query.toString();
     const _path = this._getFinalPath(path4);
-    const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString}`, {
+    const downloadFn = () => get(this.fetch, `${this.url}/${renderPath}/${_path}${queryString ? `?${queryString}` : ""}`, {
       headers: this.headers,
       noResolveJson: true
     }, parameters);
@@ -63461,7 +64758,8 @@ var StorageFileApi = class extends BaseApiClient {
   * Returns detailed file metadata including size, content type, and timestamps.
   * Note: The API returns `last_modified` field, not `updated_at`.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the file name. For example `folder/image.png`.
   * @returns Promise with response containing file metadata or error
   *
@@ -63488,7 +64786,8 @@ var StorageFileApi = class extends BaseApiClient {
   /**
   * Checks the existence of a file.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The file path, including the file name. For example `folder/image.png`.
   * @returns Promise with response containing boolean indicating file existence or error
   *
@@ -63526,10 +64825,12 @@ var StorageFileApi = class extends BaseApiClient {
   * A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset.
   * This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The path and name of the file to generate the public URL for. For example `folder/image.png`.
   * @param options.download Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
   * @param options.transform Transform the asset before serving it to the client.
+  * @param options.cacheNonce Append a cache nonce parameter to the URL to invalidate the cache.
   * @returns Object with public URL
   *
   * @example Returns the URL for an asset in a public bucket
@@ -63571,18 +64872,23 @@ var StorageFileApi = class extends BaseApiClient {
   *     download: true,
   *   })
   * ```
+  *
+  * @remarks
+  * - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   getPublicUrl(path4, options) {
     const _path = this._getFinalPath(path4);
-    const _queryString = [];
-    const downloadQueryParam = (options === null || options === void 0 ? void 0 : options.download) ? `download=${options.download === true ? "" : options.download}` : "";
-    if (downloadQueryParam !== "") _queryString.push(downloadQueryParam);
-    const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) !== "undefined" ? "render/image" : "object";
-    const transformationQuery = this.transformOptsToQueryString((options === null || options === void 0 ? void 0 : options.transform) || {});
-    if (transformationQuery !== "") _queryString.push(transformationQuery);
-    let queryString = _queryString.join("&");
-    if (queryString !== "") queryString = `?${queryString}`;
-    return { data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}${queryString}`) } };
+    const query = new URLSearchParams();
+    if (options === null || options === void 0 ? void 0 : options.download) query.set("download", options.download === true ? "" : options.download);
+    if (options === null || options === void 0 ? void 0 : options.transform) this.applyTransformOptsToQuery(query, options.transform);
+    if ((options === null || options === void 0 ? void 0 : options.cacheNonce) != null) query.set("cacheNonce", String(options.cacheNonce));
+    const queryString = query.toString();
+    const renderPath = typeof (options === null || options === void 0 ? void 0 : options.transform) === "object" && options.transform !== null && Object.keys(options.transform).length > 0 ? "render/image" : "object";
+    return { data: { publicUrl: encodeURI(`${this.url}/${renderPath}/public/${_path}`) + (queryString ? `?${queryString}` : "") } };
   }
   /**
   * Deletes files within the same bucket
@@ -63590,7 +64896,8 @@ var StorageFileApi = class extends BaseApiClient {
   * Returns an array of FileObject entries for the deleted files. Note that deprecated
   * fields like `bucket_id` may or may not be present in the response - do not rely on them.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param paths An array of files to delete, including the path and file name. For example [`'folder/image.png'`].
   * @returns Promise with response containing array of deleted file objects or error
   *
@@ -63609,6 +64916,12 @@ var StorageFileApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `delete` and `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async remove(paths) {
     var _this12 = this;
@@ -63633,7 +64946,8 @@ var StorageFileApi = class extends BaseApiClient {
   * Additionally, deprecated fields like `bucket_id`, `owner`, and `buckets` are NOT returned
   * by this method.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param path The folder path.
   * @param options Search options including limit (defaults to 100), offset, sortBy, and search
   * @param parameters Optional fetch parameters including signal for cancellation
@@ -63662,7 +64976,7 @@ var StorageFileApi = class extends BaseApiClient {
   * })
   * ```
   *
-  * Response (file entry):
+  * Response:
   * ```json
   * {
   *   "data": [
@@ -63699,6 +65013,12 @@ var StorageFileApi = class extends BaseApiClient {
   *     search: 'jon'
   *   })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: none
+  *   - `objects` table permissions: `select`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async list(path4, options, parameters) {
     var _this13 = this;
@@ -63716,7 +65036,8 @@ var StorageFileApi = class extends BaseApiClient {
   *
   * @experimental this method signature might change in the future
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param options Search options including prefix, cursor for pagination, limit, with_delimiter
   * @param parameters Optional fetch parameters including signal for cancellation
   * @returns Promise with response containing folders/objects arrays with pagination info or error
@@ -63773,17 +65094,17 @@ var StorageFileApi = class extends BaseApiClient {
   _removeEmptyFolders(path4) {
     return path4.replace(/^\/|\/$/g, "").replace(/\/+/g, "/");
   }
-  transformOptsToQueryString(transform) {
-    const params = [];
-    if (transform.width) params.push(`width=${transform.width}`);
-    if (transform.height) params.push(`height=${transform.height}`);
-    if (transform.resize) params.push(`resize=${transform.resize}`);
-    if (transform.format) params.push(`format=${transform.format}`);
-    if (transform.quality) params.push(`quality=${transform.quality}`);
-    return params.join("&");
+  /** Modifies the `query`, appending values the from `transform` */
+  applyTransformOptsToQuery(query, transform) {
+    if (transform.width) query.set("width", transform.width.toString());
+    if (transform.height) query.set("height", transform.height.toString());
+    if (transform.resize) query.set("resize", transform.resize);
+    if (transform.format) query.set("format", transform.format);
+    if (transform.quality) query.set("quality", transform.quality.toString());
+    return query;
   }
 };
-var version = "2.99.3";
+var version = "2.106.2";
 var DEFAULT_HEADERS = { "X-Client-Info": `storage-js/${version}` };
 var StorageBucketApi = class extends BaseApiClient {
   constructor(url, headers = {}, fetch$1, opts) {
@@ -63798,7 +65119,8 @@ var StorageBucketApi = class extends BaseApiClient {
   /**
   * Retrieves the details of all Storage buckets within an existing project.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param options Query parameters for listing buckets
   * @param options.limit Maximum number of buckets to return
   * @param options.offset Number of buckets to skip
@@ -63826,6 +65148,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *     search: 'prod'
   *   })
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `select`
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async listBuckets(options) {
     var _this = this;
@@ -63837,7 +65165,8 @@ var StorageBucketApi = class extends BaseApiClient {
   /**
   * Retrieves the details of an existing Storage bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param id The unique identifier of the bucket you would like to retrieve.
   * @returns Promise with response containing bucket details or error
   *
@@ -63866,6 +65195,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `select`
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async getBucket(id) {
     var _this2 = this;
@@ -63876,7 +65211,8 @@ var StorageBucketApi = class extends BaseApiClient {
   /**
   * Creates a new Storage bucket
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param id A unique identifier for the bucket you are creating.
   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private.
   * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
@@ -63909,6 +65245,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `insert`
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async createBucket(id, options = { public: false }) {
     var _this3 = this;
@@ -63926,7 +65268,8 @@ var StorageBucketApi = class extends BaseApiClient {
   /**
   * Updates a Storage bucket
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param id A unique identifier for the bucket you are updating.
   * @param options.public The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations.
   * @param options.fileSizeLimit specifies the max file size in bytes that can be uploaded to this bucket.
@@ -63957,6 +65300,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `select` and `update`
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async updateBucket(id, options) {
     var _this4 = this;
@@ -63973,7 +65322,8 @@ var StorageBucketApi = class extends BaseApiClient {
   /**
   * Removes all objects inside a single bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param id The unique identifier of the bucket you would like to empty.
   * @returns Promise with success message or error
   *
@@ -63993,6 +65343,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `select`
+  *   - `objects` table permissions: `select` and `delete`
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async emptyBucket(id) {
     var _this5 = this;
@@ -64004,7 +65360,8 @@ var StorageBucketApi = class extends BaseApiClient {
   * Deletes an existing bucket. A bucket can't be deleted with existing objects inside it.
   * You must first `empty()` the bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
   * @param id The unique identifier of the bucket you would like to delete.
   * @returns Promise with success message or error
   *
@@ -64024,6 +65381,12 @@ var StorageBucketApi = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - RLS policy permissions required:
+  *   - `buckets` table permissions: `select` and `delete`
+  *   - `objects` table permissions: none
+  * - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
   */
   async deleteBucket(id) {
     var _this6 = this;
@@ -64051,13 +65414,24 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
   * @param url - The base URL for the storage API
   * @param headers - HTTP headers to include in requests
   * @param fetch - Optional custom fetch implementation
   *
-  * @example
+  * @example Using supabase-js (recommended)
   * ```typescript
+  * import { createClient } from '@supabase/supabase-js'
+  *
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const { data, error } = await supabase.storage.analytics.listBuckets()
+  * ```
+  *
+  * @example Standalone import for bundle-sensitive environments
+  * ```typescript
+  * import { StorageAnalyticsClient } from '@supabase/storage-js'
+  *
   * const client = new StorageAnalyticsClient(url, headers)
   * ```
   */
@@ -64074,7 +65448,8 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
   * @param name A unique name for the bucket you are creating
   * @returns Promise with response containing newly created analytics bucket or error
   *
@@ -64099,6 +65474,10 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - Creates a new analytics bucket using Iceberg tables
+  * - Analytics buckets are optimized for analytical queries and data processing
   */
   async createBucket(name) {
     var _this = this;
@@ -64114,7 +65493,8 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
   * @param options Query parameters for listing buckets
   * @param options.limit Maximum number of buckets to return
   * @param options.offset Number of buckets to skip
@@ -64151,6 +65531,10 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - Retrieves the details of all Analytics Storage buckets within an existing project
+  * - Only returns buckets of type 'ANALYTICS'
   */
   async listBuckets(options) {
     var _this2 = this;
@@ -64175,7 +65559,8 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
   * @param bucketName The unique identifier of the bucket you would like to delete
   * @returns Promise with response containing success message or error
   *
@@ -64196,6 +65581,9 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *   "error": null
   * }
   * ```
+  *
+  * @remarks
+  * - Deletes an analytics bucket
   */
   async deleteBucket(bucketName) {
     var _this3 = this;
@@ -64213,7 +65601,8 @@ var StorageAnalyticsClient = class extends BaseApiClient {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
   * @param bucketName - The name of the analytics bucket (warehouse) to connect to
   * @returns The wrapped Iceberg catalog client
   * @throws {StorageError} If the bucket name is invalid
@@ -64496,13 +65885,24 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param url - Base URL of the Storage Vectors REST API.
   * @param options.headers - Optional headers (for example `Authorization`) applied to every request.
   * @param options.fetch - Optional custom `fetch` implementation for non-browser runtimes.
   *
-  * @example
+  * @example Using supabase-js (recommended)
   * ```typescript
+  * import { createClient } from '@supabase/supabase-js'
+  *
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const bucket = supabase.storage.vectors.from('embeddings-prod')
+  * ```
+  *
+  * @example Standalone import for bundle-sensitive environments
+  * ```typescript
+  * import { StorageVectorsClient } from '@supabase/storage-js'
+  *
   * const client = new StorageVectorsClient(url, options)
   * ```
   */
@@ -64518,11 +65918,12 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param vectorBucketName - Name of the vector bucket
   * @returns Bucket-scoped client with index and vector operations
   *
-  * @example
+  * @example Accessing a vector bucket
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * ```
@@ -64539,11 +65940,12 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param vectorBucketName - Unique name for the vector bucket
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Creating a vector bucket
   * ```typescript
   * const { data, error } = await supabase
   *   .storage
@@ -64563,11 +65965,12 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param vectorBucketName - Name of the vector bucket
   * @returns Promise with bucket metadata or error
   *
-  * @example
+  * @example Get bucket metadata
   * ```typescript
   * const { data, error } = await supabase
   *   .storage
@@ -64589,11 +65992,12 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Optional filters (prefix, maxResults, nextToken)
   * @returns Promise with list of buckets or error
   *
-  * @example
+  * @example List vector buckets
   * ```typescript
   * const { data, error } = await supabase
   *   .storage
@@ -64618,11 +66022,12 @@ var StorageVectorsClient = class extends VectorBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param vectorBucketName - Name of the vector bucket to delete
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Delete a vector bucket
   * ```typescript
   * const { data, error } = await supabase
   *   .storage
@@ -64643,8 +66048,9 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
-  * @example
+  * @category Storage
+  * @subcategory Vector Buckets
+  * @example Creating a vector bucket scope
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * ```
@@ -64662,11 +66068,12 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Index configuration (vectorBucketName is automatically set)
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Creating a vector index
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * await bucket.createIndex({
@@ -64693,11 +66100,12 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Listing options (vectorBucketName is automatically set)
   * @returns Promise with response containing indexes array and pagination token or error
   *
-  * @example
+  * @example List indexes
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * const { data } = await bucket.listIndexes({ prefix: 'documents-' })
@@ -64716,11 +66124,12 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param indexName - Name of the index to retrieve
   * @returns Promise with index metadata or error
   *
-  * @example
+  * @example Get index metadata
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * const { data } = await bucket.getIndex('documents-openai')
@@ -64740,11 +66149,12 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param indexName - Name of the index to delete
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Delete an index
   * ```typescript
   * const bucket = supabase.storage.vectors.from('embeddings-prod')
   * await bucket.deleteIndex('old-index')
@@ -64763,11 +66173,12 @@ var VectorBucketScope = class extends VectorIndexApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param indexName - Name of the index
   * @returns Index-scoped client with vector data operations
   *
-  * @example
+  * @example Accessing an index
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   *
@@ -64798,8 +66209,9 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
-  * @example
+  * @category Storage
+  * @subcategory Vector Buckets
+  * @example Creating a vector index scope
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * ```
@@ -64818,11 +66230,12 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Vector insertion options (bucket and index names automatically set)
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Insert vectors into an index
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * await index.putVectors({
@@ -64852,11 +66265,12 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Vector retrieval options (bucket and index names automatically set)
   * @returns Promise with response containing vectors array or error
   *
-  * @example
+  * @example Get vectors by keys
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * const { data } = await index.getVectors({
@@ -64881,11 +66295,12 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Listing options (bucket and index names automatically set)
   * @returns Promise with response containing vectors array and pagination token or error
   *
-  * @example
+  * @example List vectors with pagination
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * const { data } = await index.listVectors({
@@ -64910,11 +66325,12 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Query options (bucket and index names automatically set)
   * @returns Promise with response containing matches array of similar vectors ordered by distance or error
   *
-  * @example
+  * @example Query similar vectors
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * const { data } = await index.queryVectors({
@@ -64942,11 +66358,12 @@ var VectorIndexScope = class extends VectorDataApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
   * @param options - Deletion options (bucket and index names automatically set)
   * @returns Promise with empty response on success or error
   *
-  * @example
+  * @example Delete vectors by keys
   * ```typescript
   * const index = supabase.storage.vectors.from('embeddings-prod').index('documents-openai')
   * await index.deleteVectors({
@@ -64966,13 +66383,23 @@ var StorageClient = class extends StorageBucketApi {
   /**
   * Creates a client for Storage buckets, files, analytics, and vectors.
   *
-  * @category File Buckets
-  * @example
+  * @category Storage
+  * @subcategory File Buckets
+  *
+  * @example Using supabase-js (recommended)
+  * ```ts
+  * import { createClient } from '@supabase/supabase-js'
+  *
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+  * const avatars = supabase.storage.from('avatars')
+  * ```
+  *
+  * @example Standalone import for bundle-sensitive environments
   * ```ts
   * import { StorageClient } from '@supabase/storage-js'
   *
   * const storage = new StorageClient('https://xyzcompany.supabase.co/storage/v1', {
-  *   apikey: 'public-anon-key',
+  *   apikey: 'your-publishable-key',
   * })
   * const avatars = storage.from('avatars')
   * ```
@@ -64983,10 +66410,12 @@ var StorageClient = class extends StorageBucketApi {
   /**
   * Perform file operation in a bucket.
   *
-  * @category File Buckets
+  * @category Storage
+  * @subcategory File Buckets
+  *
   * @param id The bucket id to operate on.
   *
-  * @example
+  * @example Accessing a bucket
   * ```typescript
   * const avatars = supabase.storage.from('avatars')
   * ```
@@ -65002,7 +66431,9 @@ var StorageClient = class extends StorageBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Vector Buckets
+  * @category Storage
+  * @subcategory Vector Buckets
+  *
   * @returns A StorageVectorsClient instance configured with the current storage settings.
   */
   get vectors() {
@@ -65019,7 +66450,9 @@ var StorageClient = class extends StorageBucketApi {
   *
   * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
   *
-  * @category Analytics Buckets
+  * @category Storage
+  * @subcategory Analytics Buckets
+  *
   * @returns A StorageAnalyticsClient instance configured with the current storage settings.
   */
   get analytics() {
@@ -65027,11 +66460,11 @@ var StorageClient = class extends StorageBucketApi {
   }
 };
 
-// ../../node_modules/.pnpm/@supabase+supabase-js@2.99.3/node_modules/@supabase/supabase-js/dist/index.mjs
+// node_modules/.pnpm/@supabase+supabase-js@2.106.2/node_modules/@supabase/supabase-js/dist/index.mjs
 var import_auth_js = __toESM(require_main3(), 1);
 __reExport(dist_exports, __toESM(require_main2(), 1));
 __reExport(dist_exports, __toESM(require_main3(), 1));
-var version2 = "2.99.3";
+var version2 = "2.106.2";
 var JS_ENV = "";
 if (typeof Deno !== "undefined") JS_ENV = "deno";
 else if (typeof document !== "undefined") JS_ENV = "web";
@@ -65047,6 +66480,127 @@ var DEFAULT_AUTH_OPTIONS = {
   flowType: "implicit"
 };
 var DEFAULT_REALTIME_OPTIONS = {};
+var DEFAULT_TRACE_PROPAGATION_OPTIONS = {
+  enabled: false,
+  respectSamplingDecision: true
+};
+function __awaiter2(thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function(resolve) {
+      resolve(value);
+    });
+  }
+  return new (P || (P = Promise))(function(resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+    function step(result) {
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+}
+var otelModulePromise = null;
+var OTEL_PKG = "@opentelemetry/api";
+function loadOtel() {
+  if (otelModulePromise === null) otelModulePromise = import(
+    /* webpackIgnore: true */
+    /* turbopackIgnore: true */
+    /* @vite-ignore */
+    OTEL_PKG
+  ).catch(() => null);
+  return otelModulePromise;
+}
+function extractTraceContext() {
+  return __awaiter2(this, void 0, void 0, function* () {
+    try {
+      const otel = yield loadOtel();
+      if (!otel || !otel.propagation || !otel.context) return null;
+      const carrier = {};
+      otel.propagation.inject(otel.context.active(), carrier);
+      const traceparent = carrier["traceparent"];
+      if (!traceparent) return null;
+      return {
+        traceparent,
+        tracestate: carrier["tracestate"],
+        baggage: carrier["baggage"]
+      };
+    } catch (_a) {
+      return null;
+    }
+  });
+}
+function parseTraceParent(traceparent) {
+  if (!traceparent || typeof traceparent !== "string") return null;
+  const parts = traceparent.split("-");
+  if (parts.length !== 4) return null;
+  const [version$1, traceId, parentId, traceFlags] = parts;
+  if (version$1.length !== 2 || traceId.length !== 32 || parentId.length !== 16 || traceFlags.length !== 2) return null;
+  const hexRegex = /^[0-9a-f]+$/i;
+  if (!hexRegex.test(version$1) || !hexRegex.test(traceId) || !hexRegex.test(parentId) || !hexRegex.test(traceFlags)) return null;
+  if (traceId === "00000000000000000000000000000000" || parentId === "0000000000000000") return null;
+  return {
+    version: version$1,
+    traceId,
+    parentId,
+    traceFlags,
+    isSampled: (parseInt(traceFlags, 16) & 1) === 1
+  };
+}
+function shouldPropagateToTarget(targetUrl, targets) {
+  if (!targetUrl || !targets || targets.length === 0) return false;
+  let url;
+  if (targetUrl instanceof URL) url = targetUrl;
+  else try {
+    url = new URL(targetUrl);
+  } catch (error) {
+    return false;
+  }
+  for (const target of targets) try {
+    if (typeof target === "string") {
+      if (matchStringTarget(url.hostname, target)) return true;
+    } else if (target instanceof RegExp) {
+      if (target.test(url.hostname)) return true;
+    } else if (typeof target === "function") {
+      if (target(url)) return true;
+    }
+  } catch (error) {
+    continue;
+  }
+  return false;
+}
+function matchStringTarget(hostname, target) {
+  if (target === hostname) return true;
+  if (target.startsWith("*.")) {
+    const domain = target.slice(2);
+    if (hostname.endsWith(domain)) {
+      if (hostname === domain || hostname.endsWith("." + domain)) return true;
+    }
+  }
+  return false;
+}
+function getDefaultPropagationTargets(supabaseUrl2) {
+  const targets = [];
+  try {
+    const url = new URL(supabaseUrl2);
+    targets.push(url.hostname);
+  } catch (error) {
+  }
+  targets.push("*.supabase.co", "*.supabase.in");
+  targets.push("localhost", "127.0.0.1", "[::1]");
+  return targets;
+}
 function _typeof3(o) {
   "@babel/helpers - typeof";
   return _typeof3 = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(o$1) {
@@ -65105,31 +66659,61 @@ var resolveFetch2 = (customFetch) => {
 var resolveHeadersConstructor = () => {
   return Headers;
 };
-var fetchWithAuth = (supabaseKey2, getAccessToken, customFetch) => {
+var fetchWithAuth = (supabaseKey2, supabaseUrl2, getAccessToken, customFetch, tracePropagationOptions) => {
   const fetch$1 = resolveFetch2(customFetch);
   const HeadersConstructor = resolveHeadersConstructor();
+  const traceEnabled = (tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.enabled) === true;
+  const respectSampling = (tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.respectSamplingDecision) !== false;
+  const traceTargets = traceEnabled ? getDefaultPropagationTargets(supabaseUrl2) : null;
   return async (input, init) => {
     var _await$getAccessToken;
     const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey2;
     let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
     if (!headers.has("apikey")) headers.set("apikey", supabaseKey2);
     if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
+    if (traceTargets) {
+      const traceHeaders = await getTraceHeaders(input, traceTargets, respectSampling);
+      if (traceHeaders) {
+        if (traceHeaders.traceparent && !headers.has("traceparent")) headers.set("traceparent", traceHeaders.traceparent);
+        if (traceHeaders.tracestate && !headers.has("tracestate")) headers.set("tracestate", traceHeaders.tracestate);
+        if (traceHeaders.baggage && !headers.has("baggage")) headers.set("baggage", traceHeaders.baggage);
+      }
+    }
     return fetch$1(input, _objectSpread23(_objectSpread23({}, init), {}, { headers }));
   };
 };
+async function getTraceHeaders(input, targets, respectSampling) {
+  if (!shouldPropagateToTarget(typeof input === "string" ? input : input instanceof URL ? input : input.url, targets)) return null;
+  const traceContext = await extractTraceContext();
+  if (!traceContext || !traceContext.traceparent) return null;
+  if (respectSampling) {
+    const parsed = parseTraceParent(traceContext.traceparent);
+    if (parsed && !parsed.isSampled) return null;
+  }
+  return traceContext;
+}
+function normalizeTracePropagation(value) {
+  return typeof value === "boolean" ? { enabled: value } : value;
+}
 function ensureTrailingSlash(url) {
   return url.endsWith("/") ? url : url + "/";
 }
 function applySettingDefaults(options, defaults) {
-  var _DEFAULT_GLOBAL_OPTIO, _globalOptions$header;
+  var _DEFAULT_GLOBAL_OPTIO, _globalOptions$header, _ref, _tracePropagationOpti, _ref2, _tracePropagationOpti2;
   const { db: dbOptions, auth: authOptions, realtime: realtimeOptions, global: globalOptions } = options;
   const { db: DEFAULT_DB_OPTIONS$1, auth: DEFAULT_AUTH_OPTIONS$1, realtime: DEFAULT_REALTIME_OPTIONS$1, global: DEFAULT_GLOBAL_OPTIONS$1 } = defaults;
+  const tracePropagationOptions = normalizeTracePropagation(options.tracePropagation);
+  const DEFAULT_TRACE_PROPAGATION_OPTIONS$1 = normalizeTracePropagation(defaults.tracePropagation);
   const result = {
     db: _objectSpread23(_objectSpread23({}, DEFAULT_DB_OPTIONS$1), dbOptions),
     auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS$1), authOptions),
     realtime: _objectSpread23(_objectSpread23({}, DEFAULT_REALTIME_OPTIONS$1), realtimeOptions),
     storage: {},
     global: _objectSpread23(_objectSpread23(_objectSpread23({}, DEFAULT_GLOBAL_OPTIONS$1), globalOptions), {}, { headers: _objectSpread23(_objectSpread23({}, (_DEFAULT_GLOBAL_OPTIO = DEFAULT_GLOBAL_OPTIONS$1 === null || DEFAULT_GLOBAL_OPTIONS$1 === void 0 ? void 0 : DEFAULT_GLOBAL_OPTIONS$1.headers) !== null && _DEFAULT_GLOBAL_OPTIO !== void 0 ? _DEFAULT_GLOBAL_OPTIO : {}), (_globalOptions$header = globalOptions === null || globalOptions === void 0 ? void 0 : globalOptions.headers) !== null && _globalOptions$header !== void 0 ? _globalOptions$header : {}) }),
+    tracePropagation: {
+      enabled: (_ref = (_tracePropagationOpti = tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.enabled) !== null && _tracePropagationOpti !== void 0 ? _tracePropagationOpti : DEFAULT_TRACE_PROPAGATION_OPTIONS$1 === null || DEFAULT_TRACE_PROPAGATION_OPTIONS$1 === void 0 ? void 0 : DEFAULT_TRACE_PROPAGATION_OPTIONS$1.enabled) !== null && _ref !== void 0 ? _ref : false,
+      respectSamplingDecision: (_ref2 = (_tracePropagationOpti2 = tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.respectSamplingDecision) !== null && _tracePropagationOpti2 !== void 0 ? _tracePropagationOpti2 : DEFAULT_TRACE_PROPAGATION_OPTIONS$1 === null || DEFAULT_TRACE_PROPAGATION_OPTIONS$1 === void 0 ? void 0 : DEFAULT_TRACE_PROPAGATION_OPTIONS$1.respectSamplingDecision) !== null && _ref2 !== void 0 ? _ref2 : true
+    },
     accessToken: async () => ""
   };
   if (options.accessToken) result.accessToken = options.accessToken;
@@ -65173,7 +66757,7 @@ var SupabaseClient = class {
   * import { createClient } from '@supabase/supabase-js'
   *
   * // Create a single supabase client for interacting with your database
-  * const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key')
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
   * ```
   *
   * @example With a custom domain
@@ -65181,7 +66765,7 @@ var SupabaseClient = class {
   * import { createClient } from '@supabase/supabase-js'
   *
   * // Use a custom domain as the supabase URL
-  * const supabase = createClient('https://my-custom-domain.com', 'publishable-or-anon-key')
+  * const supabase = createClient('https://my-custom-domain.com', 'your-publishable-key')
   * ```
   *
   * @example With additional parameters
@@ -65201,7 +66785,7 @@ var SupabaseClient = class {
   *     headers: { 'x-my-custom-header': 'my-app-name' },
   *   },
   * }
-  * const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", options)
+  * const supabase = createClient("https://xyzcompany.supabase.co", "your-publishable-key", options)
   * ```
   *
   * @exampleDescription With custom schemas
@@ -65214,7 +66798,7 @@ var SupabaseClient = class {
   * ```js
   * import { createClient } from '@supabase/supabase-js'
   *
-  * const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key', {
   *   // Provide a custom schema. Defaults to "public".
   *   db: { schema: 'other_schema' }
   * })
@@ -65229,7 +66813,7 @@ var SupabaseClient = class {
   * ```js
   * import { createClient } from '@supabase/supabase-js'
   *
-  * const supabase = createClient('https://xyzcompany.supabase.co', 'publishable-or-anon-key', {
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key', {
   *   global: { fetch: fetch.bind(globalThis) }
   * })
   * ```
@@ -65243,7 +66827,7 @@ var SupabaseClient = class {
   * import { createClient } from '@supabase/supabase-js'
   * import AsyncStorage from "@react-native-async-storage/async-storage";
   *
-  * const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
+  * const supabase = createClient("https://xyzcompany.supabase.co", "your-publishable-key", {
   *   auth: {
   *     storage: AsyncStorage,
   *     autoRefreshToken: true,
@@ -65320,7 +66904,7 @@ var SupabaseClient = class {
   *   }
   * }
   *
-  * const supabase = createClient("https://xyzcompany.supabase.co", "publishable-or-anon-key", {
+  * const supabase = createClient("https://xyzcompany.supabase.co", "your-publishable-key", {
   *   auth: {
   *     storage: new LargeSecureStore(),
   *     autoRefreshToken: true,
@@ -65334,9 +66918,33 @@ var SupabaseClient = class {
   * ```ts
   * import { createClient } from '@supabase/supabase-js'
   *
-  * const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
   *
   * const { data } = await supabase.from('profiles').select('*')
+  * ```
+  *
+  * @exampleDescription With OpenTelemetry tracing
+  * Opt in to W3C trace context propagation so the `trace_id` from your
+  * client-side spans is attached to Supabase requests and appears in API
+  * Gateway and Edge Function logs. Requires `@opentelemetry/api` to be
+  * installed in your application. See [Tracing with the JS SDK](https://supabase.com/docs/guides/telemetry/client-side-tracing).
+  *
+  * @example With OpenTelemetry tracing
+  * ```ts
+  * import { createClient } from '@supabase/supabase-js'
+  * import { trace } from '@opentelemetry/api'
+  *
+  * const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key', {
+  *   tracePropagation: true,
+  * })
+  *
+  * const tracer = trace.getTracer('my-app')
+  *
+  * await tracer.startActiveSpan('fetch-users', async (span) => {
+  *   // Outgoing request carries the active trace context.
+  *   const { data, error } = await supabase.from('users').select('*')
+  *   span.end()
+  * })
   * ```
   */
   constructor(supabaseUrl2, supabaseKey2, options) {
@@ -65355,9 +66963,11 @@ var SupabaseClient = class {
       db: DEFAULT_DB_OPTIONS,
       realtime: DEFAULT_REALTIME_OPTIONS,
       auth: _objectSpread23(_objectSpread23({}, DEFAULT_AUTH_OPTIONS), {}, { storageKey: defaultStorageKey }),
-      global: DEFAULT_GLOBAL_OPTIONS
+      global: DEFAULT_GLOBAL_OPTIONS,
+      tracePropagation: DEFAULT_TRACE_PROPAGATION_OPTIONS
     };
     const settings = applySettingDefaults(options !== null && options !== void 0 ? options : {}, DEFAULTS);
+    this.settings = settings;
     this.storageKey = (_settings$auth$storag = settings.auth.storageKey) !== null && _settings$auth$storag !== void 0 ? _settings$auth$storag : "";
     this.headers = (_settings$global$head = settings.global.headers) !== null && _settings$global$head !== void 0 ? _settings$global$head : {};
     if (!settings.accessToken) {
@@ -65369,10 +66979,11 @@ var SupabaseClient = class {
         throw new Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(prop)} is not possible`);
       } });
     }
-    this.fetch = fetchWithAuth(supabaseKey2, this._getAccessToken.bind(this), settings.global.fetch);
+    this.fetch = fetchWithAuth(supabaseKey2, supabaseUrl2, this._getAccessToken.bind(this), settings.global.fetch, settings.tracePropagation);
     this.realtime = this._initRealtimeClient(_objectSpread23({
       headers: this.headers,
-      accessToken: this._getAccessToken.bind(this)
+      accessToken: this._getAccessToken.bind(this),
+      fetch: this.fetch
     }, settings.realtime));
     if (this.accessToken) Promise.resolve(this.accessToken()).then((token) => this.realtime.setAuth(token)).catch((e) => console.warn("Failed to set initial Realtime auth token:", e));
     this.rest = new PostgrestClient(new URL("rest/v1", baseUrl).href, {
@@ -65448,12 +67059,20 @@ var SupabaseClient = class {
   * @param {string} name - The name of the Realtime channel.
   * @param {Object} opts - The options to pass to the Realtime channel.
   *
+  * @category Realtime
   */
   channel(name, opts = { config: {} }) {
     return this.realtime.channel(name, opts);
   }
   /**
   * Returns all Realtime channels.
+  *
+  * @category Realtime
+  *
+  * @example Get all channels
+  * ```js
+  * const channels = supabase.getChannels()
+  * ```
   */
   getChannels() {
     return this.realtime.getChannels();
@@ -65463,12 +67082,32 @@ var SupabaseClient = class {
   *
   * @param {RealtimeChannel} channel - The name of the Realtime channel.
   *
+  *
+  * @category Realtime
+  *
+  * @remarks
+  * - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+  *
+  * @example Removes a channel
+  * ```js
+  * supabase.removeChannel(myChannel)
+  * ```
   */
   removeChannel(channel) {
     return this.realtime.removeChannel(channel);
   }
   /**
   * Unsubscribes and removes all Realtime channels from Realtime client.
+  *
+  * @category Realtime
+  *
+  * @remarks
+  * - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+  *
+  * @example Remove all channels
+  * ```js
+  * supabase.removeAllChannels()
+  * ```
   */
   removeAllChannels() {
     return this.realtime.removeAllChannels();
@@ -65480,7 +67119,7 @@ var SupabaseClient = class {
     const { data } = await _this.auth.getSession();
     return (_data$session$access_ = (_data$session = data.session) === null || _data$session === void 0 ? void 0 : _data$session.access_token) !== null && _data$session$access_ !== void 0 ? _data$session$access_ : _this.supabaseKey;
   }
-  _initSupabaseAuthClient({ autoRefreshToken, persistSession, detectSessionInUrl, storage, userStorage, storageKey, flowType, lock, debug, throwOnError }, headers, fetch$1) {
+  _initSupabaseAuthClient({ autoRefreshToken, persistSession, detectSessionInUrl, storage, userStorage, storageKey, flowType, lock, debug, throwOnError, experimental, lockAcquireTimeout, skipAutoInitialize }, headers, fetch$1) {
     const authHeaders = {
       Authorization: `Bearer ${this.supabaseKey}`,
       apikey: `${this.supabaseKey}`
@@ -65498,7 +67137,10 @@ var SupabaseClient = class {
       lock,
       debug,
       throwOnError,
+      experimental,
       fetch: fetch$1,
+      lockAcquireTimeout,
+      skipAutoInitialize,
       hasCustomAuthorizationHeader: Object.keys(this.headers).some((key) => key.toLowerCase() === "authorization")
     });
   }
@@ -65629,53 +67271,137 @@ var upload2 = (0, import_multer2.default)({
   }
 });
 var router3 = (0, import_express3.Router)();
+async function uploadImage(buffer, originalname, mimetype) {
+  const ext = path2.extname(originalname);
+  const filename = `projects/${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
+  const { error } = await supabase.storage.from(BUCKET).upload(filename, buffer, { contentType: mimetype });
+  if (error) throw new Error("Error al subir imagen: " + error.message);
+  const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(filename);
+  return publicUrl;
+}
+async function deleteImageByUrl(url) {
+  try {
+    const urlPath = new URL(url).pathname;
+    const storagePath = urlPath.split(`/public/${BUCKET}/`)[1];
+    if (storagePath) await supabase.storage.from(BUCKET).remove([storagePath]);
+  } catch {
+  }
+}
 router3.get("/projects", async (_req, res) => {
-  const { data, error } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase.from("projects").select("*, project_images(id, image_url, created_at)").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
     return;
   }
   res.json(data);
 });
-router3.post("/projects", upload2.single("image"), async (req, res) => {
+router3.post("/projects", upload2.array("images", 10), async (req, res) => {
   const { title, status } = req.body;
-  if (!title || !status || !req.file) {
-    res.status(400).json({ error: "T\xEDtulo, estado e imagen son requeridos" });
+  const files = req.files;
+  if (!title || !status) {
+    res.status(400).json({ error: "T\xEDtulo y estado son requeridos" });
     return;
   }
   if (!["en_curso", "terminado"].includes(status)) {
     res.status(400).json({ error: "Estado inv\xE1lido" });
     return;
   }
-  const ext = path2.extname(req.file.originalname);
-  const filename = `projects/${Date.now()}${ext}`;
-  const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filename, req.file.buffer, { contentType: req.file.mimetype });
-  if (uploadError) {
-    res.status(500).json({ error: "Error al subir imagen: " + uploadError.message });
+  const { data: project, error: projectError } = await supabase.from("projects").insert({ title, status, image: null }).select().single();
+  if (projectError) {
+    res.status(500).json({ error: projectError.message });
     return;
   }
-  const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(filename);
-  const { data, error } = await supabase.from("projects").insert({ title, image: publicUrl, status }).select().single();
+  if (files && files.length > 0) {
+    const uploadPromises = files.map((f) => uploadImage(f.buffer, f.originalname, f.mimetype));
+    let urls;
+    try {
+      urls = await Promise.all(uploadPromises);
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    const rows = urls.map((url) => ({ project_id: project.id, image_url: url }));
+    const { error: imgError } = await supabase.from("project_images").insert(rows);
+    if (imgError) {
+      res.status(500).json({ error: imgError.message });
+      return;
+    }
+    await supabase.from("projects").update({ image: urls[0] }).eq("id", project.id);
+    project.image = urls[0];
+  }
+  res.status(201).json(project);
+});
+router3.patch("/projects/:id/status", async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!["en_curso", "terminado"].includes(status)) {
+    res.status(400).json({ error: "Estado inv\xE1lido" });
+    return;
+  }
+  const { data, error } = await supabase.from("projects").update({ status }).eq("id", id).select().single();
   if (error) {
     res.status(500).json({ error: error.message });
     return;
   }
-  res.status(201).json(data);
+  res.json(data);
 });
-router3.delete("/projects/:id", async (req, res) => {
+router3.post("/projects/:id/images", upload2.array("images", 10), async (req, res) => {
   const { id } = req.params;
-  const { data: row, error: fetchError } = await supabase.from("projects").select("image").eq("id", id).single();
-  if (fetchError || !row) {
+  const files = req.files;
+  if (!files || files.length === 0) {
+    res.status(400).json({ error: "Se requiere al menos una imagen" });
+    return;
+  }
+  const { data: project, error: fetchError } = await supabase.from("projects").select("id, image").eq("id", id).single();
+  if (fetchError || !project) {
     res.status(404).json({ error: "Proyecto no encontrado" });
     return;
   }
-  if (row.image) {
-    try {
-      const urlPath = new URL(row.image).pathname;
-      const storagePath = urlPath.split(`/public/${BUCKET}/`)[1];
-      if (storagePath) await supabase.storage.from(BUCKET).remove([storagePath]);
-    } catch {
-    }
+  const uploadPromises = files.map((f) => uploadImage(f.buffer, f.originalname, f.mimetype));
+  let urls;
+  try {
+    urls = await Promise.all(uploadPromises);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    return;
+  }
+  const rows = urls.map((url) => ({ project_id: Number(id), image_url: url }));
+  const { data: newImages, error: imgError } = await supabase.from("project_images").insert(rows).select();
+  if (imgError) {
+    res.status(500).json({ error: imgError.message });
+    return;
+  }
+  if (!project.image) {
+    await supabase.from("projects").update({ image: urls[0] }).eq("id", id);
+  }
+  res.status(201).json(newImages);
+});
+router3.delete("/projects/:id/images/:imageId", async (req, res) => {
+  const { id, imageId } = req.params;
+  const { data: img, error: fetchError } = await supabase.from("project_images").select("image_url").eq("id", imageId).eq("project_id", id).single();
+  if (fetchError || !img) {
+    res.status(404).json({ error: "Imagen no encontrada" });
+    return;
+  }
+  await deleteImageByUrl(img.image_url);
+  const { error } = await supabase.from("project_images").delete().eq("id", imageId);
+  if (error) {
+    res.status(500).json({ error: error.message });
+    return;
+  }
+  const { data: project } = await supabase.from("projects").select("image").eq("id", id).single();
+  if (project?.image === img.image_url) {
+    const { data: remaining } = await supabase.from("project_images").select("image_url").eq("project_id", id).order("created_at", { ascending: true }).limit(1);
+    const newMain = remaining?.[0]?.image_url ?? null;
+    await supabase.from("projects").update({ image: newMain }).eq("id", id);
+  }
+  res.json({ success: true });
+});
+router3.delete("/projects/:id", async (req, res) => {
+  const { id } = req.params;
+  const { data: images } = await supabase.from("project_images").select("image_url").eq("project_id", id);
+  if (images && images.length > 0) {
+    await Promise.all(images.map((img) => deleteImageByUrl(img.image_url)));
   }
   const { error } = await supabase.from("projects").delete().eq("id", id);
   if (error) {
@@ -65770,7 +67496,7 @@ var router6 = (0, import_express6.Router)();
 router6.post("/registrar", async (req, res) => {
   const { codigo, nombre, telefono } = req.body;
   if (!codigo || !nombre || !telefono) {
-    return res.status(400).json({ error: "Faltan datos obligatorios." });
+    return res.status(400).json({ error: "Todos los campos son obligatorios." });
   }
   try {
     const { error } = await supabase2.from("rifa").insert([{
@@ -65781,14 +67507,14 @@ router6.post("/registrar", async (req, res) => {
     }]);
     if (error) {
       if (error.code === "23505") {
-        return res.status(400).json({ error: "Este c\xF3digo ya fue registrado." });
+        return res.status(400).json({ error: "Este c\xF3digo ya fue registrado anteriormente." });
       }
       throw error;
     }
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, message: "\xA1Registro exitoso!" });
   } catch (err) {
-    console.error("Error Rifa:", err);
-    return res.status(500).json({ error: "Error interno del servidor." });
+    console.error("Error en m\xF3dulo rifa:", err);
+    return res.status(500).json({ error: "Error interno al procesar la rifa." });
   }
 });
 var rifa_default = router6;
@@ -65942,6 +67668,7 @@ on-finished/index.js:
    * MIT Licensed
    *)
 
+content-type/dist/index.js:
 content-type/index.js:
   (*!
    * content-type
