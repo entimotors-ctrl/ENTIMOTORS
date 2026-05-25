@@ -1,10 +1,13 @@
 import { Router } from "express";
+import ws from "ws";
 import { createClient } from "@supabase/supabase-js";
 
 // Usamos las variables de entorno que ya tienes en Render
 const supabaseUrl = process.env.SUPABASE_URL as string;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY as string;
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  realtime: { transport: ws },
+});
 
 const router = Router();
 
