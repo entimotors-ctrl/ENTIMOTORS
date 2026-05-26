@@ -71107,19 +71107,52 @@ var projects_default = router3;
 // src/routes/videos.ts
 var import_express4 = __toESM(require_express2(), 1);
 var router4 = (0, import_express4.Router)();
-function parseVideoUrl(url) {
+async function parseVideoUrl(rawUrl) {
+  const url = rawUrl.trim();
+  if (url.includes("youtube.com/embed/") || url.includes("tiktok.com/embed/") || url.includes("facebook.com/plugins/video.php")) {
+    return url;
+  }
   const youtubeMatch = url.match(
     /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
   );
   if (youtubeMatch) {
     return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
   }
-  const tiktokMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-  if (tiktokMatch) {
-    return `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`;
+  const tiktokFullMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+  if (tiktokFullMatch) {
+    return `https://www.tiktok.com/embed/v2/${tiktokFullMatch[1]}`;
   }
-  if (url.includes("youtube.com/embed/") || url.includes("tiktok.com/embed/")) {
-    return url;
+  if (/(?:vt|vm)\.tiktok\.com\/|tiktok\.com\/t\//.test(url)) {
+    try {
+      const oembed = await fetch(
+        `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`,
+        { headers: { "User-Agent": "Mozilla/5.0" } }
+      );
+      if (oembed.ok) {
+        const json = await oembed.json();
+        if (json.embed_product_id) {
+          return `https://www.tiktok.com/embed/v2/${json.embed_product_id}`;
+        }
+        if (json.author_url) {
+          const m = json.author_url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+          if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
+        }
+      }
+    } catch {
+    }
+    try {
+      const redir = await fetch(url, {
+        redirect: "follow",
+        headers: { "User-Agent": "Mozilla/5.0" }
+      });
+      const m = redir.url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+      if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
+    } catch {
+    }
+    return null;
+  }
+  if (url.includes("facebook.com") || url.includes("fb.watch")) {
+    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&autoplay=false`;
   }
   return null;
 }
@@ -71137,7 +71170,7 @@ router4.post("/videos", async (req, res) => {
     res.status(400).json({ error: "T\xEDtulo y URL son requeridos" });
     return;
   }
-  const embedUrl = parseVideoUrl(url);
+  const embedUrl = await parseVideoUrl(url);
   if (!embedUrl) {
     res.status(400).json({ error: "URL de YouTube o TikTok inv\xE1lida" });
     return;
