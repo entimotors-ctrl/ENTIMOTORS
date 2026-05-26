@@ -64,51 +64,6 @@ function filterProjects(status, btn) {
     if (btn) btn.classList.add('active');
 }
 
-// ---- VIDEOS ----
-async function loadVideos() {
-    const grid = document.getElementById('videos-grid');
-    const empty = document.getElementById('videos-empty');
-    try {
-        const r = await fetch(`${BASE}/videos`);
-        const data = await r.json();
-        if (!data.length) {
-            grid.innerHTML = '';
-            empty.classList.remove('hidden');
-            return;
-        }
-        empty.classList.add('hidden');
-        
-        // Aquí ocurre la magia para adaptar los tamaños automáticamente
-        grid.innerHTML = data.map(v => {
-            const urlLower = v.url.toLowerCase();
-            // TikTok es vertical 9:16; YouTube y Facebook son horizontal 16:9
-            const isTikTok = urlLower.includes('tiktok');
-            const aspectRatio = isTikTok ? '177.77%' : '56.25%';
-            // Facebook requiere allow="encrypted-media" y scrolling="no"
-            const isFacebook = urlLower.includes('facebook.com');
-            const extraAttrs = isFacebook
-                ? 'scrolling="no" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"'
-                : 'allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"';
-
-            return `
-            <div class="glass-panel card-hover overflow-hidden flex flex-col h-full">
-                <div style="position:relative; padding-bottom:${aspectRatio}; height:0;">
-                    <iframe src="${v.url}" title="${v.title}" frameborder="0"
-                        ${extraAttrs}
-                        allowfullscreen
-                        style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
-                </div>
-                <div class="p-4 mt-auto">
-                    <h3 class="font-teko text-xl uppercase text-white">${v.title}</h3>
-                </div>
-            </div>
-            `;
-        }).join('');
-    } catch {
-        document.getElementById('videos-grid').innerHTML = '<p class="text-gray-600 col-span-3 text-center py-12 font-teko text-2xl">Error al cargar videos.</p>';
-    }
-}
-
 // ---- GALERÍA / LIGHTBOX ----
 let galleryImages = [];
 let galleryIdx = 0;
@@ -176,6 +131,4 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ---- INICIALIZAR LA PÁGINA ----
-// Estas son las órdenes que le dicen a la página que empiece a buscar la información
 loadProjects();
-loadVideos();
