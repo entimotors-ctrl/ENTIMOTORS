@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import { supabase, BUCKET } from "../lib/supabase.js";
+import { requireAdmin } from "./admin-auth.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -24,7 +25,7 @@ router.get("/products", async (_req, res) => {
   res.json(data);
 });
 
-router.post("/products", upload.single("image"), async (req, res) => {
+router.post("/products", requireAdmin, upload.single("image"), async (req, res) => {
   const { name, price, category } = req.body as { name: string; price: string; category: string };
   if (!name || !price) {
     res.status(400).json({ error: "Nombre y precio son requeridos" });
@@ -58,7 +59,7 @@ router.post("/products", upload.single("image"), async (req, res) => {
   res.status(201).json(data);
 });
 
-router.delete("/products/:id", async (req, res) => {
+router.delete("/products/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase
     .from("products")

@@ -61970,7 +61970,7 @@ router.get("/healthz", (_req, res) => {
 var health_default = router;
 
 // src/routes/products.ts
-var import_express2 = __toESM(require_express2(), 1);
+var import_express3 = __toESM(require_express2(), 1);
 var import_multer = __toESM(require_multer(), 1);
 import path from "path";
 
@@ -70879,6 +70879,30 @@ var supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 });
 var BUCKET = "entimotors-media";
 
+// src/routes/admin-auth.ts
+var import_express2 = __toESM(require_express2(), 1);
+var router2 = (0, import_express2.Router)();
+var ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+router2.post("/admin/login", (req, res) => {
+  const { password } = req.body;
+  if (ADMIN_PASSWORD && password === ADMIN_PASSWORD) {
+    res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString("base64") });
+  } else {
+    res.status(401).json({ error: "Contrase\xF1a incorrecta" });
+  }
+});
+function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization;
+  const token = auth?.replace("Bearer ", "");
+  const expected = ADMIN_PASSWORD ? Buffer.from(ADMIN_PASSWORD).toString("base64") : null;
+  if (!expected || token !== expected) {
+    res.status(401).json({ error: "No autorizado" });
+    return;
+  }
+  next();
+}
+var admin_auth_default = router2;
+
 // src/routes/products.ts
 var upload = (0, import_multer.default)({
   storage: import_multer.default.memoryStorage(),
@@ -70889,8 +70913,8 @@ var upload = (0, import_multer.default)({
     cb(null, ok);
   }
 });
-var router2 = (0, import_express2.Router)();
-router2.get("/products", async (_req, res) => {
+var router3 = (0, import_express3.Router)();
+router3.get("/products", async (_req, res) => {
   const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -70898,7 +70922,7 @@ router2.get("/products", async (_req, res) => {
   }
   res.json(data);
 });
-router2.post("/products", upload.single("image"), async (req, res) => {
+router3.post("/products", requireAdmin, upload.single("image"), async (req, res) => {
   const { name, price, category } = req.body;
   if (!name || !price) {
     res.status(400).json({ error: "Nombre y precio son requeridos" });
@@ -70925,7 +70949,7 @@ router2.post("/products", upload.single("image"), async (req, res) => {
   }
   res.status(201).json(data);
 });
-router2.delete("/products/:id", async (req, res) => {
+router3.delete("/products/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase.from("products").select("image").eq("id", id).single();
   if (fetchError || !row) {
@@ -70947,10 +70971,10 @@ router2.delete("/products/:id", async (req, res) => {
   }
   res.json({ success: true });
 });
-var products_default = router2;
+var products_default = router3;
 
 // src/routes/projects.ts
-var import_express3 = __toESM(require_express2(), 1);
+var import_express4 = __toESM(require_express2(), 1);
 var import_multer2 = __toESM(require_multer(), 1);
 import path2 from "path";
 var upload2 = (0, import_multer2.default)({
@@ -70962,7 +70986,7 @@ var upload2 = (0, import_multer2.default)({
     cb(null, ok);
   }
 });
-var router3 = (0, import_express3.Router)();
+var router4 = (0, import_express4.Router)();
 async function uploadImage(buffer, originalname, mimetype) {
   const ext = path2.extname(originalname);
   const filename = `projects/${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
@@ -70979,7 +71003,7 @@ async function deleteImageByUrl(url) {
   } catch {
   }
 }
-router3.get("/projects", async (_req, res) => {
+router4.get("/projects", async (_req, res) => {
   const { data, error } = await supabase.from("projects").select("*, project_images(id, image_url, created_at)").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -70987,7 +71011,7 @@ router3.get("/projects", async (_req, res) => {
   }
   res.json(data);
 });
-router3.post("/projects", upload2.array("images", 10), async (req, res) => {
+router4.post("/projects", requireAdmin, upload2.array("images", 10), async (req, res) => {
   const { title, status } = req.body;
   const files = req.files;
   if (!title || !status) {
@@ -71023,7 +71047,7 @@ router3.post("/projects", upload2.array("images", 10), async (req, res) => {
   }
   res.status(201).json(project);
 });
-router3.patch("/projects/:id/status", async (req, res) => {
+router4.patch("/projects/:id/status", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   if (!["en_curso", "terminado"].includes(status)) {
@@ -71037,7 +71061,7 @@ router3.patch("/projects/:id/status", async (req, res) => {
   }
   res.json(data);
 });
-router3.post("/projects/:id/images", upload2.array("images", 10), async (req, res) => {
+router4.post("/projects/:id/images", requireAdmin, upload2.array("images", 10), async (req, res) => {
   const { id } = req.params;
   const files = req.files;
   if (!files || files.length === 0) {
@@ -71068,7 +71092,7 @@ router3.post("/projects/:id/images", upload2.array("images", 10), async (req, re
   }
   res.status(201).json(newImages);
 });
-router3.delete("/projects/:id/images/:imageId", async (req, res) => {
+router4.delete("/projects/:id/images/:imageId", requireAdmin, async (req, res) => {
   const { id, imageId } = req.params;
   const { data: img, error: fetchError } = await supabase.from("project_images").select("image_url").eq("id", imageId).eq("project_id", id).single();
   if (fetchError || !img) {
@@ -71089,7 +71113,7 @@ router3.delete("/projects/:id/images/:imageId", async (req, res) => {
   }
   res.json({ success: true });
 });
-router3.delete("/projects/:id", async (req, res) => {
+router4.delete("/projects/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: images } = await supabase.from("project_images").select("image_url").eq("project_id", id);
   if (images && images.length > 0) {
@@ -71102,11 +71126,11 @@ router3.delete("/projects/:id", async (req, res) => {
   }
   res.json({ success: true });
 });
-var projects_default = router3;
+var projects_default = router4;
 
 // src/routes/videos.ts
-var import_express4 = __toESM(require_express2(), 1);
-var router4 = (0, import_express4.Router)();
+var import_express5 = __toESM(require_express2(), 1);
+var router5 = (0, import_express5.Router)();
 async function parseVideoUrl(rawUrl) {
   const url = rawUrl.trim();
   if (url.includes("youtube.com/embed/") || url.includes("tiktok.com/embed/") || url.includes("facebook.com/plugins/video.php")) {
@@ -71156,7 +71180,7 @@ async function parseVideoUrl(rawUrl) {
   }
   return null;
 }
-router4.get("/videos", async (_req, res) => {
+router5.get("/videos", async (_req, res) => {
   const { data, error } = await supabase.from("videos").select("*").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -71164,7 +71188,7 @@ router4.get("/videos", async (_req, res) => {
   }
   res.json(data);
 });
-router4.post("/videos", async (req, res) => {
+router5.post("/videos", requireAdmin, async (req, res) => {
   const { title, url } = req.body;
   if (!title || !url) {
     res.status(400).json({ error: "T\xEDtulo y URL son requeridos" });
@@ -71182,7 +71206,7 @@ router4.post("/videos", async (req, res) => {
   }
   res.status(201).json(data);
 });
-router4.delete("/videos/:id", async (req, res) => {
+router5.delete("/videos/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase.from("videos").select("id").eq("id", id).single();
   if (fetchError || !row) {
@@ -71196,21 +71220,7 @@ router4.delete("/videos/:id", async (req, res) => {
   }
   res.json({ success: true });
 });
-var videos_default = router4;
-
-// src/routes/admin-auth.ts
-var import_express5 = __toESM(require_express2(), 1);
-var router5 = (0, import_express5.Router)();
-var ADMIN_PASSWORD = process.env.ADMIN_PASSWORD ?? "entimotors2024";
-router5.post("/admin/login", (req, res) => {
-  const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
-    res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString("base64") });
-  } else {
-    res.status(401).json({ error: "Contrase\xF1a incorrecta" });
-  }
-});
-var admin_auth_default = router5;
+var videos_default = router5;
 
 // src/routes/rifa.ts
 var import_express6 = __toESM(require_express2(), 1);

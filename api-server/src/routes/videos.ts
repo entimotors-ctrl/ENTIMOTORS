@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { supabase } from "../lib/supabase.js";
+import { requireAdmin } from "./admin-auth.js";
 
 const router = Router();
 
@@ -79,7 +80,7 @@ router.get("/videos", async (_req, res) => {
   res.json(data);
 });
 
-router.post("/videos", async (req, res) => {
+router.post("/videos", requireAdmin, async (req, res) => {
   const { title, url } = req.body as { title: string; url: string };
   if (!title || !url) {
     res.status(400).json({ error: "Título y URL son requeridos" });
@@ -100,7 +101,7 @@ router.post("/videos", async (req, res) => {
   res.status(201).json(data);
 });
 
-router.delete("/videos/:id", async (req, res) => {
+router.delete("/videos/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase
     .from("videos")

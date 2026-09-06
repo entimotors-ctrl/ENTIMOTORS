@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import path from "path";
 import { supabase, BUCKET } from "../lib/supabase.js";
+import { requireAdmin } from "./admin-auth.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -47,7 +48,7 @@ router.get("/projects", async (_req, res) => {
 });
 
 // POST /projects — crea proyecto con una o más fotos
-router.post("/projects", upload.array("images", 10), async (req, res) => {
+router.post("/projects", requireAdmin, upload.array("images", 10), async (req, res) => {
   const { title, status } = req.body as { title: string; status: string };
   const files = req.files as Express.Multer.File[];
 
@@ -92,7 +93,7 @@ router.post("/projects", upload.array("images", 10), async (req, res) => {
 });
 
 // PATCH /projects/:id/status — actualiza el estado del proyecto
-router.patch("/projects/:id/status", async (req, res) => {
+router.patch("/projects/:id/status", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body as { status: string };
   if (!["en_curso", "terminado"].includes(status)) {
@@ -110,7 +111,7 @@ router.patch("/projects/:id/status", async (req, res) => {
 });
 
 // POST /projects/:id/images — agrega más fotos a un proyecto existente
-router.post("/projects/:id/images", upload.array("images", 10), async (req, res) => {
+router.post("/projects/:id/images", requireAdmin, upload.array("images", 10), async (req, res) => {
   const { id } = req.params;
   const files = req.files as Express.Multer.File[];
 
@@ -152,7 +153,7 @@ router.post("/projects/:id/images", upload.array("images", 10), async (req, res)
 });
 
 // DELETE /projects/:id/images/:imageId — elimina una foto individual
-router.delete("/projects/:id/images/:imageId", async (req, res) => {
+router.delete("/projects/:id/images/:imageId", requireAdmin, async (req, res) => {
   const { id, imageId } = req.params;
 
   const { data: img, error: fetchError } = await supabase
@@ -185,7 +186,7 @@ router.delete("/projects/:id/images/:imageId", async (req, res) => {
 });
 
 // DELETE /projects/:id — elimina el proyecto y todas sus fotos
-router.delete("/projects/:id", async (req, res) => {
+router.delete("/projects/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
 
   // Obtener todas las imágenes del proyecto
