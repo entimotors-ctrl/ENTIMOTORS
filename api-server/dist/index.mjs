@@ -20662,16 +20662,16 @@ var require_router = __commonJS({
         return new Router9(options);
       }
       const opts = options || {};
-      function router9(req, res, next) {
-        router9.handle(req, res, next);
+      function router8(req, res, next) {
+        router8.handle(req, res, next);
       }
-      Object.setPrototypeOf(router9, this);
-      router9.caseSensitive = opts.caseSensitive;
-      router9.mergeParams = opts.mergeParams;
-      router9.params = {};
-      router9.strict = opts.strict;
-      router9.stack = [];
-      return router9;
+      Object.setPrototypeOf(router8, this);
+      router8.caseSensitive = opts.caseSensitive;
+      router8.mergeParams = opts.mergeParams;
+      router8.params = {};
+      router8.strict = opts.strict;
+      router8.stack = [];
+      return router8;
     }
     Router9.prototype = function() {
     };
@@ -21027,7 +21027,7 @@ var require_router = __commonJS({
       }
     }
     function wrap(old, fn) {
-      return function proxy() {
+      return function proxy2() {
         const args = new Array(arguments.length + 1);
         args[0] = old;
         for (let i = 0, len = arguments.length; i < len; i++) {
@@ -21059,7 +21059,7 @@ var require_application = __commonJS({
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router9 = null;
+      var router8 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -21068,13 +21068,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router9 === null) {
-            router9 = new Router9({
+          if (router8 === null) {
+            router8 = new Router9({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router9;
+          return router8;
         }
       });
     };
@@ -21145,15 +21145,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router9 = this.router;
+      var router8 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router9.use(path4, fn2);
+          return router8.use(path4, fn2);
         }
         debug(".use app under %s", path4);
         fn2.mountpath = path4;
         fn2.parent = this;
-        router9.use(path4, function mounted_app(req, res, next) {
+        router8.use(path4, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -24041,6 +24041,119 @@ var require_lib3 = __commonJS({
       }
       module.exports = middlewareWrapper;
     })();
+  }
+});
+
+// node_modules/.pnpm/cookie-signature@1.0.6/node_modules/cookie-signature/index.js
+var require_cookie_signature2 = __commonJS({
+  "node_modules/.pnpm/cookie-signature@1.0.6/node_modules/cookie-signature/index.js"(exports) {
+    var crypto2 = __require("crypto");
+    exports.sign = function(val, secret) {
+      if ("string" != typeof val) throw new TypeError("Cookie value must be provided as a string.");
+      if ("string" != typeof secret) throw new TypeError("Secret string must be provided.");
+      return val + "." + crypto2.createHmac("sha256", secret).update(val).digest("base64").replace(/\=+$/, "");
+    };
+    exports.unsign = function(val, secret) {
+      if ("string" != typeof val) throw new TypeError("Signed cookie string must be provided.");
+      if ("string" != typeof secret) throw new TypeError("Secret string must be provided.");
+      var str = val.slice(0, val.lastIndexOf(".")), mac = exports.sign(str, secret);
+      return sha1(mac) == sha1(val) ? str : false;
+    };
+    function sha1(str) {
+      return crypto2.createHash("sha1").update(str).digest("hex");
+    }
+  }
+});
+
+// node_modules/.pnpm/cookie-parser@1.4.7/node_modules/cookie-parser/index.js
+var require_cookie_parser = __commonJS({
+  "node_modules/.pnpm/cookie-parser@1.4.7/node_modules/cookie-parser/index.js"(exports, module) {
+    "use strict";
+    var cookie = require_cookie();
+    var signature = require_cookie_signature2();
+    module.exports = cookieParser2;
+    module.exports.JSONCookie = JSONCookie;
+    module.exports.JSONCookies = JSONCookies;
+    module.exports.signedCookie = signedCookie;
+    module.exports.signedCookies = signedCookies;
+    function cookieParser2(secret, options) {
+      var secrets = !secret || Array.isArray(secret) ? secret || [] : [secret];
+      return function cookieParser3(req, res, next) {
+        if (req.cookies) {
+          return next();
+        }
+        var cookies = req.headers.cookie;
+        req.secret = secrets[0];
+        req.cookies = /* @__PURE__ */ Object.create(null);
+        req.signedCookies = /* @__PURE__ */ Object.create(null);
+        if (!cookies) {
+          return next();
+        }
+        req.cookies = cookie.parse(cookies, options);
+        if (secrets.length !== 0) {
+          req.signedCookies = signedCookies(req.cookies, secrets);
+          req.signedCookies = JSONCookies(req.signedCookies);
+        }
+        req.cookies = JSONCookies(req.cookies);
+        next();
+      };
+    }
+    function JSONCookie(str) {
+      if (typeof str !== "string" || str.substr(0, 2) !== "j:") {
+        return void 0;
+      }
+      try {
+        return JSON.parse(str.slice(2));
+      } catch (err) {
+        return void 0;
+      }
+    }
+    function JSONCookies(obj) {
+      var cookies = Object.keys(obj);
+      var key;
+      var val;
+      for (var i = 0; i < cookies.length; i++) {
+        key = cookies[i];
+        val = JSONCookie(obj[key]);
+        if (val) {
+          obj[key] = val;
+        }
+      }
+      return obj;
+    }
+    function signedCookie(str, secret) {
+      if (typeof str !== "string") {
+        return void 0;
+      }
+      if (str.substr(0, 2) !== "s:") {
+        return str;
+      }
+      var secrets = !secret || Array.isArray(secret) ? secret || [] : [secret];
+      for (var i = 0; i < secrets.length; i++) {
+        var val = signature.unsign(str.slice(2), secrets[i]);
+        if (val !== false) {
+          return val;
+        }
+      }
+      return false;
+    }
+    function signedCookies(obj, secret) {
+      var cookies = Object.keys(obj);
+      var dec;
+      var key;
+      var ret = /* @__PURE__ */ Object.create(null);
+      var val;
+      for (var i = 0; i < cookies.length; i++) {
+        key = cookies[i];
+        val = obj[key];
+        dec = signedCookie(val, secret);
+        if (val !== dec) {
+          ret[key] = dec;
+          delete obj[key];
+        }
+      }
+      return ret;
+    }
   }
 });
 
@@ -28145,7 +28258,7 @@ var require_pino = __commonJS({
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS-fase4-multiusuario/api-server/dist";
+        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS-rcv24/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -50838,7 +50951,7 @@ var require_helpers = __commonJS({
       crypto.getRandomValues(array);
       return Array.from(array, dec2hex).join("");
     }
-    async function sha256(randomString) {
+    async function sha2562(randomString) {
       const encoder = new TextEncoder();
       const encodedData = encoder.encode(randomString);
       const hash = await crypto.subtle.digest("SHA-256", encodedData);
@@ -50851,7 +50964,7 @@ var require_helpers = __commonJS({
         console.warn("WebCrypto API is not supported. Code challenge method will default to use plain instead of sha256.");
         return verifier;
       }
-      const hashed = await sha256(verifier);
+      const hashed = await sha2562(verifier);
       return btoa(hashed).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
     }
     async function getCodeChallengeAndMethod(storage, storageKey, isPasswordRecovery = false) {
@@ -60520,7 +60633,7 @@ var require_websocket = __commonJS({
     var http = __require("http");
     var net = __require("net");
     var tls = __require("tls");
-    var { randomBytes, createHash } = __require("crypto");
+    var { randomBytes: randomBytes2, createHash: createHash2 } = __require("crypto");
     var { Duplex, Readable } = __require("stream");
     var { URL: URL2 } = __require("url");
     var PerMessageDeflate2 = require_permessage_deflate();
@@ -61058,7 +61171,7 @@ var require_websocket = __commonJS({
         }
       }
       const defaultPort = isSecure ? 443 : 80;
-      const key = randomBytes(16).toString("base64");
+      const key = randomBytes2(16).toString("base64");
       const request = isSecure ? https.request : http.request;
       const protocolSet = /* @__PURE__ */ new Set();
       let perMessageDeflate;
@@ -61188,7 +61301,7 @@ var require_websocket = __commonJS({
           abortHandshake(websocket, socket, "Invalid Upgrade header");
           return;
         }
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         if (res.headers["sec-websocket-accept"] !== digest) {
           abortHandshake(websocket, socket, "Invalid Sec-WebSocket-Accept header");
           return;
@@ -61557,7 +61670,7 @@ var require_websocket_server = __commonJS({
     var EventEmitter = __require("events");
     var http = __require("http");
     var { Duplex } = __require("stream");
-    var { createHash } = __require("crypto");
+    var { createHash: createHash2 } = __require("crypto");
     var extension2 = require_extension();
     var PerMessageDeflate2 = require_permessage_deflate();
     var subprotocol2 = require_subprotocol();
@@ -61864,7 +61977,7 @@ var require_websocket_server = __commonJS({
           );
         }
         if (this._state > RUNNING) return abortHandshake(socket, 503);
-        const digest = createHash("sha1").update(key + GUID).digest("base64");
+        const digest = createHash2("sha1").update(key + GUID).digest("base64");
         const headers = [
           "HTTP/1.1 101 Switching Protocols",
           "Upgrade: websocket",
@@ -61954,6 +62067,7 @@ var require_websocket_server = __commonJS({
 // src/app.ts
 var import_express9 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
+var import_cookie_parser = __toESM(require_cookie_parser(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
 import path3 from "path";
 import { fileURLToPath } from "url";
@@ -66970,18 +67084,18 @@ function buildUrl(baseUrl, path4, query) {
   }
   return url.toString();
 }
-async function buildAuthHeaders(auth) {
-  if (!auth || auth.type === "none") {
+async function buildAuthHeaders(auth2) {
+  if (!auth2 || auth2.type === "none") {
     return {};
   }
-  if (auth.type === "bearer") {
-    return { Authorization: `Bearer ${auth.token}` };
+  if (auth2.type === "bearer") {
+    return { Authorization: `Bearer ${auth2.token}` };
   }
-  if (auth.type === "header") {
-    return { [auth.name]: auth.value };
+  if (auth2.type === "header") {
+    return { [auth2.name]: auth2.value };
   }
-  if (auth.type === "custom") {
-    return await auth.getHeaders();
+  if (auth2.type === "custom") {
+    return await auth2.getHeaders();
   }
   return {};
 }
@@ -70881,27 +70995,163 @@ var BUCKET = "entimotors-media";
 
 // src/routes/admin-auth.ts
 var import_express2 = __toESM(require_express2(), 1);
-var router2 = (0, import_express2.Router)();
-var ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-router2.post("/admin/login", (req, res) => {
-  const { password } = req.body;
-  if (ADMIN_PASSWORD && password === ADMIN_PASSWORD) {
-    res.json({ success: true, token: Buffer.from(ADMIN_PASSWORD).toString("base64") });
-  } else {
-    res.status(401).json({ error: "Contrase\xF1a incorrecta" });
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
+
+// src/lib/logger.ts
+var import_pino = __toESM(require_pino(), 1);
+var isProduction = process.env.NODE_ENV === "production";
+var logger = (0, import_pino.default)({
+  level: process.env.LOG_LEVEL ?? "info",
+  redact: [
+    "req.headers.authorization",
+    "req.headers.cookie",
+    "res.headers['set-cookie']"
+  ],
+  ...isProduction ? {} : {
+    transport: {
+      target: "pino-pretty",
+      options: { colorize: true }
+    }
   }
 });
-function requireAdmin(req, res, next) {
-  const auth = req.headers.authorization;
-  const token = auth?.replace("Bearer ", "");
-  const expected = ADMIN_PASSWORD ? Buffer.from(ADMIN_PASSWORD).toString("base64") : null;
-  if (!expected || token !== expected) {
-    res.status(401).json({ error: "No autorizado" });
-    return;
+
+// src/routes/admin-auth.ts
+var COOKIE_PRODUCCION = "__Host-enti_admin";
+var COOKIE_DESARROLLO = "enti_admin";
+var HOST_VALIDO = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*|\[[0-9a-f:.]+\])(?::\d{1,5})?$/;
+var LOOPBACK = /* @__PURE__ */ new Set(["localhost", "127.0.0.1", "[::1]"]);
+var sha256 = (texto) => createHash("sha256").update(texto, "utf8").digest();
+function crearAuthAdmin(opciones = {}) {
+  const password = opciones.password;
+  const ahora = opciones.ahora ?? Date.now;
+  const SESION_MS = opciones.sesionMs ?? 8 * 60 * 60 * 1e3;
+  const VENTANA_MS = opciones.ventanaMs ?? 15 * 60 * 1e3;
+  const MAX_FALLOS = opciones.maxFallos ?? 5;
+  const COOKIE_SEGURA = opciones.cookieSegura ?? process.env.NODE_ENV !== "development";
+  const COOKIE = COOKIE_SEGURA ? COOKIE_PRODUCCION : COOKIE_DESARROLLO;
+  const MAX_SESIONES = 20;
+  const MAX_IPS = 1e4;
+  const sesiones = /* @__PURE__ */ new Map();
+  const fallos = /* @__PURE__ */ new Map();
+  const atributos = () => ({ httpOnly: true, secure: COOKIE_SEGURA, sameSite: "strict", path: "/" });
+  function claveCorrecta(intento) {
+    if (typeof intento !== "string" || intento.length === 0 || intento.length > 1024) return false;
+    if (!password) return false;
+    return timingSafeEqual(sha256(intento), sha256(password));
   }
-  next();
+  function limpiar() {
+    const t = ahora();
+    for (const [h, expira] of sesiones) if (expira <= t) sesiones.delete(h);
+    for (const [ip, f] of fallos) if (t - f.desde >= VENTANA_MS) fallos.delete(ip);
+    if (fallos.size > MAX_IPS) fallos.clear();
+  }
+  function bloqueada(ip) {
+    const f = fallos.get(ip);
+    if (!f) return 0;
+    const restante = f.desde + VENTANA_MS - ahora();
+    if (restante <= 0) {
+      fallos.delete(ip);
+      return 0;
+    }
+    return f.cuenta >= MAX_FALLOS ? restante : 0;
+  }
+  function anotarFallo(ip) {
+    const f = fallos.get(ip);
+    if (!f || ahora() - f.desde >= VENTANA_MS) fallos.set(ip, { cuenta: 1, desde: ahora() });
+    else f.cuenta++;
+  }
+  function sesionValida(req) {
+    const id = req.cookies?.[COOKIE];
+    if (typeof id !== "string" || id.length < 40 || id.length > 100) return null;
+    const h = sha256(id).toString("hex");
+    const expira = sesiones.get(h);
+    if (expira === void 0) return null;
+    if (expira <= ahora()) {
+      sesiones.delete(h);
+      return null;
+    }
+    return h;
+  }
+  function origenPermitido(req) {
+    const host = req.get("host")?.toLowerCase();
+    if (!host || !HOST_VALIDO.test(host)) return false;
+    const sitio = req.get("sec-fetch-site");
+    if (sitio && sitio !== "same-origin" && sitio !== "none") return false;
+    const origin = req.get("origin");
+    if (origin === void 0) return true;
+    let url;
+    try {
+      url = new URL(origin);
+    } catch {
+      return false;
+    }
+    if (url.origin !== origin) return false;
+    if (url.host !== host) return false;
+    return url.protocol === "https:" || url.protocol === "http:" && (!COOKIE_SEGURA || LOOPBACK.has(url.hostname));
+  }
+  const router8 = (0, import_express2.Router)();
+  router8.post("/admin/login", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    limpiar();
+    const ip = req.ip ?? "desconocida";
+    const espera = bloqueada(ip);
+    if (espera > 0) {
+      logger.warn({ evento: "login-admin-bloqueado", ip }, "demasiados intentos de login admin");
+      res.set("Retry-After", String(Math.ceil(espera / 1e3)));
+      res.status(429).json({ error: "Demasiados intentos. Espera unos minutos y vuelve a probar." });
+      return;
+    }
+    if (!claveCorrecta(req.body?.password)) {
+      anotarFallo(ip);
+      logger.warn({ evento: "login-admin-fallido", ip }, "login admin rechazado");
+      res.status(401).json({ error: "No se pudo iniciar sesi\xF3n." });
+      return;
+    }
+    fallos.delete(ip);
+    if (sesiones.size >= MAX_SESIONES) {
+      const masVieja = [...sesiones.entries()].sort((a, b) => a[1] - b[1])[0];
+      if (masVieja) sesiones.delete(masVieja[0]);
+    }
+    const id = randomBytes(32).toString("base64url");
+    const expiraEn = ahora() + SESION_MS;
+    sesiones.set(sha256(id).toString("hex"), expiraEn);
+    res.cookie(COOKIE, id, { ...atributos(), maxAge: SESION_MS });
+    logger.info({ evento: "login-admin" }, "sesi\xF3n admin iniciada");
+    res.json({ success: true, expiraEn: new Date(expiraEn).toISOString() });
+  });
+  router8.post("/admin/logout", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    const h = sesionValida(req);
+    if (h) sesiones.delete(h);
+    res.clearCookie(COOKIE, atributos());
+    res.json({ success: true });
+  });
+  router8.get("/admin/sesion", (req, res) => {
+    res.set("Cache-Control", "no-store");
+    const h = sesionValida(req);
+    if (!h) {
+      res.status(401).json({ error: "No autorizado" });
+      return;
+    }
+    res.json({ autenticado: true, expiraEn: new Date(sesiones.get(h)).toISOString() });
+  });
+  function requireAdmin2(req, res, next) {
+    res.set("Cache-Control", "no-store");
+    if (!sesionValida(req)) {
+      res.status(401).json({ error: "No autorizado" });
+      return;
+    }
+    if (!["GET", "HEAD", "OPTIONS"].includes(req.method) && !origenPermitido(req)) {
+      res.status(403).json({ error: "Origen no permitido" });
+      return;
+    }
+    next();
+  }
+  return { router: router8, requireAdmin: requireAdmin2 };
 }
-var admin_auth_default = router2;
+var auth = crearAuthAdmin({ password: process.env.ADMIN_PASSWORD });
+var requireAdmin = auth.requireAdmin;
+var admin_auth_default = auth.router;
 
 // src/routes/products.ts
 var upload = (0, import_multer.default)({
@@ -70913,8 +71163,8 @@ var upload = (0, import_multer.default)({
     cb(null, ok);
   }
 });
-var router3 = (0, import_express3.Router)();
-router3.get("/products", async (_req, res) => {
+var router2 = (0, import_express3.Router)();
+router2.get("/products", async (_req, res) => {
   const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -70922,7 +71172,7 @@ router3.get("/products", async (_req, res) => {
   }
   res.json(data);
 });
-router3.post("/products", requireAdmin, upload.single("image"), async (req, res) => {
+router2.post("/products", requireAdmin, upload.single("image"), async (req, res) => {
   const { name, price, category } = req.body;
   if (!name || !price) {
     res.status(400).json({ error: "Nombre y precio son requeridos" });
@@ -70949,7 +71199,7 @@ router3.post("/products", requireAdmin, upload.single("image"), async (req, res)
   }
   res.status(201).json(data);
 });
-router3.delete("/products/:id", requireAdmin, async (req, res) => {
+router2.delete("/products/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase.from("products").select("image").eq("id", id).single();
   if (fetchError || !row) {
@@ -70971,7 +71221,7 @@ router3.delete("/products/:id", requireAdmin, async (req, res) => {
   }
   res.json({ success: true });
 });
-var products_default = router3;
+var products_default = router2;
 
 // src/routes/projects.ts
 var import_express4 = __toESM(require_express2(), 1);
@@ -70986,7 +71236,7 @@ var upload2 = (0, import_multer2.default)({
     cb(null, ok);
   }
 });
-var router4 = (0, import_express4.Router)();
+var router3 = (0, import_express4.Router)();
 async function uploadImage(buffer, originalname, mimetype) {
   const ext = path2.extname(originalname);
   const filename = `projects/${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
@@ -71003,7 +71253,7 @@ async function deleteImageByUrl(url) {
   } catch {
   }
 }
-router4.get("/projects", async (_req, res) => {
+router3.get("/projects", async (_req, res) => {
   const { data, error } = await supabase.from("projects").select("*, project_images(id, image_url, created_at)").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -71011,7 +71261,7 @@ router4.get("/projects", async (_req, res) => {
   }
   res.json(data);
 });
-router4.post("/projects", requireAdmin, upload2.array("images", 10), async (req, res) => {
+router3.post("/projects", requireAdmin, upload2.array("images", 10), async (req, res) => {
   const { title, status } = req.body;
   const files = req.files;
   if (!title || !status) {
@@ -71047,7 +71297,7 @@ router4.post("/projects", requireAdmin, upload2.array("images", 10), async (req,
   }
   res.status(201).json(project);
 });
-router4.patch("/projects/:id/status", requireAdmin, async (req, res) => {
+router3.patch("/projects/:id/status", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
   if (!["en_curso", "terminado"].includes(status)) {
@@ -71061,7 +71311,7 @@ router4.patch("/projects/:id/status", requireAdmin, async (req, res) => {
   }
   res.json(data);
 });
-router4.post("/projects/:id/images", requireAdmin, upload2.array("images", 10), async (req, res) => {
+router3.post("/projects/:id/images", requireAdmin, upload2.array("images", 10), async (req, res) => {
   const { id } = req.params;
   const files = req.files;
   if (!files || files.length === 0) {
@@ -71092,7 +71342,7 @@ router4.post("/projects/:id/images", requireAdmin, upload2.array("images", 10), 
   }
   res.status(201).json(newImages);
 });
-router4.delete("/projects/:id/images/:imageId", requireAdmin, async (req, res) => {
+router3.delete("/projects/:id/images/:imageId", requireAdmin, async (req, res) => {
   const { id, imageId } = req.params;
   const { data: img, error: fetchError } = await supabase.from("project_images").select("image_url").eq("id", imageId).eq("project_id", id).single();
   if (fetchError || !img) {
@@ -71113,7 +71363,7 @@ router4.delete("/projects/:id/images/:imageId", requireAdmin, async (req, res) =
   }
   res.json({ success: true });
 });
-router4.delete("/projects/:id", requireAdmin, async (req, res) => {
+router3.delete("/projects/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: images } = await supabase.from("project_images").select("image_url").eq("project_id", id);
   if (images && images.length > 0) {
@@ -71126,11 +71376,11 @@ router4.delete("/projects/:id", requireAdmin, async (req, res) => {
   }
   res.json({ success: true });
 });
-var projects_default = router4;
+var projects_default = router3;
 
 // src/routes/videos.ts
 var import_express5 = __toESM(require_express2(), 1);
-var router5 = (0, import_express5.Router)();
+var router4 = (0, import_express5.Router)();
 async function parseVideoUrl(rawUrl) {
   const url = rawUrl.trim();
   if (url.includes("youtube.com/embed/") || url.includes("tiktok.com/embed/") || url.includes("facebook.com/plugins/video.php")) {
@@ -71180,7 +71430,7 @@ async function parseVideoUrl(rawUrl) {
   }
   return null;
 }
-router5.get("/videos", async (_req, res) => {
+router4.get("/videos", async (_req, res) => {
   const { data, error } = await supabase.from("videos").select("*").order("created_at", { ascending: false });
   if (error) {
     res.status(500).json({ error: error.message });
@@ -71188,7 +71438,7 @@ router5.get("/videos", async (_req, res) => {
   }
   res.json(data);
 });
-router5.post("/videos", requireAdmin, async (req, res) => {
+router4.post("/videos", requireAdmin, async (req, res) => {
   const { title, url } = req.body;
   if (!title || !url) {
     res.status(400).json({ error: "T\xEDtulo y URL son requeridos" });
@@ -71206,7 +71456,7 @@ router5.post("/videos", requireAdmin, async (req, res) => {
   }
   res.status(201).json(data);
 });
-router5.delete("/videos/:id", requireAdmin, async (req, res) => {
+router4.delete("/videos/:id", requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { data: row, error: fetchError } = await supabase.from("videos").select("id").eq("id", id).single();
   if (fetchError || !row) {
@@ -71220,7 +71470,7 @@ router5.delete("/videos/:id", requireAdmin, async (req, res) => {
   }
   res.json({ success: true });
 });
-var videos_default = router5;
+var videos_default = router4;
 
 // src/routes/rifa.ts
 var import_express6 = __toESM(require_express2(), 1);
@@ -71229,8 +71479,8 @@ var supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 var supabase2 = createClient(supabaseUrl, supabaseKey, {
   realtime: { transport: wrapper_default }
 });
-var router6 = (0, import_express6.Router)();
-router6.post("/registrar", async (req, res) => {
+var router5 = (0, import_express6.Router)();
+router5.post("/registrar", async (req, res) => {
   const { codigo, nombre, telefono } = req.body;
   if (!codigo || !nombre || !telefono) {
     return res.status(400).json({ error: "Todos los campos son obligatorios." });
@@ -71254,30 +71504,10 @@ router6.post("/registrar", async (req, res) => {
     return res.status(500).json({ error: "Error interno al procesar la rifa." });
   }
 });
-var rifa_default = router6;
+var rifa_default = router5;
 
 // src/routes/admin-usuarios.ts
 var import_express7 = __toESM(require_express2(), 1);
-
-// src/lib/logger.ts
-var import_pino = __toESM(require_pino(), 1);
-var isProduction = process.env.NODE_ENV === "production";
-var logger = (0, import_pino.default)({
-  level: process.env.LOG_LEVEL ?? "info",
-  redact: [
-    "req.headers.authorization",
-    "req.headers.cookie",
-    "res.headers['set-cookie']"
-  ],
-  ...isProduction ? {} : {
-    transport: {
-      target: "pino-pretty",
-      options: { colorize: true }
-    }
-  }
-});
-
-// src/routes/admin-usuarios.ts
 var SUPABASE_URL2 = process.env["SUPABASE_URL"];
 var SERVICE_KEY = process.env["SUPABASE_SERVICE_KEY"];
 var ANON_KEY = process.env["SUPABASE_ANON_KEY"];
@@ -71387,8 +71617,8 @@ function claveDeUnUso() {
   globalThis.crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => abc[b % abc.length]).join("");
 }
-var router7 = (0, import_express7.Router)();
-router7.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
+var router6 = (0, import_express7.Router)();
+router6.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const { data: perfiles, error } = await comoElAdmin(req.quien.token).from("perfiles").select("id, nombre, rol, telefono, activo, creado_en").order("nombre");
   if (error) {
     logger.error({ err: error }, "no se pudieron listar los perfiles");
@@ -71411,7 +71641,7 @@ router7.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res
     }))
   });
 });
-router7.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
+router6.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const v = validarAlta(req.body ?? {});
   if (!v.ok) {
     res.status(400).json({ error: v.error });
@@ -71492,7 +71722,7 @@ router7.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, re
     nota: enlace ? "P\xE1sale este enlace a la persona. Es de un solo uso: ah\xED elige su contrase\xF1a." : (avisoEnlace ?? "") + (avisoEnlace ? " " : "") + "La cuenta est\xE1 creada. Para darle contrase\xF1a: panel de Supabase \u2192 Authentication \u2192 el usuario \u2192 Reset password."
   });
 });
-router7.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req, res) => {
+router6.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const id = String(req.params["id"] ?? "");
   const cuerpo = req.body ?? {};
   if (!/^[0-9a-f-]{36}$/i.test(id)) {
@@ -71564,22 +71794,39 @@ router7.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (re
   }
   res.json({ usuario: actualizado });
 });
-var admin_usuarios_default = router7;
+var admin_usuarios_default = router6;
 
 // src/routes/index.ts
-var router8 = (0, import_express8.Router)();
-router8.use("/rifa", rifa_default);
-router8.use(admin_usuarios_default);
-router8.use(health_default);
-router8.use(admin_auth_default);
-router8.use(products_default);
-router8.use(projects_default);
-router8.use(videos_default);
-var routes_default = router8;
+var router7 = (0, import_express8.Router)();
+router7.use("/rifa", rifa_default);
+router7.use(admin_usuarios_default);
+router7.use(health_default);
+router7.use(admin_auth_default);
+router7.use(products_default);
+router7.use(projects_default);
+router7.use(videos_default);
+var routes_default = router7;
+
+// src/lib/proxy.ts
+var MAX_SALTOS = 5;
+function saltosDeProxy(env) {
+  const porDefecto = env.RENDER ? 1 : 0;
+  const valor = env.TRUST_PROXY_SALTOS?.trim();
+  if (!valor) return { saltos: porDefecto };
+  if (/^\d{1,2}$/.test(valor) && Number(valor) <= MAX_SALTOS) return { saltos: Number(valor) };
+  return {
+    saltos: porDefecto,
+    aviso: `TRUST_PROXY_SALTOS inv\xE1lida (se esperaba un entero de 0 a ${MAX_SALTOS}); se usa ${porDefecto}`
+  };
+}
 
 // src/app.ts
 var __dirname2 = path3.dirname(fileURLToPath(import.meta.url));
 var app = (0, import_express9.default)();
+var proxy = saltosDeProxy(process.env);
+if (proxy.aviso) logger.error({ evento: "trust-proxy-invalido" }, proxy.aviso);
+if (proxy.saltos > 0) app.set("trust proxy", proxy.saltos);
+logger.info({ evento: "trust-proxy", saltos: proxy.saltos }, "proxies de confianza");
 app.use(
   (0, import_pino_http.default)({
     logger,
@@ -71602,6 +71849,7 @@ app.use(
 app.use((0, import_cors.default)());
 app.use(import_express9.default.json());
 app.use(import_express9.default.urlencoded({ extended: true }));
+app.use((0, import_cookie_parser.default)());
 app.use("/uploads", import_express9.default.static(path3.resolve(__dirname2, "../uploads")));
 app.use(import_express9.default.static(path3.resolve(__dirname2, "../public")));
 app.use("/api", routes_default);
@@ -71921,6 +72169,14 @@ object-assign/index.js:
   (c) Sindre Sorhus
   @license MIT
   *)
+
+cookie-parser/index.js:
+  (*!
+   * cookie-parser
+   * Copyright(c) 2014 TJ Holowaychuk
+   * Copyright(c) 2015 Douglas Christopher Wilson
+   * MIT Licensed
+   *)
 
 media-typer/index.js:
   (*!

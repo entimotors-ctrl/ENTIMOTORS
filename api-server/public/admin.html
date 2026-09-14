@@ -229,7 +229,7 @@
         <input type="password" id="password-input" class="input-field" placeholder="Ingresa la contraseña" required />
       </div>
       <button type="submit" class="btn-red">Acceder</button>
-      <p id="login-error" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; text-align:center; display:none;">Contraseña incorrecta</p>
+      <p id="login-error" style="color:var(--red); font-size:0.85rem; margin-top:0.75rem; text-align:center; display:none;">No se pudo iniciar sesión.</p>
     </form>
   </div>
 </div>
@@ -357,8 +357,11 @@
 <div id="toast" class="toast" style="display:none;"></div>
 
 <script>
-  let authToken = localStorage.getItem('enti_token') || '';
   const BASE = '/api';
+  // El panel ya no guarda nada en el navegador: la sesión es una cookie HttpOnly que
+  // pone el servidor y que este JavaScript no puede leer. Se borra el token antiguo
+  // (base64 de la contraseña) que pudiera quedar de versiones anteriores.
+  localStorage.removeItem('enti_token');
 
   function showToast(msg, type = 'success') {
     const t = document.getElementById('toast');
@@ -372,14 +375,26 @@
     }, 3000);
   }
 
-  function headers() {
-    return { Authorization: `Bearer ${authToken}` };
+  // Para las acciones del panel: la cookie de sesión viaja sola (mismo origen).
+  // Si el servidor dice 401 la sesión caducó o se cerró: se vuelve a pedir la contraseña.
+  async function adminFetch(url, opts = {}) {
+    const r = await fetch(url, { ...opts, credentials: 'same-origin' });
+    if (r.status === 401) mostrarLogin('Tu sesión terminó. Vuelve a entrar.');
+    return r;
   }
 
   async function checkAuth() {
-    if (!authToken) return;
-    const r = await fetch(`${BASE}/healthz`);
-    if (r.ok) showDashboard();
+    const r = await fetch(`${BASE}/admin/sesion`, { credentials: 'same-origin' });
+    const data = await r.json().catch(() => null);
+    if (r.ok && data?.autenticado === true) showDashboard();
+  }
+
+  function mostrarLogin(mensaje) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    const err = document.getElementById('login-error');
+    err.textContent = mensaje || '';
+    err.style.display = mensaje ? 'block' : 'none';
   }
 
   function showDashboard() {
@@ -388,29 +403,27 @@
     loadAll();
   }
 
-  function logout() {
-    authToken = '';
-    localStorage.removeItem('enti_token');
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('dashboard').style.display = 'none';
+  async function logout() {
+    await fetch(`${BASE}/admin/logout`, { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+    mostrarLogin();
   }
 
   document.getElementById('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const pw = document.getElementById('password-input').value;
+    const input = document.getElementById('password-input');
     const r = await fetch(`${BASE}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: pw })
+      credentials: 'same-origin',
+      body: JSON.stringify({ password: input.value })
     });
-    const data = await r.json();
+    input.value = '';
+    const data = await r.json().catch(() => ({}));
     if (r.ok) {
-      authToken = data.token;
-      localStorage.setItem('enti_token', authToken);
       document.getElementById('login-error').style.display = 'none';
       showDashboard();
     } else {
-      document.getElementById('login-error').style.display = 'block';
+      mostrarLogin(data.error || 'No se pudo iniciar sesión.');
     }
   });
 
@@ -430,30 +443,79 @@
     loadVideos();
   }
 
+  // ---- PINTAR DATOS DEL SERVIDOR ----
+  // Nada que venga de la API (nombres, títulos, URLs, ids) se mete como HTML: se crean
+  // los nodos y el texto va por textContent. Un nombre como <img onerror=…> se ve tal
+  // cual y no se ejecuta. Los atributos que se pasan aquí son siempre constantes del
+  // código; los ids solo se usan en listeners y en rutas con encodeURIComponent.
+  function crear(tag, { clase, estilo, texto, ...attrs } = {}, hijos = []) {
+    const n = document.createElement(tag);
+    if (clase) n.className = clase;
+    if (estilo) n.style.cssText = estilo;
+    if (texto !== undefined) n.textContent = texto === null ? '' : String(texto);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v);
+    for (const h of hijos) if (h) n.append(h);
+    return n;
+  }
+
+  function mensajeVacio(el, texto) {
+    el.replaceChildren(crear('p', { estilo: 'text-align:center;padding:2rem;color:#555;', texto }));
+  }
+
+  const lista = (data) => Array.isArray(data) ? data : [];
+  const idRuta = (id) => encodeURIComponent(String(id));
+
+  // Solo imágenes https:// o rutas de este mismo sitio (/uploads/…). javascript:, data:,
+  // //otro-host, /\otro-host o cualquier cosa que no sea URL → sin imagen, y sin petición.
+  function urlImagen(valor) {
+    if (typeof valor !== 'string') return null;
+    const v = valor.trim();
+    if (!v || v.length > 2048) return null;
+    try {
+      const u = new URL(v, location.origin);
+      if (/^\/(?![\/\\])/.test(v) && u.origin === location.origin) return u.href;
+      if (/^https:\/\//i.test(v) && u.protocol === 'https:') return u.href;
+    } catch {}
+    return null;
+  }
+
+  function imagen(src, attrs) {
+    const img = crear('img', attrs);
+    img.src = src;
+    return img;
+  }
+
   // ---- PRODUCTS ----
   async function loadProducts() {
     const r = await fetch(`${BASE}/products`);
-    const data = await r.json();
+    const data = lista(await r.json());
     const el = document.getElementById('products-list');
-    if (!data.length) {
-      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin productos aún.</p>';
-      return;
-    }
-    el.innerHTML = data.map(p => `
-      <div class="table-row">
-        ${p.image ? `<img src="${p.image}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;" />` : '<div style="width:48px;height:48px;background:#1a1a1a;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;">🔧</div>'}
-        <div style="flex:1; min-width:0;">
-          <p style="font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</p>
-          <div style="display:flex;align-items:center;gap:0.6rem;margin-top:2px;">
-            <p style="color:var(--red); font-family:'Teko',sans-serif; font-size:1.1rem;">L. ${parseFloat(p.price).toFixed(2)}</p>
-            <span style="font-size:0.7rem; padding:1px 8px; border-radius:999px; font-family:'Teko',sans-serif; letter-spacing:0.05em; ${p.category === 'accesorio' ? 'background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid #a855f7' : 'background:rgba(225,29,72,0.12);color:var(--red);border:1px solid var(--red)'}">
-              ${p.category === 'accesorio' ? '✨ Accesorio' : '🔧 Repuesto'}
-            </span>
-          </div>
-        </div>
-        <button onclick="deleteProduct(${p.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
-      </div>
-    `).join('');
+    if (!data.length) { mensajeVacio(el, 'Sin productos aún.'); return; }
+    el.replaceChildren(...data.map(filaProducto));
+  }
+
+  function filaProducto(p) {
+    const src = urlImagen(p.image);
+    const accesorio = p.category === 'accesorio';
+    const borrar = crear('button', { clase: 'btn-outline', estilo: 'flex-shrink:0;', texto: 'Eliminar' });
+    borrar.addEventListener('click', () => deleteProduct(p.id));
+    return crear('div', { clase: 'table-row' }, [
+      src
+        ? imagen(src, { estilo: 'width:48px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;' })
+        : crear('div', { estilo: 'width:48px;height:48px;background:#1a1a1a;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;', texto: '🔧' }),
+      crear('div', { estilo: 'flex:1; min-width:0;' }, [
+        crear('p', { estilo: 'font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;', texto: p.name }),
+        crear('div', { estilo: 'display:flex;align-items:center;gap:0.6rem;margin-top:2px;' }, [
+          crear('p', { estilo: "color:var(--red); font-family:'Teko',sans-serif; font-size:1.1rem;", texto: `L. ${parseFloat(p.price).toFixed(2)}` }),
+          crear('span', {
+            estilo: "font-size:0.7rem; padding:1px 8px; border-radius:999px; font-family:'Teko',sans-serif; letter-spacing:0.05em; " +
+              (accesorio ? 'background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid #a855f7' : 'background:rgba(225,29,72,0.12);color:var(--red);border:1px solid var(--red)'),
+            texto: accesorio ? '✨ Accesorio' : '🔧 Repuesto',
+          }),
+        ]),
+      ]),
+      borrar,
+    ]);
   }
 
   document.getElementById('product-form').addEventListener('submit', async (e) => {
@@ -462,7 +524,7 @@
     const fd = new FormData(form);
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Guardando...';
-    const r = await fetch(`${BASE}/products`, { method: 'POST', headers: headers(), body: fd });
+    const r = await adminFetch(`${BASE}/products`, { method: 'POST', body: fd });
     btn.disabled = false; btn.textContent = 'Agregar Producto';
     if (r.ok) { showToast('Producto agregado'); form.reset(); loadProducts(); }
     else { const d = await r.json(); showToast(d.error || 'Error', 'error'); }
@@ -470,7 +532,7 @@
 
   async function deleteProduct(id) {
     if (!confirm('¿Eliminar este producto?')) return;
-    const r = await fetch(`${BASE}/products/${id}`, { method: 'DELETE', headers: headers() });
+    const r = await adminFetch(`${BASE}/products/${idRuta(id)}`, { method: 'DELETE' });
     if (r.ok) { showToast('Producto eliminado'); loadProducts(); }
     else showToast('Error al eliminar', 'error');
   }
@@ -478,53 +540,56 @@
   // ---- PROJECTS ----
   async function loadProjects() {
     const r = await fetch(`${BASE}/projects`);
-    const data = await r.json();
+    const data = lista(await r.json());
     const el = document.getElementById('projects-list');
-    if (!data.length) {
-      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin proyectos aún.</p>';
-      return;
-    }
-    el.innerHTML = data.map(p => {
-      const imgs = p.project_images || [];
-      const statusStyle = p.status === 'en_curso'
+    if (!data.length) { mensajeVacio(el, 'Sin proyectos aún.'); return; }
+    el.replaceChildren(...data.map(tarjetaProyecto));
+  }
+
+  function tarjetaProyecto(p) {
+    const imgs = lista(p.project_images);
+    const enCurso = p.status === 'en_curso';
+    const nextStatus = enCurso ? 'terminado' : 'en_curso';
+
+    const estado = crear('span', {
+      clase: 'badge-status',
+      estilo: enCurso
         ? 'background:rgba(225,29,72,0.15);color:var(--red);border:1px solid var(--red)'
-        : 'background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid #4ade80';
-      const nextStatus = p.status === 'en_curso' ? 'terminado' : 'en_curso';
-      const nextLabel = p.status === 'en_curso' ? 'Marcar Terminado' : 'Reabrir';
+        : 'background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid #4ade80',
+      title: enCurso ? 'Marcar Terminado' : 'Reabrir',
+      texto: enCurso ? '🔧 En Curso' : '✅ Terminado',
+    });
+    estado.addEventListener('click', () => toggleProjectStatus(p.id, nextStatus));
 
-      const thumbsHtml = imgs.map(img => `
-        <div class="photo-thumb">
-          <img src="${img.image_url}" alt="foto" loading="lazy" />
-          <button class="photo-thumb-del" onclick="deleteProjectImage(${p.id}, ${img.id})" title="Eliminar foto">✕</button>
-        </div>
-      `).join('');
+    const borrar = crear('button', { clase: 'btn-outline', estilo: 'flex-shrink:0; font-size:0.85rem;', texto: 'Eliminar' });
+    borrar.addEventListener('click', () => deleteProject(p.id));
 
-      return `
-        <div class="project-card" id="project-card-${p.id}">
-          <div style="display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap;">
-            <div style="flex:1; min-width:0;">
-              <p style="font-weight:500; margin-bottom:0.4rem;">${p.title}</p>
-              <div style="display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;">
-                <span class="badge-status" style="${statusStyle}" onclick="toggleProjectStatus(${p.id}, '${nextStatus}')" title="${nextLabel}">
-                  ${p.status === 'en_curso' ? '🔧 En Curso' : '✅ Terminado'}
-                </span>
-                <span style="color:#555; font-size:0.75rem;">${imgs.length} foto${imgs.length !== 1 ? 's' : ''}</span>
-              </div>
-            </div>
-            <button onclick="deleteProject(${p.id})" class="btn-outline" style="flex-shrink:0; font-size:0.85rem;">Eliminar</button>
-          </div>
+    const fotos = imgs.map(img => {
+      const src = urlImagen(img.image_url);
+      const quitar = crear('button', { clase: 'photo-thumb-del', title: 'Eliminar foto', texto: '✕' });
+      quitar.addEventListener('click', () => deleteProjectImage(p.id, img.id));
+      return crear('div', { clase: 'photo-thumb' }, [src ? imagen(src, { alt: 'foto', loading: 'lazy' }) : null, quitar]);
+    });
 
-          <div class="photo-grid">
-            ${thumbsHtml}
-            <label class="add-photos-label" title="Agregar más fotos">
-              +
-              <input type="file" accept="image/*" multiple style="display:none;"
-                onchange="uploadMorePhotos(${p.id}, this)" />
-            </label>
-          </div>
-        </div>
-      `;
-    }).join('');
+    return crear('div', { clase: 'project-card' }, [
+      crear('div', { estilo: 'display:flex; align-items:flex-start; gap:1rem; flex-wrap:wrap;' }, [
+        crear('div', { estilo: 'flex:1; min-width:0;' }, [
+          crear('p', { estilo: 'font-weight:500; margin-bottom:0.4rem;', texto: p.title }),
+          crear('div', { estilo: 'display:flex; gap:0.5rem; flex-wrap:wrap; align-items:center;' }, [
+            estado,
+            crear('span', { estilo: 'color:#555; font-size:0.75rem;', texto: `${imgs.length} foto${imgs.length !== 1 ? 's' : ''}` }),
+          ]),
+        ]),
+        borrar,
+      ]),
+      crear('div', { clase: 'photo-grid' }, [...fotos, botonMasFotos(p.id)]),
+    ]);
+  }
+
+  function botonMasFotos(projectId) {
+    const input = crear('input', { type: 'file', accept: 'image/*', multiple: '', estilo: 'display:none;' });
+    input.addEventListener('change', () => uploadMorePhotos(projectId, input));
+    return crear('label', { clase: 'add-photos-label', title: 'Agregar más fotos', texto: '+' }, [input]);
   }
 
   // Fotos acumuladas para el formulario de nuevo proyecto
@@ -539,13 +604,11 @@
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      const thumb = document.createElement('div');
-      thumb.className = 'photo-thumb';
+      const quitar = crear('button', { type: 'button', clase: 'photo-thumb-del', texto: '×' });
+      quitar.addEventListener('click', () => removeNewProjectPhoto(idx));
+      // e.target.result es la data: URL del archivo que se acaba de elegir en este equipo
+      const thumb = crear('div', { clase: 'photo-thumb' }, [imagen(e.target.result, { alt: 'foto' }), quitar]);
       thumb.id = `np-thumb-${idx}`;
-      thumb.innerHTML = `
-        <img src="${e.target.result}" alt="foto" />
-        <button type="button" class="photo-thumb-del" onclick="removeNewProjectPhoto(${idx})">&times;</button>
-      `;
       const addBtn = document.getElementById('new-project-add-btn');
       document.getElementById('new-project-preview').insertBefore(thumb, addBtn);
     };
@@ -568,17 +631,14 @@
     for (const file of validFiles) fd.append('images', file);
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Guardando...';
-    const r = await fetch(`${BASE}/projects`, { method: 'POST', headers: headers(), body: fd });
+    const r = await adminFetch(`${BASE}/projects`, { method: 'POST', body: fd });
     btn.disabled = false; btn.textContent = 'Crear Proyecto';
     if (r.ok) {
       showToast('Proyecto creado');
       form.reset();
       newProjectFiles = [];
-      document.getElementById('new-project-preview').innerHTML = `
-        <label class="add-photos-label" id="new-project-add-btn" title="Agregar foto">
-          +
-          <input type="file" accept="image/*" style="display:none;" onchange="addNewProjectPhoto(this)" />
-        </label>`;
+      // quitar las miniaturas y dejar solo el botón «+» original
+      document.getElementById('new-project-preview').replaceChildren(document.getElementById('new-project-add-btn'));
       loadProjects();
     } else {
       const d = await r.json();
@@ -592,29 +652,28 @@
     for (const file of input.files) fd.append('images', file);
     const label = input.closest('label');
     label.textContent = '...';
-    const r = await fetch(`${BASE}/projects/${projectId}/images`, {
+    const r = await adminFetch(`${BASE}/projects/${idRuta(projectId)}/images`, {
       method: 'POST',
-      headers: headers(),
       body: fd
     });
-    label.innerHTML = '+<input type="file" accept="image/*" multiple style="display:none;" onchange="uploadMorePhotos(' + projectId + ', this)" />';
+    label.replaceWith(botonMasFotos(projectId));
     if (r.ok) { showToast('Fotos agregadas'); loadProjects(); }
     else { const d = await r.json(); showToast(d.error || 'Error al subir', 'error'); }
   }
 
   async function deleteProjectImage(projectId, imageId) {
     if (!confirm('¿Eliminar esta foto?')) return;
-    const r = await fetch(`${BASE}/projects/${projectId}/images/${imageId}`, {
-      method: 'DELETE', headers: headers()
+    const r = await adminFetch(`${BASE}/projects/${idRuta(projectId)}/images/${idRuta(imageId)}`, {
+      method: 'DELETE'
     });
     if (r.ok) { showToast('Foto eliminada'); loadProjects(); }
     else showToast('Error al eliminar foto', 'error');
   }
 
   async function toggleProjectStatus(id, newStatus) {
-    const r = await fetch(`${BASE}/projects/${id}/status`, {
+    const r = await adminFetch(`${BASE}/projects/${idRuta(id)}/status`, {
       method: 'PATCH',
-      headers: { ...headers(), 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: newStatus })
     });
     if (r.ok) { showToast('Estado actualizado'); loadProjects(); }
@@ -623,7 +682,7 @@
 
   async function deleteProject(id) {
     if (!confirm('¿Eliminar este proyecto y todas sus fotos?')) return;
-    const r = await fetch(`${BASE}/projects/${id}`, { method: 'DELETE', headers: headers() });
+    const r = await adminFetch(`${BASE}/projects/${idRuta(id)}`, { method: 'DELETE' });
     if (r.ok) { showToast('Proyecto eliminado'); loadProjects(); }
     else showToast('Error al eliminar', 'error');
   }
@@ -631,21 +690,22 @@
   // ---- VIDEOS ----
   async function loadVideos() {
     const r = await fetch(`${BASE}/videos`);
-    const data = await r.json();
+    const data = lista(await r.json());
     const el = document.getElementById('videos-list');
-    if (!data.length) {
-      el.innerHTML = '<p style="text-align:center;padding:2rem;color:#555;">Sin videos aún.</p>';
-      return;
-    }
-    el.innerHTML = data.map(v => `
-      <div class="table-row">
-        <div style="flex:1; min-width:0;">
-          <p style="font-weight:500;">${v.title}</p>
-          <p style="color:#555; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${v.url}</p>
-        </div>
-        <button onclick="deleteVideo(${v.id})" class="btn-outline" style="flex-shrink:0;">Eliminar</button>
-      </div>
-    `).join('');
+    if (!data.length) { mensajeVacio(el, 'Sin videos aún.'); return; }
+    el.replaceChildren(...data.map(filaVideo));
+  }
+
+  function filaVideo(v) {
+    const borrar = crear('button', { clase: 'btn-outline', estilo: 'flex-shrink:0;', texto: 'Eliminar' });
+    borrar.addEventListener('click', () => deleteVideo(v.id));
+    return crear('div', { clase: 'table-row' }, [
+      crear('div', { estilo: 'flex:1; min-width:0;' }, [
+        crear('p', { estilo: 'font-weight:500;', texto: v.title }),
+        crear('p', { estilo: 'color:#555; font-size:0.8rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;', texto: v.url }),
+      ]),
+      borrar,
+    ]);
   }
 
   document.getElementById('video-form').addEventListener('submit', async (e) => {
@@ -654,9 +714,9 @@
     const fd = new FormData(form);
     const btn = form.querySelector('button[type=submit]');
     btn.disabled = true; btn.textContent = 'Guardando...';
-    const r = await fetch(`${BASE}/videos`, {
+    const r = await adminFetch(`${BASE}/videos`, {
       method: 'POST',
-      headers: { ...headers(), 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title: fd.get('title'), url: fd.get('url') })
     });
     btn.disabled = false; btn.textContent = 'Agregar Video';
@@ -666,7 +726,7 @@
 
   async function deleteVideo(id) {
     if (!confirm('¿Eliminar este video?')) return;
-    const r = await fetch(`${BASE}/videos/${id}`, { method: 'DELETE', headers: headers() });
+    const r = await adminFetch(`${BASE}/videos/${idRuta(id)}`, { method: 'DELETE' });
     if (r.ok) { showToast('Video eliminado'); loadVideos(); }
     else showToast('Error al eliminar', 'error');
   }
