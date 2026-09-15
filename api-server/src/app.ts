@@ -47,10 +47,7 @@ app.use(cookieParser());
 app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
 app.use(express.static(path.resolve(__dirname, "../public")));
 
+/* Sin comodín que devuelva index.html: una ruta que no existe (página o API) responde 404. */
 app.use("/api", router);
-
-app.get("/{*splat}", (_req, res) => {
-  res.sendFile(path.resolve(__dirname, "../public/index.html"));
-});
 
 export default app;

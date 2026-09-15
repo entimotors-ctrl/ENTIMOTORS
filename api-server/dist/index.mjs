@@ -20655,27 +20655,27 @@ var require_router = __commonJS({
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var methods = METHODS.map((method) => method.toLowerCase());
-    module.exports = Router9;
+    module.exports = Router8;
     module.exports.Route = Route;
-    function Router9(options) {
-      if (!(this instanceof Router9)) {
-        return new Router9(options);
+    function Router8(options) {
+      if (!(this instanceof Router8)) {
+        return new Router8(options);
       }
       const opts = options || {};
-      function router8(req, res, next) {
-        router8.handle(req, res, next);
+      function router7(req, res, next) {
+        router7.handle(req, res, next);
       }
-      Object.setPrototypeOf(router8, this);
-      router8.caseSensitive = opts.caseSensitive;
-      router8.mergeParams = opts.mergeParams;
-      router8.params = {};
-      router8.strict = opts.strict;
-      router8.stack = [];
-      return router8;
+      Object.setPrototypeOf(router7, this);
+      router7.caseSensitive = opts.caseSensitive;
+      router7.mergeParams = opts.mergeParams;
+      router7.params = {};
+      router7.strict = opts.strict;
+      router7.stack = [];
+      return router7;
     }
-    Router9.prototype = function() {
+    Router8.prototype = function() {
     };
-    Router9.prototype.param = function param(name, fn) {
+    Router8.prototype.param = function param(name, fn) {
       if (!name) {
         throw new TypeError("argument name is required");
       }
@@ -20695,7 +20695,7 @@ var require_router = __commonJS({
       params.push(fn);
       return this;
     };
-    Router9.prototype.handle = function handle(req, res, callback) {
+    Router8.prototype.handle = function handle(req, res, callback) {
       if (!callback) {
         throw new TypeError("argument callback is required");
       }
@@ -20822,7 +20822,7 @@ var require_router = __commonJS({
         }
       }
     };
-    Router9.prototype.use = function use(handler) {
+    Router8.prototype.use = function use(handler) {
       let offset = 0;
       let path4 = "/";
       if (typeof handler !== "function") {
@@ -20855,7 +20855,7 @@ var require_router = __commonJS({
       }
       return this;
     };
-    Router9.prototype.route = function route(path4) {
+    Router8.prototype.route = function route(path4) {
       const route2 = new Route(path4);
       const layer = new Layer(path4, {
         sensitive: this.caseSensitive,
@@ -20870,7 +20870,7 @@ var require_router = __commonJS({
       return route2;
     };
     methods.concat("all").forEach(function(method) {
-      Router9.prototype[method] = function(path4) {
+      Router8.prototype[method] = function(path4) {
         const route = this.route(path4);
         route[method].apply(route, slice.call(arguments, 1));
         return this;
@@ -21053,13 +21053,13 @@ var require_application = __commonJS({
     var compileTrust = require_utils3().compileTrust;
     var resolve = __require("node:path").resolve;
     var once = require_once();
-    var Router9 = require_router();
+    var Router8 = require_router();
     var slice = Array.prototype.slice;
     var flatten = Array.prototype.flat;
     var app2 = exports = module.exports = {};
     var trustProxyDefaultSymbol = "@@symbol:trust_proxy_default";
     app2.init = function init() {
-      var router8 = null;
+      var router7 = null;
       this.cache = /* @__PURE__ */ Object.create(null);
       this.engines = /* @__PURE__ */ Object.create(null);
       this.settings = /* @__PURE__ */ Object.create(null);
@@ -21068,13 +21068,13 @@ var require_application = __commonJS({
         configurable: true,
         enumerable: true,
         get: function getrouter() {
-          if (router8 === null) {
-            router8 = new Router9({
+          if (router7 === null) {
+            router7 = new Router8({
               caseSensitive: this.enabled("case sensitive routing"),
               strict: this.enabled("strict routing")
             });
           }
-          return router8;
+          return router7;
         }
       });
     };
@@ -21145,15 +21145,15 @@ var require_application = __commonJS({
       if (fns.length === 0) {
         throw new TypeError("app.use() requires a middleware function");
       }
-      var router8 = this.router;
+      var router7 = this.router;
       fns.forEach(function(fn2) {
         if (!fn2 || !fn2.handle || !fn2.set) {
-          return router8.use(path4, fn2);
+          return router7.use(path4, fn2);
         }
         debug(".use app under %s", path4);
         fn2.mountpath = path4;
         fn2.parent = this;
-        router8.use(path4, function mounted_app(req, res, next) {
+        router7.use(path4, function mounted_app(req, res, next) {
           var orig = req.app;
           fn2.handle(req, res, function(err) {
             Object.setPrototypeOf(req, orig.request);
@@ -23726,7 +23726,7 @@ var require_express = __commonJS({
     var EventEmitter = __require("node:events").EventEmitter;
     var mixin = require_merge_descriptors();
     var proto = require_application();
-    var Router9 = require_router();
+    var Router8 = require_router();
     var req = require_request();
     var res = require_response();
     exports = module.exports = createApplication;
@@ -23748,8 +23748,8 @@ var require_express = __commonJS({
     exports.application = proto;
     exports.request = req;
     exports.response = res;
-    exports.Route = Router9.Route;
-    exports.Router = Router9;
+    exports.Route = Router8.Route;
+    exports.Router = Router8;
     exports.json = bodyParser.json;
     exports.raw = bodyParser.raw;
     exports.static = require_serve_static();
@@ -28258,7 +28258,7 @@ var require_pino = __commonJS({
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS-rcv24/api-server/dist";
+        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS-rcv27/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -62065,7 +62065,7 @@ var require_websocket_server = __commonJS({
 });
 
 // src/app.ts
-var import_express9 = __toESM(require_express2(), 1);
+var import_express8 = __toESM(require_express2(), 1);
 var import_cors = __toESM(require_lib3(), 1);
 var import_cookie_parser = __toESM(require_cookie_parser(), 1);
 var import_pino_http = __toESM(require_logger(), 1);
@@ -62073,7 +62073,7 @@ import path3 from "path";
 import { fileURLToPath } from "url";
 
 // src/routes/index.ts
-var import_express8 = __toESM(require_express2(), 1);
+var import_express7 = __toESM(require_express2(), 1);
 
 // src/routes/health.ts
 var import_express = __toESM(require_express2(), 1);
@@ -70383,10 +70383,10 @@ function matchStringTarget(hostname, target) {
   }
   return false;
 }
-function getDefaultPropagationTargets(supabaseUrl2) {
+function getDefaultPropagationTargets(supabaseUrl) {
   const targets = [];
   try {
-    const url = new URL(supabaseUrl2);
+    const url = new URL(supabaseUrl);
     targets.push(url.hostname);
   } catch (error) {
   }
@@ -70452,17 +70452,17 @@ var resolveFetch2 = (customFetch) => {
 var resolveHeadersConstructor = () => {
   return Headers;
 };
-var fetchWithAuth = (supabaseKey2, supabaseUrl2, getAccessToken, customFetch, tracePropagationOptions) => {
+var fetchWithAuth = (supabaseKey, supabaseUrl, getAccessToken, customFetch, tracePropagationOptions) => {
   const fetch$1 = resolveFetch2(customFetch);
   const HeadersConstructor = resolveHeadersConstructor();
   const traceEnabled = (tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.enabled) === true;
   const respectSampling = (tracePropagationOptions === null || tracePropagationOptions === void 0 ? void 0 : tracePropagationOptions.respectSamplingDecision) !== false;
-  const traceTargets = traceEnabled ? getDefaultPropagationTargets(supabaseUrl2) : null;
+  const traceTargets = traceEnabled ? getDefaultPropagationTargets(supabaseUrl) : null;
   return async (input, init) => {
     var _await$getAccessToken;
-    const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey2;
+    const accessToken = (_await$getAccessToken = await getAccessToken()) !== null && _await$getAccessToken !== void 0 ? _await$getAccessToken : supabaseKey;
     let headers = new HeadersConstructor(init === null || init === void 0 ? void 0 : init.headers);
-    if (!headers.has("apikey")) headers.set("apikey", supabaseKey2);
+    if (!headers.has("apikey")) headers.set("apikey", supabaseKey);
     if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${accessToken}`);
     if (traceTargets) {
       const traceHeaders = await getTraceHeaders(input, traceTargets, respectSampling);
@@ -70513,8 +70513,8 @@ function applySettingDefaults(options, defaults) {
   else delete result.accessToken;
   return result;
 }
-function validateSupabaseUrl(supabaseUrl2) {
-  const trimmedUrl = supabaseUrl2 === null || supabaseUrl2 === void 0 ? void 0 : supabaseUrl2.trim();
+function validateSupabaseUrl(supabaseUrl) {
+  const trimmedUrl = supabaseUrl === null || supabaseUrl === void 0 ? void 0 : supabaseUrl.trim();
   if (!trimmedUrl) throw new Error("supabaseUrl is required.");
   if (!trimmedUrl.match(/^https?:\/\//i)) throw new Error("Invalid supabaseUrl: Must be a valid HTTP or HTTPS URL.");
   try {
@@ -70740,12 +70740,12 @@ var SupabaseClient = class {
   * })
   * ```
   */
-  constructor(supabaseUrl2, supabaseKey2, options) {
+  constructor(supabaseUrl, supabaseKey, options) {
     var _settings$auth$storag, _settings$global$head;
-    this.supabaseUrl = supabaseUrl2;
-    this.supabaseKey = supabaseKey2;
-    const baseUrl = validateSupabaseUrl(supabaseUrl2);
-    if (!supabaseKey2) throw new Error("supabaseKey is required.");
+    this.supabaseUrl = supabaseUrl;
+    this.supabaseKey = supabaseKey;
+    const baseUrl = validateSupabaseUrl(supabaseUrl);
+    if (!supabaseKey) throw new Error("supabaseKey is required.");
     this.realtimeUrl = new URL("realtime/v1", baseUrl);
     this.realtimeUrl.protocol = this.realtimeUrl.protocol.replace("http", "ws");
     this.authUrl = new URL("auth/v1", baseUrl);
@@ -70772,7 +70772,7 @@ var SupabaseClient = class {
         throw new Error(`@supabase/supabase-js: Supabase Client is configured with the accessToken option, accessing supabase.auth.${String(prop)} is not possible`);
       } });
     }
-    this.fetch = fetchWithAuth(supabaseKey2, supabaseUrl2, this._getAccessToken.bind(this), settings.global.fetch, settings.tracePropagation);
+    this.fetch = fetchWithAuth(supabaseKey, supabaseUrl, this._getAccessToken.bind(this), settings.global.fetch, settings.tracePropagation);
     this.realtime = this._initRealtimeClient(_objectSpread23({
       headers: this.headers,
       accessToken: this._getAccessToken.bind(this),
@@ -70956,8 +70956,8 @@ var SupabaseClient = class {
     }
   }
 };
-var createClient = (supabaseUrl2, supabaseKey2, options) => {
-  return new SupabaseClient(supabaseUrl2, supabaseKey2, options);
+var createClient = (supabaseUrl, supabaseKey, options) => {
+  return new SupabaseClient(supabaseUrl, supabaseKey, options);
 };
 function shouldShowDeprecationWarning() {
   if (typeof window !== "undefined") return false;
@@ -71089,8 +71089,8 @@ function crearAuthAdmin(opciones = {}) {
     if (url.host !== host) return false;
     return url.protocol === "https:" || url.protocol === "http:" && (!COOKIE_SEGURA || LOOPBACK.has(url.hostname));
   }
-  const router8 = (0, import_express2.Router)();
-  router8.post("/admin/login", (req, res) => {
+  const router7 = (0, import_express2.Router)();
+  router7.post("/admin/login", (req, res) => {
     res.set("Cache-Control", "no-store");
     limpiar();
     const ip = req.ip ?? "desconocida";
@@ -71119,14 +71119,14 @@ function crearAuthAdmin(opciones = {}) {
     logger.info({ evento: "login-admin" }, "sesi\xF3n admin iniciada");
     res.json({ success: true, expiraEn: new Date(expiraEn).toISOString() });
   });
-  router8.post("/admin/logout", (req, res) => {
+  router7.post("/admin/logout", (req, res) => {
     res.set("Cache-Control", "no-store");
     const h = sesionValida(req);
     if (h) sesiones.delete(h);
     res.clearCookie(COOKIE, atributos());
     res.json({ success: true });
   });
-  router8.get("/admin/sesion", (req, res) => {
+  router7.get("/admin/sesion", (req, res) => {
     res.set("Cache-Control", "no-store");
     const h = sesionValida(req);
     if (!h) {
@@ -71147,7 +71147,7 @@ function crearAuthAdmin(opciones = {}) {
     }
     next();
   }
-  return { router: router8, requireAdmin: requireAdmin2 };
+  return { router: router7, requireAdmin: requireAdmin2 };
 }
 var auth = crearAuthAdmin({ password: process.env.ADMIN_PASSWORD });
 var requireAdmin = auth.requireAdmin;
@@ -71380,56 +71380,124 @@ var projects_default = router3;
 
 // src/routes/videos.ts
 var import_express5 = __toESM(require_express2(), 1);
-var router4 = (0, import_express5.Router)();
-async function parseVideoUrl(rawUrl) {
-  const url = rawUrl.trim();
-  if (url.includes("youtube.com/embed/") || url.includes("tiktok.com/embed/") || url.includes("facebook.com/plugins/video.php")) {
-    return url;
-  }
-  const youtubeMatch = url.match(
-    /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-  );
-  if (youtubeMatch) {
-    return `https://www.youtube.com/embed/${youtubeMatch[1]}`;
-  }
-  const tiktokFullMatch = url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-  if (tiktokFullMatch) {
-    return `https://www.tiktok.com/embed/v2/${tiktokFullMatch[1]}`;
-  }
-  if (/(?:vt|vm)\.tiktok\.com\/|tiktok\.com\/t\//.test(url)) {
-    try {
-      const oembed = await fetch(
-        `https://www.tiktok.com/oembed?url=${encodeURIComponent(url)}`,
-        { headers: { "User-Agent": "Mozilla/5.0" } }
-      );
-      if (oembed.ok) {
-        const json = await oembed.json();
-        if (json.embed_product_id) {
-          return `https://www.tiktok.com/embed/v2/${json.embed_product_id}`;
-        }
-        if (json.author_url) {
-          const m = json.author_url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-          if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
-        }
-      }
-    } catch {
-    }
-    try {
-      const redir = await fetch(url, {
-        redirect: "follow",
-        headers: { "User-Agent": "Mozilla/5.0" }
-      });
-      const m = redir.url.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
-      if (m) return `https://www.tiktok.com/embed/v2/${m[1]}`;
-    } catch {
-    }
+
+// src/lib/video-url.ts
+var YOUTUBE = /* @__PURE__ */ new Set(["youtube.com", "www.youtube.com", "m.youtube.com", "youtube-nocookie.com", "www.youtube-nocookie.com"]);
+var TIKTOK = /* @__PURE__ */ new Set(["tiktok.com", "www.tiktok.com", "m.tiktok.com"]);
+var TIKTOK_CORTO = /* @__PURE__ */ new Set(["vt.tiktok.com", "vm.tiktok.com"]);
+var FACEBOOK = /* @__PURE__ */ new Set(["facebook.com", "www.facebook.com", "m.facebook.com", "web.facebook.com"]);
+var ID_YOUTUBE = /^[A-Za-z0-9_-]{11}$/;
+var ID_NUMERICO = /^\d{1,25}$/;
+var CODIGO = /^[A-Za-z0-9_-]{3,40}$/;
+var PROHIBIDOS = /[ - -\\]/;
+var embedYoutube = (id) => ({ tipo: "youtube", embed: `https://www.youtube.com/embed/${id}` });
+var embedTiktok = (id) => ({ tipo: "tiktok", embed: `https://www.tiktok.com/embed/v2/${id}` });
+var embedFacebook = (href) => ({
+  tipo: "facebook",
+  embed: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(href)}&show_text=false&autoplay=false`
+});
+function analizar(entrada) {
+  if (typeof entrada !== "string") return null;
+  const texto = entrada.trim();
+  if (texto.length === 0 || texto.length > 2048 || PROHIBIDOS.test(texto)) return null;
+  if (!/^https?:\/\//i.test(texto)) return null;
+  let url;
+  try {
+    url = new URL(texto);
+  } catch {
     return null;
   }
-  if (url.includes("facebook.com") || url.includes("fb.watch")) {
-    return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=false&autoplay=false`;
+  if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+  if (url.username || url.password || url.port) return null;
+  return url;
+}
+function hrefFacebook(url) {
+  const host = url.hostname;
+  const ruta = url.pathname;
+  if (host === "fb.watch") {
+    const m2 = ruta.match(/^\/([^/]+)\/?$/);
+    return m2 && CODIGO.test(m2[1]) ? `https://fb.watch/${m2[1]}/` : null;
+  }
+  if (!FACEBOOK.has(host)) return null;
+  if (ruta === "/watch" || ruta === "/watch/") {
+    const v = url.searchParams.getAll("v");
+    return v.length === 1 && ID_NUMERICO.test(v[0]) ? `https://www.facebook.com/watch/?v=${v[0]}` : null;
+  }
+  let m = ruta.match(/^\/([A-Za-z0-9.-]{1,80})\/videos\/(?:[A-Za-z0-9-]{1,120}\/)?(\d{1,25})\/?$/);
+  if (m) return `https://www.facebook.com/${m[1]}/videos/${m[2]}/`;
+  m = ruta.match(/^\/reel\/(\d{1,25})\/?$/);
+  if (m) return `https://www.facebook.com/reel/${m[1]}`;
+  m = ruta.match(/^\/share\/([vr])\/([^/]+)\/?$/);
+  if (m && CODIGO.test(m[2])) return `https://www.facebook.com/share/${m[1]}/${m[2]}/`;
+  return null;
+}
+function canonizarVideo(entrada) {
+  const url = analizar(entrada);
+  if (!url) return null;
+  const host = url.hostname;
+  const ruta = url.pathname;
+  if (host === "youtu.be") {
+    const m = ruta.match(/^\/([^/]+)\/?$/);
+    return m && ID_YOUTUBE.test(m[1]) ? embedYoutube(m[1]) : null;
+  }
+  if (YOUTUBE.has(host)) {
+    if (ruta === "/watch") {
+      const v = url.searchParams.getAll("v");
+      return v.length === 1 && ID_YOUTUBE.test(v[0]) ? embedYoutube(v[0]) : null;
+    }
+    const m = ruta.match(/^\/(?:embed|shorts)\/([^/]+)\/?$/);
+    return m && ID_YOUTUBE.test(m[1]) ? embedYoutube(m[1]) : null;
+  }
+  if (TIKTOK.has(host)) {
+    let m = ruta.match(/^\/@[A-Za-z0-9._-]{1,64}\/video\/(\d{1,25})\/?$/) || ruta.match(/^\/embed\/(?:v2\/)?(\d{1,25})\/?$/);
+    if (m) return embedTiktok(m[1]);
+    m = ruta.match(/^\/t\/([^/]+)\/?$/);
+    return m && CODIGO.test(m[1]) ? { tiktokCorto: `https://www.tiktok.com/t/${m[1]}/` } : null;
+  }
+  if (TIKTOK_CORTO.has(host)) {
+    const m = ruta.match(/^\/([^/]+)\/?$/);
+    return m && CODIGO.test(m[1]) ? { tiktokCorto: `https://${host}/${m[1]}/` } : null;
+  }
+  if (FACEBOOK.has(host) && ruta === "/plugins/video.php") {
+    const href = url.searchParams.getAll("href");
+    if (href.length !== 1) return null;
+    const interna = analizar(href[0]);
+    if (!interna || interna.pathname === "/plugins/video.php") return null;
+    const h = hrefFacebook(interna);
+    return h ? embedFacebook(h) : null;
+  }
+  if (FACEBOOK.has(host) || host === "fb.watch") {
+    const h = hrefFacebook(url);
+    return h ? embedFacebook(h) : null;
   }
   return null;
 }
+async function resolverVideo(entrada, buscar = fetch) {
+  const c = canonizarVideo(entrada);
+  if (!c) return null;
+  if ("embed" in c) return c;
+  const soloTiktok = (x) => x && "embed" in x && x.tipo === "tiktok" ? x : null;
+  const cabeceras = { "User-Agent": "Mozilla/5.0" };
+  try {
+    const r = await buscar(`https://www.tiktok.com/oembed?url=${encodeURIComponent(c.tiktokCorto)}`, { headers: cabeceras, signal: AbortSignal.timeout(8e3) });
+    if (r.ok) {
+      const json = await r.json();
+      if (typeof json.embed_product_id === "string" && ID_NUMERICO.test(json.embed_product_id)) return embedTiktok(json.embed_product_id);
+      const porAutor = soloTiktok(canonizarVideo(json.author_url));
+      if (porAutor) return porAutor;
+    }
+  } catch {
+  }
+  try {
+    const r = await buscar(c.tiktokCorto, { redirect: "follow", headers: cabeceras, signal: AbortSignal.timeout(8e3) });
+    return soloTiktok(canonizarVideo(r.url));
+  } catch {
+    return null;
+  }
+}
+
+// src/routes/videos.ts
+var router4 = (0, import_express5.Router)();
 router4.get("/videos", async (_req, res) => {
   const { data, error } = await supabase.from("videos").select("*").order("created_at", { ascending: false });
   if (error) {
@@ -71439,17 +71507,17 @@ router4.get("/videos", async (_req, res) => {
   res.json(data);
 });
 router4.post("/videos", requireAdmin, async (req, res) => {
-  const { title, url } = req.body;
-  if (!title || !url) {
+  const { title, url } = req.body ?? {};
+  if (!title || !url || typeof title !== "string" || typeof url !== "string") {
     res.status(400).json({ error: "T\xEDtulo y URL son requeridos" });
     return;
   }
-  const embedUrl = await parseVideoUrl(url);
-  if (!embedUrl) {
-    res.status(400).json({ error: "URL de YouTube o TikTok inv\xE1lida" });
+  const video = await resolverVideo(url);
+  if (!video) {
+    res.status(400).json({ error: "URL de video no v\xE1lida. Usa un enlace de YouTube, TikTok o Facebook." });
     return;
   }
-  const { data, error } = await supabase.from("videos").insert({ title, url: embedUrl }).select().single();
+  const { data, error } = await supabase.from("videos").insert({ title, url: video.embed }).select().single();
   if (error) {
     res.status(500).json({ error: error.message });
     return;
@@ -71472,42 +71540,8 @@ router4.delete("/videos/:id", requireAdmin, async (req, res) => {
 });
 var videos_default = router4;
 
-// src/routes/rifa.ts
-var import_express6 = __toESM(require_express2(), 1);
-var supabaseUrl = process.env.SUPABASE_URL;
-var supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-var supabase2 = createClient(supabaseUrl, supabaseKey, {
-  realtime: { transport: wrapper_default }
-});
-var router5 = (0, import_express6.Router)();
-router5.post("/registrar", async (req, res) => {
-  const { codigo, nombre, telefono } = req.body;
-  if (!codigo || !nombre || !telefono) {
-    return res.status(400).json({ error: "Todos los campos son obligatorios." });
-  }
-  try {
-    const { error } = await supabase2.from("rifa").insert([{
-      codigo: codigo.toUpperCase(),
-      nombre,
-      telefono,
-      fecha_registro: (/* @__PURE__ */ new Date()).toISOString()
-    }]);
-    if (error) {
-      if (error.code === "23505") {
-        return res.status(400).json({ error: "Este c\xF3digo ya fue registrado anteriormente." });
-      }
-      throw error;
-    }
-    return res.status(200).json({ success: true, message: "\xA1Registro exitoso!" });
-  } catch (err) {
-    console.error("Error en m\xF3dulo rifa:", err);
-    return res.status(500).json({ error: "Error interno al procesar la rifa." });
-  }
-});
-var rifa_default = router5;
-
 // src/routes/admin-usuarios.ts
-var import_express7 = __toESM(require_express2(), 1);
+var import_express6 = __toESM(require_express2(), 1);
 var SUPABASE_URL2 = process.env["SUPABASE_URL"];
 var SERVICE_KEY = process.env["SUPABASE_SERVICE_KEY"];
 var ANON_KEY = process.env["SUPABASE_ANON_KEY"];
@@ -71617,8 +71651,8 @@ function claveDeUnUso() {
   globalThis.crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => abc[b % abc.length]).join("");
 }
-var router6 = (0, import_express7.Router)();
-router6.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
+var router5 = (0, import_express6.Router)();
+router5.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const { data: perfiles, error } = await comoElAdmin(req.quien.token).from("perfiles").select("id, nombre, rol, telefono, activo, creado_en").order("nombre");
   if (error) {
     logger.error({ err: error }, "no se pudieron listar los perfiles");
@@ -71641,7 +71675,7 @@ router6.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res
     }))
   });
 });
-router6.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
+router5.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const v = validarAlta(req.body ?? {});
   if (!v.ok) {
     res.status(400).json({ error: v.error });
@@ -71722,7 +71756,7 @@ router6.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, re
     nota: enlace ? "P\xE1sale este enlace a la persona. Es de un solo uso: ah\xED elige su contrase\xF1a." : (avisoEnlace ?? "") + (avisoEnlace ? " " : "") + "La cuenta est\xE1 creada. Para darle contrase\xF1a: panel de Supabase \u2192 Authentication \u2192 el usuario \u2192 Reset password."
   });
 });
-router6.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req, res) => {
+router5.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const id = String(req.params["id"] ?? "");
   const cuerpo = req.body ?? {};
   if (!/^[0-9a-f-]{36}$/i.test(id)) {
@@ -71794,18 +71828,17 @@ router6.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (re
   }
   res.json({ usuario: actualizado });
 });
-var admin_usuarios_default = router6;
+var admin_usuarios_default = router5;
 
 // src/routes/index.ts
-var router7 = (0, import_express8.Router)();
-router7.use("/rifa", rifa_default);
-router7.use(admin_usuarios_default);
-router7.use(health_default);
-router7.use(admin_auth_default);
-router7.use(products_default);
-router7.use(projects_default);
-router7.use(videos_default);
-var routes_default = router7;
+var router6 = (0, import_express7.Router)();
+router6.use(admin_usuarios_default);
+router6.use(health_default);
+router6.use(admin_auth_default);
+router6.use(products_default);
+router6.use(projects_default);
+router6.use(videos_default);
+var routes_default = router6;
 
 // src/lib/proxy.ts
 var MAX_SALTOS = 5;
@@ -71822,7 +71855,7 @@ function saltosDeProxy(env) {
 
 // src/app.ts
 var __dirname2 = path3.dirname(fileURLToPath(import.meta.url));
-var app = (0, import_express9.default)();
+var app = (0, import_express8.default)();
 var proxy = saltosDeProxy(process.env);
 if (proxy.aviso) logger.error({ evento: "trust-proxy-invalido" }, proxy.aviso);
 if (proxy.saltos > 0) app.set("trust proxy", proxy.saltos);
@@ -71847,15 +71880,12 @@ app.use(
   })
 );
 app.use((0, import_cors.default)());
-app.use(import_express9.default.json());
-app.use(import_express9.default.urlencoded({ extended: true }));
+app.use(import_express8.default.json());
+app.use(import_express8.default.urlencoded({ extended: true }));
 app.use((0, import_cookie_parser.default)());
-app.use("/uploads", import_express9.default.static(path3.resolve(__dirname2, "../uploads")));
-app.use(import_express9.default.static(path3.resolve(__dirname2, "../public")));
+app.use("/uploads", import_express8.default.static(path3.resolve(__dirname2, "../uploads")));
+app.use(import_express8.default.static(path3.resolve(__dirname2, "../public")));
 app.use("/api", routes_default);
-app.get("/{*splat}", (_req, res) => {
-  res.sendFile(path3.resolve(__dirname2, "../public/index.html"));
-});
 var app_default = app;
 
 // src/index.ts
