@@ -1,0 +1,13 @@
+{
+  "name": "entimotors-pruebas",
+  "private": true,
+  "description": "Guards estaticos y fixtures de RCV-34/RCV-35. Sin dependencias: no hace falta npm install. NO VERIFICAN PRODUCCION.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test:guard": "node rcv34/guard-estatico-funciones.test.mjs",
+    "security:sql": "node rcv34/guard-estatico-funciones.mjs --repo",
+    "test:sync": "node rcv34/guard-estatico-cobertura-sync.test.mjs",
+    "security:sync": "node rcv34/guard-estatico-cobertura-sync.mjs",
+    "verify:rcv34": "npm run test:guard && npm run security:sql && npm run test:sync && npm run security:sync"
+  }
+}

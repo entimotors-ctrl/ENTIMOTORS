@@ -1,0 +1,56 @@
+{
+  "formato": "rcv35-produccion-post-fix/1",
+  "origen": "RCV35 03 read-only production verification 2026-09-18",
+  "firma": "rol_actual()",
+  "md5_prosrc": "e66ee46e01d3df511ee5bd4d0f2a178a",
+  "bytes": 158,
+  "cr": 0,
+  "lf": 11,
+  "owner": "postgres",
+  "retorno": "text",
+  "lenguaje": "sql",
+  "volatilidad": "STABLE",
+  "security_definer": true,
+  "search_path": "public",
+  "acl_efectiva": {
+    "PUBLIC_execute": false,
+    "anon_execute": false,
+    "authenticated_execute": true,
+    "service_role_execute": true
+  },
+  "contiene_filtro_activo": true,
+  "cuerpo_es_la_logica_esperada": true,
+  "cumple_estado_post_fix": true,
+  "procedencia": {
+    "comunicado_por_el_usuario": [
+      "md5_prosrc",
+      "bytes",
+      "cr",
+      "lf",
+      "security_definer",
+      "search_path",
+      "acl_efectiva",
+      "contiene_filtro_activo",
+      "cumple_estado_post_fix"
+    ],
+    "verificado_localmente_sobre_la_definicion_y_el_prosrc_comunicados": [
+      "md5_prosrc",
+      "bytes",
+      "cr",
+      "lf",
+      "retorno",
+      "lenguaje",
+      "volatilidad",
+      "security_definer",
+      "search_path",
+      "contiene_filtro_activo",
+      "cuerpo_es_la_logica_esperada"
+    ],
+    "derivado_de_cumple_estado_post_fix": [
+      "owner"
+    ],
+    "nota": "03 exige owner = postgres dentro de cumple_estado_post_fix; owner no venia listado por separado en la fila comunicada.",
+    "estado_previo_reemplazado": "md5_prosrc 527f940b66f3c7b88b746dc3a676bdb9 (sin AND p.activo; SECURITY_REGRESSION_CONFIRMED)",
+    "no_contiene": "cuerpos de funcion, base64 ni datos de negocio"
+  }
+}

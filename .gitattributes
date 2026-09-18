@@ -1,0 +1,4 @@
+# RCV-34: el source-sync contiene CRLF reales (6 cuerpos de funcion medidos en produccion).
+# -text impide que Git normalice los fines de linea al confirmar o extraer. No lo quites.
+taller-demo/supabase/entimotors-rcv34-source-sync.sql -text
+taller-demo/supabase/entimotors-rcv34-source-sync.sql whitespace=cr-at-eol

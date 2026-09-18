@@ -1,0 +1,29 @@
+[
+  {
+    "archivo": "pruebas/rcv34/02-rollback-cierre-triggers.sql",
+    "sha256_archivo": "dd373ee768f1f2ed67e5b4fb1e79e4bc93f32126854d7a59ebf7e18767c4a76e",
+    "tipo": "prohibited_grant",
+    "firma": "public.mecanico_solo_avance_tecnico()",
+    "roles": ["public", "anon"],
+    "privilegio": "execute",
+    "razon": "01-cierre-triggers-public.sql REV3 SI fue ejecutado en produccion y cerro el EXECUTE de PUBLIC/anon de esta funcion. 02-rollback-cierre-triggers.sql (este archivo) es su rollback de emergencia: esta aprobado pero NO ha sido ejecutado. La excepcion existe porque 02, a proposito, restaura deliberadamente el ACL PRE-01 real de produccion, que para esta funcion incluia PUBLIC y anon antes del cierre. No es una migracion nueva que abre la funcion: es la reversion documentada de un cierre ya ejecutado."
+  },
+  {
+    "archivo": "pruebas/rcv34/02-rollback-cierre-triggers.sql",
+    "sha256_archivo": "dd373ee768f1f2ed67e5b4fb1e79e4bc93f32126854d7a59ebf7e18767c4a76e",
+    "tipo": "prohibited_grant",
+    "firma": "public.proteger_caja_ligada()",
+    "roles": ["public", "anon"],
+    "privilegio": "execute",
+    "razon": "01-cierre-triggers-public.sql REV3 SI fue ejecutado en produccion y cerro el EXECUTE de PUBLIC/anon de esta funcion. 02-rollback-cierre-triggers.sql (este archivo) es su rollback de emergencia: esta aprobado pero NO ha sido ejecutado. La excepcion existe porque 02, a proposito, restaura deliberadamente el ACL PRE-01 real de produccion, que para esta funcion incluia PUBLIC y anon antes del cierre."
+  },
+  {
+    "archivo": "pruebas/rcv34/02-rollback-cierre-triggers.sql",
+    "sha256_archivo": "dd373ee768f1f2ed67e5b4fb1e79e4bc93f32126854d7a59ebf7e18767c4a76e",
+    "tipo": "prohibited_grant",
+    "firma": "public.proteger_rol_perfil()",
+    "roles": ["anon"],
+    "privilegio": "execute",
+    "razon": "01-cierre-triggers-public.sql REV3 SI fue ejecutado en produccion y cerro el EXECUTE de anon de esta funcion. 02-rollback-cierre-triggers.sql (este archivo) es su rollback de emergencia: esta aprobado pero NO ha sido ejecutado. La excepcion existe porque 02, a proposito, restaura deliberadamente el ACL PRE-01 real de produccion, que para esta funcion incluia anon (nunca PUBLIC) antes del cierre."
+  }
+]

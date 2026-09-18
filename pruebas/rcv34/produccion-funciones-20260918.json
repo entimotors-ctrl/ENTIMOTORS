@@ -1,0 +1,189 @@
+{
+  "formato": "rcv34-produccion-funciones/1",
+  "capturado": "2026-09-18",
+  "origen": "Supabase pg_catalog read-only 2026-09-18",
+  "total": 17,
+  "normales": 13,
+  "trigger": 4,
+  "PUBLIC_execute": 0,
+  "anon_execute": 0,
+  "equivalente_04": true,
+  "procedencia": {
+    "verificado_desde_la_captura": "firma, md5_prosrc, bytes, caracteres, cr, lf; total, normales y trigger (derivados de las 17 definiciones); cuerpo de cada definicion identico a su prosrc",
+    "comunicado_por_el_usuario_no_contenido_en_la_captura": "PUBLIC_execute, anon_execute y equivalente_04 provienen de la auditoria read-only del 2026-09-18 informada por el usuario; la captura de funciones no incluye ACL",
+    "clasificacion_source": "comparacion byte a byte del prosrc contra los 5 SQL de origin/main (efd9cbb)",
+    "no_contiene": "cuerpos de funcion, base64, datos de negocio ni secretos"
+  },
+  "funciones": [
+    {
+      "firma": "crear_perfil_al_registrarse()",
+      "md5_prosrc": "f3873b6473a2831c8046a29b97947ea3",
+      "bytes": 257,
+      "caracteres": 257,
+      "cr": 0,
+      "lf": 17,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "es_admin()",
+      "md5_prosrc": "35aa9a08ef4e9960cb333eea4939d15e",
+      "bytes": 43,
+      "caracteres": 43,
+      "cr": 2,
+      "lf": 2,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "es_desarrollador()",
+      "md5_prosrc": "25a3787ce375a9a89a58266b96b732a3",
+      "bytes": 51,
+      "caracteres": 51,
+      "cr": 2,
+      "lf": 2,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "SOURCE_DIVERGED"
+    },
+    {
+      "firma": "es_equipo()",
+      "md5_prosrc": "635c8361317be3293aee3778a0de048d",
+      "bytes": 88,
+      "caracteres": 88,
+      "cr": 6,
+      "lf": 6,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "SOURCE_DIVERGED"
+    },
+    {
+      "firma": "es_mecanico_activo()",
+      "md5_prosrc": "1b786deb21df29b40f89dca23ab776fd",
+      "bytes": 60,
+      "caracteres": 60,
+      "cr": 0,
+      "lf": 2,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    },
+    {
+      "firma": "estadisticas_tecnicas()",
+      "md5_prosrc": "86948fdcaf03939a1d0929004cd9c730",
+      "bytes": 1467,
+      "caracteres": 1462,
+      "cr": 0,
+      "lf": 26,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    },
+    {
+      "firma": "estado_tecnico()",
+      "md5_prosrc": "8cab17a837ec35d46c8575befd53e85a",
+      "bytes": 1764,
+      "caracteres": 1763,
+      "cr": 82,
+      "lf": 82,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "SOURCE_DIVERGED"
+    },
+    {
+      "firma": "mecanico_solo_avance_tecnico()",
+      "md5_prosrc": "5c9d8db5084b0a4e881948d9a920462b",
+      "bytes": 4298,
+      "caracteres": 4218,
+      "cr": 0,
+      "lf": 89,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    },
+    {
+      "firma": "mi_cliente(uuid)",
+      "md5_prosrc": "aeee991cda291df054c2924d1e9f3cdf",
+      "bytes": 299,
+      "caracteres": 299,
+      "cr": 0,
+      "lf": 6,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    },
+    {
+      "firma": "mi_moto(uuid)",
+      "md5_prosrc": "235499aeafbd8379d6333b7e51edb6c2",
+      "bytes": 161,
+      "caracteres": 161,
+      "cr": 0,
+      "lf": 4,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    },
+    {
+      "firma": "proteger_caja_ligada()",
+      "md5_prosrc": "4b1a0e352c4eae22efcbb139ae72a725",
+      "bytes": 299,
+      "caracteres": 297,
+      "cr": 0,
+      "lf": 16,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "proteger_rol_perfil()",
+      "md5_prosrc": "5bcd1237d7e6714293cf4fc332e08667",
+      "bytes": 272,
+      "caracteres": 272,
+      "cr": 16,
+      "lf": 16,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "puede_cobrar()",
+      "md5_prosrc": "2c95d9a820de4ae25ec59d25cbbd1a91",
+      "bytes": 71,
+      "caracteres": 71,
+      "cr": 5,
+      "lf": 5,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "registrar_abono(uuid,numeric,text,text)",
+      "md5_prosrc": "6dee1802d5cf45cd4d8d91b140e2cadd",
+      "bytes": 2117,
+      "caracteres": 2111,
+      "cr": 0,
+      "lf": 145,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "registrar_venta(uuid,text,text,numeric,jsonb,integer,text)",
+      "md5_prosrc": "ae8ee6c6d7c066d4d544ff4e9ab5147b",
+      "bytes": 2853,
+      "caracteres": 2849,
+      "cr": 0,
+      "lf": 177,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "rol_actual()",
+      "md5_prosrc": "527f940b66f3c7b88b746dc3a676bdb9",
+      "bytes": 147,
+      "caracteres": 147,
+      "cr": 10,
+      "lf": 10,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "PRODUCTION_NOT_IN_SOURCE"
+    },
+    {
+      "firma": "ve_todo_el_taller()",
+      "md5_prosrc": "80b7f166927d6559301d8507c397a243",
+      "bytes": 69,
+      "caracteres": 69,
+      "cr": 0,
+      "lf": 2,
+      "origen": "Supabase pg_catalog read-only 2026-09-18",
+      "clasificacion_source": "MATCH_SOURCE_EXACT"
+    }
+  ]
+}

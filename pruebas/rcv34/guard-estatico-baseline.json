@@ -1,0 +1,67 @@
+[
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.ve_todo_el_taller()",
+    "hash": "0f9c0e336310e6fe00fd1e939f8d4ce95813ac9f394ea3f2487ae99955ec40ee"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.es_mecanico_activo()",
+    "hash": "cfa37adeab9e92dcea0b462e932ce04c6715f212bccf64b232e240fab9dde5bc"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.mi_cliente(uuid)",
+    "hash": "f4f1e9972340eeade8421532494221f6e3146ce76b1df3e566c813bf74c7ad2f"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.mi_moto(uuid)",
+    "hash": "7c73a207c544927e8584ee78997909f0623759393474899b4d55ccb79520c1bc"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.mecanico_solo_avance_tecnico()",
+    "hash": "02883f14a50d57baf59dbe0568ff7510c2e603e2f128942353ff6a9b434db31f"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "firma": "public.estadisticas_tecnicas()",
+    "hash": "edd2212488de1360b218a6e04848014b8fc799d71a0e5e075a539c4e353f0950"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-fase4d-rollback.sql",
+    "firma": "public.estadisticas_tecnicas()",
+    "hash": "9a8a8330a35dcce89662c14c5df96b918f7921e39f08d4d3950425cacc2ba037"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.es_equipo()",
+    "hash": "c8499c9f2eed432ff3678948120ef548f46d21338cb19bb010443aa0c238dd41"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.es_desarrollador()",
+    "hash": "cddca80049eb7949694f0b13244ee8de625d90f7022145d4c7cad9428252a32a"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.proteger_admin_unico()",
+    "hash": "feac534fad9fe8e3970dba50e2e58341687bbb940b04f434e5edd033d54f6cd3"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.proteger_borrado_admin()",
+    "hash": "7f50abfef26de8eca249d0976ad288c9babca53ec19cf98f7f084a61be2dd539"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.estadisticas_tecnicas()",
+    "hash": "9a8a8330a35dcce89662c14c5df96b918f7921e39f08d4d3950425cacc2ba037"
+  },
+  {
+    "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+    "firma": "public.estado_tecnico()",
+    "hash": "e778301a4434c805d2d246013ccfab264c46c2bacdeb16b662f994d07776a35c"
+  }
+]

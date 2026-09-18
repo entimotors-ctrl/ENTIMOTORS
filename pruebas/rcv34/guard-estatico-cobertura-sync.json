@@ -1,0 +1,242 @@
+{
+  "formato": "rcv34-cobertura-sync/1",
+  "descripcion": "Manifiesto del coverage gate del source-sync canonico post RCV-35. Lo consume guard-estatico-cobertura-sync.mjs. Solo huellas y clasificacion: sin cuerpos, sin base64, sin datos de negocio.",
+  "no_verifica_produccion": "Este manifiesto y su guard NO VERIFICAN PRODUCCION: comparan archivos del repositorio con evidencia ya capturada.",
+  "source_sync": {
+    "archivo": "taller-demo/supabase/entimotors-rcv34-source-sync.sql",
+    "sha256": "6530b27cb7d339338a78a3300b4e62d6c73d23c33aa7e53b1d64ceeddb63ab73",
+    "funciones": 17,
+    "triggers": 5
+  },
+  "gitattributes": {
+    "archivo": ".gitattributes",
+    "regla": "taller-demo/supabase/entimotors-rcv34-source-sync.sql -text"
+  },
+  "canonico": {
+    "rol_actual_post_rcv35_md5": "e66ee46e01d3df511ee5bd4d0f2a178a",
+    "rol_actual_pre_inseguro_md5": "527f940b66f3c7b88b746dc3a676bdb9",
+    "evidencia_pre_b3r": {
+      "archivo": "pruebas/rcv34/produccion-funciones-20260918.json",
+      "sha256": "f747be9b4cef0db6d983d61cabe716ecac4c685cf1e17a9e881f534ef5c2dd6a"
+    },
+    "evidencia_post_rcv35": {
+      "archivo": "pruebas/rcv35/produccion-post-fix-20260918.json",
+      "sha256": "aa4c0e7aea3e963b1f52b35ba9755bf27cbefb70a998e8064652d717e2b58b1d"
+    }
+  },
+  "triggers": [
+    {
+      "tabla": "auth.users",
+      "nombre": "al_crear_usuario",
+      "funcion": "crear_perfil_al_registrarse()",
+      "tgtype": 5,
+      "descripcion": "AFTER INSERT"
+    },
+    {
+      "tabla": "public.caja_movimientos",
+      "nombre": "no_borrar_caja_ligada",
+      "funcion": "proteger_caja_ligada()",
+      "tgtype": 11,
+      "descripcion": "BEFORE DELETE"
+    },
+    {
+      "tabla": "public.citas",
+      "nombre": "citas_mecanico_avance",
+      "funcion": "mecanico_solo_avance_tecnico()",
+      "tgtype": 19,
+      "descripcion": "BEFORE UPDATE"
+    },
+    {
+      "tabla": "public.ordenes",
+      "nombre": "ordenes_mecanico_avance",
+      "funcion": "mecanico_solo_avance_tecnico()",
+      "tgtype": 19,
+      "descripcion": "BEFORE UPDATE"
+    },
+    {
+      "tabla": "public.perfiles",
+      "nombre": "proteger_rol_perfil_trigger",
+      "funcion": "proteger_rol_perfil()",
+      "tgtype": 19,
+      "descripcion": "BEFORE UPDATE"
+    }
+  ],
+  "acl": {
+    "PUBLIC_cerrado": 17,
+    "anon_cerrado": 17,
+    "authenticated_true": 16,
+    "sin_authenticated": [
+      "crear_perfil_al_registrarse()"
+    ],
+    "service_role_true": 17
+  },
+  "source_only": [
+    "proteger_admin_unico()",
+    "proteger_borrado_admin()"
+  ],
+  "conteos_esperados": {
+    "ACTIVE_SOURCE_MATCHES_CANONICAL": 6,
+    "ACTIVE_SOURCE_DIVERGED_SUPERSEDED_BY_CANONICAL": 3,
+    "SUPERSEDED_HISTORICAL": 1,
+    "ROLLBACK_ONLY": 1,
+    "SOURCE_ONLY_NOT_DEPLOYED": 2,
+    "total": 13
+  },
+  "baseline": {
+    "archivo": "pruebas/rcv34/guard-estatico-baseline.json",
+    "entradas": 13
+  },
+  "protegidos": [
+    {
+      "archivo": "pruebas/rcv34/guard-estatico-funciones.mjs",
+      "sha256": "e71a3d9f0b431e042566afa07bba6c30e832f17d5e01182313a105cef2cb63a6"
+    },
+    {
+      "archivo": "pruebas/rcv34/guard-estatico-funciones.test.mjs",
+      "sha256": "46682a48579d0bf7553759f14d80ffbbe40299613a0d377b387460d285c34ae1"
+    },
+    {
+      "archivo": "pruebas/rcv34/guard-estatico-excepciones.json",
+      "sha256": "6e06273f14db9ac856a954a9bbb9ba70df077f0407c8b4ec0f338db876f22b55"
+    },
+    {
+      "archivo": "pruebas/rcv34/01-cierre-triggers-public.sql",
+      "sha256": "af4788240fe84f7299f24d7d44b4b67e74dffec2463a71b9b3ddb25defb206b3"
+    },
+    {
+      "archivo": "pruebas/rcv34/02-rollback-cierre-triggers.sql",
+      "sha256": "dd373ee768f1f2ed67e5b4fb1e79e4bc93f32126854d7a59ebf7e18767c4a76e"
+    },
+    {
+      "archivo": "pruebas/rcv34/04-guard-funciones-public.sql",
+      "sha256": "f37bf718b2072f5b8f6eb0bc4d5b4078c2090b1c242f2bb2c0e3c518cd190ccf"
+    },
+    {
+      "archivo": "pruebas/rcv35/01-fix-rol-actual-activo.sql",
+      "sha256": "1c568e03b0a5e22072619d13c0606391950fed3e7c5a556c6f6f29658ec0d887"
+    },
+    {
+      "archivo": "pruebas/rcv35/03-verificacion-post-fix-readonly.sql",
+      "sha256": "c01c336dd7c6bb6c487dfea109eec22712c8a1981e24add73dc0283f8ab35847"
+    }
+  ],
+  "clasificacion": [
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.ve_todo_el_taller()",
+      "hash": "0f9c0e336310e6fe00fd1e939f8d4ce95813ac9f394ea3f2487ae99955ec40ee",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "ve_todo_el_taller()",
+      "md5_cuerpo_fuente": "80b7f166927d6559301d8507c397a243",
+      "bytes_cuerpo_fuente": 69
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.es_mecanico_activo()",
+      "hash": "cfa37adeab9e92dcea0b462e932ce04c6715f212bccf64b232e240fab9dde5bc",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "es_mecanico_activo()",
+      "md5_cuerpo_fuente": "1b786deb21df29b40f89dca23ab776fd",
+      "bytes_cuerpo_fuente": 60
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.mi_cliente(uuid)",
+      "hash": "f4f1e9972340eeade8421532494221f6e3146ce76b1df3e566c813bf74c7ad2f",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "mi_cliente(uuid)",
+      "md5_cuerpo_fuente": "aeee991cda291df054c2924d1e9f3cdf",
+      "bytes_cuerpo_fuente": 299
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.mi_moto(uuid)",
+      "hash": "7c73a207c544927e8584ee78997909f0623759393474899b4d55ccb79520c1bc",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "mi_moto(uuid)",
+      "md5_cuerpo_fuente": "235499aeafbd8379d6333b7e51edb6c2",
+      "bytes_cuerpo_fuente": 161
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.mecanico_solo_avance_tecnico()",
+      "hash": "02883f14a50d57baf59dbe0568ff7510c2e603e2f128942353ff6a9b434db31f",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "mecanico_solo_avance_tecnico()",
+      "md5_cuerpo_fuente": "5c9d8db5084b0a4e881948d9a920462b",
+      "bytes_cuerpo_fuente": 4298
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "firma": "public.estadisticas_tecnicas()",
+      "hash": "edd2212488de1360b218a6e04848014b8fc799d71a0e5e075a539c4e353f0950",
+      "clasificacion": "ACTIVE_SOURCE_MATCHES_CANONICAL",
+      "canonico_firma": "estadisticas_tecnicas()",
+      "md5_cuerpo_fuente": "86948fdcaf03939a1d0929004cd9c730",
+      "bytes_cuerpo_fuente": 1467
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-fase4d-rollback.sql",
+      "firma": "public.estadisticas_tecnicas()",
+      "hash": "9a8a8330a35dcce89662c14c5df96b918f7921e39f08d4d3950425cacc2ba037",
+      "clasificacion": "ROLLBACK_ONLY",
+      "canonico_firma": "estadisticas_tecnicas()",
+      "md5_cuerpo_fuente": "4455a2ed38af825de850d0412d22287a",
+      "bytes_cuerpo_fuente": 1486
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.es_equipo()",
+      "hash": "c8499c9f2eed432ff3678948120ef548f46d21338cb19bb010443aa0c238dd41",
+      "clasificacion": "ACTIVE_SOURCE_DIVERGED_SUPERSEDED_BY_CANONICAL",
+      "canonico_firma": "es_equipo()",
+      "md5_cuerpo_fuente": "322fdf365c918916f39d2de348938621",
+      "bytes_cuerpo_fuente": 80
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.es_desarrollador()",
+      "hash": "cddca80049eb7949694f0b13244ee8de625d90f7022145d4c7cad9428252a32a",
+      "clasificacion": "ACTIVE_SOURCE_DIVERGED_SUPERSEDED_BY_CANONICAL",
+      "canonico_firma": "es_desarrollador()",
+      "md5_cuerpo_fuente": "362be451c09f403f48d70440dafe42c1",
+      "bytes_cuerpo_fuente": 65
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.proteger_admin_unico()",
+      "hash": "feac534fad9fe8e3970dba50e2e58341687bbb940b04f434e5edd033d54f6cd3",
+      "clasificacion": "SOURCE_ONLY_NOT_DEPLOYED",
+      "canonico_firma": null,
+      "md5_cuerpo_fuente": "1482957b3226696ee49029582baf85b0",
+      "bytes_cuerpo_fuente": 820
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.proteger_borrado_admin()",
+      "hash": "7f50abfef26de8eca249d0976ad288c9babca53ec19cf98f7f084a61be2dd539",
+      "clasificacion": "SOURCE_ONLY_NOT_DEPLOYED",
+      "canonico_firma": null,
+      "md5_cuerpo_fuente": "cb745ad6ec30de93169d453cab5b4bb7",
+      "bytes_cuerpo_fuente": 267
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.estadisticas_tecnicas()",
+      "hash": "9a8a8330a35dcce89662c14c5df96b918f7921e39f08d4d3950425cacc2ba037",
+      "clasificacion": "SUPERSEDED_HISTORICAL",
+      "canonico_firma": "estadisticas_tecnicas()",
+      "md5_cuerpo_fuente": "4455a2ed38af825de850d0412d22287a",
+      "bytes_cuerpo_fuente": 1486
+    },
+    {
+      "archivo": "taller-demo/supabase/entimotors-usuarios.sql",
+      "firma": "public.estado_tecnico()",
+      "hash": "e778301a4434c805d2d246013ccfab264c46c2bacdeb16b662f994d07776a35c",
+      "clasificacion": "ACTIVE_SOURCE_DIVERGED_SUPERSEDED_BY_CANONICAL",
+      "canonico_firma": "estado_tecnico()",
+      "md5_cuerpo_fuente": "b8d60d0e284bbf7cc25ecead611667f4",
+      "bytes_cuerpo_fuente": 1467
+    }
+  ]
+}
