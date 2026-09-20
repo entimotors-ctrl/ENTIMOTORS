@@ -1,7 +1,7 @@
 {
   "name": "ENTIMOTORS Mi Trabajo",
   "short_name": "Mi Trabajo",
-  "description": "Trabajo asignado del mecánico — ENTIMOTORS",
+  "description": "Acceso para mecánicos — ENTIMOTORS",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

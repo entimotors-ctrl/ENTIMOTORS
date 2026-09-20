@@ -8,6 +8,16 @@
  *
  * Esconder botones no es seguridad: el backend rechaza igual a quien no sea
  * admin. Esto solo evita enseñar lo que no toca.
+ *
+ * «GENERAR ENLACE» (recuperación mediada por el administrador, OBS-9)
+ *   Una persona del equipo perdió su contraseña: el administrador le genera un
+ *   enlace de un solo uso, lo copia y se lo pasa; ella lo abre y recovery.js la
+ *   deja elegir una contraseña nueva. No se envía correo. El enlace es un secreto:
+ *   vive SOLO en el campo de la caja de resultado (memoria/DOM); no se guarda en
+ *   localStorage, sessionStorage, IndexedDB, bitácora ni consola, y se retira al
+ *   generar otro, al cerrar la caja, al salir de la pantalla y al cerrar sesión.
+ *   La cuenta del propio administrador queda fuera a propósito (se recupera desde
+ *   el panel de Supabase).
  * ==========================================================================*/
 (function (global) {
   "use strict";
@@ -28,8 +38,20 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function aviso(msg) { if (typeof toast === "function") toast(msg, "off"); }
+  /* Recibe TEXTO PLANO. toast() pinta su argumento como HTML, así que se escapa
+     aquí, una sola vez, justo antes de entregárselo: lo que dijo el servidor
+     nunca se convierte en marcado. */
+  function aviso(msg) { if (typeof toast === "function") toast(esc(msg), "off"); }
   function bien(msg) { if (typeof toast === "function") toast(msg); }
+
+  /* Primera CADENA no vacía de la lista; un objeto anidado no se convierte a
+     texto (saldría «[object Object]»). */
+  function primeraCadena(lista) {
+    for (var i = 0; i < lista.length; i++) {
+      if (typeof lista[i] === "string" && lista[i].trim() !== "") return lista[i];
+    }
+    return "";
+  }
 
   /* Todas las llamadas pasan por aquí: una sola puerta para el token y para
      traducir los fallos a algo que se pueda leer. */
@@ -60,7 +82,7 @@
       if (!res.ok) {
         return { ok: false, motivo: res.status === 401 ? "sin-sesion"
                             : res.status === 403 ? "sin-permiso" : "rechazado",
-                 mensaje: (datos && datos.error) || "No se pudo completar la operación.", http: res.status };
+                 mensaje: primeraCadena(datos && typeof datos === "object" ? [datos.error, datos.message, datos.msg] : []) || "No se pudo completar la operación.", http: res.status };
       }
       return { ok: true, datos: datos };
     } catch (e) {
@@ -79,6 +101,7 @@
   async function render() {
     var c = document.getElementById("usuariosCuerpo");
     if (!c) return;
+    limpiarEnlace();   // volver a esta pantalla (o repintarla) nunca deja un enlace anterior a la vista
 
     // ── condiciones para que esta pantalla tenga sentido ──
     if (!global.Auth || !Auth.esAdmin()) {
@@ -115,6 +138,10 @@
               (u.activo ? "Dar de baja" : "Reactivar") + "</button>" +
             '<button class="btn small ghost u-editar" data-id="' + esc(u.id) + '" data-nombre="' + esc(u.nombre) +
               '" data-telefono="' + esc(u.telefono) + '">Editar</button>' +
+            /* «Generar enlace» solo para cuentas ACTIVAS: una cuenta dada de baja no puede entrar aunque tenga contraseña nueva,
+               y generar el enlace nunca la reactiva (primero se reactiva). El servidor lo comprueba igual. */
+            (u.activo ? '<button class="btn small ghost u-enlace" data-id="' + esc(u.id) + '" data-nombre="' + esc(u.nombre) +
+              '" title="Genera un enlace de un solo uso para que esta persona elija una contraseña nueva">Generar enlace</button>' : "") +
           "</div>";
       return "<tr>" +
         "<td>" + esc(u.nombre) + (u.esUsted ? ' <span class="hint">(tú)</span>' : "") + "</td>" +
@@ -125,19 +152,10 @@
         "<td>" + acciones + "</td></tr>";
     }).join("");
 
+    /* «Nuevo usuario» va ANTES de la lista, no después: con unas pocas personas en el equipo la tarjeta caía por debajo del pliegue
+       (y con ella el enlace generado, que se pinta en #nuResultado), y al pulsar el botón no pasaba nada a la vista. */
     c.innerHTML =
-      '<div class="card">' +
-        '<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.6rem;">' +
-          '<h3 class="font-display" style="font-size:0.95rem; margin:0;">Equipo · ' + us.length + "</h3>" +
-          '<button class="btn primary small" id="btnNuevoUsuario">+ Nuevo usuario</button>' +
-        "</div>" +
-        '<div class="table-scroll"><table><thead><tr>' +
-          "<th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Estado</th><th>Acciones</th>" +
-        "</tr></thead><tbody>" + filas + "</tbody></table></div>" +
-        '<p class="hint" style="margin:0.6rem 0 0;">Dar de baja no borra nada: la persona deja de poder entrar, ' +
-        "pero su historial en órdenes, ventas y bitácora se queda como está.</p>" +
-      "</div>" +
-      '<div class="card" id="cardNuevoUsuario" style="margin-top:1rem; display:none;">' +
+      '<div class="card" id="cardNuevoUsuario" style="margin-bottom:1rem; display:none;">' +
         '<h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">Nuevo usuario</h3>' +
         '<div class="grid-2">' +
           "<div><label>Nombre</label><input type=\"text\" id=\"nuNombre\" maxlength=\"60\" placeholder=\"Juan Pérez\"></div>" +
@@ -154,9 +172,71 @@
           '<button class="btn small ghost" id="btnCancelarUsuario">Cancelar</button>' +
         "</div>" +
         '<div id="nuResultado" style="margin-top:0.6rem;"></div>' +
+      "</div>" +
+      /* Resultado de «Generar enlace»: vacío y oculto hasta que haga falta. Se rellena con nodos DOM (textContent/value), nunca con innerHTML. */
+      '<div class="card" id="cardEnlaceRecuperacion" style="margin-bottom:1rem; display:none;"></div>' +
+      '<div class="card">' +
+        '<div style="display:flex; justify-content:space-between; align-items:center; gap:0.6rem; flex-wrap:wrap; margin-bottom:0.6rem;">' +
+          '<h3 class="font-display" style="font-size:0.95rem; margin:0;">Equipo · ' + us.length + "</h3>" +
+          '<button class="btn primary small" id="btnNuevoUsuario">+ Nuevo usuario</button>' +
+        "</div>" +
+        '<div class="table-scroll"><table><thead><tr>' +
+          "<th>Nombre</th><th>Correo</th><th>Teléfono</th><th>Rol</th><th>Estado</th><th>Acciones</th>" +
+        "</tr></thead><tbody>" + filas + "</tbody></table></div>" +
+        '<p class="hint" style="margin:0.6rem 0 0;">Dar de baja no borra nada: la persona deja de poder entrar, ' +
+        "pero su historial en órdenes, ventas y bitácora se queda como está.</p>" +
       "</div>";
 
     enganchar();
+  }
+
+  /* ── «Generar enlace»: caja de resultado ───────────────────────────────────
+     El enlace nunca se guarda en una variable: existe solo como `value` del campo. `campoEnlace` apunta al ELEMENTO (para poder vaciarlo),
+     no al texto. Todo lo que se pinta son nodos creados con createElement + textContent/value: lo que diga el servidor jamás se vuelve marcado. */
+  var campoEnlace = null;
+
+  function el(etiqueta, texto, atributos) {
+    var e = document.createElement(etiqueta);
+    if (texto != null) e.textContent = texto;
+    if (atributos) for (var k in atributos) e.setAttribute(k, atributos[k]);
+    return e;
+  }
+
+  function limpiarEnlace() {
+    if (campoEnlace) { try { campoEnlace.value = ""; } catch (e) { /* ya no esta */ } campoEnlace = null; }
+    var caja = document.getElementById("cardEnlaceRecuperacion");
+    if (caja) { caja.textContent = ""; caja.style.display = "none"; }
+  }
+
+  function esEnlaceUtil(x) { return typeof x === "string" && /^https?:\/\/\S+$/i.test(x); }
+
+  function mostrarEnlace(nombre, enlace) {
+    var caja = document.getElementById("cardEnlaceRecuperacion");
+    if (!caja) return;
+    limpiarEnlace();
+    var campo = el("input", null, { type: "text", readonly: "readonly", autocomplete: "off", spellcheck: "false", "aria-label": "Enlace de recuperación", style: "width:100%; margin-bottom:0.5rem;" });
+    campo.value = enlace; campo.readOnly = true; campoEnlace = campo;
+    campo.addEventListener("click", function () { campo.select(); });
+    var copiar = el("button", "Copiar enlace", { type: "button", class: "btn primary small" });
+    var cerrar = el("button", "Cerrar", { type: "button", class: "btn small ghost" });
+    var fila = el("div", null, { style: "display:flex; gap:0.5rem; flex-wrap:wrap;" });
+    fila.appendChild(copiar); fila.appendChild(cerrar);
+    /* Se copia EXACTAMENTE lo que se ve en el campo: ni recortes ni cambios. */
+    copiar.addEventListener("click", async function () {
+      var texto = campo.value, listo = function () { copiar.textContent = "Copiado"; };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { await navigator.clipboard.writeText(texto); listo(); return; }
+      } catch (e) { /* sin permiso del navegador: se prueba la via antigua */ }
+      try { campo.select(); if (document.execCommand && document.execCommand("copy")) { listo(); return; } } catch (e) { /* nada */ }
+      var r = { ok: false, motivo: "copia-fallida" };
+      aviso(textoPlanoDeFallo(r));
+    });
+    cerrar.addEventListener("click", limpiarEnlace);
+    caja.appendChild(el("h3", "Enlace de recuperación", { class: "font-display", style: "font-size:0.95rem; margin:0 0 0.5rem;" }));
+    caja.appendChild(el("p", "Para: " + nombre + ". Es de un solo uso y reemplaza cualquier enlace anterior de esta persona. " +
+      "Pásaselo tú (por ejemplo por WhatsApp): al abrirlo elige su nueva contraseña. No se envía por correo.", { class: "hint", style: "margin:0 0 0.5rem;" }));
+    caja.appendChild(campo); caja.appendChild(fila);
+    caja.style.display = "";
   }
 
   function textoDeFallo(r) {
@@ -165,7 +245,22 @@
     if (r.motivo === "tiempo-agotado") return "El servidor tardó demasiado en responder.";
     if (r.motivo === "sin-sesion") return "Tu sesión ha caducado. Vuelve a entrar.";
     if (r.motivo === "sin-permiso") return "Solo el administrador puede gestionar usuarios.";
+    if (r.motivo === "enlace-invalido") return "El servidor no devolvió un enlace utilizable. Inténtalo de nuevo.";
+    if (r.motivo === "copia-fallida") return "No se pudo copiar automáticamente. Selecciona el enlace y cópialo a mano.";
     return esc(r.mensaje || "No se pudo completar la operación.");
+  }
+
+  /* Lo mismo que textoDeFallo() pero como TEXTO PLANO (sin marcado, sin
+     escapar), para los avisos. Si cambia un texto aquí, cambia también arriba. */
+  function textoPlanoDeFallo(r) {
+    if (r.motivo === "sin-servidor") return "Falta configurar apiUrl en supabase-config.js.";
+    if (r.motivo === "sin-conexion") return "Sin conexión con el servidor. Esta pantalla necesita internet.";
+    if (r.motivo === "tiempo-agotado") return "El servidor tardó demasiado en responder.";
+    if (r.motivo === "sin-sesion") return "Tu sesión ha caducado. Vuelve a entrar.";
+    if (r.motivo === "sin-permiso") return "Solo el administrador puede gestionar usuarios.";
+    if (r.motivo === "enlace-invalido") return "El servidor no devolvió un enlace utilizable. Inténtalo de nuevo.";
+    if (r.motivo === "copia-fallida") return "No se pudo copiar automáticamente. Selecciona el enlace y cópialo a mano.";
+    return r.mensaje || "No se pudo completar la operación.";
   }
 
   function enganchar() {
@@ -180,7 +275,7 @@
         if (enCurso) return; enCurso = true;
         var r = await pedir("PATCH", "/" + sel.dataset.id, { rol: sel.value });
         enCurso = false;
-        if (!r.ok) { aviso(quitarHtml(textoDeFallo(r))); render(); return; }
+        if (!r.ok) { aviso(textoPlanoDeFallo(r)); render(); return; }
         bien("Rol actualizado");
         render();
       });
@@ -192,7 +287,7 @@
         b.disabled = true;
         var r = await pedir("PATCH", "/" + b.dataset.id, { activo: b.dataset.activo !== "1" });
         enCurso = false; b.disabled = false;
-        if (!r.ok) { aviso(quitarHtml(textoDeFallo(r))); return; }
+        if (!r.ok) { aviso(textoPlanoDeFallo(r)); return; }
         bien(b.dataset.activo === "1" ? "Usuario dado de baja" : "Usuario reactivado");
         render();
       });
@@ -206,9 +301,31 @@
         var tel = await showPrompt("Teléfono (puede quedar vacío)", { titulo: "Editar usuario", valorInicial: b.dataset.telefono });
         if (tel == null) return;
         var r = await pedir("PATCH", "/" + b.dataset.id, { nombre: nombre.trim(), telefono: tel.trim() });
-        if (!r.ok) { aviso(quitarHtml(textoDeFallo(r))); return; }
+        if (!r.ok) { aviso(textoPlanoDeFallo(r)); return; }
         bien("Datos actualizados");
         render();
+      });
+    });
+
+    document.querySelectorAll(".u-enlace").forEach(function (b) {
+      b.addEventListener("click", async function () {
+        if (enCurso) return;
+        if (typeof showConfirm !== "function") return;
+        var nombre = b.dataset.nombre || "esta persona";
+        var acepto = await showConfirm(
+          "Vas a generar un enlace de recuperación de un solo uso para " + nombre + ". Cualquier enlace anterior de esa persona dejará de servir. " +
+          "Tú se lo pasas (por ejemplo por WhatsApp); no se envía por correo.",
+          { titulo: "Generar enlace de recuperación", textoOk: "Generar enlace", textoCancelar: "Cancelar" });
+        if (!acepto) return;
+        if (enCurso) return; enCurso = true; b.disabled = true;
+        limpiarEnlace();   // el enlace anterior se retira ANTES de pedir otro
+        var r = await pedir("POST", "/" + encodeURIComponent(b.dataset.id) + "/enlace");
+        enCurso = false; b.disabled = false;
+        if (!r.ok) { aviso(textoPlanoDeFallo(r)); return; }
+        var enlace = r.datos && r.datos.enlaceParaEstablecerClave;
+        if (!esEnlaceUtil(enlace)) { r = { ok: false, motivo: "enlace-invalido" }; aviso(textoPlanoDeFallo(r)); return; }
+        mostrarEnlace(nombre, enlace);
+        bien("Enlace generado");
       });
     });
 
@@ -252,7 +369,15 @@
     });
   }
 
-  function quitarHtml(s) { var d = document.createElement("div"); d.innerHTML = s; return d.textContent; }
+  /* El enlace se retira solo cuando: se cierra sesión (evento de Auth) o se sale de esta pantalla (la vista deja de estar `active`).
+     Sin MutationObserver (navegador muy antiguo) queda la limpieza por repintado de render(). */
+  if (global.Auth && typeof global.Auth.alCambiar === "function") {
+    global.Auth.alCambiar(function (evento) { if (evento === "SIGNED_OUT") limpiarEnlace(); });
+  }
+  var vistaUsuarios = document.getElementById("view-usuarios");
+  if (vistaUsuarios && typeof global.MutationObserver === "function") {
+    new global.MutationObserver(function () { if (!vistaUsuarios.classList.contains("active")) limpiarEnlace(); }).observe(vistaUsuarios, { attributes: true, attributeFilter: ["class"] });
+  }
 
-  global.PantallaUsuarios = { render: render };
+  global.PantallaUsuarios = { render: render, limpiarEnlace: limpiarEnlace };
 })(typeof window !== "undefined" ? window : this);

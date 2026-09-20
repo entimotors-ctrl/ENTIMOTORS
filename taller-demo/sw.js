@@ -2,7 +2,7 @@
 // cambiando la app todos los días, "caché primero" deja a los dispositivos ya
 // instalados atascados en una versión vieja para siempre — network-first evita
 // eso y de todos modos cae al caché cuando de verdad no hay señal.
-const CACHE_NAME = "entimotors-v3.12.2";
+const CACHE_NAME = "entimotors-v3.13.0";
 // La capa de Supabase va en el SHELL por el mismo motivo que app.js: index.html
 // la carga antes de arrancar, y sin ella la app tardaría o fallaría al abrirse
 // sin señal. config-local.js NO va aquí (es solo de desarrollo y no se publica)
@@ -10,10 +10,10 @@ const CACHE_NAME = "entimotors-v3.12.2";
 const SHELL = ["./", "./index.html",
   // build-target.js va en el SHELL a propósito: sin él, un arranque sin señal
   // no sabría qué producto es esta copia y asumiría el taller.
-  "./build-target.js?v=3.12.2",
-  "./supabase-config.js?v=3.12.2", "./supabase-client.js?v=3.12.2",
-  "./auth.js?v=3.12.2", "./recovery.js?v=3.12.2",
-  "./app.js?v=3.12.2", "./usuarios.js?v=3.12.2",
+  "./build-target.js?v=3.13.0",
+  "./supabase-config.js?v=3.13.0", "./supabase-client.js?v=3.13.0",
+  "./auth.js?v=3.13.0", "./recovery.js?v=3.13.0",
+  "./app.js?v=3.13.0", "./usuarios.js?v=3.13.0",
   "./manifest.json", "./icons/icon-192.png", "./icons/logo-watermark-doc.png"];
 
 // Librerías que convierten la factura en imagen/PDF para poder mandarla por

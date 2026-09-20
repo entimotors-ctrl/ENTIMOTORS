@@ -6,9 +6,11 @@
  * alguien escribe una contraseña que no es la suya de siempre.
  *
  * DE DÓNDE SALE ESTA PANTALLA
- *   El administrador crea la cuenta desde «Usuarios y equipo». El servidor
- *   genera una contraseña aleatoria que nadie llega a ver y pide a Supabase un
- *   enlace de un solo uso. La persona abre ese enlace y aterriza aquí.
+ *   Siempre de un enlace de un solo uso que el ADMINISTRADOR le pasa a la persona
+ *   desde «Usuarios y equipo»: al CREAR la cuenta (el servidor genera una
+ *   contraseña aleatoria que nadie llega a ver) o con «Generar enlace» cuando
+ *   alguien perdió su contraseña. Los dos son enlaces de tipo `recovery`. No se
+ *   envía correo. La persona abre el enlace y aterriza aquí.
  *
  * LO QUE NO HACE, A PROPÓSITO
  *   · No guarda la contraseña en ningún sitio. Se escribe, se manda a Supabase
@@ -25,6 +27,13 @@
   /* Los dos tipos de enlace que significan «tienes que poner una contraseña».
      `magiclink` no está: ese es un acceso directo, no un alta. */
   var TIPOS = ["recovery", "invite"];
+
+  /* Frase de bienvenida según el tipo de enlace. Un enlace `recovery` (el del alta y el de «Generar enlace») NO es una invitación:
+     solo `invite` dice «Has sido invitado». El texto de partida (HTML) ya es el neutro de `recovery`. */
+  var TEXTO_INTRO = {
+    recovery: "Elige tu contraseña para entrar a ENTIMOTORS OS.",
+    invite: "Has sido invitado a ENTIMOTORS OS. Crea tu contraseña para activar tu acceso.",
+  };
   var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   var MINIMO = 8;
 
@@ -210,6 +219,8 @@
     if (d.que === "ninguno") return false;
 
     mostrarGate();
+    var intro = document.getElementById("rcvIntro");
+    if (intro) intro.textContent = d.verificacion === "invite" ? TEXTO_INTRO.invite : TEXTO_INTRO.recovery;
     estadoVerificando();
 
     if (d.que === "error") {

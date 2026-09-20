@@ -248,8 +248,19 @@
       return SB.actualizarUsuario({ password: nueva }, recuperacion.token).then(function (r) {
         if (!r.ok) {
           if (r.motivo === "sin-permiso") return mal("enlace-caducado", r.detalle);
+          /* Un fallo de TRANSPORTE no es una respuesta del servidor: no se llegó a
+             saber si aplicó la contraseña. Pasa con su motivo (como en
+             entrarEnRecuperacion) para que recovery.js diga «sin conexión» en vez
+             de enseñar el texto crudo del navegador como si fuera un rechazo. */
+          if (r.motivo === "sin-conexion" || r.motivo === "tiempo-agotado") return mal(r.motivo, r.detalle);
           return mal("rechazada-por-el-servidor", r.detalle);
         }
+        /* Éxito = HTTP correcto Y la forma mínima del contrato: Supabase Auth
+           contesta a este PUT con el usuario, o sea un objeto. Un 200 con HTML,
+           texto, null, un arreglo o JSON truncado (lo que contestaría un
+           intermediario) NO es éxito: no se da la contraseña por puesta. No es un
+           fallo de red ni se sale de la recuperación: se puede reintentar. */
+        if (!r.datos || typeof r.datos !== "object" || Array.isArray(r.datos)) return mal("respuesta-invalida");
         // hecho: el token de recuperación ya no vale para nada más
         recuperacion = null;
         avisar("SIGNED_OUT");

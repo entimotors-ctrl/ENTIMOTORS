@@ -28258,7 +28258,7 @@ var require_pino = __commonJS({
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/wilkin/Escritorio/ENTIMOTORS-rcv27/api-server/dist";
+        const outputDir = "/home/wilkin/Escritorio/Sistema-emos/ENTIMOTORS-integracion-4e/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -71651,6 +71651,47 @@ function claveDeUnUso() {
   globalThis.crypto.getRandomValues(bytes);
   return Array.from(bytes, (b) => abc[b % abc.length]).join("");
 }
+async function generarEnlaceDeRecuperacion(correo, rol) {
+  const destino = destinoDeRecuperacion(rol);
+  if (!destino.ok) {
+    logger.error({ rol, motivo: destino.motivo }, "sin destino de recuperaci\xF3n: no se genera enlace");
+    return { ok: false, motivo: destino.motivo, aviso: destino.error };
+  }
+  try {
+    const { data: link, error: errEnlace } = await servidor.auth.admin.generateLink({
+      type: "recovery",
+      email: correo,
+      options: { redirectTo: destino.url }
+    });
+    if (errEnlace) {
+      logger.error({
+        motivo: "supabase-rechazo",
+        destino: destino.url,
+        // lo fija el servidor, no es un secreto
+        estado: errEnlace.status ?? null,
+        codigo: errEnlace.code ?? null,
+        mensaje: errEnlace.message
+      }, "generateLink fall\xF3: no se genera enlace");
+      return {
+        ok: false,
+        motivo: "supabase-rechazo",
+        aviso: "Supabase no acept\xF3 generar el enlace. Revisa que la direcci\xF3n de vuelta est\xE9 en Authentication \u2192 URL Configuration \u2192 Redirect URLs."
+      };
+    }
+    const accion = link?.properties?.action_link;
+    if (typeof accion !== "string" || !/^https?:\/\/\S+$/i.test(accion)) {
+      logger.error({ motivo: "sin-action-link" }, "generateLink no devolvi\xF3 action_link");
+      return { ok: false, motivo: "sin-action-link", aviso: "Supabase respondi\xF3 sin enlace utilizable." };
+    }
+    return { ok: true, enlace: accion };
+  } catch (e) {
+    logger.error(
+      { motivo: "error-de-red", mensaje: e instanceof Error ? e.message : String(e) },
+      "generateLink lanz\xF3 una excepci\xF3n"
+    );
+    return { ok: false, motivo: "error-de-red", aviso: "No se pudo contactar con Supabase para generar el enlace." };
+  }
+}
 var router5 = (0, import_express6.Router)();
 router5.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
   const { data: perfiles, error } = await comoElAdmin(req.quien.token).from("perfiles").select("id, nombre, rol, telefono, activo, creado_en").order("nombre");
@@ -71703,57 +71744,78 @@ router5.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, re
     res.status(400).json({ error: `No se pudo asignar el rol: ${errPerfil.message}` });
     return;
   }
-  let enlace = null;
-  let avisoEnlace = null;
-  let motivoSinEnlace = null;
-  const destino = destinoDeRecuperacion(String(perfilGuardado?.rol ?? rol));
-  if (!destino.ok) {
-    avisoEnlace = destino.error;
-    motivoSinEnlace = destino.motivo;
-    logger.error(
-      { rol: perfilGuardado?.rol ?? rol, motivo: destino.motivo },
-      "sin destino de recuperaci\xF3n: no se genera enlace"
-    );
-  } else {
-    try {
-      const { data: link, error: errEnlace } = await servidor.auth.admin.generateLink({
-        type: "recovery",
-        email: correo,
-        options: { redirectTo: destino.url }
-      });
-      if (errEnlace) {
-        motivoSinEnlace = "supabase-rechazo";
-        avisoEnlace = "Supabase no acept\xF3 generar el enlace. Revisa que la direcci\xF3n de vuelta est\xE9 en Authentication \u2192 URL Configuration \u2192 Redirect URLs.";
-        logger.error({
-          motivo: motivoSinEnlace,
-          destino: destino.url,
-          // lo fija el servidor, no es un secreto
-          estado: errEnlace.status ?? null,
-          codigo: errEnlace.code ?? null,
-          mensaje: errEnlace.message
-        }, "generateLink fall\xF3: no se genera enlace");
-      } else {
-        enlace = link?.properties?.action_link ?? null;
-        if (!enlace) {
-          motivoSinEnlace = "sin-action-link";
-          avisoEnlace = "Supabase respondi\xF3 sin enlace utilizable.";
-          logger.error({ motivo: motivoSinEnlace }, "generateLink no devolvi\xF3 action_link");
-        }
-      }
-    } catch (e) {
-      motivoSinEnlace = "error-de-red";
-      avisoEnlace = "No se pudo contactar con Supabase para generar el enlace.";
-      logger.error(
-        { motivo: motivoSinEnlace, mensaje: e instanceof Error ? e.message : String(e) },
-        "generateLink lanz\xF3 una excepci\xF3n"
-      );
-    }
-  }
+  const generado = await generarEnlaceDeRecuperacion(correo, String(perfilGuardado?.rol ?? rol));
+  const enlace = generado.ok ? generado.enlace : null;
+  const avisoEnlace = generado.ok ? null : generado.aviso;
+  const motivoSinEnlace = generado.ok ? null : generado.motivo;
   res.status(201).json({
     usuario: { id: nuevoId, correo, nombre, telefono, rol, activo: true },
     enlaceParaEstablecerClave: enlace,
     motivoSinEnlace,
     nota: enlace ? "P\xE1sale este enlace a la persona. Es de un solo uso: ah\xED elige su contrase\xF1a." : (avisoEnlace ?? "") + (avisoEnlace ? " " : "") + "La cuenta est\xE1 creada. Para darle contrase\xF1a: panel de Supabase \u2192 Authentication \u2192 el usuario \u2192 Reset password."
+  });
+});
+router5.post("/admin/usuarios/:id/enlace", exigirConfiguracion, exigirAdmin, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+    res.status(400).json({ error: "Identificador no v\xE1lido." });
+    return;
+  }
+  if (id === req.quien.id) {
+    res.status(400).json({ error: "No se genera un enlace para tu propia cuenta desde aqu\xED. La cuenta del administrador se recupera desde el panel de Supabase (Authentication)." });
+    return;
+  }
+  const { data: perfil, error: errPerfil } = await servidor.from("perfiles").select("id, rol, activo").eq("id", id).maybeSingle();
+  if (errPerfil) {
+    logger.error({ err: errPerfil }, "no se pudo leer el perfil del usuario objetivo");
+    res.status(500).json({ error: "No se pudo comprobar el usuario." });
+    return;
+  }
+  if (!perfil) {
+    res.status(404).json({ error: "Ese usuario no existe." });
+    return;
+  }
+  if (perfil.rol === "admin") {
+    res.status(400).json({ error: "La cuenta del administrador no se gestiona desde esta pantalla. Se recupera desde el panel de Supabase (Authentication)." });
+    return;
+  }
+  if (!ROLES_ASIGNABLES.includes(perfil.rol)) {
+    res.status(409).json({ error: "El rol de esa cuenta no permite generar un enlace." });
+    return;
+  }
+  if (perfil.activo !== true) {
+    res.status(409).json({ error: "Esa cuenta est\xE1 dada de baja. React\xEDvala antes de generar un enlace de recuperaci\xF3n." });
+    return;
+  }
+  let correo = "";
+  try {
+    const { data: cuenta, error: errCuenta } = await servidor.auth.admin.getUserById(id);
+    if (errCuenta) {
+      logger.error({ estado: errCuenta.status ?? null, mensaje: errCuenta.message }, "no se pudo leer la cuenta de Auth del usuario objetivo");
+      res.status(502).json({ error: "No se pudo leer la cuenta en Supabase. Int\xE9ntalo de nuevo." });
+      return;
+    }
+    correo = typeof cuenta?.user?.email === "string" ? cuenta.user.email.trim() : "";
+  } catch (e) {
+    logger.error({ mensaje: e instanceof Error ? e.message : String(e) }, "getUserById lanz\xF3 una excepci\xF3n");
+    res.status(502).json({ error: "No se pudo contactar con Supabase. Int\xE9ntalo de nuevo." });
+    return;
+  }
+  if (!correo) {
+    res.status(409).json({ error: "Esa cuenta no tiene un correo asociado: no se puede generar el enlace." });
+    return;
+  }
+  const generado = await generarEnlaceDeRecuperacion(correo, perfil.rol);
+  if (!generado.ok) {
+    const estado = generado.motivo === "sin-origin" || generado.motivo === "origin-invalido" ? 503 : generado.motivo === "rol-desconocido" ? 409 : 502;
+    res.status(estado).json({ error: generado.aviso, motivoSinEnlace: generado.motivo });
+    return;
+  }
+  logger.info({ evento: "enlace-recuperacion-generado", por: req.quien.id, para: id, rol: perfil.rol }, "enlace de recuperaci\xF3n generado");
+  res.json({
+    enlaceParaEstablecerClave: generado.enlace,
+    nota: "P\xE1sale este enlace a la persona. Es de un solo uso y reemplaza cualquier enlace anterior: ah\xED elige su nueva contrase\xF1a."
   });
 });
 router5.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req, res) => {

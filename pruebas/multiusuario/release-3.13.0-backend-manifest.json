@@ -1,0 +1,347 @@
+{
+  "format": "entimotors-backend-freeze/1",
+  "version": "3.13.0",
+  "phase": "4E-C9",
+  "phase_history": [
+    "4E-C7-FIX-B",
+    "4E-C9"
+  ],
+  "base_commit": "544d1bea177f1c5eb1175f4ffcf390f932c9d19d",
+  "branch": "release/multiuser-3.13.0",
+  "scope": "obs-9-plan-b-recuperacion-mediada-por-administrador",
+  "description": "Evidencia SEPARADA del backend (api-server/). El manifest del frontend (release-3.13.0-manifest.json) no cubre api-server/; este lo cubre: la ruta modificada y sus dependencias, las pruebas y, desde 4E-C9, los archivos COMPILADOS de api-server/dist/ (artefacto generado y versionado, grupo generated_build_artifacts). Recuperacion de contraseña mediada por el administrador: POST /api/admin/usuarios/:id/enlace. No hay correo, ni SMTP, ni ruta publica.",
+  "published": false,
+  "how_to_reproduce": {
+    "verifier": "node pruebas/multiusuario/verificar-backend-manifest.mjs",
+    "expected_output": "MATCH <N> archivos  (salida 0); ante un cambio: MANIFEST_MISMATCH <archivo> … FAIL <n> problemas (salida 1)",
+    "hash": "SHA-256 de los BYTES EXACTOS del archivo en disco (sin normalizar saltos de linea ni codificacion); `bytes` es su tamaño; equivale a `sha256sum <archivo>`",
+    "paths": "relativas a la raiz del repositorio, con «/» como separador, ordenadas alfabeticamente dentro de cada grupo",
+    "on_a_copy": "node pruebas/multiusuario/verificar-backend-manifest.mjs --raiz <copia>  (la copia debe contener los archivos listados y este manifest en pruebas/multiusuario/)",
+    "maintainers_only": "--regenerar reescribe sha256/bytes de los archivos ya listados (no añade ni quita)"
+  },
+  "endpoint": {
+    "metodo": "POST",
+    "ruta": "/api/admin/usuarios/:id/enlace",
+    "archivo": "api-server/src/routes/admin-usuarios.ts",
+    "respuesta_200": [
+      "enlaceParaEstablecerClave",
+      "nota"
+    ],
+    "autorizacion": "misma puerta que /api/admin/usuarios: exigirConfiguracion + exigirAdmin (token de un administrador activo)",
+    "ignora_al_cliente": [
+      "cuerpo",
+      "query",
+      "cabeceras",
+      "correo",
+      "rol",
+      "redirect_to"
+    ],
+    "rechaza": [
+      "sin sesion (401)",
+      "no administrador (403)",
+      "id invalido (400)",
+      "el propio administrador (400)",
+      "otra cuenta administradora (400)",
+      "persona inexistente (404)",
+      "persona inactiva (409)",
+      "rol no asignable (409)",
+      "correo ausente (409)",
+      "origen sin configurar o invalido (503)",
+      "fallo de Supabase, de red o respuesta malformada (502)"
+    ],
+    "cabeceras": {
+      "Cache-Control": "no-store"
+    },
+    "registro": "solo ids (quien lo pidio, para quien) y el rol; nunca el enlace, el token ni el correo",
+    "destino_por_rol": {
+      "mecanico": "ENTIMOTORS_MECHANIC_ORIGIN",
+      "cajero": "ENTIMOTORS_ADMIN_ORIGIN",
+      "desarrollador": "ENTIMOTORS_ADMIN_ORIGIN"
+    }
+  },
+  "runtime_files": [
+    {
+      "path": "api-server/.env.example",
+      "sha256": "d46ed11a85da4382ffed070135eab67fcdbb1f5aa12203f0d0a8971ac259abd1",
+      "bytes": 3701,
+      "change": "dependency-unchanged",
+      "rol": "documenta ENTIMOTORS_ADMIN_ORIGIN y ENTIMOTORS_MECHANIC_ORIGIN"
+    },
+    {
+      "path": "api-server/package.json",
+      "sha256": "c96ef2412bd9c314aa2e6b0d0794c697d3c65fc8852b7c12d82af96c2736c6e2",
+      "bytes": 895,
+      "change": "dependency-unchanged",
+      "rol": "dependencias declaradas (sin cambios)"
+    },
+    {
+      "path": "api-server/pnpm-lock.yaml",
+      "sha256": "12359dd3f72bf168f0b78aebdb2c57876fe47bbe52e05aece88d8e48ba4cb695",
+      "bytes": 44036,
+      "change": "dependency-unchanged",
+      "rol": "versiones exactas de las dependencias (sin cambios)"
+    },
+    {
+      "path": "api-server/src/app.ts",
+      "sha256": "e7e3b2fde12c4bad512bcfba4bc84cdbaa8e760782b84543adb16bfa735120cf",
+      "bytes": 1585,
+      "change": "dependency-unchanged",
+      "rol": "express.json(), cors(), pino-http (solo registra ruta sin query ni cuerpo)"
+    },
+    {
+      "path": "api-server/src/lib/logger.ts",
+      "sha256": "29e1ca75036fe917595a3a74fd450857d845836fe0625c30b9caa02df4acba62",
+      "bytes": 421,
+      "change": "dependency-unchanged",
+      "rol": "logger con redact de Authorization/cookies"
+    },
+    {
+      "path": "api-server/src/routes/admin-usuarios.ts",
+      "sha256": "98921e771f367ce6728fadc1767d552f0684b1004f8695d5d8bb18f3cb02b957",
+      "bytes": 26470,
+      "change": "modified",
+      "rol": "helper generarEnlaceDeRecuperacion (compartido por el alta) + ruta POST /admin/usuarios/:id/enlace"
+    },
+    {
+      "path": "api-server/src/routes/index.ts",
+      "sha256": "0f0a4c4a1f7ba2b5bca3796980a0fdf22ab9b5f6569b7d22f5abea3977c5cafc",
+      "bytes": 673,
+      "change": "dependency-unchanged",
+      "rol": "monta admin-usuarios bajo /api"
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/21-backend-enlace-recuperacion.test.mjs",
+      "sha256": "bed9a6bdec74e7c193ada852216bb51fa727629ed5757dd54371e95f54346e4e",
+      "bytes": 35219,
+      "rol": "pruebas del endpoint contra un Supabase falso"
+    },
+    {
+      "path": "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "sha256": "86020824d8b158f5b43fa7a0acccba83ec2d3d3bcfa43701177f669cf3005e8d",
+      "bytes": 16993,
+      "rol": "prueba de este manifest y de su verificador"
+    },
+    {
+      "path": "pruebas/multiusuario/24-backend-dist-enlace.test.mjs",
+      "sha256": "0ba26bde3dc3e6e2c0398743f0c44e651808b0de4c7464d7794db6a74e68345f",
+      "bytes": 15988
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/backend-admin-usuarios.mjs",
+      "sha256": "6a443cce43656b9d60d9a2f6eee0f037fca7002d20f93f276f999ac625247e1a",
+      "bytes": 12821,
+      "rol": "cargador: ejecuta el api-server real sin red ni dependencias"
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/ts-a-js.mjs",
+      "sha256": "06b7a73747028bb7b551f2b189c86252144981d45f81f3472a420d8138c68738",
+      "bytes": 11688,
+      "rol": "quita tipos de TypeScript (sin dependencias)"
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "sha256": "62de023778c9f131a210f2c2154565831c2039eb03ddda255f8b15e7fcc8af2b",
+      "bytes": 4342,
+      "rol": "verificador determinista de este manifest"
+    }
+  ],
+  "generated_build_artifacts": [
+    {
+      "path": "api-server/dist/index.mjs",
+      "sha256": "17562fbad9f2afef51bf39159cfcba9443aee6b8e14585a0afd7948f1833169c",
+      "bytes": 2758010,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "regenerated"
+    },
+    {
+      "path": "api-server/dist/index.mjs.map",
+      "sha256": "54d50e67280c0a787abec37d46c4577e35d331b7efc79de1258f1b83ed3c7ef8",
+      "bytes": 4421644,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "regenerated"
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs",
+      "sha256": "bf31ab01323cc0659d4f9ba5c6e8616cef088f9d2f1198463153105a16d2cd7b",
+      "bytes": 145134,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "rebuilt-path-only"
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs.map",
+      "sha256": "ee2cf49dc3c693ea899aa6dd49b27b858c616f22d51a96760130210325d76c7f",
+      "bytes": 234391,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "rebuilt-path-only"
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs",
+      "sha256": "cf71a8b7a8c0684fe283ebab253d95b2c5e795b15c26523d48149ce44121066f",
+      "bytes": 116870,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "unchanged"
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs.map",
+      "sha256": "7e31e5fbff959c8ae7e58c3f7f90de1740a253bee942c374f02dc220ff4f9777",
+      "bytes": 208647,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "unchanged"
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs",
+      "sha256": "47544f3c5b391f58bd37735de2cef81c561783b561fbd00dce9fa560a8eaa4c4",
+      "bytes": 156724,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "rebuilt-path-only"
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs.map",
+      "sha256": "5a9763ecbf3940bf55c32b14524809e57784be4042d0c9bad4bcc2f0ab6b2a25",
+      "bytes": 262859,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "rebuilt-path-only"
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs",
+      "sha256": "b490228463d2d47a57932bcbe6bb307af9c54d1b4f3953191e1077e791bb188d",
+      "bytes": 7459,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "unchanged"
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs.map",
+      "sha256": "9db59f00b9b60ea947471e8a27d98934dac9419be8b6e6332df4ce868ee80cc9",
+      "bytes": 12296,
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "change": "unchanged"
+    }
+  ],
+  "dist_versionado": {
+    "ruta": "api-server/dist/",
+    "politica": "VERSIONED",
+    "clasificacion": "GENERATED_BUILD_ARTIFACT",
+    "estado": "REGENERADO en 4E-C9 con el build oficial: los 10 archivos versionados de api-server/dist/ salen del src de este manifest y contienen la ruta nueva POST /admin/usuarios/:id/enlace",
+    "como_se_genero": "pnpm install --frozen-lockfile y pnpm run build en api-server/ (node ./build.mjs con esbuild 0.27.7; pnpm 10.34.3; Node 20.20.1). package.json, pnpm-lock.yaml, pnpm-workspace.yaml, build.mjs y tsconfig.json son los mismos bytes que en HEAD; node_modules no queda en el arbol.",
+    "archivos": "10 (5 modulos .mjs y 5 mapas): 6 modificados (index.mjs y su mapa con la ruta nueva; pino-file y pino-worker, y sus mapas, solo cambian la ruta absoluta de compilacion) y 4 sin cambios",
+    "ruta_absoluta_embebida": "esbuild-plugin-pino incrusta la ruta absoluta del directorio dist donde se compila (<raiz del repositorio>/api-server/dist) en index.mjs, pino-file.mjs, pino-worker.mjs y sus mapas. NO es un secreto ni un host. Con NODE_ENV=production pino no usa transport y esa ruta no se lee; en desarrollo `pnpm dev` recompila antes de arrancar. Dos compilaciones hechas en directorios distintos difieren solo en esa cadena.",
+    "evidencia_de_la_politica": [
+      "api-server/dist/ esta versionado en HEAD (10 archivos) y el script start de package.json ejecuta `node --enable-source-maps ./dist/index.mjs`",
+      "en el historial, 6 de los 7 ultimos commits que cambian api-server/src tambien cambian dist/ (4d56c64, 501f1d6, f8bfb8d, 6a3337f, b016dbc, efd9cbb); la excepcion es 66ed64d («chore: preserve multiuser auth implementation»)",
+      "el dist versionado en HEAD es REPRODUCIBLE: reconstruido desde el src de HEAD con el lockfile sale byte a byte identico (10/10) salvo la ruta absoluta de compilacion",
+      "el mensaje del commit ac5ceb8 (2026-09-11) dice que Render instala pnpm y que el build de produccion moria por el script de instalacion de esbuild («sin el no hay dist»): indica que Render compila, pero NO es configuracion versionada ni prueba el Build Command exacto"
+    ],
+    "por_que_versionado": "No se puede probar desde el repositorio que Render compile. Con el dist regenerado y versionado el despliegue es correcto en los dos casos: si Render compila, sobrescribe estos archivos; si solo ejecuta start, ejecuta este dist, que ya trae la ruta (lo prueba 24-backend-dist-enlace.test.mjs arrancando el bundle real).",
+    "regla": "No se edita a mano: si cambia api-server/src o sus dependencias se vuelve a ejecutar el build y se regenera este manifest (`node pruebas/multiusuario/verificar-backend-manifest.mjs --regenerar`)."
+  },
+  "render": {
+    "config_en_el_repositorio": false,
+    "estado": "RENDER_BUILD_COMMAND_NEEDS_MANUAL_CONFIRMATION",
+    "archivos_buscados": [
+      "render.yaml",
+      "Dockerfile",
+      "Procfile",
+      ".node-version",
+      ".nvmrc",
+      "engines de package.json",
+      "documentos de despliegue"
+    ],
+    "lo_que_el_repositorio_si_dice": {
+      "build_script": "node ./build.mjs",
+      "start_script": "node --enable-source-maps ./dist/index.mjs",
+      "gestor": "pnpm (pnpm-lock.yaml y pnpm-workspace.yaml propios en api-server/)",
+      "nota_ac5ceb8": "su mensaje afirma que Render instala pnpm con `npm install -g pnpm` y que el build de produccion falla sin aprobar el script de instalacion de esbuild"
+    },
+    "lo_que_no_dice": [
+      "el Build Command real del servicio",
+      "el Start Command real",
+      "el Root Directory",
+      "la version de Node",
+      "las variables de entorno definidas"
+    ],
+    "confirmar_antes_de_desplegar": [
+      "Root Directory del servicio (api-server/)",
+      "Build Command (debe compilar con `pnpm install` y `pnpm run build`, o dejar que se ejecute el dist versionado)",
+      "Start Command (`pnpm start`, es decir `node --enable-source-maps ./dist/index.mjs`)",
+      "version de Node (20 o superior)",
+      "variables SUPABASE_URL, SUPABASE_SERVICE_KEY, SUPABASE_ANON_KEY, ENTIMOTORS_ADMIN_ORIGIN, ENTIMOTORS_MECHANIC_ORIGIN, ADMIN_PASSWORD"
+    ]
+  },
+  "prerrequisitos_de_despliegue": [
+    "api-server desplegado con la version de admin-usuarios.ts de este manifest y su dist versionado (ver dist_versionado)",
+    "variables de entorno ENTIMOTORS_ADMIN_ORIGIN y ENTIMOTORS_MECHANIC_ORIGIN definidas (https://, sin /index.html) y SUPABASE_ANON_KEY (ya requerida por la gestion de usuarios)",
+    "las direcciones de vuelta de ambos productos en Supabase → Authentication → URL Configuration → Redirect URLs (ya necesarias para el alta)",
+    "supabase-config.js del frontend con apiUrl apuntando al api-server desplegado",
+    "confirmar en el panel de Render el Build Command, el Start Command, el Root Directory y la version de Node del servicio (no estan en el repositorio: ver render)"
+  ],
+  "verificaciones": {
+    "tipos": "tsc --noEmit sobre admin-usuarios.ts en copia temporal: 0 errores nuevos (2 preexistentes del tipado de `ws`, identicos a la base)",
+    "conversor_de_pruebas": "ts-a-js validado contra esbuild sobre el mismo archivo: 16 escenarios con respuestas y registros identicos",
+    "sin_red": "todas las pruebas usan un Supabase falso; ninguna peticion real",
+    "build": "pnpm install --frozen-lockfile y pnpm run build en api-server/: salida 0; un unico aviso de esbuild ya presente antes (tsconfig.json extiende ../../tsconfig.base.json, que no existe en este arbol; no impide el build)",
+    "dist_reproducible": "el dist de HEAD se reconstruye desde el src de HEAD byte a byte (10/10, normalizando la ruta de compilacion); el dist nuevo sale identico compilando en dos directorios distintos (10/10, normalizado)",
+    "dist_sintaxis": "node --check sobre los 5 modulos .mjs de dist/",
+    "dist_por_http": "24-backend-dist-enlace.test.mjs arranca el bundle real (`node --enable-source-maps ./dist/index.mjs`, entorno sintetico) contra un Supabase falso y ejerce POST /api/admin/usuarios/:id/enlace; contra el dist ANTERIOR (sin la ruta) 10 de sus 17 casos fallan"
+  },
+  "test_summary": {
+    "backend_endpoint": {
+      "file": "21-backend-enlace-recuperacion.test.mjs",
+      "tests": 56,
+      "pass": 56,
+      "fail": 0,
+      "cubre": [
+        "autorizacion (401/403/503)",
+        "camino feliz",
+        "destino por rol (mecanico/cajero/desarrollador)",
+        "correo/rol/redirect del cliente ignorados",
+        "propio admin, otro admin, inexistente, inactivo, id invalido, rol invalido, correo ausente",
+        "origen sin configurar o invalido",
+        "generateLink con error, que lanza o malformado",
+        "ningun secreto en respuestas ni registros",
+        "el alta comparte el helper y no cambio",
+        "13 mutantes"
+      ]
+    },
+    "backend_manifest": {
+      "file": "23-backend-manifest.test.mjs",
+      "tests": 23,
+      "pass": 23,
+      "fail": 0
+    },
+    "backend_dist": {
+      "file": "24-backend-dist-enlace.test.mjs",
+      "tests": 17,
+      "pass": 17,
+      "fail": 0,
+      "cubre": [
+        "node --check de los 5 modulos",
+        "la ruta y enlaceParaEstablecerClave en el bundle; sin la ruta de la rifa",
+        "arranque real con entorno sintetico; /api/healthz; rutas inexistentes 404",
+        "autorizacion: sin token 401, token desconocido 401, no administrador 403",
+        "mecanico → Mi Trabajo; cajero y desarrollador → Taller (origen del servidor)",
+        "propio admin, otro admin, inactivo, rol desconocido, inexistente, id mal formado: rechazados sin llamar a Supabase",
+        "correo, rol, redirect, query y destino del cliente ignorados",
+        "generateLink rechazado, sin action_link y action_link no http(s) → 502 sin filtrar el mensaje",
+        "ningun secreto en respuestas ni registros del proceso",
+        "sin SUPABASE_ANON_KEY → 503"
+      ]
+    }
+  },
+  "no_ejecutado": [
+    "supabase_real",
+    "render",
+    "sql_produccion",
+    "deploy",
+    "publicacion",
+    "envio_de_correo"
+  ],
+  "known_limitations": [
+    "la cuenta del administrador NO se recupera con este endpoint: se recupera desde el panel de Supabase (Authentication)",
+    "si un correo escaner consume el enlace antes que la persona, hace falta generar otro (el enlace es de un solo uso)",
+    "la ruta absoluta de compilacion queda incrustada en 6 archivos de dist/ (no es un secreto): dos compilaciones en directorios distintos difieren solo en esa cadena, y conviene normalizarla para compararlas",
+    "el Build Command y el Start Command de Render no estan versionados: hay que confirmarlos en el panel antes de desplegar (render.estado)"
+  ],
+  "note": "Este manifest no contiene su propio hash; lo referencia el manifest del frontend (backend_manifest) y el documento de freeze."
+}

@@ -204,6 +204,65 @@ function claveDeUnUso(): string {
   return Array.from(bytes, (b) => abc[b % abc.length]).join("");
 }
 
+/* ── ENLACE DE RECUPERACIÓN ────────────────────────────────────────────────
+   Única puerta por la que este servidor le pide a Supabase un enlace de un solo
+   uso: la usan el ALTA (POST /admin/usuarios) y «generar enlace» de un usuario
+   que ya existe (POST /admin/usuarios/:id/enlace). Así el destino (por rol) y el
+   tratamiento de los fallos no se duplican.
+
+   Recibe el correo y el rol que YA están guardados en el servidor; nunca lo que
+   diga quien llama. El enlace devuelto es un secreto: no se registra, no se
+   guarda y no sale en ningún mensaje de error. */
+export type MotivoSinEnlace = FalloDestino | "supabase-rechazo" | "sin-action-link" | "error-de-red";
+export type ResultadoEnlace =
+  | { ok: true; enlace: string }
+  | { ok: false; motivo: MotivoSinEnlace; aviso: string };
+
+async function generarEnlaceDeRecuperacion(correo: string, rol: string): Promise<ResultadoEnlace> {
+  const destino = destinoDeRecuperacion(rol);
+  if (!destino.ok) {
+    logger.error({ rol, motivo: destino.motivo }, "sin destino de recuperación: no se genera enlace");
+    return { ok: false, motivo: destino.motivo, aviso: destino.error };
+  }
+  /* generateLink NO lanza cuando la API contesta con un error de Auth: devuelve
+     { data: { properties: null, user: null }, error } y solo relanza lo que no
+     es de Auth. Desestructurar únicamente `data` tiraba ese `error` a la basura
+     y el enlace salía null sin que nada quedara registrado — exactamente lo que
+     pasó en GATE 7A-1. Por eso aquí se miran las dos cosas, y el try/catch se
+     queda para lo otro: red, DNS, timeout. */
+  try {
+    const { data: link, error: errEnlace } = await servidor.auth.admin.generateLink({
+      type: "recovery", email: correo,
+      options: { redirectTo: destino.url },
+    });
+    if (errEnlace) {
+      /* Del error solo lo que sirve para diagnosticar. El enlace y el token
+         no pasan por aquí: no están en `error`, y no se registran nunca. */
+      logger.error({
+        motivo: "supabase-rechazo",
+        destino: destino.url,           // lo fija el servidor, no es un secreto
+        estado: errEnlace.status ?? null,
+        codigo: (errEnlace as { code?: string }).code ?? null,
+        mensaje: errEnlace.message,
+      }, "generateLink falló: no se genera enlace");
+      return { ok: false, motivo: "supabase-rechazo",
+               aviso: "Supabase no aceptó generar el enlace. Revisa que la dirección de vuelta esté en Authentication → URL Configuration → Redirect URLs." };
+    }
+    /* Solo vale una cadena que sea una dirección http(s): un objeto, un número o
+       algo sin esquema es una respuesta malformada, no un enlace. */
+    const accion: unknown = link?.properties?.action_link;
+    if (typeof accion !== "string" || !/^https?:\/\/\S+$/i.test(accion)) {
+      logger.error({ motivo: "sin-action-link" }, "generateLink no devolvió action_link");
+      return { ok: false, motivo: "sin-action-link", aviso: "Supabase respondió sin enlace utilizable." };
+    }
+    return { ok: true, enlace: accion };
+  } catch (e) {
+    logger.error({ motivo: "error-de-red", mensaje: e instanceof Error ? e.message : String(e) },
+                 "generateLink lanzó una excepción");
+    return { ok: false, motivo: "error-de-red", aviso: "No se pudo contactar con Supabase para generar el enlace." };
+  }
+}
+
 const router = Router();
 
 /* ───────────────────── GET /api/admin/usuarios ───────────────────── */
@@ -271,55 +330,12 @@ router.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req: Pet
   /* Enlace de un solo uso para que la persona ponga su propia contraseña. El
      destino sale del rol REAL que quedó en `perfiles`, no del que venía en la
      petición: si el disparador o una política lo hubieran cambiado, manda lo
-     que hay en la base. */
-  let enlace: string | null = null;
-  let avisoEnlace: string | null = null;
-  let motivoSinEnlace: string | null = null;
-  const destino = destinoDeRecuperacion(String(perfilGuardado?.rol ?? rol));
-  if (!destino.ok) {
-    avisoEnlace = destino.error;
-    motivoSinEnlace = destino.motivo;
-    logger.error({ rol: perfilGuardado?.rol ?? rol, motivo: destino.motivo },
-                 "sin destino de recuperación: no se genera enlace");
-  } else {
-    /* generateLink NO lanza cuando la API contesta con un error de Auth: devuelve
-       { data: { properties: null, user: null }, error } y solo relanza lo que no
-       es de Auth. Desestructurar únicamente `data` tiraba ese `error` a la basura
-       y el enlace salía null sin que nada quedara registrado — exactamente lo que
-       pasó en GATE 7A-1. Por eso aquí se miran las dos cosas, y el try/catch se
-       queda para lo otro: red, DNS, timeout. */
-    try {
-      const { data: link, error: errEnlace } = await servidor.auth.admin.generateLink({
-        type: "recovery", email: correo,
-        options: { redirectTo: destino.url },
-      });
-      if (errEnlace) {
-        motivoSinEnlace = "supabase-rechazo";
-        avisoEnlace = "Supabase no aceptó generar el enlace. Revisa que la dirección de vuelta esté en Authentication → URL Configuration → Redirect URLs.";
-        /* Del error solo lo que sirve para diagnosticar. El enlace y el token
-           no pasan por aquí: no están en `error`, y no se registran nunca. */
-        logger.error({
-          motivo: motivoSinEnlace,
-          destino: destino.url,           // lo fija el servidor, no es un secreto
-          estado: errEnlace.status ?? null,
-          codigo: (errEnlace as { code?: string }).code ?? null,
-          mensaje: errEnlace.message,
-        }, "generateLink falló: no se genera enlace");
-      } else {
-        enlace = link?.properties?.action_link ?? null;
-        if (!enlace) {
-          motivoSinEnlace = "sin-action-link";
-          avisoEnlace = "Supabase respondió sin enlace utilizable.";
-          logger.error({ motivo: motivoSinEnlace }, "generateLink no devolvió action_link");
-        }
-      }
-    } catch (e) {
-      motivoSinEnlace = "error-de-red";
-      avisoEnlace = "No se pudo contactar con Supabase para generar el enlace.";
-      logger.error({ motivo: motivoSinEnlace, mensaje: e instanceof Error ? e.message : String(e) },
-                   "generateLink lanzó una excepción");
-    }
-  }
+     que hay en la base. (La generación vive en generarEnlaceDeRecuperacion, que
+     comparte con la ruta «generar enlace» de un usuario ya existente.) */
+  const generado = await generarEnlaceDeRecuperacion(correo, String(perfilGuardado?.rol ?? rol));
+  const enlace: string | null = generado.ok ? generado.enlace : null;
+  const avisoEnlace: string | null = generado.ok ? null : generado.aviso;
+  const motivoSinEnlace: string | null = generado.ok ? null : generado.motivo;
 
   /* 201 aunque no haya enlace, a propósito: la cuenta EXISTE. Devolver un error
      haría creer al administrador que no se creó nada y le llevaría a repetir el
@@ -334,6 +350,94 @@ router.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req: Pet
       : (avisoEnlace ?? "") +
         (avisoEnlace ? " " : "") +
         "La cuenta está creada. Para darle contraseña: panel de Supabase → Authentication → el usuario → Reset password.",
+  });
+});
+
+/* ─────────────── POST /api/admin/usuarios/:id/enlace ───────────────
+   RECUPERACIÓN MEDIADA POR EL ADMINISTRADOR (OBS-9, plan B). Una persona del
+   equipo perdió su contraseña: el administrador le genera un enlace de un solo
+   uso, lo copia y se lo pasa. Ella lo abre y `recovery.js` la deja elegir una
+   contraseña nueva. No se envía correo, no hay SMTP y no hay ninguna ruta pública.
+
+   QUIÉN MANDA EN QUÉ
+     · Autorización: la misma de todo /admin/usuarios (token de un admin activo).
+     · El CUERPO NO SE LEE. El correo sale de Auth, el rol de `perfiles` y el
+       destino (Taller o Mi Trabajo) lo decide destinoDeRecuperacion() con las
+       variables del servidor. Si alguien manda correo, rol o redirect_to, se
+       ignoran: no hay dónde ponerlos.
+     · Solo cuentas ACTIVAS de rol no administrador. Una cuenta dada de baja no
+       puede entrar aunque tenga contraseña nueva (auth.js la rechaza), así que
+       generar el enlace solo daría una falsa sensación de acceso; generar el
+       enlace NUNCA reactiva una cuenta: el perfil no se toca.
+     · La cuenta del propio administrador queda fuera a propósito: este camino
+       no resuelve que el admin pierda su acceso y no debe parecer autoservicio.
+       Se recupera desde el panel de Supabase (Authentication).
+
+   El enlace es un secreto: viaja SOLO en el cuerpo de esta respuesta (con
+   Cache-Control: no-store) y no se escribe en ningún registro. */
+router.post("/admin/usuarios/:id/enlace", exigirConfiguracion, exigirAdmin, async (req: PeticionAdmin, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+
+  if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(400).json({ error: "Identificador no válido." }); return; }
+  if (id === req.quien!.id) {
+    res.status(400).json({ error: "No se genera un enlace para tu propia cuenta desde aquí. La cuenta del administrador se recupera desde el panel de Supabase (Authentication)." });
+    return;
+  }
+
+  // quién es el objetivo, según la base (no según quien llama)
+  const { data: perfil, error: errPerfil } = await servidor
+    .from("perfiles").select("id, rol, activo").eq("id", id).maybeSingle();
+  if (errPerfil) {
+    logger.error({ err: errPerfil }, "no se pudo leer el perfil del usuario objetivo");
+    res.status(500).json({ error: "No se pudo comprobar el usuario." });
+    return;
+  }
+  if (!perfil) { res.status(404).json({ error: "Ese usuario no existe." }); return; }
+  if (perfil.rol === "admin") {
+    res.status(400).json({ error: "La cuenta del administrador no se gestiona desde esta pantalla. Se recupera desde el panel de Supabase (Authentication)." });
+    return;
+  }
+  if (!ROLES_ASIGNABLES.includes(perfil.rol as RolAsignable)) {
+    res.status(409).json({ error: "El rol de esa cuenta no permite generar un enlace." });
+    return;
+  }
+  if (perfil.activo !== true) {
+    res.status(409).json({ error: "Esa cuenta está dada de baja. Reactívala antes de generar un enlace de recuperación." });
+    return;
+  }
+
+  // el correo vive en Auth, no en `perfiles`
+  let correo = "";
+  try {
+    const { data: cuenta, error: errCuenta } = await servidor.auth.admin.getUserById(id);
+    if (errCuenta) {
+      logger.error({ estado: errCuenta.status ?? null, mensaje: errCuenta.message }, "no se pudo leer la cuenta de Auth del usuario objetivo");
+      res.status(502).json({ error: "No se pudo leer la cuenta en Supabase. Inténtalo de nuevo." });
+      return;
+    }
+    correo = typeof cuenta?.user?.email === "string" ? cuenta.user.email.trim() : "";
+  } catch (e) {
+    logger.error({ mensaje: e instanceof Error ? e.message : String(e) }, "getUserById lanzó una excepción");
+    res.status(502).json({ error: "No se pudo contactar con Supabase. Inténtalo de nuevo." });
+    return;
+  }
+  if (!correo) { res.status(409).json({ error: "Esa cuenta no tiene un correo asociado: no se puede generar el enlace." }); return; }
+
+  const generado = await generarEnlaceDeRecuperacion(correo, perfil.rol);
+  if (!generado.ok) {
+    // configuración del servidor (origen sin definir o mal escrito) = 503; lo que falla en Supabase o en la red = 502
+    const estado = generado.motivo === "sin-origin" || generado.motivo === "origin-invalido" ? 503
+      : generado.motivo === "rol-desconocido" ? 409 : 502;
+    res.status(estado).json({ error: generado.aviso, motivoSinEnlace: generado.motivo });
+    return;
+  }
+
+  // se registra QUIÉN lo pidió y PARA QUIÉN (ids), nunca el enlace ni el correo
+  logger.info({ evento: "enlace-recuperacion-generado", por: req.quien!.id, para: id, rol: perfil.rol }, "enlace de recuperación generado");
+  res.json({
+    enlaceParaEstablecerClave: generado.enlace,
+    nota: "Pásale este enlace a la persona. Es de un solo uso y reemplaza cualquier enlace anterior: ahí elige su nueva contraseña.",
   });
 });
 

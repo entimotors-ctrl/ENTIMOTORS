@@ -44,6 +44,9 @@ const ES_APP_MECANICOS = PRODUCTO === "mecanico";
 // window.ENTIMOTORS_LOCAL a mano.
 const PERMITE_LOGIN_LOCAL = !ES_APP_MECANICOS;
 
+// Los únicos roles que abren el taller (ver sesionAdmitida). «mecanico» solo con sesión LOCAL de la lista TEAM.
+const ROLES_DEL_TALLER = ["admin", "cajero", "mecanico"];
+
 /* El portero. Se ejecuta ANTES de abrir ninguna base: una sesión que no
    corresponde a este producto no debe llegar a tocar IndexedDB, ni siquiera
    para leerla un instante. Devuelve el motivo en el idioma del taller, porque
@@ -68,6 +71,15 @@ function sesionAdmitida(session) {
   // locales de la lista TEAM siguen entrando como siempre — ver TEAM más abajo.
   if (session.rol === "mecanico" && session.origen === "supabase")
     return { ok: false, motivo: "Esta cuenta debe ingresar desde ENTIMOTORS Mi Trabajo." };
+  /* Lista BLANCA. Antes se admitía cualquier rol que no estuviera en una lista
+     de vistas restringidas, y un rol inventado (p. ej. una sesión guardada
+     manipulada) entraba con el nivel operativo de un mecánico local. El
+     desarrollador tiene su propio panel y ya se rechaza al iniciar sesión: aquí
+     se repite, porque este portero también corre con sesiones ya guardadas. */
+  if (session.rol === "desarrollador")
+    return { ok: false, motivo: "Cuenta técnica: no abre el taller. Usa el panel técnico." };
+  if (typeof session.rol !== "string" || !ROLES_DEL_TALLER.includes(session.rol))
+    return { ok: false, motivo: "Tu rol no tiene acceso a ENTIMOTORS Taller." };
   return { ok: true };
 }
 
@@ -1835,7 +1847,7 @@ async function renderMiTrabajo() {
   const motoDe = (id) => motos.find(m => m.id === id);
 
   document.getElementById("miTrabajoSub").textContent =
-    `${currentUser?.nombre || ""} · lo que tienes asignado.`;
+    `${currentUser?.nombre || ""} · acceso para mecánicos.`;
 
   const mias = citas.filter(esTrabajoPropio).filter(c => !citaCerrada(c))
     .sort((a, b) => `${a.fecha}${a.hora}`.localeCompare(`${b.fecha}${b.hora}`));
@@ -1848,7 +1860,7 @@ async function renderMiTrabajo() {
       <div class="meta">${esc(c.motivo || "Sin motivo especificado")}</div>
       <div class="meta">${esc(telCliente(c.clienteId) || c.telefonoTmp || "sin teléfono")}</div>
     </div>`).join("")
-    : `<div class="card"><p style="color:var(--text-muted); margin:0;">No tienes citas asignadas.</p></div>`;
+    : `<div class="card"><p style="color:var(--text-muted); margin:0;">No hay citas en este dispositivo.</p></div>`;
 
   const abiertas = ordenes.filter(esTrabajoPropio).filter(o => o.estado !== "entregado");
   const entregadas = ordenes.filter(esTrabajoPropio).filter(o => o.estado === "entregado");
@@ -1866,10 +1878,10 @@ async function renderMiTrabajo() {
   };
   document.getElementById("miTrabajoOrdenes").innerHTML = abiertas.length
     ? abiertas.map(o => tarjeta(o, false)).join("")
-    : `<div class="card"><p style="color:var(--text-muted); margin:0;">No tienes órdenes abiertas.</p></div>`;
+    : `<div class="card"><p style="color:var(--text-muted); margin:0;">No hay órdenes abiertas en este dispositivo.</p></div>`;
   document.getElementById("miTrabajoHistorial").innerHTML = entregadas.length
     ? entregadas.map(o => tarjeta(o, true)).join("")
-    : `<div class="card"><p style="color:var(--text-muted); margin:0;">Todavía no has entregado ningún trabajo.</p></div>`;
+    : `<div class="card"><p style="color:var(--text-muted); margin:0;">Todavía no hay trabajos entregados en este dispositivo.</p></div>`;
 
   document.querySelectorAll(".orden-mia").forEach(el => {
     el.addEventListener("click", () => openOrder(Number(el.dataset.id)));
@@ -3990,7 +4002,8 @@ async function renderCitasList() {
 
   list.querySelectorAll('[data-action="eliminar"]').forEach(btn => {
     btn.addEventListener("click", async (e) => {
-      if (!exigeGestion("Solo el administrador elimina una cita")) return;
+      // solo el administrador borra: lo dice el aviso y la politica citas_admin_borra; exigeGestion() dejaba pasar tambien al cajero
+      if (!esAdmin()) { bloquear("Solo el administrador elimina una cita"); return; }
       e.stopPropagation();
       const ventanaWA = btn.dataset.tel ? abrirVentanaWA() : null;
       const id = Number(btn.dataset.id);
@@ -5999,7 +6012,7 @@ async function renderAjustes() {
   const conteos = await Promise.all(ALL_STORES.map(s => DB.getAll(s).then(r => r.length)));
   const totalRegistros = conteos.reduce((a, b) => a + b, 0);
   document.getElementById("ajustesInfo").innerHTML = `
-    Usuario: <b>${esc(currentUser?.nombre || "—")}</b> (${NOMBRE_ROL[currentUser?.rol] || currentUser?.rol || "—"})<br>
+    Usuario: <b>${esc(currentUser?.nombre || "—")}</b> (${esc(NOMBRE_ROL[currentUser?.rol] || currentUser?.rol || "—")})<br>
     Este dispositivo arrancó ${modo} · ${totalRegistros} registros guardados en total.
   `;
 
@@ -6015,23 +6028,92 @@ async function renderAjustes() {
   pintarUltimoRespaldo();
 }
 
-document.getElementById("btnForzarActualizacion").addEventListener("click", async () => {
+/* ---- Buscar actualización ahora ----
+   ANTES este botón desregistraba todos los Service Workers, borraba todas las
+   cachés y recargaba: instalaba la versión publicada sin ofrecer la copia de
+   seguridad, pasaba por encima del «Ahora no» y, sin señal, dejaba el equipo sin
+   su caché (el navegador mostraba su página de error hasta que volviera Internet).
+
+   Ahora SOLO COMPRUEBA. Nunca desregistra, nunca borra cachés y nunca recarga por
+   su cuenta. Si hay una versión nueva abre el MISMO aviso de siempre (copia y
+   actualizar / solo copia / ahora no); quien activa el worker nuevo sigue siendo
+   únicamente «Crear copia y actualizar», con el mensaje «activar-ya». */
+const ESPERA_ACTUALIZACION_MS = 20000;   // tope para comprobar y para que un worker nuevo termine de instalarse
+
+/* Resuelve con lo que devuelva `promesa`, o con "timeout" si tarda más de `ms`.
+   Si `promesa` rechaza, rechaza. La promesa perdedora no se cancela (no se puede) pero
+   tampoco queda un rechazo sin atender. */
+function conPlazo(promesa, ms) {
+  const p = Promise.resolve(promesa);
+  p.catch(() => {});
+  let reloj;
+  const plazo = new Promise((resolve) => { reloj = setTimeout(() => resolve("timeout"), ms); });
+  return Promise.race([p, plazo]).finally(() => clearTimeout(reloj));
+}
+
+/* Espera a que `worker` termine de instalarse. "instalado": quedó listo (esperando, o ya
+   activo si no había ningún cliente al que esperar). "fallo": la instalación se abortó
+   (worker "redundant"). "timeout": no terminó a tiempo. */
+function esperarInstalacionSW(worker, ms) {
+  return new Promise((resolve) => {
+    const veredicto = () => ["installed", "activating", "activated"].includes(worker.state) ? "instalado"
+      : worker.state === "redundant" ? "fallo" : null;
+    const ya = veredicto();
+    if (ya) { resolve(ya); return; }
+    let reloj = null;
+    const salir = (r) => { clearTimeout(reloj); worker.removeEventListener("statechange", alCambiar); resolve(r); };
+    const alCambiar = () => { const r = veredicto(); if (r) salir(r); };
+    reloj = setTimeout(() => salir("timeout"), ms);
+    worker.addEventListener("statechange", alCambiar);
+  });
+}
+
+async function buscarActualizacion() {
+  if (navigator.onLine === false) {
+    toast("Sin conexión: ahora no se puede buscar actualizaciones. La app sigue funcionando igual.", "off");
+    return "sin-conexion";
+  }
+  if (!("serviceWorker" in navigator)) {
+    toast("Este navegador no permite buscar actualizaciones automáticas.", "off");
+    return "sin-soporte";
+  }
   toast("Buscando la última versión…");
-  try {
-    if ("serviceWorker" in navigator) {
-      const regs = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map((r) => r.unregister()));
-    }
-    if ("caches" in window) {
-      const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
-    }
-  } catch (e) {}
-  // ?_= con la hora actual evita que el propio navegador (no el Service
-  // Worker, que ya se acaba de borrar) conteste esto con algo guardado en su
-  // caché HTTP normal.
-  location.href = location.pathname + "?_=" + Date.now();
-});
+
+  let reg;
+  try { reg = await navigator.serviceWorker.getRegistration(); }
+  catch (e) { toast("No se pudo comprobar en este dispositivo.", "off"); return "error"; }
+
+  if (!reg) {
+    // Sin Service Worker no hay nada que actualizar ni que proteger: se prepara la
+    // instalación con la misma llamada del arranque, sin forzar nada ni recargar.
+    try { await navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }); }
+    catch (e) { toast("No se pudo preparar la instalación en este dispositivo.", "off"); return "sin-sw"; }
+    toast("Instalación preparada en este dispositivo.");
+    return "sin-sw-registrado";
+  }
+
+  // Una versión que ya estaba esperando (p. ej. tras un «Ahora no» y una recarga) no
+  // vuelve a avisar sola: se le muestra a quien lo pide.
+  if (reg.waiting) { abrirAvisoVersionNueva({ forzar: true }); return "nueva"; }
+
+  if (!reg.installing) {
+    let r;
+    try { r = await conPlazo(reg.update(), ESPERA_ACTUALIZACION_MS); }
+    catch (e) { toast("No se pudo comprobar ahora. Revisa tu conexión e inténtalo de nuevo.", "off"); return "error"; }
+    if (r === "timeout") { toast("La comprobación está tardando más de lo normal. Inténtalo de nuevo en un momento.", "off"); return "timeout"; }
+  }
+
+  // update() resuelve cuando el worker nuevo EMPIEZA a instalarse, no cuando termina.
+  const nuevo = reg.waiting || reg.installing;
+  if (!nuevo) { toast("Ya tienes la última versión"); return "al-dia"; }
+  const estado = await esperarInstalacionSW(nuevo, ESPERA_ACTUALIZACION_MS);
+  if (estado === "instalado") { abrirAvisoVersionNueva({ forzar: true }); return "nueva"; }
+  if (estado === "fallo") { toast("No se pudo preparar la versión nueva. Inténtalo otra vez con conexión.", "off"); return "fallo"; }
+  toast("La comprobación está tardando más de lo normal. Inténtalo de nuevo en un momento.", "off");
+  return "timeout";
+}
+
+alHacerClicUnaVez(document.getElementById("btnForzarActualizacion"), buscarActualizacion);
 
 /* ================= RESPALDO, VERIFICACIÓN Y RESTAURACIÓN =================
    Toda la información del taller existe únicamente en este dispositivo. El
@@ -6047,7 +6129,7 @@ document.getElementById("btnForzarActualizacion").addEventListener("click", asyn
    fecha e identificador, para que al restaurarlo se sepa exactamente de dónde
    salió y si el esquema es compatible. */
 
-const VERSION_APP = "3.12.2";
+const VERSION_APP = "3.13.0";
 const VERSION_RESPALDO = 2; // formato del archivo, no de la app
 
 async function armarRespaldo() {
@@ -6436,8 +6518,8 @@ document.getElementById("offlineToggle").addEventListener("click", () => {
   forcedOffline = !forcedOffline;
   document.getElementById("offlineToggle").textContent = forcedOffline ? "Volver a estar en línea" : "Simular sin conexión";
   renderSyncChip();
-  toast(forcedOffline ? "Modo sin conexión activado" : "Conexión restaurada — sincronizando cambios pendientes");
-  if (!forcedOffline && pending > 0) setTimeout(() => { pending = 0; renderSyncChip(); toast("Todo sincronizado"); }, 1200);
+  toast(forcedOffline ? "Modo sin conexión activado" : "Conexión restaurada — procesando cambios locales…");
+  if (!forcedOffline && pending > 0) setTimeout(() => { pending = 0; renderSyncChip(); toast("Cambios guardados localmente"); }, 1200);
 });
 window.addEventListener("online", renderSyncChip);
 window.addEventListener("offline", renderSyncChip);
@@ -6662,11 +6744,13 @@ function wireServiceWorkerUpdates() {
    automática — se avisa, se le ofrece la copia primero, y él decide.
 
    "Ahora no" es una respuesta válida y se respeta: no se vuelve a preguntar en
-   esta sesión, y la versión vieja sigue funcionando con normalidad. */
+   esta sesión, y la versión vieja sigue funcionando con normalidad. Solo lo
+   reabre la propia persona, con «Buscar actualización ahora» (`forzar`). */
 let avisoVersionMostrado = false;
 
-function abrirAvisoVersionNueva() {
-  if (avisoVersionMostrado) return;
+function abrirAvisoVersionNueva({ forzar = false } = {}) {
+  if (document.getElementById("modalVersionNueva")?.classList.contains("active")) return; // ya está abierto: no se duplica
+  if (avisoVersionMostrado && !forzar) return;
   if (document.getElementById("modalRestaurar")?.classList.contains("active")) return; // no interrumpir una restauración
   avisoVersionMostrado = true;
 

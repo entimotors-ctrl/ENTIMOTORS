@@ -115,9 +115,13 @@
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.45} }
   .chip .n { font-variant-numeric: tabular-nums; font-weight: 600; }
 
-  .user-chip { display: flex; align-items: center; gap: 0.55rem; }
-  .user-chip .who { font-weight: 600; font-size: 0.85rem; }
-  .user-chip .who small { display: block; font-weight: 400; color: var(--text-faint); font-size: 0.72rem; }
+  /* Nombre + rol en dos líneas: la píldora de una sola línea (.chip, radio 999px, line-height 1.5 heredado) los dejaba pegados al borde curvo
+     y con un nombre largo (el api-server admite 60 letras) rompía el topbar. Aquí: compacto, y elipsis en escritorio. En móvil manda el
+     bloque de abajo (.account-panel …): nombre completo, en varias líneas si hace falta. */
+  .user-chip { display: flex; align-items: center; gap: 0.55rem; padding: 0.3rem 0.9rem; border-radius: 0.9rem; line-height: 1.25; max-width: 14rem; }
+  .user-chip .who { font-weight: 600; font-size: 0.85rem; min-width: 0; }
+  .user-chip .who > span, .user-chip .who small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-chip .who small { font-weight: 400; color: var(--text-faint); font-size: 0.72rem; }
 
   button.btn {
     border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 0.55rem;
@@ -765,7 +769,8 @@
     }
     .account-panel.open { display: flex; }
     .account-panel .chip { white-space: normal; width: 100%; }
-    .account-panel .user-chip { background: var(--panel); padding: 0.6rem 0.7rem; border-radius: 0.6rem; }
+    .account-panel .user-chip { background: var(--panel); padding: 0.6rem 0.7rem; border-radius: 0.6rem; max-width: none; }
+    .account-panel .user-chip .who > span, .account-panel .user-chip .who small { overflow: visible; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
     .account-panel button.btn { width: 100%; }
 
     #sidebar {
@@ -964,6 +969,8 @@
       <p class="gate-error" id="loginError"></p>
       <button class="btn primary" type="submit" style="width:100%;">Entrar</button>
     </form>
+    <!-- OBS-9 (plan B): no hay formulario de correo ni promesa de correo; la recuperación la hace el administrador desde «Usuarios y equipo» -->
+    <p class="desc" id="loginAyuda" style="font-size:.8rem;opacity:.8;margin:1rem 0 0;">¿Olvidaste tu contraseña? Pide al administrador que te genere un enlace de recuperación.</p>
   </div>
 </div>
 
@@ -972,7 +979,7 @@
   <div class="gate-card">
     <img src="icons/icon-192.png" alt="ENTIMOTORS">
     <h1>Establecer contraseña</h1>
-    <p class="desc">Has sido invitado a ENTIMOTORS OS. Crea tu contraseña para activar tu acceso.</p>
+    <p class="desc" id="rcvIntro">Elige tu contraseña para entrar a ENTIMOTORS OS.</p>
     <div id="rcvCuerpo"></div>
   </div>
 </div>
@@ -1018,7 +1025,7 @@
       <div class="account-wrap" id="accountWrap">
         <button type="button" class="icon-btn" id="btnCuenta" aria-label="Cuenta y estado de conexión" title="Cuenta">👤</button>
         <div class="account-panel" id="accountPanel">
-          <span class="chip" id="syncChip"><span class="dot on" id="syncDot"></span><span id="syncLabel">En línea · sincronizado</span></span>
+          <span class="chip" id="syncChip"><span class="dot on" id="syncDot"></span><span id="syncLabel">En línea · datos locales</span></span>
           <button class="btn small ghost" id="offlineToggle" title="Simular pérdida de señal para probar el modo sin internet">Simular sin conexión</button>
           <button class="btn small ghost" id="btnTema" title="Cambiar entre modo claro y oscuro">🌙 Modo oscuro</button>
           <span class="chip user-chip"><span class="who"><span id="loggedUserName">—</span><small id="loggedUserRole"></small></span></span>
@@ -1056,7 +1063,10 @@
     <!-- DASHBOARD -->
     <section class="view" id="view-mi-trabajo">
       <h2 class="font-display" style="margin-bottom:0.2rem;">Mi trabajo</h2>
-      <p style="color:var(--text-muted); margin:0 0 1rem;" id="miTrabajoSub">Lo que tienes asignado.</p>
+      <p style="color:var(--text-muted); margin:0 0 1rem;" id="miTrabajoSub">Acceso para mecánicos.</p>
+      <div class="card" id="miTrabajoAlcance" style="margin-bottom:1rem;">
+        <p style="margin:0; color:var(--text-muted);">La asignación y sincronización de trabajos entre dispositivos estará disponible en una versión posterior.</p>
+      </div>
       <h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">Mis citas</h3>
       <div id="miTrabajoCitas"></div>
       <h3 class="font-display" style="font-size:0.95rem; margin:1.2rem 0 0.5rem;">Mis órdenes abiertas</h3>
@@ -1454,7 +1464,7 @@
     <!-- USUARIOS Y EQUIPO — solo administrador; el servidor lo comprueba aparte -->
     <section class="view" id="view-usuarios">
       <div class="view-head">
-        <div><h2>Usuarios y equipo</h2><p>Quién entra al sistema y qué puede hacer. Los permisos los aplica el servidor, no esta pantalla.</p></div>
+        <div><h2>Usuarios y equipo</h2><p>Quién entra al sistema y con qué rol. Las cuentas las protege el servidor; los datos de este dispositivo los controla la aplicación.</p></div>
       </div>
       <div id="usuariosCuerpo"></div>
     </section>
@@ -1495,7 +1505,7 @@
         <p class="hint" style="margin:0 0 0.6rem;" id="ajustesInfo"></p>
         <p class="hint" style="margin:0 0 0.8rem;">Versión instalada: <b id="ajustesVersion">—</b></p>
         <button type="button" class="btn small" id="btnForzarActualizacion">Buscar actualización ahora</button>
-        <p class="hint" style="margin:0.5rem 0 0;">Si hiciste un cambio y no se refleja en este dispositivo, usa este botón — borra la copia guardada y vuelve a bajar todo de cero.</p>
+        <p class="hint" style="margin:0.5rem 0 0;">Comprueba si hay una versión nueva. Si la hay, te ofrece guardar una copia de seguridad antes de actualizar; nunca se instala sola.</p>
       </div>
     </section>
 
@@ -2346,22 +2356,22 @@
      la app sigue funcionando igual. Ver config-local.example.js. -->
 <!-- Declara si esta copia es el taller o «Mi Trabajo». Va primero: app.js lo
      lee al arrancar. Ver build-target.js. -->
-<script src="build-target.js?v=3.12.2"></script>
+<script src="build-target.js?v=3.13.0"></script>
 <!-- Capa de Supabase. Si supabase-config.js no existe o está sin rellenar, los
      cuatro se cargan igual y no hacen nada: la app sigue funcionando entera con
      IndexedDB, como hasta ahora. -->
-<script src="supabase-config.js?v=3.12.2"></script>
-<script src="supabase-client.js?v=3.12.2"></script>
-<script src="auth.js?v=3.12.2"></script>
-<script src="recovery.js?v=3.12.2"></script>
-<script src="config-local.js?v=3.12.2"></script>
+<script src="supabase-config.js?v=3.13.0"></script>
+<script src="supabase-client.js?v=3.13.0"></script>
+<script src="auth.js?v=3.13.0"></script>
+<script src="recovery.js?v=3.13.0"></script>
+<script src="config-local.js?v=3.13.0"></script>
 <!-- el ?v= debe cambiar cada vez que se toque app.js (junto con CACHE_NAME en
      sw.js) — es la forma más universal de forzar que CUALQUIER navegador
      pida el archivo de nuevo aunque ya tenga guardada una copia vieja en su
      propio caché HTTP, sin depender de que respete el Service Worker. -->
-<script src="app.js?v=3.12.2"></script>
+<script src="app.js?v=3.13.0"></script>
 <!-- Pantalla «Usuarios y equipo»: habla con el api-server, no con IndexedDB.
      Va después de app.js porque solo se invoca al abrir esa vista. -->
-<script src="usuarios.js?v=3.12.2"></script>
+<script src="usuarios.js?v=3.13.0"></script>
 </body>
 </html>

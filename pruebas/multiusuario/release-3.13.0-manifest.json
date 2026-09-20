@@ -1,0 +1,833 @@
+{
+  "format": "entimotors-release-freeze/1",
+  "version": "3.13.0",
+  "base_commit": "544d1bea177f1c5eb1175f4ffcf390f932c9d19d",
+  "branch": "release/multiuser-3.13.0",
+  "scope": "identidad-acceso-roles",
+  "scope_description": "Identidad, acceso y roles multiusuario. NO incluye trabajo compartido ni sincronizacion multidispositivo.",
+  "status": "release-candidate",
+  "published": false,
+  "pending": [],
+  "version_matrix": {
+    "VERSION_APP": "3.13.0",
+    "CACHE_NAME_taller": "entimotors-v3.13.0",
+    "CACHE_NAME_mi_trabajo": "entimotors-mitrabajo-v3.13.0",
+    "index_query_versions": {
+      "build-target.js": "3.13.0",
+      "supabase-config.js": "3.13.0",
+      "supabase-client.js": "3.13.0",
+      "auth.js": "3.13.0",
+      "recovery.js": "3.13.0",
+      "config-local.js": "3.13.0",
+      "app.js": "3.13.0",
+      "usuarios.js": "3.13.0"
+    },
+    "panel_visual": "3.13.0"
+  },
+  "runtime_files": [
+    {
+      "path": "taller-demo/app.js",
+      "sha256": "67349b918c1ee0f8070532819876b6bc35efb2096d980fadafd1cdc2c073b121",
+      "bytes": 360425,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/auth.js",
+      "sha256": "a7c6914beb933fb4340cf6592db41a5e5691265de3b617ef8d06bc5a17f5ffe7",
+      "bytes": 13643,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/build-mecanicos/_headers",
+      "sha256": "ae57bedbe84d365de9aa67f0f23d24806f5132b21a2c87a45b77c7d6dcb3bb73",
+      "bytes": 798,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/build-mecanicos/build-target.js",
+      "sha256": "ee3640821f2483b19fda1315c6b0012dd954a397ffdb092d40f5f62712c4bd1f",
+      "bytes": 208,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/build-mecanicos/manifest.json",
+      "sha256": "c26ed7840ee0250d7f6552ce8369d831dd82ba995fcc47274a3b5772c8f1deeb",
+      "bytes": 715,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/build-target.js",
+      "sha256": "b943b38532811fa50be5c7c4f7754cf194bc8af638be9d8189628b6e2714cdce",
+      "bytes": 1581,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/config-local.example.js",
+      "sha256": "8d4d1f6e616bb40adaf12d4931486000816affb359c6289b1561bc683bb496b2",
+      "bytes": 1002,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/hacer-build-mecanicos.sh",
+      "sha256": "794232b693bf0fbb144fc6f2e6f7768e39e10d4397cca55d13cbb94582da7eeb",
+      "bytes": 4311,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/icon-192-maskable.png",
+      "sha256": "80b3d171e3325a207705b9c25993b0a0004d24ce6556e4f2051b9f210ccd7dee",
+      "bytes": 15141,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/icon-192.png",
+      "sha256": "a0ba3b2bb2da6e77be89d9a8327585766b3a7d0fc617e6a09cff2646e2712803",
+      "bytes": 20035,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/icon-512-maskable.png",
+      "sha256": "19da11c8bf669d79bbad194d8b0c5b147af8a360904b77fb77745198aaffcde7",
+      "bytes": 69811,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/icon-512.png",
+      "sha256": "028475e77655b240c4457f94e386b93029b120d153bcd2a4c3ccafa538204175",
+      "bytes": 94548,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark-doc.png",
+      "sha256": "f3d57e4c3f4b5f3dbd3d9eabd8f9af0dea634f326c226e457459e4caf72a38fe",
+      "bytes": 162214,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark.png",
+      "sha256": "4aa40f666fe981c280729b08b575d885ba1850861b01f5186752dcaaa3bc1733",
+      "bytes": 311256,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/index.html",
+      "sha256": "3024a4d8548e9ee59da6ad69964cf0080d23dd5d49aab384f3380b26dfd26f77",
+      "bytes": 253338,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/manifest.json",
+      "sha256": "0389761bd3de44a6c2fa3ca93623cd88b7348a397c691fe0334cbe2139c0ae75",
+      "bytes": 709,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/panel-tecnico.html",
+      "sha256": "eb5d7bad5cd9c578cad50ae363202d4e6dc0dbd97c18ede8efda4b80295c9aa8",
+      "bytes": 11497,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/recovery.js",
+      "sha256": "ea74ae97d4c282bebc9e0e3372c3c4d233db6ef06f12df43a2b7cb145218beef",
+      "bytes": 13716,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/supabase-client.js",
+      "sha256": "c028a34290c00c13af4a417a8fe93b42a9bc58af5055cbcfda6b5c5903f12114",
+      "bytes": 12393,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/supabase-config.js",
+      "sha256": "9db2483e5a754f2b32989c826008fd3ab94bc534205c2ad27f1819d570e32ad0",
+      "bytes": 1465,
+      "change": "unchanged"
+    },
+    {
+      "path": "taller-demo/sw.js",
+      "sha256": "a1ad574a1a197c6af87af0fcfe5d2928dc118137457f15779098fcb39e6e61d3",
+      "bytes": 5275,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/usuarios.js",
+      "sha256": "c60286306ffe492452ce458be45086902a74523c7619789119069ec348ff5553",
+      "bytes": 22174,
+      "change": "modified"
+    }
+  ],
+  "documentation_files": [
+    {
+      "path": "taller-demo/CHANGELOG.md",
+      "sha256": "4ee3668cd551b52f3cae837be92ad02c704bd0e6fed7b715c4947a6689cd7ae1",
+      "bytes": 14163,
+      "change": "modified"
+    },
+    {
+      "path": "taller-demo/README.md",
+      "sha256": "3e73cd4e3623cfdfefc4864977909e25a4bcd3aa656912487d4fe289687b290a",
+      "bytes": 15484,
+      "change": "modified"
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.13.0.test.mjs",
+      "sha256": "5c1c92d9ed08ff1a171c7be2424b79c3512d569830d504866b91c69f72a700b0",
+      "bytes": 7627
+    },
+    {
+      "path": "pruebas/multiusuario/02-build-target.test.mjs",
+      "sha256": "f2ce251db47a6696ea82b24b5595a99cf7ea54110334344b2c17c394308be942",
+      "bytes": 9439
+    },
+    {
+      "path": "pruebas/multiusuario/03-auth.test.mjs",
+      "sha256": "26be2f4e1ed4055c815d9b175252bdf18eeb1158aa536c392a172d52b9d9dbcb",
+      "bytes": 24559
+    },
+    {
+      "path": "pruebas/multiusuario/04-app-multiusuario.test.mjs",
+      "sha256": "591b8c50114f63c2fdf01be84c17d43ef0e14d18c17cebb498d0f987958fe9e1",
+      "bytes": 40171
+    },
+    {
+      "path": "pruebas/multiusuario/04b-app-mutantes.test.mjs",
+      "sha256": "4c0d52237a2d352805e37cd9989736f59bbc3564656c2c4c4601f0d60d7fc409",
+      "bytes": 18252
+    },
+    {
+      "path": "pruebas/multiusuario/04c-app-regresion-comun.test.mjs",
+      "sha256": "d335dd6a4c5bbf730fac465af8cc94c2479db8eb3ced5ff36c6d532649b0e4a6",
+      "bytes": 36153
+    },
+    {
+      "path": "pruebas/multiusuario/05-usuarios.test.mjs",
+      "sha256": "03155c988c909d27daf119a1e6fad96d048909250221c7575b6d72032148dc56",
+      "bytes": 54277
+    },
+    {
+      "path": "pruebas/multiusuario/06-recovery.test.mjs",
+      "sha256": "d455ee5a95a2608fff538cca4c003e6fe1d53dd94b9b2239b5d2dd4e57fadfc9",
+      "bytes": 32517
+    },
+    {
+      "path": "pruebas/multiusuario/07-panel-tecnico.test.mjs",
+      "sha256": "545eaaf0866737cc65598a29f54f2bc2ad6524fcb82cdc1149f46df34c012131",
+      "bytes": 16911
+    },
+    {
+      "path": "pruebas/multiusuario/08-build-mecanicos.test.mjs",
+      "sha256": "ae3c35dd2729e1ef9295ae25d7f957029c35f8baa980b8b202b8e37ba860d91f",
+      "bytes": 19999
+    },
+    {
+      "path": "pruebas/multiusuario/09-hallazgos.test.mjs",
+      "sha256": "d16f83905927e2ded7a4db4de735d846e73a75399afa279b5736aae6297591e3",
+      "bytes": 6807
+    },
+    {
+      "path": "pruebas/multiusuario/10-fsec1-mensajes-error.test.mjs",
+      "sha256": "d3150a8b823d31673595fc39b7e6aaf7948984b896e4d80ab6a1557798ffbaa0",
+      "bytes": 14790
+    },
+    {
+      "path": "pruebas/multiusuario/11-fsec2-rol-en-ajustes.test.mjs",
+      "sha256": "86b705e2e556c1e10c9370b293b316d6a339479dc30a469027e89b0cedc06041",
+      "bytes": 12992
+    },
+    {
+      "path": "pruebas/multiusuario/12-ffunc1-establecer-clave.test.mjs",
+      "sha256": "6d8c5e2cdbba1b7a5e0cb30d8287da4b302f9f83ac1098cc45836677947cb279",
+      "bytes": 18472
+    },
+    {
+      "path": "pruebas/multiusuario/13-obs3-eliminar-cita.test.mjs",
+      "sha256": "4461f964969e67e2d16a839a597350195b7b4fd76b3df9cb6e267087c80b3a16",
+      "bytes": 8275
+    },
+    {
+      "path": "pruebas/multiusuario/14-obs4-obs5-respuestas.test.mjs",
+      "sha256": "cd16db88f9a4d0445b633a6ec44f1aa5e2c7f0a7ca5a356040d048c5b7545468",
+      "bytes": 18121
+    },
+    {
+      "path": "pruebas/multiusuario/15-rol-desconocido-portero.test.mjs",
+      "sha256": "7dea481858abe8e40b1d17b059a2bc20c66bf8becd336600669d654395fb02c0",
+      "bytes": 10556
+    },
+    {
+      "path": "pruebas/multiusuario/16-alcance-honesto.test.mjs",
+      "sha256": "197689594b331fddfc5de62b6215955e3da586e9e579a6c6da8a7a79641f25f1",
+      "bytes": 13207
+    },
+    {
+      "path": "pruebas/multiusuario/17-copy-sin-sincronizacion.test.mjs",
+      "sha256": "ba3fa92dd545bfc87ae8a329df6be00f515e6ef8b46e2b4acdf5e7df886bf657",
+      "bytes": 13759
+    },
+    {
+      "path": "pruebas/multiusuario/18-obs7-chip-usuario.test.mjs",
+      "sha256": "e455e7c8a585455e70b795d43d49a08348dd0efc5e21454376ebb26b5cf84e5f",
+      "bytes": 9836
+    },
+    {
+      "path": "pruebas/multiusuario/19-obs8-nuevo-usuario-arriba.test.mjs",
+      "sha256": "657c3562c130546d1a05b84584ed9eefe2955b3f437385ef49bd7ce4859ac8c2",
+      "bytes": 10983
+    },
+    {
+      "path": "pruebas/multiusuario/20-obs10-buscar-actualizacion.test.mjs",
+      "sha256": "d5457bdf1eb786adf66ce0332273c2c9e22add30cb44939bba2e33b73f0f7a30",
+      "bytes": 28265
+    },
+    {
+      "path": "pruebas/multiusuario/21-backend-enlace-recuperacion.test.mjs",
+      "sha256": "bed9a6bdec74e7c193ada852216bb51fa727629ed5757dd54371e95f54346e4e",
+      "bytes": 35219
+    },
+    {
+      "path": "pruebas/multiusuario/22-obs9-recuperacion-mediada.test.mjs",
+      "sha256": "a2a4f4a6761dea60447f14e343daebd9007fb1cd80f6a1cd9d0fb3da8470f356",
+      "bytes": 13316
+    },
+    {
+      "path": "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "sha256": "86020824d8b158f5b43fa7a0acccba83ec2d3d3bcfa43701177f669cf3005e8d",
+      "bytes": 16993
+    },
+    {
+      "path": "pruebas/multiusuario/24-backend-dist-enlace.test.mjs",
+      "sha256": "0ba26bde3dc3e6e2c0398743f0c44e651808b0de4c7464d7794db6a74e68345f",
+      "bytes": 15988
+    },
+    {
+      "path": "pruebas/multiusuario/README.md",
+      "sha256": "d848a76f9cdeff53fa2a1e60af753ac4e842dc32f0e0a51cb61b82e6caf40d38",
+      "bytes": 22489
+    },
+    {
+      "path": "pruebas/multiusuario/browser/README.md",
+      "sha256": "02a34b3ee8cad008ec87452089f081b88d2fa8d44c6b8873e72204cdd8e22d9b",
+      "bytes": 8461
+    },
+    {
+      "path": "pruebas/multiusuario/browser/browser-runner.mjs",
+      "sha256": "e9dc7c737c603c9b20a846dd5237b9dc192e924de737ee766c81c725c4821763",
+      "bytes": 16933
+    },
+    {
+      "path": "pruebas/multiusuario/browser/collector.mjs",
+      "sha256": "b9d23b2bbaab1ef0ba99b05def878409cd69b21f81cc2b4a5da9208e030b246c",
+      "bytes": 1211
+    },
+    {
+      "path": "pruebas/multiusuario/browser/harness.html",
+      "sha256": "5c9d18058ae7dacdc09e38d6ab43fd0d311ad6a3c52cf80cb5929452008827b2",
+      "bytes": 388
+    },
+    {
+      "path": "pruebas/multiusuario/browser/harness.js",
+      "sha256": "69a6effc25c7e4c25446d236ee100d3a64cf1df6dcd717c82903547b652f5537",
+      "bytes": 2003
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/mock-navegador.js",
+      "sha256": "9a48376d5c1be969927ede4413772113e9f243c5c219a6cbd94c1fca428c4371",
+      "bytes": 615
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/pagina.js",
+      "sha256": "9c8a9c4c49a59ba182d7a73e8234411b6143500c037918580fc4b2615f5d2239",
+      "bytes": 8726
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/prelude.js",
+      "sha256": "c15c46dd870fc9085c47ca5cbb40d7f8cd0c0b4c795525e890ab84367ee72061",
+      "bytes": 5473
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-app.js",
+      "sha256": "bb7a63a575fd84a95b931f27cd4a2ecc69b9d599f2c2afe9f6661ede472f836e",
+      "bytes": 55771
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-c7fixa.js",
+      "sha256": "d1fa10d3a37ad2bd99d5d88b820d8168c8156c670bba0505b23a0a5e821e410b",
+      "bytes": 22660
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-c7fixb.js",
+      "sha256": "e1bbd0bbc07b6eb902b4075fe3b243698320d4b5fbc3c86ab84e65c512198e75",
+      "bytes": 21084
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-mutantes.js",
+      "sha256": "f45467dc7fd92a386f8b4100c755b3a0db8c2cb2d9708e40a7ab33290fb40210",
+      "bytes": 6107
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-pwa.js",
+      "sha256": "3048152b4eb2b856da8fc246642ed5f6c67ad9dad01eb811698cdc1bf990d12d",
+      "bytes": 10635
+    },
+    {
+      "path": "pruebas/multiusuario/browser/server.mjs",
+      "sha256": "0be22e81ca2c4864c7e45211df893753810ee41e9595ef71f4350bb1ea59788b",
+      "bytes": 9008
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/backend-admin-usuarios.mjs",
+      "sha256": "6a443cce43656b9d60d9a2f6eee0f037fca7002d20f93f276f999ac625247e1a",
+      "bytes": 12821
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/dom.mjs",
+      "sha256": "01626e3c3c4cd18be371f712671700f6c4cbd7396d99e75793caf387bf929226",
+      "bytes": 9518
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/entorno.mjs",
+      "sha256": "fc971749c0e67ec686be202f86b7babcec6561d69e2d64d8cff94dcd396370d9",
+      "bytes": 10657
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/flujos.mjs",
+      "sha256": "adc5ac563da536d16db4c455a5cd24b145a579703e6c76571592acb29945ec6e",
+      "bytes": 4024
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/idb-falsa.mjs",
+      "sha256": "a0eb1b087831747a10d73a8265e1be8355f16fe9c6c85eeca973ac5eddf1cd3f",
+      "bytes": 2660
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/pwa.mjs",
+      "sha256": "4bc3d603057374e5a1daf03fe809764d72d9dd9afc7bcab9ae16216c2842e235",
+      "bytes": 7027
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/supabase-mock.mjs",
+      "sha256": "c49d5a74df161b3442bbcf96d86b4f38e24c1b229b0d047f40c19bb5f67677c6",
+      "bytes": 12897
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/ts-a-js.mjs",
+      "sha256": "06b7a73747028bb7b551f2b189c86252144981d45f81f3472a420d8138c68738",
+      "bytes": 11688
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "sha256": "62de023778c9f131a210f2c2154565831c2039eb03ddda255f8b15e7fcc8af2b",
+      "bytes": 4342
+    }
+  ],
+  "freeze_document": {
+    "path": "pruebas/multiusuario/RELEASE-FREEZE-3.13.0.md",
+    "sha256": "a8c473adaaf8fec22c0c26b7f4bf13b519d53125819cccb439bbbb927a263689",
+    "bytes": 30135
+  },
+  "database_scripts_unchanged": [
+    {
+      "path": "taller-demo/supabase/entimotors-fase3a.sql",
+      "sha256": "d7623f92b608f08581f48cf4d4aa74a1b3bfada34e1edfc596eb9e0088cefcf7",
+      "bytes": 824
+    },
+    {
+      "path": "taller-demo/supabase/entimotors-fase4c-identidad.sql",
+      "sha256": "48073e350b60088cd9cec7110303fe6eec668803386ebb5a511dc4b7e5dc0622",
+      "bytes": 5743
+    },
+    {
+      "path": "taller-demo/supabase/entimotors-fase4d-rls.sql",
+      "sha256": "21551a1355787446ea0392d316a412763bb6c2adc4d11d4fa5431119673c3f60",
+      "bytes": 31494
+    },
+    {
+      "path": "taller-demo/supabase/entimotors-fase4d-rollback.sql",
+      "sha256": "e17a70a71db4e9c3acda9898ebab66ac97abc588cc5135d1345874adb41031b6",
+      "bytes": 11230
+    },
+    {
+      "path": "taller-demo/supabase/entimotors-rcv34-source-sync.sql",
+      "sha256": "6530b27cb7d339338a78a3300b4e62d6c73d23c33aa7e53b1d64ceeddb63ab73",
+      "bytes": 45302
+    },
+    {
+      "path": "taller-demo/supabase/entimotors-usuarios.sql",
+      "sha256": "af4c74064e16b6ba911c922f9c28ae05019c2770bb3edafc297e0e19f847db00",
+      "bytes": 17408
+    }
+  ],
+  "unchanged_since_base_commit": [
+    "pruebas/package.json",
+    "pruebas/rcv34/",
+    "pruebas/rcv35/",
+    "taller-demo/supabase/"
+  ],
+  "included_fixes": [
+    "F-SEC-1",
+    "F-SEC-2",
+    "F-FUNC-1",
+    "OBS-3",
+    "OBS-4",
+    "OBS-5",
+    "UNKNOWN_ROLE",
+    "MI_TRABAJO_SCOPE_COPY",
+    "USUARIOS_COPY",
+    "PANEL_VERSION_VISUAL",
+    "SYNC_COPY_CLEANUP",
+    "OBS-7",
+    "OBS-8",
+    "OBS-10",
+    "OBS-9"
+  ],
+  "test_summary": {
+    "node": {
+      "tests": 1051,
+      "suites": 135,
+      "pass": 1051,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "test_files": 26,
+      "de_ellas_backend": {
+        "endpoint_21": 56,
+        "manifest_23": 23,
+        "dist_24": 17,
+        "total": 96
+      }
+    },
+    "chrome": {
+      "version": "Google Chrome 153.0.8010.36",
+      "total": 137,
+      "pass": 137,
+      "fail": 0,
+      "suites": {
+        "app": "81/81",
+        "mt": "33/33",
+        "mut": "9/9",
+        "pwa-taller": "6/6",
+        "pwa-mt": "6/6",
+        "pwa-upg": "2/2"
+      },
+      "application_errors": 0,
+      "external_unexpected": 0,
+      "repeated_in": "4E-C9 (antes de regenerar dist/; runtime del frontend sin cambios)"
+    },
+    "firefox": {
+      "version": "Mozilla Firefox 155.0.1",
+      "total": 137,
+      "pass": 137,
+      "fail": 0,
+      "suites": {
+        "app": "81/81",
+        "mt": "33/33",
+        "mut": "9/9",
+        "pwa-taller": "6/6",
+        "pwa-mt": "6/6",
+        "pwa-upg": "2/2"
+      },
+      "application_errors": 0,
+      "external_unexpected": 0,
+      "repeated_in": "4E-C9 (antes de regenerar dist/; runtime del frontend sin cambios)"
+    },
+    "browser_common": {
+      "application_errors": 0,
+      "external_requests_from_page": 0,
+      "external_unexpected_sink": 0,
+      "runtime_integrity_compared": 32,
+      "runtime_integrity_mismatches": 0
+    },
+    "rcv34": {
+      "rev8": "77/77",
+      "coverage": "72/72",
+      "coverage_real": "PASS",
+      "source_sync_sha256": "6530b27cb7d339338a78a3300b4e62d6c73d23c33aa7e53b1d64ceeddb63ab73",
+      "source_sync_sha256_expected_match": true,
+      "source_sync_executed": false
+    },
+    "secret_scan": {
+      "status": "PASS",
+      "phase": "4E-C9",
+      "archivos_escaneados": 65,
+      "dist_archivos_comparados_con_head": 10,
+      "jwt": 0,
+      "sb_secret": 0,
+      "host_produccion": 0,
+      "action_link_real_persistido": 0,
+      "service_role_literal": "solo mencion en texto",
+      "coincidencias_nuevas_en_dist": 0,
+      "real_findings": 0,
+      "public_anon_key_unchanged": true,
+      "nota": "la unica ruta de usuario nueva es la de compilacion de dist/ (no es un secreto)"
+    },
+    "production_references": 0,
+    "ui_sync_copy": {
+      "invalid_ui_promise": 0,
+      "visible_mentions_remaining": 1,
+      "visible_mention_is": "mi_trabajo_honest_limitation_note",
+      "code_string_remaining": "unreachable_branch_has_server_true"
+    },
+    "pwa_real_4813": {
+      "phase": "4E-C7-FIX-A",
+      "chrome": "Google Chrome 153.0.8010.36",
+      "cases": 12,
+      "pass": 12,
+      "fail": 0,
+      "page_errors": 0,
+      "external_unexpected": 0,
+      "rerun_after_c7_fix_b": {
+        "cases": 12,
+        "pass": 12,
+        "fail": 0,
+        "page_errors": 0,
+        "external_unexpected": 0
+      }
+    },
+    "tests_detect_the_defect": {
+      "contra": "runtime y backend anteriores a C7-FIX-B (copia temporal)",
+      "node_fallos": 86,
+      "chrome_casos_obs9_fallan": "11/11",
+      "otros_casos_fallan": 0
+    },
+    "backend_build": {
+      "status": "PASS",
+      "command": "pnpm install --frozen-lockfile && pnpm run build (en api-server/)",
+      "tools": "esbuild 0.27.7; pnpm 10.34.3; Node 20.20.1",
+      "dist_policy": "VERSIONED",
+      "dist_files_modified": 6,
+      "dist_files_unchanged": 4,
+      "head_dist_reproducible_byte_for_byte": true,
+      "route_in_build": true,
+      "package_json_and_lockfile_changed": false,
+      "render_build_command": "NEEDS_MANUAL_CONFIRMATION"
+    }
+  },
+  "known_limitations": [
+    "no_assignment_to_mechanic_accounts",
+    "no_cross_device_sync",
+    "no_immediate_cross_tab_logout_ui"
+  ],
+  "known_observations": [
+    "unreachable_has_server_true_branch_still_names_sincronizado_in_code",
+    "desktop_topbar_at_or_below_1000px_with_account_name_over_about_30_chars_can_overflow",
+    "admin_account_recovery_only_via_supabase_dashboard_no_email_no_self_service",
+    "render_build_command_and_start_command_not_in_repository_needs_manual_confirmation_before_deploy"
+  ],
+  "not_executed": [
+    "source_sync",
+    "deploy",
+    "publish",
+    "production_changes",
+    "remote_supabase",
+    "sql",
+    "render"
+  ],
+  "resolved_observations": [
+    "legacy_simulated_sync_copy_in_connection_chip_and_offline_toggle",
+    "obs_7_user_chip_tight_and_long_name_breaks_topbar",
+    "obs_8_new_user_form_below_the_fold",
+    "obs_10_search_update_button_destructive_offline_and_skips_backup",
+    "obs_9_no_visible_password_recovery_path_admin_mediated_plan_b",
+    "api_server_dist_versioned_not_regenerated_deploy_must_run_pnpm_build"
+  ],
+  "sync_copy_cleanup": {
+    "phase": "4E-C5.1",
+    "classification": "PRODUCT_SCOPE_COPY_ONLY",
+    "runtime_files_changed": [
+      "taller-demo/app.js",
+      "taller-demo/index.html"
+    ],
+    "strings": [
+      {
+        "from": "En línea · sincronizado",
+        "to": "En línea · datos locales",
+        "file": "taller-demo/index.html"
+      },
+      {
+        "from": "Conexión restaurada — sincronizando cambios pendientes",
+        "to": "Conexión restaurada — procesando cambios locales…",
+        "file": "taller-demo/app.js"
+      },
+      {
+        "from": "Todo sincronizado",
+        "to": "Cambios guardados localmente",
+        "file": "taller-demo/app.js"
+      }
+    ],
+    "logic_changed": false,
+    "version_bumped": false
+  },
+  "freeze_history": [
+    {
+      "phase": "4E-C5",
+      "status": "superseded",
+      "manifest_sha256": "da0c2f608961563d6cab8498f46bd62a4986d7fbd2284b978e56e1a88b738edc",
+      "freeze_document_sha256": "de203098a6b51cbbcc208e3e1bfb154e74a597ccc9a1caa35f483763393739c3"
+    },
+    {
+      "phase": "4E-C5.1",
+      "status": "superseded",
+      "manifest_sha256": "bc33301cd1400f15fa028ce3154b1e8e4c0adc2774de42d9671e88efbd1f5ae6",
+      "freeze_document_sha256": "1f862827e09a6263369fabb9e653be03b514e0def9788cc46dcab1d9bc560749"
+    },
+    {
+      "phase": "4E-C7-FIX-A",
+      "status": "superseded",
+      "manifest_sha256": "85e60ef1195fe7d46e9267a339258d1e6cd429a7f525ab02b27296c418bc2650",
+      "freeze_document_sha256": "b38f8609bc01f28bc93d368b8c8b6697bd2fcfeb36b3671af23563b36cdb106c"
+    },
+    {
+      "phase": "4E-C7-FIX-B",
+      "status": "superseded",
+      "manifest_sha256": "95dede130dcd5a9c8107f7c867000e12431a8878200dd7f6e05e488d64973c13",
+      "freeze_document_sha256": "b21c05bada7cc5f9d27613734ed87120e26f25b8db797fa62233a3ece6a5fdc6",
+      "backend_manifest_sha256": "7974cc1fa31ffe6a45ed720457aab3b1aa7ece21efd205d03cf2372b3f68013b"
+    },
+    {
+      "phase": "4E-C9",
+      "status": "current",
+      "note": "cierre del QA visual manual, build oficial del backend y dist/ regenerado; este archivo y el manifest del backend son los vigentes"
+    }
+  ],
+  "backlog": [
+    "obs_6_falla_reportada_read_only_ux_improvement"
+  ],
+  "qa_visual": {
+    "phase": "4E-C9",
+    "result": "PASS",
+    "critical_blockers": 0,
+    "manual_visual_recheck_final": "PASS",
+    "findings": {
+      "OBS-6": "BACKLOG_UX_IMPROVEMENT",
+      "OBS-7": "CLOSED_MANUAL_PASS",
+      "OBS-8": "CLOSED_MANUAL_PASS",
+      "OBS-9": "CLOSED_MANUAL_PASS",
+      "OBS-10": "CLOSED_MANUAL_PASS"
+    },
+    "note": "Revision visual humana final (C8) confirmada por la persona que la hizo; el repositorio la registra pero no puede verificarla. Sin hallazgos visuales bloqueantes. No implica publicacion.",
+    "history": {
+      "phase": "4E-C6",
+      "result": "PASS_WITH_FINDINGS",
+      "note": "OBS-7/8/9/10 cerrados por correccion automatica en C7-FIX-A y C7-FIX-B; revision humana final en C8."
+    }
+  },
+  "c7_fix_a": {
+    "phase": "4E-C7-FIX-A",
+    "version_unchanged": "3.13.0",
+    "runtime_files_changed": {
+      "taller-demo/index.html": "OBS-7 (CSS only) + one OBS-10 copy line (explicitly authorized by the user)",
+      "taller-demo/usuarios.js": "OBS-8 only",
+      "taller-demo/app.js": "OBS-10 only"
+    },
+    "runtime_files_unchanged_since_4E-C5.1": [
+      "taller-demo/sw.js",
+      "taller-demo/auth.js",
+      "taller-demo/recovery.js",
+      "taller-demo/supabase-client.js",
+      "taller-demo/panel-tecnico.html",
+      "taller-demo/build-target.js",
+      "taller-demo/build-mecanicos/manifest.json"
+    ],
+    "new_test_files": [
+      "pruebas/multiusuario/18-obs7-chip-usuario.test.mjs",
+      "pruebas/multiusuario/19-obs8-nuevo-usuario-arriba.test.mjs",
+      "pruebas/multiusuario/20-obs10-buscar-actualizacion.test.mjs",
+      "pruebas/multiusuario/browser/helpers/suite-c7fixa.js"
+    ],
+    "obs_10_new_handler": {
+      "unregister": false,
+      "caches_delete": false,
+      "reload": false,
+      "activar_ya": false,
+      "update_via": "registration.update()",
+      "install_wait_ms": 20000,
+      "only_path_that_sends_activar_ya": "btnCopiaYActualizar"
+    },
+    "obs_10_pwa_real_4813": {
+      "cases": "12/12 PASS",
+      "offline_after_button": "app still opens offline from cache",
+      "phase_4813_restored": "post"
+    }
+  },
+  "backend_manifest": {
+    "path": "pruebas/multiusuario/release-3.13.0-backend-manifest.json",
+    "sha256": "e9d05b97170cdcf6aaa03e90d607b08757ee15d63c7d256ca1a61b4b42f2b774",
+    "bytes": 17675
+  },
+  "c7_fix_b": {
+    "phase": "4E-C7-FIX-B",
+    "version_unchanged": "3.13.0",
+    "decision_de_producto": "PLAN_B_RECUPERACION_MEDIADA_POR_ADMINISTRADOR (sin correo, sin SMTP, sin endpoint publico, sin autoservicio)",
+    "endpoint": "POST /api/admin/usuarios/:id/enlace",
+    "runtime_files_changed": {
+      "api-server/src/routes/admin-usuarios.ts": "OBS-9 backend (fuera de este manifest: ver backend_manifest)",
+      "taller-demo/usuarios.js": "OBS-9 UI",
+      "taller-demo/index.html": "OBS-9 login copy + texto neutro de recovery",
+      "taller-demo/recovery.js": "OBS-9 copy (recovery vs invite)"
+    },
+    "documentation_changed": [
+      "taller-demo/README.md",
+      "taller-demo/CHANGELOG.md"
+    ],
+    "runtime_files_unchanged_since_c7_fix_a": [
+      "taller-demo/app.js",
+      "taller-demo/sw.js",
+      "taller-demo/auth.js",
+      "taller-demo/supabase-client.js",
+      "taller-demo/panel-tecnico.html",
+      "taller-demo/build-target.js",
+      "taller-demo/build-mecanicos/manifest.json"
+    ],
+    "new_test_files": [
+      "pruebas/multiusuario/21-backend-enlace-recuperacion.test.mjs",
+      "pruebas/multiusuario/22-obs9-recuperacion-mediada.test.mjs",
+      "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "pruebas/multiusuario/helpers/ts-a-js.mjs",
+      "pruebas/multiusuario/helpers/backend-admin-usuarios.mjs",
+      "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "pruebas/multiusuario/browser/helpers/suite-c7fixb.js"
+    ],
+    "admin_account": "no se recupera desde la aplicacion; procedimiento manual desde el panel de Supabase documentado en el README",
+    "frontend_link_lifetime": "el enlace solo vive en el campo de la caja de resultado; no se guarda en localStorage/sessionStorage/IndexedDB/bitacora/consola; se retira al reemplazar, cerrar, salir de la vista y cerrar sesion",
+    "backend_manifest": "pruebas/multiusuario/release-3.13.0-backend-manifest.json"
+  },
+  "release_status": "READY_FOR_COMMIT",
+  "pending_before_deploy": [
+    "render_build_command_manual_confirmation"
+  ],
+  "c9": {
+    "phase": "4E-C9",
+    "version_unchanged": "3.13.0",
+    "release_status": "READY_FOR_COMMIT",
+    "runtime_files_changed": [],
+    "api_server_src_changed": false,
+    "dist": {
+      "policy": "VERSIONED",
+      "classification": "GENERATED_BUILD_ARTIFACT",
+      "regenerated": true,
+      "files_modified": 6,
+      "files_unchanged": 4,
+      "route_in_build": "POST /api/admin/usuarios/:id/enlace",
+      "covered_by": "backend_manifest.generated_build_artifacts"
+    },
+    "render": {
+      "config_in_repository": false,
+      "status": "RENDER_BUILD_COMMAND_NEEDS_MANUAL_CONFIRMATION",
+      "blocks": "deploy (not the commit)"
+    },
+    "new_test_files": [
+      "pruebas/multiusuario/24-backend-dist-enlace.test.mjs"
+    ],
+    "test_files_changed": [
+      "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "pruebas/multiusuario/README.md"
+    ],
+    "backend_manifest": "pruebas/multiusuario/release-3.13.0-backend-manifest.json"
+  }
+}
