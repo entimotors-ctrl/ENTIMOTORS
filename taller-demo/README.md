@@ -114,10 +114,15 @@ cuenta con `activo=false` no entra.
 La pantalla «Usuarios y equipo» habla con el **api-server** (`/api/admin/usuarios`: listar, crear,
 modificar y generar un enlace de recuperación), no con IndexedDB. Para que funcione hace falta:
 
-1. **`apiUrl`** en `supabase-config.js`: la dirección del api-server (por ejemplo
-   `https://<tu-servicio>.onrender.com`). En el repositorio viene **vacío a propósito**; no pongas
-   ahí ningún secreto. Mientras esté vacío, la pantalla avisa «Falta indicar la dirección del
-   servidor» y el resto de la aplicación sigue igual.
+1. **`apiUrl`** en `supabase-config.js`: la dirección del api-server, **solo el origen** (sin barra
+   final ni ruta; por ejemplo `https://<tu-servicio>.onrender.com`: la aplicación añade
+   `/api/admin/usuarios`). **Viene ya rellenada con el backend de producción**: es una URL pública,
+   no un secreto, y solo hay que cambiarla si el backend se muda; no pongas ahí ningún secreto. Si
+   alguien la deja vacía, la pantalla avisa «Falta indicar la dirección del servidor» y el resto de
+   la aplicación sigue igual. **Antes de publicar el Taller** se comprueba el archivo que se sube (o
+   el ya publicado) con `node pruebas/multiusuario/verificar-config-produccion.mjs [ruta-o-URL]`, y
+   la prueba `25-config-produccion-apiurl` lo vigila en el repositorio: la versión 3.13.0 se publicó
+   una vez con `apiUrl` vacío y esa pantalla mostró justo ese aviso.
 2. En el **api-server**, las variables de entorno `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` y
    `SUPABASE_ANON_KEY`, más **`ENTIMOTORS_ADMIN_ORIGIN`** y **`ENTIMOTORS_MECHANIC_ORIGIN`**: el
    origen de cada producto. El servidor decide con ellas adónde vuelve el enlace de alta según el
@@ -182,7 +187,8 @@ Estas limitaciones **no son bugs corregidos**: son lo que 3.13.0 no hace.
   la aplicación solo usa Supabase para cuentas (`perfiles` y las funciones de rol).
 - **Cerrar sesión en otra pestaña no es inmediato.** La sesión abierta en otra pestaña no se invalida
   visualmente hasta que se recarga; el servidor sí vuelve a comprobar cada acción de administración.
-- **La administración de usuarios requiere configurar `apiUrl`** (arriba).
+- **La administración de usuarios requiere configurar `apiUrl`** (arriba; ya viene con el backend
+  de producción y se comprueba antes de publicar).
 - **No hay recuperación por correo ni autoservicio.** La recuperación de una persona la genera el
   administrador («Generar enlace»).
 - **La cuenta administradora se recupera desde el panel de Supabase**, no desde la aplicación.

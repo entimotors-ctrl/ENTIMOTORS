@@ -141,9 +141,9 @@
     },
     {
       "path": "taller-demo/supabase-config.js",
-      "sha256": "9db2483e5a754f2b32989c826008fd3ab94bc534205c2ad27f1819d570e32ad0",
-      "bytes": 1465,
-      "change": "unchanged"
+      "sha256": "d325f87a17be2f155be42c7b20c2e817213c8210150192f31e5e41b14f052437",
+      "bytes": 1694,
+      "change": "modified"
     },
     {
       "path": "taller-demo/sw.js",
@@ -161,14 +161,14 @@
   "documentation_files": [
     {
       "path": "taller-demo/CHANGELOG.md",
-      "sha256": "4ee3668cd551b52f3cae837be92ad02c704bd0e6fed7b715c4947a6689cd7ae1",
-      "bytes": 14163,
+      "sha256": "f313b1180c0e9637a19d9bd8e4a0f5eec215d82263f558d26430d31fa043238d",
+      "bytes": 14766,
       "change": "modified"
     },
     {
       "path": "taller-demo/README.md",
-      "sha256": "3e73cd4e3623cfdfefc4864977909e25a4bcd3aa656912487d4fe289687b290a",
-      "bytes": 15484,
+      "sha256": "00f9fd5ce7d1072ebb5f6b6166b2fedb2d090a185e2e160285649a1c1b448169",
+      "bytes": 16093,
       "change": "modified"
     }
   ],
@@ -260,8 +260,8 @@
     },
     {
       "path": "pruebas/multiusuario/16-alcance-honesto.test.mjs",
-      "sha256": "197689594b331fddfc5de62b6215955e3da586e9e579a6c6da8a7a79641f25f1",
-      "bytes": 13207
+      "sha256": "981cb263388c8808d211c73b065ed362669023213db1bd843d47c8b211661cf8",
+      "bytes": 13742
     },
     {
       "path": "pruebas/multiusuario/17-copy-sin-sincronizacion.test.mjs",
@@ -304,9 +304,14 @@
       "bytes": 15988
     },
     {
+      "path": "pruebas/multiusuario/25-config-produccion-apiurl.test.mjs",
+      "sha256": "c401bb20737293697de380b62e8feec322f93b4c406a09dca01d1ae2599baa58",
+      "bytes": 10903
+    },
+    {
       "path": "pruebas/multiusuario/README.md",
-      "sha256": "d848a76f9cdeff53fa2a1e60af753ac4e842dc32f0e0a51cb61b82e6caf40d38",
-      "bytes": 22489
+      "sha256": "254f00bdd2a51753895a6c39911053aa42762708429d6fdd4f70d5290e72e28c",
+      "bytes": 23975
     },
     {
       "path": "pruebas/multiusuario/browser/README.md",
@@ -422,12 +427,17 @@
       "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
       "sha256": "62de023778c9f131a210f2c2154565831c2039eb03ddda255f8b15e7fcc8af2b",
       "bytes": 4342
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-config-produccion.mjs",
+      "sha256": "b7ce5742cd178906948a5651ab042fa24df3bc1144875131cc086a3e49e261b0",
+      "bytes": 5494
     }
   ],
   "freeze_document": {
     "path": "pruebas/multiusuario/RELEASE-FREEZE-3.13.0.md",
-    "sha256": "a8c473adaaf8fec22c0c26b7f4bf13b519d53125819cccb439bbbb927a263689",
-    "bytes": 30135
+    "sha256": "5ad6161ec4f1cc4573fd71bfcef7670c0bbf775ca1ad2d5dd1ffafb159d52709",
+    "bytes": 37191
   },
   "database_scripts_unchanged": [
     {
@@ -486,20 +496,21 @@
   ],
   "test_summary": {
     "node": {
-      "tests": 1051,
-      "suites": 135,
-      "pass": 1051,
+      "tests": 1081,
+      "suites": 140,
+      "pass": 1081,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0,
       "todo": 0,
-      "test_files": 26,
+      "test_files": 27,
       "de_ellas_backend": {
         "endpoint_21": 56,
         "manifest_23": 23,
         "dist_24": 17,
         "total": 96
-      }
+      },
+      "de_ellas_config_produccion_25": 30
     },
     "chrome": {
       "version": "Google Chrome 153.0.8010.36",
@@ -516,7 +527,7 @@
       },
       "application_errors": 0,
       "external_unexpected": 0,
-      "repeated_in": "4E-C9 (antes de regenerar dist/; runtime del frontend sin cambios)"
+      "repeated_in": "4E-C11 (arbol del hotfix; el runtime del frontend no cambio, solo supabase-config.js, que el servidor de navegador sustituye por una config sintetica)"
     },
     "firefox": {
       "version": "Mozilla Firefox 155.0.1",
@@ -533,7 +544,7 @@
       },
       "application_errors": 0,
       "external_unexpected": 0,
-      "repeated_in": "4E-C9 (antes de regenerar dist/; runtime del frontend sin cambios)"
+      "repeated_in": "4E-C11 (arbol del hotfix; el runtime del frontend no cambio, solo supabase-config.js, que el servidor de navegador sustituye por una config sintetica)"
     },
     "browser_common": {
       "application_errors": 0,
@@ -690,8 +701,15 @@
     },
     {
       "phase": "4E-C9",
+      "status": "superseded",
+      "note": "cierre del QA visual manual, build oficial del backend y dist/ regenerado; publicado como 8eea52c (backend en Render, Taller en entimotors-os 0a215a1, Mi Trabajo en Netlify) con apiUrl vacio: ver 4E-C11",
+      "manifest_sha256": "b8162b886109977a238a0dc7d666d03a97a19c9c3a8738334567cbf224ac2621",
+      "freeze_document_sha256": "a8c473adaaf8fec22c0c26b7f4bf13b519d53125819cccb439bbbb927a263689"
+    },
+    {
+      "phase": "4E-C11",
       "status": "current",
-      "note": "cierre del QA visual manual, build oficial del backend y dist/ regenerado; este archivo y el manifest del backend son los vigentes"
+      "note": "HOTFIX PRE-TAG: apiUrl del Taller (DEPLOYMENT_CONFIGURATION_GAP); este archivo y el manifest del backend (sin cambios) son los vigentes"
     }
   ],
   "backlog": [
@@ -829,5 +847,62 @@
       "pruebas/multiusuario/README.md"
     ],
     "backend_manifest": "pruebas/multiusuario/release-3.13.0-backend-manifest.json"
+  },
+  "hotfix_4e_c11": {
+    "phase": "4E-C11",
+    "kind": "HOTFIX_PRE_TAG",
+    "classification": "DEPLOYMENT_CONFIGURATION_GAP",
+    "version_unchanged": "3.13.0",
+    "tag_created": false,
+    "stable_declared": false,
+    "base_commit": "8eea52c30e25a1678c63b70d012a8af212255460",
+    "symptom": "«Usuarios y equipo» del Taller publicado mostraba «Falta indicar la dirección del servidor. Se configura en supabase-config.js, campo apiUrl»",
+    "cause": "taller-demo/supabase-config.js llevaba apiUrl vacio a proposito (la prueba 16 lo exigia) y el paso de despliegue «apiUrl apuntando al api-server» no se ejecuto al publicar",
+    "identical_in": {
+      "sha256_prefix": "9db2483e",
+      "files": [
+        "3.12.3 (entimotors-os f7f7eec)",
+        "source 8eea52c",
+        "entimotors-os 0a215a1",
+        "URL publica del Taller",
+        "Mi Trabajo publicado"
+      ]
+    },
+    "demo_local_title_related": false,
+    "runtime_files_changed": [
+      "taller-demo/supabase-config.js"
+    ],
+    "api_url": "https://entimotors-1.onrender.com",
+    "api_url_shape": "solo origen, https, sin barra final ni ruta",
+    "api_server_changed": false,
+    "supabase_changed": false,
+    "sw_changed": false,
+    "index_html_changed": false,
+    "new_test_files": [
+      "pruebas/multiusuario/25-config-produccion-apiurl.test.mjs"
+    ],
+    "new_tools": [
+      "pruebas/multiusuario/verificar-config-produccion.mjs"
+    ],
+    "test_files_modified": [
+      "pruebas/multiusuario/16-alcance-honesto.test.mjs"
+    ],
+    "bug_detected_before_deploy": {
+      "against_commit": "8eea52c30e25a1678c63b70d012a8af212255460",
+      "failing_cases_in_25_and_16": 7,
+      "cli_exit_code": 1,
+      "cli_problem": "APIURL_AUSENTE"
+    },
+    "mi_trabajo": {
+      "republished": false,
+      "reason": "un mecanico no abre «Usuarios y equipo»; el bundle publicado conserva apiUrl vacio sin efecto; las reconstrucciones futuras lo llevan relleno (prueba 25)"
+    },
+    "qa_local_gap": [
+      "apiUrl sintetico en las suites Node",
+      "browser/server.mjs sustituye supabase-config.js por una config sintetica",
+      "la prueba 16 exigia apiUrl vacio",
+      "QA visual local con config propia (registro del proyecto; no reinspeccionable)"
+    ],
+    "freeze_doc_placeholder_fixed": "@@SHA_BACKEND@@ -> valor real (sin cambio)"
   }
 }

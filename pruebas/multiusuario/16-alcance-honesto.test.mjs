@@ -58,8 +58,13 @@ describe("«Usuarios y equipo» · el texto ya no sobreafirma: cuentas (servidor
     assert.match(p, /cuentas/); assert.match(p, /servidor/); assert.match(p, /datos de este dispositivo/); assert.match(p, /aplicación/);
     assert.ok(p.length < 160, "texto corto para la UI");
   });
-  test("apiUrl NO se relleno: el supabase-config.js versionado sigue con apiUrl vacio, sin URL de produccion y sin secretos", () => {
-    const cfg = leer("supabase-config.js"); assert.match(cfg, /apiUrl:\s*""/); assert.ok(!/onrender\.com|service_role/i.test(cfg.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "")));
+  // HOTFIX PRE-TAG (4E-C11): esta prueba fijaba lo CONTRARIO (apiUrl vacio, sin URL de produccion) y por eso el Taller se publico
+  // con «Falta indicar la dirección del servidor». Ahora apiUrl es la URL PUBLICA del backend de produccion; el detalle (HTTPS, sin ruta,
+  // host esperado, la pantalla real sin el aviso) vive en 25-config-produccion-apiurl.test.mjs. Aqui solo se conserva «sin secretos».
+  test("apiUrl viene rellenado con el backend de produccion (URL publica) y el archivo sigue sin secretos", () => {
+    const cfg = leer("supabase-config.js");
+    const codigo = cfg.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").filter((l) => !/^\s*\/\//.test(l)).join("\n"); // sin comentarios; NO se recorta «//» de https://
+    assert.match(codigo, /apiUrl:\s*"https:\/\/entimotors-1\.onrender\.com"/); assert.ok(!/service_role/i.test(codigo));
   });
   test("con apiUrl vacio la pantalla conserva su aviso actual", () => assert.match(leer("usuarios.js"), /Falta indicar la dirección del servidor/));
 });

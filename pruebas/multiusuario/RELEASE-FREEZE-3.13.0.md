@@ -1,5 +1,7 @@
 # RELEASE FREEZE · ENTIMOTORS OS 3.13.0 (release candidate)
 
+> **HOTFIX PRE-TAG 4E-C11 (`apiUrl`).** El Taller publicado con los bytes de `8eea52c…` mostró «Falta indicar la dirección del servidor» en «Usuarios y equipo» porque `supabase-config.js` llevaba `apiUrl: ""`. La corrección, su causa y por qué el QA no la vio están en «Recongelado 4E-C9 → 4E-C11» más abajo. **No hay etiqueta `v3.13.0`; 3.13.0 no se declara estable hasta el QA manual de producción sobre el commit del hotfix.**
+
 **Estado:** CONGELADO TÉCNICAMENTE · **QA AUTOMÁTICO: PASS** · **QA VISUAL FINAL: PASS** (`MANUAL_VISUAL_RECHECK_FINAL`: PASS; OBS-7, OBS-8, OBS-9 y OBS-10 **CLOSED + MANUAL PASS**; OBS-6 **BACKLOG**; 0 hallazgos visuales bloqueantes) · **BACKEND BUILD: PASS** · **DIST POLICY: VERSIONED** · **RENDER BUILD COMMAND: NEEDS MANUAL CONFIRMATION** (hace falta antes del deploy, no del commit) · **RELEASE STATUS: `READY_FOR_COMMIT`** · **NO PUBLICADO** · sin commit.
 Fecha del freeze: 19 de septiembre de 2026 (fase 4E-C5); **recongelado en la fase 4E-C5.1** (limpieza de los tres textos heredados de sincronización) **otra vez en la fase 4E-C7-FIX-A** (19 de septiembre de 2026: correcciones post-QA OBS-7, OBS-8 y OBS-10) **en la fase 4E-C7-FIX-B** (OBS-9: recuperación de contraseña mediada por el administrador, que toca también el backend) y **en la fase 4E-C9** (cierre del QA visual manual, build oficial del backend y regeneración de `api-server/dist/`; sin cambios en el runtime del frontend ni en `api-server/src/`). Este documento y los **dos** manifests son los definitivos: el del frontend y, aparte, el del backend.
 
@@ -179,13 +181,56 @@ Con el `dist/` regenerado el despliegue es correcto **en los dos casos**: si Ren
 
 Sin cambios: `pino-pretty.mjs`, `thread-stream-worker.mjs` y sus mapas. Además cambiaron solo archivos de pruebas y documentación: `24-backend-dist-enlace.test.mjs` (nuevo), `23-backend-manifest.test.mjs`, `verificar-backend-manifest.mjs` (grupo `generated_build_artifacts`), el `README.md` de pruebas, los dos manifests y este documento.
 
-El manifest del frontend de 4E-C7-FIX-B (`95dede13…3c13`), el del backend (`7974cc1f…013b`) y su freeze doc (`b21c05ba…fdc6`) quedan **obsoletos**; los vigentes son los que comprueban los comandos de abajo. El manifest del backend tiene SHA-256 `@@SHA_BACKEND@@` y el del frontend lo referencia (`backend_manifest`).
+El manifest del frontend de 4E-C7-FIX-B (`95dede13…3c13`), el del backend (`7974cc1f…013b`) y su freeze doc (`b21c05ba…fdc6`) quedan **obsoletos**; los vigentes son los que comprueban los comandos de abajo. El manifest del backend tiene SHA-256 `e9d05b97170cdcf6aaa03e90d607b08757ee15d63c7d256ca1a61b4b42f2b774` y el del frontend lo referencia (`backend_manifest`). *(4E-C11: aquí quedó sin sustituir el marcador `@@SHA_BACKEND@@`; se pone el valor real, que no cambió.)*
 
 ### Requisitos de despliegue del backend (no ejecutados)
 
 - **Render — `RENDER_BUILD_COMMAND_NEEDS_MANUAL_CONFIRMATION`.** No hay `render.yaml`, `Dockerfile`, `Procfile`, `.node-version`, `.nvmrc` ni `engines` en el repositorio: **el Build Command y el Start Command reales no se pueden probar desde aquí**. Antes de desplegar hay que confirmar en el panel de Render: Root Directory (`api-server/`), Build Command (debe compilar con `pnpm install` y `pnpm run build`, o bien dejar que se ejecute el `dist/` versionado), Start Command (`pnpm start`, es decir `node --enable-source-maps ./dist/index.mjs`) y la versión de Node (20 o superior). Esto bloquea el **deploy**, no el commit.
 - Variables en el api-server: `ENTIMOTORS_ADMIN_ORIGIN` y `ENTIMOTORS_MECHANIC_ORIGIN` (`https://…`, sin `/index.html`) y `SUPABASE_ANON_KEY`, además de las de siempre.
-- Las direcciones de vuelta de **ambos** productos en Supabase → Authentication → URL Configuration → Redirect URLs (ya necesarias para el alta), y `apiUrl` en `supabase-config.js` apuntando al api-server desplegado.
+- Las direcciones de vuelta de **ambos** productos en Supabase → Authentication → URL Configuration → Redirect URLs (ya necesarias para el alta), y `apiUrl` en `supabase-config.js` apuntando al api-server desplegado. **Este último paso NO se ejecutó al publicar el Taller y por eso hubo que hacer el hotfix 4E-C11**: ahora el archivo versionado ya lleva el backend de producción y `verificar-config-produccion.mjs` lo comprueba antes de publicar.
+
+## Recongelado 4E-C9 → 4E-C11 (HOTFIX PRE-TAG: `apiUrl` del Taller)
+
+**Estado:** hotfix aplicado sobre `8eea52c30e25a1678c63b70d012a8af212255460` como commit NUEVO (sin `--amend`). Versión, cachés, `sw.js` y todo el JavaScript de la aplicación **sin cambios** (3.13.0, `entimotors-v3.13.0`). **NO existe la etiqueta `v3.13.0`** y 3.13.0 **no** se declara estable hasta el QA manual de producción sobre el commit del hotfix. El manifest del frontend de 4E-C9 (`b8162b88…2621`) y su freeze doc (`a8c473ad…3689`) quedan **obsoletos**; el del backend (`e9d05b97…f2b774`) **no cambió**.
+
+**Qué pasó.** En el QA manual del Taller publicado (repo `entimotors-ctrl/entimotors-os`, commit `0a215a1`, con los bytes de `8eea52c`) el administrador entraba bien, pero «Usuarios y equipo» mostraba «Falta indicar la dirección del servidor. Se configura en supabase-config.js, campo apiUrl».
+
+**Causa — `DEPLOYMENT_CONFIGURATION_GAP`.**
+- `usuarios.js` (`baseApi()`) lee `window.ENTIMOTORS_SUPABASE.apiUrl`, le recorta las barras finales y llama a `apiUrl + "/api/admin/usuarios" + ruta`. Con `apiUrl` vacío pinta ese aviso.
+- `taller-demo/supabase-config.js` llevaba `apiUrl: ""` **a propósito** (la prueba `16` lo exigía; el README, el CHANGELOG y este freeze lo trataban como requisito de despliegue). Es el **mismo archivo, byte a byte** (`9db2483e…`, 1465 bytes) en 3.12.3, en el source `8eea52c`, en el repo del Taller (`f7f7eec` y `0a215a1`), en la URL pública del Taller y en el Mi Trabajo publicado. No cambió con 3.13.0: hasta 3.12.3 no existía la pantalla que lo usa.
+- «ENTIMOTORS OS — Demo local» es solo el `<title>` estático de `index.html` (idéntico en 3.12.3): **no** tiene relación con `apiUrl`.
+- El paso «`apiUrl` apuntando al api-server desplegado» figuraba en «Requisitos de despliegue (no ejecutados)» y **no se ejecutó al publicar**: la publicación copió los bytes del commit tal cual.
+
+**Por qué el QA no lo detectó.**
+1. Las suites Node inyectan un `apiUrl` **sintético** (`helpers/entorno.mjs`, `URL_API`); ninguna leía el `supabase-config.js` real salvo para comprobar que su clave es `anon`.
+2. El servidor del navegador (`browser/server.mjs`) **sustituye** `supabase-config.js` por una configuración sintética que sí trae `apiUrl` (la suite de integridad lo declara: «solo `index.html` y `supabase-config.js` se sustituyen en memoria»).
+3. La prueba `16` **fijaba lo contrario**: `apiUrl` vacío y sin URL de producción.
+4. El entorno de QA visual local (fuera del repo) servía una configuración propia apuntando a un backend local, según consta en el registro del proyecto; ese directorio temporal ya no existe y no se pudo volver a inspeccionar.
+5. El primer punto donde se leyó el archivo real fue el QA manual sobre el sitio ya publicado.
+
+**Qué cambió (mínimo).**
+- `taller-demo/supabase-config.js`: `apiUrl: "https://entimotors-1.onrender.com"` (URL pública, solo el origen, sin barra final; el código la tolera pero no la exige) y su comentario. **Nada más** en el archivo: `url`, `anonKey` y `habilitado` idénticos.
+- `pruebas/multiusuario/verificar-config-produccion.mjs` (nuevo): única fuente de verdad de «config de producción válida»; CLI `node pruebas/multiusuario/verificar-config-produccion.mjs [archivo-o-URL]` (salida 0/1, nunca imprime la clave anon). Es la puerta del paso de publicación: se corre sobre el archivo a subir y sobre la URL ya publicada.
+- `pruebas/multiusuario/25-config-produccion-apiurl.test.mjs` (nuevo, 30 pruebas): mira el archivo **real**, 17 mutantes que el verificador debe detectar, el CLI, la pantalla real con ese `apiUrl` (sin el aviso; pide a `<backend>/api/admin/usuarios`), el control con `apiUrl` vacío, cajero y mecánico rechazados, y que el build de Mi Trabajo lleva la misma configuración. **Contra `8eea52c` FALLA (7 casos) y el CLI da salida 1 con `APIURL_AUSENTE`**: habría bloqueado la publicación.
+- `pruebas/multiusuario/16-alcance-honesto.test.mjs`: la prueba que exigía `apiUrl` vacío ahora exige la URL de producción y la ausencia de secretos.
+- Documentación: `README.md`, `CHANGELOG.md`, el README de pruebas y este documento; y se sustituyó el marcador `@@SHA_BACKEND@@` que había quedado sin resolver por el valor real (sin cambio).
+
+**Sin cambios.** `index.html`, `sw.js`, `app.js`, `usuarios.js`, `auth.js`, `recovery.js`, `supabase-client.js`, `build-target.js`, todo `api-server/` (fuente y `dist/`), Supabase (esquema, RLS, SQL) y el manifest del backend.
+
+**Mi Trabajo.** Comparte `supabase-config.js`: el publicado (deploy de Netlify del 19 de septiembre, 23:01) sigue con `apiUrl` vacío. Es inocuo: un mecánico no abre «Usuarios y equipo» (rechazo «solo para el administrador», sin llamadas) y no se republica por esto; cualquier reconstrucción futura del bundle ya lo lleva relleno (lo comprueba la prueba `25`).
+
+**Resultados tras el hotfix.**
+
+| Batería | Resultado |
+|---|---|
+| Node (`node --test pruebas/multiusuario/*.test.mjs`) | **1081 / 1081** · fail 0 · cancelled 0 · skipped 0 · 140 suites · 27 archivos (1051 anteriores + 30 de `25`) |
+| Chrome 153.0.8010.36 (headless, perfil temporal, red cerrada) | **137 / 137** (app 81 · mt 33 · mut 9 · pwa-taller 6 · pwa-mt 6 · pwa-upg 2) |
+| Firefox 155.0.1 (ídem) | **137 / 137** (ídem) |
+| Navegador: peticiones externas inesperadas · de la página | 0 · 0 |
+| Backend (`verificar-backend-manifest.mjs`) | MATCH 23/23 (sin cambios) |
+| Secret scan de los archivos del hotfix | PASS: la única clave que aparece es la `anon` pública ya existente (`role=anon`) |
+
+*El runner del navegador exige que el `sw.js` de `HEAD` sea el 3.12.2 (lo lee con `git show HEAD:…` como versión anterior); tras el commit de release ya no lo es, así que esta ejecución se hizo en una copia temporal fuera del repo con un `HEAD` propio con ese `sw.js` y el árbol del hotfix en disco, sin modificar el repositorio.*
 
 ## Lo que NO se hizo
 
@@ -221,7 +266,7 @@ Lo ejecutó una persona sobre una copia local con datos sintéticos (nunca produ
 4. **Menús por rol** — [ ] PASS  [ ] FAIL
    Administrador, cajero y mecánico local ven solo lo que corresponde; el chip de conexión dice «Solo en este dispositivo · respalda seguido» (nunca «sincronizado»); «Simular sin conexión» muestra «Modo sin conexión activado» → «Conexión restaurada — procesando cambios locales…» → «Cambios guardados localmente».
 5. **Usuarios** — [ ] PASS  [ ] FAIL
-   Lista, alta con enlace de un solo uso, cambio de rol, baja/reactivar y edición; con `apiUrl` vacío aparece «Falta indicar la dirección del servidor».
+   Lista, alta con enlace de un solo uso, cambio de rol, baja/reactivar y edición. Con el `apiUrl` de producción **no** debe salir «Falta indicar la dirección del servidor» (ese aviso es lo que apareció en el Taller publicado con `apiUrl` vacío y motivó el hotfix 4E-C11). *Este checklist se ejecutó en local con un `apiUrl` sintético; el paso equivalente sobre el Taller PUBLICADO es el QA manual de producción.*
 6. **Ajustes** — [ ] PASS  [ ] FAIL
    Usuario y rol correctos; respaldo y restauración; versión 3.13.0.
 7. **Recuperación de contraseña** — [ ] PASS  [ ] FAIL

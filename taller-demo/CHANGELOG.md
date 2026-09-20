@@ -16,7 +16,7 @@
   Cada rol ve solo las secciones que le corresponden.
 - **Administración de cuentas:** nueva pantalla «Usuarios y equipo» (solo administrador) que habla
   con el api-server: alta sin contraseña con enlace de un solo uso, cambio de rol, dar de baja y
-  reactivar, y edición de nombre y teléfono. Requiere configurar `apiUrl` en `supabase-config.js`.
+  reactivar, y edición de nombre y teléfono. Requiere `apiUrl` en `supabase-config.js` (ya viene con el backend de producción).
 - **Alta de cuenta** con enlace de un solo uso; el servidor decide a qué producto vuelve el enlace
   según el rol real de la persona.
 - **Recuperación de contraseña mediada por el administrador:** si alguien del equipo perdió su
@@ -60,6 +60,12 @@
 
 ### Correcciones
 
+- **Hotfix previo a la etiqueta estable (4E-C11):** el Taller se publicó una primera vez con
+  `apiUrl` vacío en `supabase-config.js` y «Usuarios y equipo» mostraba «Falta indicar la dirección
+  del servidor». El archivo versionado ya lleva el backend de producción (URL pública, solo el
+  origen). Ninguna prueba miraba el archivo real —todas inyectaban un `apiUrl` sintético—, así que
+  se añadieron `verificar-config-produccion.mjs` y la prueba `25-config-produccion-apiurl`, que
+  fallan si el archivo se publica sin él o con una dirección inválida.
 - **F-FUNC-1:** en la pantalla de contraseña, un fallo de red o un tiempo agotado se mostraba como
   un rechazo del servidor con el texto crudo del navegador («Failed to fetch»). Ahora dice «Sin
   conexión con el servidor. Inténtalo otra vez.».
