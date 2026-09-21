@@ -89,10 +89,87 @@ fase2() {
   "$AQUI/entorno-local.sh" borra t_sync2_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sync2_ref >/dev/null
 }
 
+# Concurrencia real: varias sesiones psql a la vez contra la misma base (cada una como cajero con su propio JWT simulado)
+sql_como() { # sql_como <db> <n_usuario> <sentencias...>  -> ejecuta como authenticated con el usuario N
+  local db="$1" n="$2"; shift 2
+  "${PSQL[@]}" -U supabase_admin -d "$db" -At -v ON_ERROR_STOP=0 \
+    -c "SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-00000000000$n',false), set_config('request.jwt.claim.role','authenticated',false), set_config('role','authenticated',false)" \
+    -c "$*" 2>&1 | tail -n +2
+}
+fase3() {
+  echo "== SYNC-3 · RPC transaccionales e importación =="
+  local s
+  # --- A: aplicar (idempotente) y probar las RPC ---
+  base_con t_sync3_ref 1-esquema 2-seguridad || { mal "no se pudo crear la referencia (SYNC-1+2)"; return; }
+  base_con t_sync3_a 1-esquema 2-seguridad || { mal "no se pudo crear la copia A"; return; }
+  s=$(correr t_sync3_a "$SQLDIR/sync-3-rpc.sql") && ok "sync-3-rpc aplica sobre SYNC-1+2" || { mal "sync-3-rpc falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_sync3_a "$SQLDIR/sync-3b-importacion.sql") && ok "sync-3b-importacion aplica" || { mal "sync-3b falló: $(tail -4 <<<"$s")"; return; }
+  correr t_sync3_a "$SQLDIR/sync-3-rpc.sql" >/dev/null && correr t_sync3_a "$SQLDIR/sync-3b-importacion.sql" >/dev/null && ok "ambos son idempotentes (segunda ejecución)" || mal "no son idempotentes"
+  pruebas t_sync3_a "$AQUI/sql/03-rpc.test.sql"
+
+  # --- B: concurrencia ---
+  echo "  -- concurrencia --"
+  cat "$AQUI/sql/00-prelude.sql" - <<'SQL' | "${PSQL[@]}" -U supabase_admin -d t_sync3_a >/dev/null 2>&1
+INSERT INTO public.inventario (id, nombre, precio_venta, costo_compra) VALUES ('00000000-0000-4000-9000-000000000901', 'Concurrente', 10, 5) ON CONFLICT DO NOTHING;
+INSERT INTO public.inventario_movimientos (inventario_id, tipo, cantidad) VALUES ('00000000-0000-4000-9000-000000000901', 'apertura', 5);
+SQL
+  local item='[{"inventario_id":"00000000-0000-4000-9000-000000000901","nombre":"Concurrente","cantidad":1,"precio":10}]'
+  # 8 reintentos SIMULTÁNEOS de la MISMA operación
+  local op='00000000-0000-4000-9000-000000000a01'
+  local ventas caja stock
+  for k in 1 2 3 4 5 6 7 8; do sql_como t_sync3_a 2 "SELECT public.registrar_venta_v2('$op'::uuid, NULL, 'x', 'efectivo', 10, '$item'::jsonb)" >/dev/null & done; wait
+  ventas=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT count(*) FROM public.ventas WHERE op_id = '$op'")
+  caja=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT count(*) FROM public.caja_movimientos WHERE op_id = '$op'")
+  stock=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT cantidad::int FROM public.inventario WHERE id = '00000000-0000-4000-9000-000000000901'")
+  [ "$ventas" = "1" ] && ok "8 reintentos simultáneos del mismo operation_id → UNA venta" || mal "reintentos concurrentes: $ventas ventas (esperaba 1)"
+  [ "$caja" = "1" ] && ok "8 reintentos simultáneos → UNA fila de caja" || mal "reintentos concurrentes: $caja filas de caja (esperaba 1)"
+  [ "$stock" = "4" ] && ok "8 reintentos simultáneos → stock descontado UNA vez (5 → 4)" || mal "reintentos concurrentes: stock $stock (esperaba 4)"
+  # 12 ventas DISTINTAS a la vez sobre 4 unidades restantes: exactamente 4 deben entrar, el resto se bloquea por falta de stock
+  for k in $(seq 1 12); do
+    sql_como t_sync3_a 2 "SELECT public.registrar_venta_v2('00000000-0000-4000-9000-0000000b$(printf %04d $k)'::uuid, NULL, 'x', 'efectivo', 10, '$item'::jsonb)" >/dev/null &
+  done; wait
+  ventas=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT count(*) FROM public.ventas WHERE op_id::text LIKE '00000000-0000-4000-9000-0000000b%'")
+  stock=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT cantidad::int FROM public.inventario WHERE id = '00000000-0000-4000-9000-000000000901'")
+  [ "$ventas" = "4" ] && [ "$stock" = "0" ] && ok "12 ventas simultáneas con 4 en stock → exactamente 4 entran y el stock queda en 0 (nunca negativo online)" || mal "concurrencia de stock: $ventas ventas, stock $stock (esperaba 4 y 0)"
+  # 6 abonos simultáneos de la MISMA operación sobre un crédito
+  sql_como t_sync3_a 2 "SELECT public.registrar_credito('00000000-0000-4000-9000-000000000c01'::uuid, NULL, 'Cliente', NULL, '[{\"nombre\":\"Servicio\",\"cantidad\":1,\"precio\":100}]'::jsonb)" >/dev/null
+  local cid; cid=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT id FROM public.creditos WHERE op_id = '00000000-0000-4000-9000-000000000c01'")
+  for k in 1 2 3 4 5 6; do sql_como t_sync3_a 2 "SELECT public.registrar_abono_v2('00000000-0000-4000-9000-000000000c02'::uuid, '$cid'::uuid, 40, 'efectivo')" >/dev/null & done; wait
+  local ab; ab=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT count(*) || '/' || (SELECT saldo FROM public.creditos WHERE id = '$cid') FROM public.abonos WHERE credito_id = '$cid'")
+  [ "$ab" = "1/60.00" ] && ok "6 abonos simultáneos de la misma operación → UN abono (saldo 60)" || mal "abonos concurrentes: $ab (esperaba 1/60.00)"
+  s=$("${PSQL[@]}" -U supabase_admin -d t_sync3_a -At -c "SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000001',false), set_config('role','authenticated',false)" -c "SELECT public.verificar_invariantes()::text" | tail -1)
+  [ "$s" = "[]" ] && ok "invariantes tras la concurrencia: stock=ledger, saldos y ventas cuadran" || mal "invariantes rotas tras la concurrencia: $s"
+  "$AQUI/entorno-local.sh" borra t_sync3_a >/dev/null
+
+  # --- C: importación (base sin datos operativos) ---
+  base_con t_sync3_i 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la copia de importación"; return; }
+  pruebas t_sync3_i "$AQUI/sql/03b-importacion.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sync3_i >/dev/null
+  base_con t_sync3_r 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la copia de revertir"; return; }
+  pruebas t_sync3_r "$AQUI/sql/03c-revertir.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sync3_r >/dev/null
+  base_con t_sync3_n 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la copia no vacía"; return; }
+  s=$(cat "$AQUI/sql/00-prelude.sql" - <<'SQL' | "${PSQL[@]}" -U supabase_admin -d t_sync3_n 2>&1
+INSERT INTO public.clientes (nombre) VALUES ('ya existe');
+DO $$ BEGIN PERFORM pg_temp.como(1); PERFORM pg_temp.falla('con datos operativos en la nube, la importación inicial se rechaza', format('SELECT public.import_iniciar(NULL, ''x'', %L, ''b'', ''3.13.0'', 6, ''{}'')', repeat('a', 64)), 'exige una base vacía'); PERFORM pg_temp.fin(); END $$;
+SQL
+)
+  cuenta "$s"
+  "$AQUI/entorno-local.sh" borra t_sync3_n >/dev/null
+
+  # --- D: rollback limpio e idéntico ---
+  base_con t_sync3_b 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la copia B"; return; }
+  s=$(correr t_sync3_b "$SQLDIR/sync-3-rollback.sql") && ok "rollback de SYNC-3 aplica" || { mal "rollback falló: $(tail -3 <<<"$s")"; return; }
+  comparar t_sync3_ref t_sync3_b "tras el rollback el esquema es IDÉNTICO a producción+SYNC-1+SYNC-2" "el rollback de SYNC-3 no restauró el estado anterior"
+  correr t_sync3_b "$SQLDIR/sync-3-rpc.sql" >/dev/null && correr t_sync3_b "$SQLDIR/sync-3b-importacion.sql" >/dev/null && ok "forward vuelve a aplicar tras el rollback" || mal "forward tras rollback falló"
+  "$AQUI/entorno-local.sh" borra t_sync3_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sync3_ref >/dev/null
+}
+
 case "${1:-}" in
   1) fase1 ;;
   2) fase2 ;;
-  *) echo "uso: $0 {1|2}" >&2; exit 2 ;;
+  3) fase3 ;;
+  *) echo "uso: $0 {1|2|3}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]

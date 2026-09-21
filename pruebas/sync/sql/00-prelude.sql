@@ -36,6 +36,10 @@ BEGIN
   PERFORM set_config('request.jwt.claims', '', true);
 END $$;
 
+-- su(): vuelve a superusuario para comprobar datos; adm(): vuelve a actuar como el administrador (usuario 1)
+CREATE FUNCTION pg_temp.su() RETURNS void LANGUAGE sql AS $$ SELECT pg_temp.fin() $$;
+CREATE FUNCTION pg_temp.adm() RETURNS void LANGUAGE sql AS $$ SELECT pg_temp.como(1) $$;
+
 -- Cuentas de prueba: 1 admin · 2 cajero · 3 mecánico A · 4 mecánico B · 5 desarrollador · 6 mecánico INACTIVO
 DO $seed$
 DECLARE i int; r text[] := ARRAY['admin','cajero','mecanico','mecanico','desarrollador','mecanico'];
