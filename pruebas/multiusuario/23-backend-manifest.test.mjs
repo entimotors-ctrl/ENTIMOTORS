@@ -13,7 +13,9 @@ import os from "node:os";
 import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { RAIZ } from "./helpers/entorno.mjs";
+// 3.14.0: el backend del árbol de trabajo cambia a propósito (PIN, CORS selectivo), así que la integridad del freeze de 3.13.0 se comprueba contra
+// la instantánea inmutable del tag v3.13.0 (helpers/congelado.mjs), no contra el árbol de trabajo. Ver pruebas/sync/README.md.
+import { RAIZ_313 as RAIZ } from "./helpers/congelado.mjs";
 
 const VERIFICADOR = path.join(RAIZ, "pruebas/multiusuario/verificar-backend-manifest.mjs");
 const REL_MANIFEST = "pruebas/multiusuario/release-3.13.0-backend-manifest.json", REL_FRONT = "pruebas/multiusuario/release-3.13.0-manifest.json";

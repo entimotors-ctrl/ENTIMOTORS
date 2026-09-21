@@ -165,11 +165,35 @@ SQL
   "$AQUI/entorno-local.sh" borra t_sync3_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sync3_ref >/dev/null
 }
 
+fase3p() {
+  echo "== SYNC-3P · límites del PIN (SQL) =="
+  local s
+  base_con t_sync3p_ref 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la referencia"; return; }
+  base_con t_sync3p_a 1-esquema 2-seguridad 3-rpc 3b-importacion || { mal "no se pudo crear la copia A"; return; }
+  s=$(correr t_sync3p_a "$SQLDIR/sync-3p-pin.sql") && ok "sync-3p-pin aplica" || { mal "sync-3p falló: $(tail -4 <<<"$s")"; return; }
+  correr t_sync3p_a "$SQLDIR/sync-3p-pin.sql" >/dev/null && ok "es idempotente (segunda ejecución)" || mal "no es idempotente"
+  pruebas t_sync3p_a "$AQUI/sql/04-pin.test.sql"
+  # carreras: 20 intentos SIMULTÁNEOS del mismo solicitante → exactamente 5 pasan
+  cat "$AQUI/sql/00-prelude.sql" - <<'SQL' | "${PSQL[@]}" -U supabase_admin -d t_sync3p_a >/dev/null 2>&1
+INSERT INTO public.admin_pin (perfil_id, hash, version) VALUES (pg_temp.uid(1), 'hash-de-prueba', 1) ON CONFLICT (perfil_id) DO UPDATE SET bloqueado_hasta = NULL, actualizado_en = clock_timestamp();
+SQL
+  for k in $(seq 1 20); do "${PSQL[@]}" -U supabase_admin -d t_sync3p_a -At -c "SELECT public.pin_reservar_intento('00000000-0000-4000-8000-000000000002'::uuid,'dev','ajustar_stock','inventario',NULL,5,10,15,15,3)->>'permitido'" >/dev/null 2>&1 & done; wait
+  local res; res=$("${PSQL[@]}" -U supabase_admin -d t_sync3p_a -At -c "SELECT count(*) FROM public.admin_pin_intentos WHERE resultado='reservado' AND solicitante_id='00000000-0000-4000-8000-000000000002' AND creado_en > (SELECT actualizado_en FROM public.admin_pin)")
+  [ "$res" = "5" ] && ok "20 intentos simultáneos → exactamente 5 reservados (el candado impide evadir el contador)" || mal "carrera: $res reservados (esperaba 5)"
+  "$AQUI/entorno-local.sh" borra t_sync3p_a >/dev/null
+  base_con t_sync3p_b 1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin || { mal "no se pudo crear la copia B"; return; }
+  s=$(correr t_sync3p_b "$SQLDIR/sync-3p-rollback.sql") && ok "rollback aplica" || { mal "rollback falló: $(tail -3 <<<"$s")"; return; }
+  comparar t_sync3p_ref t_sync3p_b "tras el rollback el esquema es IDÉNTICO al anterior" "el rollback de SYNC-3P no restauró el estado anterior"
+  correr t_sync3p_b "$SQLDIR/sync-3p-pin.sql" >/dev/null && ok "forward vuelve a aplicar tras el rollback" || mal "forward tras rollback falló"
+  "$AQUI/entorno-local.sh" borra t_sync3p_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sync3p_ref >/dev/null
+}
+
 case "${1:-}" in
   1) fase1 ;;
+  3p) fase3p ;;
   2) fase2 ;;
   3) fase3 ;;
-  *) echo "uso: $0 {1|2|3}" >&2; exit 2 ;;
+  *) echo "uso: $0 {1|2|3|3p}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]
