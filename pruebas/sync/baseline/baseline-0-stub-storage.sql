@@ -24,7 +24,7 @@ VALUES ('entimotors-media', 'entimotors-media', true), ('entimotors-taller', 'en
 ON CONFLICT (id) DO NOTHING;
 
 GRANT USAGE ON SCHEMA storage TO anon, authenticated, service_role;
-GRANT SELECT, INSERT, UPDATE, DELETE ON storage.objects, storage.buckets TO authenticated, service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON storage.objects, storage.buckets TO anon, authenticated, service_role;
 GRANT EXECUTE ON FUNCTION storage.foldername(text) TO authenticated, service_role;
 
 -- como en producción, `postgres` es el dueño: así puede crear las políticas de storage.objects

@@ -18,6 +18,9 @@ END $$;
 
 CREATE FUNCTION pg_temp.uid(n int) RETURNS uuid LANGUAGE sql IMMUTABLE AS $$ SELECT ('00000000-0000-4000-8000-00000000000' || n)::uuid $$;
 
+-- ids de datos de prueba (n >= 100), distintos de los de usuarios
+CREATE FUNCTION pg_temp.id(n int) RETURNS uuid LANGUAGE sql IMMUTABLE AS $$ SELECT ('00000000-0000-4000-9000-' || lpad(n::text, 12, '0'))::uuid $$;
+
 -- n = 0: anon sin sesión; n > 0: usuario autenticado n. Vale hasta el final de la transacción o hasta pg_temp.fin().
 CREATE FUNCTION pg_temp.como(n int) RETURNS void LANGUAGE plpgsql AS $$
 BEGIN
