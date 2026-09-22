@@ -13,6 +13,9 @@ const SHELL = ["./", "./index.html",
   "./build-target.js?v=3.13.0",
   "./supabase-config.js?v=3.13.0", "./supabase-client.js?v=3.13.0",
   "./auth.js?v=3.13.0", "./recovery.js?v=3.13.0",
+  // Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5): mismo motivo
+  // que la capa de Supabase, index.html los carga antes de app.js.
+  "./sync-rest.js?v=3.13.0", "./sync-db.js?v=3.13.0", "./sync-engine.js?v=3.13.0", "./sync-mappers.js?v=3.13.0",
   "./app.js?v=3.13.0", "./usuarios.js?v=3.13.0",
   "./manifest.json", "./icons/icon-192.png", "./icons/logo-watermark-doc.png"];
 

@@ -245,8 +245,10 @@
       if (apagado()) return { omitido: "apagado" };
       var m = mapper(entidad);
       var cur = await bd.cursor.get(entidad);
+      // select: para una entidad con hijos embebidos sin cursor propio (SYNC-5: cotizacion_items dentro de
+      // cotizaciones), el mapper declara `select` (p. ej. "*,cotizacion_items(...)") y viaja tal cual a PostgREST.
       var r = await rest.paginar(m.tabla, { cursor: cur ? { t: cur.t, id: cur.id } : null, pagina: (opciones && opciones.pagina) || 500, maxPaginas: opciones && opciones.maxPaginas,
-        solapamientoMs: opciones && opciones.solapamientoMs, onPagina: function (filas, nuevo) { return aplicarPagina(m, filas, nuevo); } });
+        solapamientoMs: opciones && opciones.solapamientoMs, select: m.select, onPagina: function (filas, nuevo) { return aplicarPagina(m, filas, nuevo); } });
       if (!r.ok) return { ok: false, clase: r.clase, codigo: r.codigo, mensaje: r.mensaje, entidad: entidad };
       return { ok: true, total: r.total, completo: r.completo, entidad: entidad };
     }
@@ -354,7 +356,9 @@
       var s = sesion(); if (!s || !s.uid) throw new Error("No hay sesión.");
       var dev = await bd.deviceId();
       var opId = (meta && meta.op_id) || nuevoUuid();
-      var op = { op_id: opId, entidad: (meta && meta.entidad) || "rpc", uid: (meta && meta.uid) || opId, kind: "rpc", rpc: nombre, params: Object.assign({}, params, { p_op_id: opId }),
+      // p_op: TODAS las RPC de sync-3-rpc.sql (y sync_guardar_items_cotizacion, SYNC-5) llaman a su
+      // primer parámetro `p_op`, nunca `p_op_id` — es la clave de idempotencia que lee sync_op_iniciar.
+      var op = { op_id: opId, entidad: (meta && meta.entidad) || "rpc", uid: (meta && meta.uid) || opId, kind: "rpc", rpc: nombre, params: Object.assign({}, params, { p_op: opId }),
         estado: "pending", intentos: 0, siguiente_en: 0, actor_uid: s.uid, device_id: dev, creado_en: reloj(), error: null };
       var seq = await bd.transaccion(["outbox"], "readwrite", function (t) { return t.add("outbox", op); });
       programarEnvio();

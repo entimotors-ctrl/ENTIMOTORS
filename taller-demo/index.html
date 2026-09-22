@@ -2365,6 +2365,14 @@
 <script src="auth.js?v=3.13.0"></script>
 <script src="recovery.js?v=3.13.0"></script>
 <script src="config-local.js?v=3.13.0"></script>
+<!-- Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5). Apagado por
+     defecto (ver sync-engine.js): sin ENTIMOTORS_SYNC.enabled === true, que
+     app.js solo pone en true dentro de prepararModoNube() para una sesión de
+     Supabase activa, no abren ninguna base ni hacen ninguna petición. -->
+<script src="sync-rest.js?v=3.13.0"></script>
+<script src="sync-db.js?v=3.13.0"></script>
+<script src="sync-engine.js?v=3.13.0"></script>
+<script src="sync-mappers.js?v=3.13.0"></script>
 <!-- el ?v= debe cambiar cada vez que se toque app.js (junto con CACHE_NAME en
      sw.js) — es la forma más universal de forzar que CUALQUIER navegador
      pida el archivo de nuevo aunque ya tenga guardada una copia vieja en su

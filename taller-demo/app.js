@@ -446,39 +446,95 @@ function tx(store, mode = "readonly") { return db.transaction(store, mode).objec
    no cambia ni una línea.
    Las transacciones atómicas de varias tablas a la vez (venta rápida, cierre
    de caja) siguen usando db.transaction([...]) directo donde ya estaban:
-   pasarlas por aquí una fila a la vez les haría perder la atomicidad. */
+   pasarlas por aquí una fila a la vez les haría perder la atomicidad.
+
+   SYNC-5: ese día llegó para 5 entidades (clientes, motos, citas,
+   categorias_inv, cotizaciones). Con el motor de sincronización activo
+   (ver prepararModoNube más abajo), get/getAll/save/delete de esas 5 se
+   desvían a `syncBd`/`syncMotor` (entimotors_sync); el resto sigue exactamente
+   igual, byte por byte, contra entimotors_os_demo. */
+const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "cotizaciones"];
+let syncBd = null;
+let syncMotor = null;
+function modoNubeActivo(store) {
+  return !!(syncMotor && syncBd) && ENTIDADES_SYNC.includes(store);
+}
+
+function idbGetAll(store) {
+  return new Promise((resolve, reject) => {
+    const out = [];
+    const req = tx(store).openCursor();
+    req.onsuccess = (e) => {
+      const cur = e.target.result;
+      if (cur) { out.push(cur.value); cur.continue(); } else resolve(out);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbGet(store, id) {
+  return new Promise((resolve, reject) => {
+    const req = tx(store).get(id);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbSave(store, value) {
+  return new Promise((resolve, reject) => {
+    const req = tx(store, "readwrite").put(value);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+function idbDelete(store, id) {
+  return new Promise((resolve, reject) => {
+    const req = tx(store, "readwrite").delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/* Regla de motos.km (SYNC-5, sección 5): no retroceder el kilometraje por
+   accidente. Se resuelve ANTES de escribir, no en el motor (que no conoce
+   reglas de negocio por campo): si el valor nuevo es menor al que ya se
+   conocía para ese id local, se conserva el mayor. */
+async function aplicarNoRetrocederKm(valor) {
+  if (valor.id === undefined || valor.id === null || typeof valor.km !== "number") return valor;
+  const previo = await syncBd.datos.get("motos", valor.id);
+  if (previo && typeof previo.km === "number" && valor.km < previo.km) return { ...valor, km: previo.km };
+  return valor;
+}
+
+/* cotizacion_items no es una entidad del motor (sin rev/updated_at propios:
+   ver sync-mappers.js). Sus renglones se reemplazan enteros con la RPC
+   idempotente sync_guardar_items_cotizacion, encolada en el MISMO outbox
+   (offline-safe, con reintento) justo después de la cabecera: por orden de
+   `seq` el outbox siempre manda la cabecera antes que sus renglones. */
+async function guardarSincronizado(store, value) {
+  const v = store === "motos" ? await aplicarNoRetrocederKm(value) : value;
+  const r = await syncMotor.escribir(store, v);
+  if (store === "cotizaciones" && r && r.uid) {
+    const items = (v.items || []).map((it) => ({ nombre: it.nombre, cantidad: it.cantidad, precio: it.precio, inventario_id: null }));
+    await syncMotor.encolarRpc("sync_guardar_items_cotizacion", { p_cotizacion_id: r.uid, p_items: items }, { entidad: "cotizaciones", uid: r.uid });
+  }
+  return r.id;
+}
+
 const DB = {
-  getAll(store) {
-    return new Promise((resolve, reject) => {
-      const out = [];
-      const req = tx(store).openCursor();
-      req.onsuccess = (e) => {
-        const cur = e.target.result;
-        if (cur) { out.push(cur.value); cur.continue(); } else resolve(out);
-      };
-      req.onerror = () => reject(req.error);
-    });
+  async getAll(store) {
+    if (modoNubeActivo(store)) return syncBd.datos.todos(store);
+    return idbGetAll(store);
   },
-  get(store, id) {
-    return new Promise((resolve, reject) => {
-      const req = tx(store).get(id);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
+  async get(store, id) {
+    if (modoNubeActivo(store)) return syncBd.datos.get(store, id);
+    return idbGet(store, id);
   },
-  save(store, value) {
-    return new Promise((resolve, reject) => {
-      const req = tx(store, "readwrite").put(value);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = () => reject(req.error);
-    });
+  async save(store, value) {
+    if (modoNubeActivo(store)) return guardarSincronizado(store, value);
+    return idbSave(store, value);
   },
-  delete(store, id) {
-    return new Promise((resolve, reject) => {
-      const req = tx(store, "readwrite").delete(id);
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(req.error);
-    });
+  async delete(store, id) {
+    if (modoNubeActivo(store)) { await syncMotor.escribir(store, { id }, { borrar: true }); return; }
+    return idbDelete(store, id);
   },
   clear(store) {
     return new Promise((resolve, reject) => {
@@ -488,6 +544,41 @@ const DB = {
     });
   },
 };
+
+/* Arma (o desarma) el motor de sincronización para la sesión que acaba de
+   entrar. Se llama DESPUÉS de abrir la base local de siempre y ANTES de la
+   primera lectura (DB.getAll("clientes")) para que el bootstrap de un
+   dispositivo nuevo (SYNC-5 sección 10) ya tenga los datos de la nube
+   cuando la app decide si mostrar el selector demo/blanco.
+   Nunca lanza: sin Supabase configurado, sin ENTIMOTORS_SYNC.enabled o sin
+   red, la app sigue funcionando 100% local como siempre (mismo espíritu que
+   supabase-client.js). */
+async function prepararModoNube(session) {
+  syncMotor = null; syncBd = null;
+  if (!session || session.origen !== "supabase" || session.activo === false) return;
+  if (!window.SyncDB || !window.SyncEngine || !window.SyncRest || !window.ENTIMOTORS_SYNC_MAPPERS) return;
+  if (!window.SupabaseCliente || !SupabaseCliente.estado().activo) return;
+
+  window.ENTIMOTORS_SYNC = { enabled: true };
+  try {
+    syncBd = await SyncDB.abrir({ nombre: SyncDB.nombreParaSesion(session) });
+  } catch (e) { syncBd = null; window.ENTIMOTORS_SYNC = { enabled: false }; return; }
+
+  const rest = SyncRest.crear({
+    baseUrl: window.ENTIMOTORS_SUPABASE.url, anonKey: window.ENTIMOTORS_SUPABASE.anonKey,
+    getToken: () => { const s = SupabaseCliente.sesion(); return s ? s.access_token : null; },
+    refrescar: () => SupabaseCliente.refrescarSesion().then((r) => r.ok),
+  });
+  syncMotor = SyncEngine.crearMotor({
+    bd: syncBd, rest, mappers: window.ENTIMOTORS_SYNC_MAPPERS, orden: window.ENTIMOTORS_SYNC_ORDEN,
+    sesion: () => (currentUser && currentUser.uid ? { uid: currentUser.uid } : null),
+    autoenvio: true,
+  });
+  // Bootstrap (SYNC-5 sección 10): con cursor vacío, pull() pagina desde el
+  // principio. Si no hay red, sigue igual — arrancar() reintentará al volver.
+  try { await syncMotor.pullTodo(); } catch (e) { /* sin red: se reintenta al volver a estar online */ }
+  syncMotor.arrancar();
+}
 const ALL_STORES = ["clientes", "motos", "ordenes", "inventario", "citas", "cotizaciones", "ventas_rapidas", "caja_movimientos", "creditos", "web_cms", "categorias_inv", "auditoria"];
 // sync_cola queda FUERA del respaldo a propósito: es un registro de "qué falta
 // subir" que solo tiene sentido en el dispositivo donde se generó. Restaurarla
@@ -6624,6 +6715,10 @@ async function startApp(session) {
   const baseDeEstaSesion = nombreBaseParaSesion(session);
   if (!baseDeEstaSesion) { await denegarSesion("No se pudo preparar tu espacio de trabajo."); return; }
   db = await openDb(baseDeEstaSesion);
+
+  // Antes de la primera lectura: si esta sesión tiene nube, clientes/motos/
+  // citas/categorias_inv/cotizaciones ya vienen de allá (bootstrap SYNC-5 §10).
+  await prepararModoNube(session);
 
   const clientesExistentes = await DB.getAll("clientes");
   const modo = localStorage.getItem("enti_modo_datos");

@@ -11,8 +11,11 @@ window.__montar = async function (o) {
       window.__token = l.shift(); window.__refrescos = (window.__refrescos || 0) + 1; return true;
     },
   });
+  // SYNC-5: con usarMappersReales, el motor de la prueba usa taller-demo/sync-mappers.js
+  // tal cual (los mismos que carga index.html), no la copia reducida mappers-prueba.js.
+  var mappers = (o.usarMappersReales && window.ENTIMOTORS_SYNC_MAPPERS) || window.__mappers;
   var motor = SyncEngine.crearMotor({
-    bd: bd, rest: rest, mappers: window.__mappers, orden: o.orden || ["clientes", "motos"],
+    bd: bd, rest: rest, mappers: mappers, orden: o.orden || ["clientes", "motos"],
     sesion: function () { return window.__sesion || null; },
     habilitado: function () { return window.__habilitado !== false; },
     locks: o.sinLocks ? null : undefined, autoenvio: !!o.autoenvio, aleatorio: function () { return 0.5; },
