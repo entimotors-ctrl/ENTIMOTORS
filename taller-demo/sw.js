@@ -78,8 +78,17 @@ self.addEventListener("message", (event) => {
   );
 });
 
+/* Qué puede pasar por el caché de este Service Worker.
+   3.14.0 (sincronización): la app ahora habla con la nube (Supabase REST/Auth/Storage y el api-server) con el token de la persona.
+   Esas respuestas NUNCA se guardan aquí: serían datos del taller (clientes, caja, créditos…) en un caché que sobrevive al cierre de
+   sesión, y —peor— una lectura vieja tapando a la nube cuando hay señal. Solo se cachea la propia app (mismo origen) y las librerías
+   del CDN que index.html ya cargaba. Todo lo demás se deja pasar SIN respondWith: el navegador lo resuelve directo. */
+const ORIGENES_CACHEABLES = new Set([self.location.origin, "https://cdn.jsdelivr.net"]);
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+  if (!ORIGENES_CACHEABLES.has(new URL(event.request.url).origin)) return;   // API / Supabase / Storage: jamás por el caché
+  if (event.request.headers && event.request.headers.has("authorization")) return;   // una petición con credenciales no es un archivo de la app
 
   // este documento solo existe en el caché (no está en el servidor), así que
   // se responde directo sin intentar la red — si no, el 404 taparía la factura.
