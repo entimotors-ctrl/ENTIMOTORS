@@ -19,7 +19,7 @@ const SECRETO_JWT = "secreto-sintetico-solo-pruebas-locales-0123456789";   // no
 const IMAGEN_REST = "public.ecr.aws/supabase/postgrest:v14.13";
 const CONT_REST = "entimotors-sync-rest";
 export const DB = "t_e2e";
-const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items", "6-mecanicos-ordenes"];
+const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items", "6-mecanicos-ordenes", "7a-inventario"];
 
 export const uid = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 export const PERFILES = { admin: uid(1), cajero: uid(2), mecanico: uid(3), mecanico2: uid(4) };
@@ -95,7 +95,7 @@ export async function iniciarPila() {
     limpiar() {
       sql(`set session_replication_role = replica;
            truncate public.clientes, public.motos, public.citas, public.categorias_inv, public.cotizaciones, public.cotizacion_items,
-             public.web_cms, public.ordenes, public.orden_items cascade;
+             public.web_cms, public.ordenes, public.orden_items, public.inventario, public.inventario_movimientos cascade;
            reset session_replication_role;
            update public.perfiles set activo = true where id in (${Object.values(PERFILES).map((v) => `'${v}'`).join(",")});`);
     },

@@ -344,7 +344,7 @@
      ni tocar el botón — la acción quedaba muerta sin ningún mensaje.
      Le pasaba al aviso de choque de horario al mover una cita, y a cualquier
      confirmación que se pidiera desde un modal declarado más abajo. */
-  #modalAdminCode, #modalConfirm, #modalPrompt { z-index: 60; }
+  #modalAdminCode, #modalConfirm, #modalPrompt, #modalPinAutorizar { z-index: 60; }
   .modal { background: var(--bg-raise); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); max-width: 480px; width: 100%; padding: 1.4rem; max-height: 88vh; overflow-y: auto; }
   .modal h3 { font-family: 'Teko', sans-serif; text-transform: uppercase; font-size: 1.3rem; margin-bottom: 0.8rem; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.6rem; }
@@ -2016,6 +2016,23 @@
   </div>
 </div>
 
+<!-- Modal: autorización con PIN del administrador (SYNC-7, D-7) — para anular/devolver/reversar
+     dinero o stock desde una cuenta de cajero. El PIN NUNCA se guarda: solo vive en este campo
+     mientras el modal está abierto (ver pin-ui.js). -->
+<div class="modal-bg" id="modalPinAutorizar">
+  <div class="modal">
+    <h3>Autorización del administrador</h3>
+    <p class="hint" style="margin-top:0;" id="pinAutorizarMsg">Esta acción requiere autorización del administrador.</p>
+    <label>PIN (6 dígitos)</label>
+    <input type="password" id="pinAutorizarInput" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">
+    <p class="gate-error" id="pinAutorizarError"></p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnPinAutorizarCancelar">Cancelar</button>
+      <button class="btn primary" id="btnPinAutorizarOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal genérico: confirmar (reemplaza confirm() del navegador) -->
 <div class="modal-bg" id="modalConfirm">
   <div class="modal">
@@ -2377,6 +2394,9 @@
 <script src="sync-engine.js?v=3.13.0"></script>
 <script src="sync-mappers.js?v=3.13.0"></script>
 <script src="sync-fotos.js?v=3.13.0"></script>
+<!-- Autorización con PIN administrativo (SYNC-7, D-7): habla con el api-server, nunca con Supabase
+     directo. Va antes de app.js porque prepararModoNube() la inicializa (PinUI.prepararInstancia). -->
+<script src="pin-ui.js?v=3.13.0"></script>
 <!-- el ?v= debe cambiar cada vez que se toque app.js (junto con CACHE_NAME en
      sw.js) — es la forma más universal de forzar que CUALQUIER navegador
      pida el archivo de nuevo aunque ya tenga guardada una copia vieja en su

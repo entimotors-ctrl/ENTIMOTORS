@@ -449,17 +449,27 @@ function tx(store, mode = "readonly") { return db.transaction(store, mode).objec
    pasarlas por aquí una fila a la vez les haría perder la atomicidad.
 
    SYNC-5 sumó 5 entidades (clientes, motos, citas, categorias_inv,
-   cotizaciones); SYNC-6 suma "ordenes" (mapper distinto por producto — ver la
-   cabecera de sync-mappers.js). Con el motor de sincronización activo (ver
-   prepararModoNube más abajo), get/getAll/save/delete de esas 6 se desvían a
-   `syncBd`/`syncMotor` (entimotors_sync); el resto (inventario, ventas_rapidas,
-   dinero) sigue exactamente igual, byte por byte, contra entimotors_os_demo —
-   eso es SYNC-7. */
-const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "cotizaciones", "ordenes"];
+   cotizaciones); SYNC-6 sumó "ordenes" (mapper distinto por producto — ver la
+   cabecera de sync-mappers.js); SYNC-7A suma "inventario" (SOLO el maestro:
+   `cantidad` nunca viaja por get/save, ver sync-mappers.js y
+   guardarSincronizado() más abajo). Con el motor de sincronización activo (ver
+   prepararModoNube más abajo), get/getAll/save/delete de esas 7 se desvían a
+   `syncBd`/`syncMotor` (entimotors_sync); el resto (ventas_rapidas, dinero,
+   movimientos de caja) sigue exactamente igual, byte por byte, contra
+   entimotors_os_demo — eso es SYNC-7B. */
+const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "inventario", "cotizaciones", "ordenes"];
 let syncBd = null;
 let syncMotor = null;
 function modoNubeActivo(store) {
   return !!(syncMotor && syncBd) && ENTIDADES_SYNC.includes(store);
+}
+/* D-4 (SYNC-7A): "inventario" y "categorias_inv" son solo del administrador en modo nube (mapper.puedeEscribir,
+   ver sync-mappers.js) — un único lugar de donde leer la regla, para no repetir el rol en cada botón. Sin
+   sesión de nube (modoNubeActivo === false) no aplica: el Taller local sigue exactamente igual que antes. */
+function puedeEscribirEntidadNube(store) {
+  const m = window.ENTIMOTORS_SYNC_MAPPERS && window.ENTIMOTORS_SYNC_MAPPERS[store];
+  if (!m || typeof m.puedeEscribir !== "function") return true;
+  return m.puedeEscribir(currentUser && currentUser.rol);
 }
 
 function idbGetAll(store) {
@@ -512,6 +522,12 @@ async function aplicarNoRetrocederKm(valor) {
    (offline-safe, con reintento) justo después de la cabecera: por orden de
    `seq` el outbox siempre manda la cabecera antes que sus renglones. */
 async function guardarSincronizado(store, value) {
+  // SYNC-7A: "esNuevo" se decide ANTES de escribir (igual que adentro de escribir()): un producto sin id local
+  // todavía es un alta. Se captura aquí porque syncMotor.escribir() muta/asigna id sobre el objeto que devuelve,
+  // no sobre `value` — y una EDICIÓN posterior del mismo repuesto ya trae `value.id` puesto, así que nunca
+  // vuelve a disparar el stock de apertura (ver la cabecera de sync-mappers.js, sección INVENTARIO).
+  const esAltaInventario = store === "inventario" && (value.id === undefined || value.id === null);
+  const cantidadInicial = esAltaInventario ? (Number(value.cantidad) || 0) : null;
   const v = store === "motos" ? await aplicarNoRetrocederKm(value) : value;
   const r = await syncMotor.escribir(store, v);
   if (store === "cotizaciones" && r && r.uid) {
@@ -524,6 +540,14 @@ async function guardarSincronizado(store, value) {
      outbox que sync_guardar_items_cotizacion arriba, offline-safe y con reintento. */
   if (store === "ordenes" && esMecanicoCuenta() && r && r.uid) {
     await encolarAvanceTecnico(r.uid, v);
+  }
+  /* SYNC-7A sección 6: el stock CON el que nace un repuesto entra como UN movimiento de ledger "apertura"
+     (sync-7a-inventario.sql, registrar_stock_inicial) — nunca escribiendo `cantidad` por el CRUD del maestro
+     (esa columna es derivada, ver sync-mappers.js). Se encola UNA sola vez (guarda esAltaInventario arriba),
+     por el MISMO outbox que todo lo demás: offline-safe, y si la app se reinicia antes de que confirme, el
+     reintento reutiliza el op_id que quedó guardado en la cola (idempotente por diseño, no por esta función). */
+  if (esAltaInventario && r && r.uid) {
+    await syncMotor.encolarRpc("registrar_stock_inicial", { p_inventario_id: r.uid, p_cantidad: cantidadInicial }, { entidad: "inventario", uid: r.uid });
   }
   return r.id;
 }
@@ -556,13 +580,24 @@ const DB = {
     return idbGet(store, id);
   },
   async save(store, value) {
-    if (modoNubeActivo(store)) return guardarSincronizado(store, value);
+    if (modoNubeActivo(store)) {
+      // D-4 (SYNC-7A): solo el administrador edita el maestro de inventario/categorías en modo nube.
+      if (!puedeEscribirEntidadNube(store)) {
+        bloquear(store === "inventario" ? "Solo el administrador edita el inventario" : "Solo el administrador edita las categorías");
+        throw new Error("SIN_PERMISO_" + store);
+      }
+      return guardarSincronizado(store, value);
+    }
     return idbSave(store, value);
   },
   async delete(store, id) {
     if (modoNubeActivo(store)) {
+      if (!puedeEscribirEntidadNube(store)) {
+        bloquear(store === "inventario" ? "Solo el administrador edita el inventario" : "Solo el administrador edita las categorías");
+        throw new Error("SIN_PERMISO_" + store);
+      }
       /* SYNC-6 sección 15: borrar una orden con seguridad (revertir stock si algo salió, RPC transaccional
-         en vez de DB.delete directo) es de SYNC-7. Mientras tanto se mantiene exactamente el mismo alcance
+         en vez de DB.delete directo) es de SYNC-7B. Mientras tanto se mantiene exactamente el mismo alcance
          de ANTES de SYNC-6: un borrado local nada más — nunca toca la nube ni pasa por el outbox. Sin este
          caso especial, el borrado genérico intentaría un soft-delete contra `ordenes` con una columna
          (deleted_at) que authenticated no tiene concedida (SYNC-2) y sync-engine.js RESTAURARÍA el registro
@@ -610,6 +645,10 @@ async function prepararModoNube(session) {
     sesion: () => (currentUser && currentUser.uid ? { uid: currentUser.uid } : null),
     autoenvio: true,
   });
+  // SYNC-7: autorización con PIN (D-7) — solo se arma con sesión de nube activa; las acciones que
+  // la necesitan (ver PinUI.ACCIONES_CON_PIN) están apagadas fuera de modo nube (mismo criterio que
+  // el resto de esta función).
+  if (window.PinUI) window.PinUI.prepararInstancia({ sesion: () => SupabaseCliente.sesion() });
   // Bootstrap (SYNC-5 sección 10): con cursor vacío, pull() pagina desde el
   // principio. Si no hay red, sigue igual — arrancar() reintentará al volver.
   try { await syncMotor.pullTodo(); } catch (e) { /* sin red: se reintenta al volver a estar online */ }

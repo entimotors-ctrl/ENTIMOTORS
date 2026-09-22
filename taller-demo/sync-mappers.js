@@ -1,10 +1,52 @@
 /* ============================================================================
- * ENTIMOTORS OS · sync-mappers.js  (3.14.0 · SYNC-6)
+ * ENTIMOTORS OS · sync-mappers.js  (3.14.0 · SYNC-7A)
  * ----------------------------------------------------------------------------
  * Mappers REALES para el motor de sincronización (SyncEngine, sync-engine.js):
- * clientes, motos, citas, categorias_inv, cotizaciones, ordenes. Cada mapper
- * describe, para UNA entidad, cómo se traduce entre el objeto local (mismos
- * nombres que siempre usó app.js) y la fila de la nube (columnas en snake_case).
+ * clientes, motos, citas, categorias_inv, inventario, cotizaciones, ordenes.
+ * Cada mapper describe, para UNA entidad, cómo se traduce entre el objeto
+ * local (mismos nombres que siempre usó app.js) y la fila de la nube
+ * (columnas en snake_case).
+ *
+ * INVENTARIO (SYNC-7A) — SOLO EL MAESTRO, NUNCA LA CANTIDAD
+ *   `inventario` ya existía como tabla cloud (fase4d) con UNIQUE(dispositivo,
+ *   local_id) igual que clientes/motos, y SYNC-1/SYNC-2/SYNC-3 ya la dejaron
+ *   lista: `cantidad` es columna derivada del ledger (inventario_movimientos,
+ *   trigger sync_ledger_aplicar) y authenticated NO tiene GRANT de INSERT/
+ *   UPDATE sobre ella (D-4, sync-2-seguridad.sql) — el maestro (nombre,
+ *   modelo, categoria_id, costo_compra, precio_venta, stock_minimo,
+ *   codigo_barras, publicar_en_web, foto_url, foto_path) sí, y solo para
+ *   admin (RLS inventario_admin_crea/inventario_admin_edita). Por eso este
+ *   mapper es un CRUD normal (mismo patrón que clientes/motos, sin RPC propia
+ *   para crear/editar el maestro) con UNA sola regla: `columnas`/`aCloud()`
+ *   JAMÁS incluyen `cantidad` — ni de ida ni de vuelta:
+ *     · aCloud(): no la manda nunca (ni en alta ni en edición): columnasNube()
+ *       de sync-engine.js solo envía lo que está en `columnas`/`fks`, así que
+ *       aunque el objeto local siempre trae `cantidad`, jamás sale de aquí.
+ *     · aLocal(): tampoco la lee (a propósito, ver más abajo). La existencia
+ *       inicial de un producto NUEVO va por la RPC `registrar_stock_inicial`
+ *       (sync-7a-inventario.sql), encolada UNA sola vez justo después del
+ *       alta del maestro (ver guardarSincronizado() en app.js) — un solo
+ *       movimiento de apertura por producto, nunca un UPDATE de `cantidad`.
+ *   Por qué aLocal() NO trae `cantidad` todavía (decisión explícita, no un
+ *   olvido): las ventas/créditos/órdenes del Taller SIGUEN moviendo el stock
+ *   100% local (IndexedDB, `DB.save("inventario", rep)` con `rep.cantidad`
+ *   editado a mano) — eso es SYNC-7B, no está conectado a la nube todavía. Si
+ *   aLocal() empezara a bajar `cantidad` de la nube, un pull() podría
+ *   PISAR silenciosamente una venta local recién hecha y sin sincronizar
+ *   (dos fuentes divergentes — justo lo que la fase prohíbe). Cuando SYNC-7B
+ *   conecte esas ventas al ledger real, ese es el momento de agregar
+ *   `cantidad`/`requiere_revision` a aLocal() (la cloud ya es la única
+ *   autoridad desde SYNC-1: MATERIALIZED_RPC vía sync_ledger_aplicar).
+ *   `categoria_id` se resuelve con el MISMO mapa local↔uid que ya usa
+ *   `categorias_inv` desde SYNC-5 — sin mapa nuevo, sin tabla nueva.
+ *   `foto`: mismo criterio que motos.foto (esRuta()) — una foto local en
+ *   base64 nunca sale; si ya es una ruta/URL, viaja como `foto_url`. Nunca se
+ *   sobreescribe al bajar (igual que motos): subir de verdad a Storage sigue
+ *   pendiente (sección 14 de la fase, fuera de alcance de SYNC-7A).
+ *   `puedeEscribir(rol)`: D-4 es "solo admin" tanto para `inventario` como
+ *   para `categorias_inv` — mismo campo en ambos mappers, para que app.js
+ *   tenga un único lugar de donde leer la regla (ver puedeEscribirEntidadNube
+ *   en app.js) en vez de hardcodear el rol en cada botón.
  *
  * ORDENES (SYNC-6) ES DOS MAPPERS DISTINTOS SEGÚN EL BUILD, NO UNO
  *   SYNC-2 cerró el acceso DIRECTO del mecánico a `ordenes`/`orden_items`: solo
@@ -135,8 +177,37 @@
     categorias_inv: {
       entidad: "categorias_inv", tabla: "categorias_inv", store: "categorias_inv",
       columnas: ["nombre"], tiempos: [], fks: [],
+      // D-4 (igual que inventario, SYNC-7A): el maestro de categorías también es solo del administrador.
+      puedeEscribir: function (rol) { return rol === "admin"; },
       aCloud: function (l) { return { nombre: l.nombre || "" }; },
       aLocal: function (r) { return { nombre: r.nombre }; },
+    },
+
+    // SYNC-7A: ver la cabecera del archivo — SOLO el maestro; `cantidad` nunca viaja por aquí.
+    inventario: {
+      entidad: "inventario", tabla: "inventario", store: "inventario",
+      columnas: ["nombre", "modelo", "costo_compra", "precio_venta", "stock_minimo", "codigo_barras", "publicar_en_web", "foto_url"],
+      tiempos: [], fks: [{ local: "categoriaId", cloud: "categoria_id", entidad: "categorias_inv" }],
+      puedeEscribir: function (rol) { return rol === "admin"; },
+      aCloud: function (l) {
+        return {
+          nombre: l.nombre || "", modelo: l.modelo || null,
+          costo_compra: l.costoCompra || 0, precio_venta: l.precio || 0,
+          stock_minimo: l.stockMinimo == null ? 3 : l.stockMinimo,
+          codigo_barras: l.codigoBarras || null, publicar_en_web: !!l.publicarEnWeb,
+          foto_url: esRuta(l.foto) ? l.foto : null,
+        };
+      },
+      aLocal: function (r) {
+        // cantidad: a propósito NO viene aquí — ver la cabecera del archivo.
+        return {
+          nombre: r.nombre, modelo: r.modelo || "",
+          costoCompra: Number(r.costo_compra) || 0, precio: Number(r.precio_venta) || 0, precioVenta: Number(r.precio_venta) || 0,
+          stockMinimo: r.stock_minimo == null ? 3 : Number(r.stock_minimo),
+          codigoBarras: r.codigo_barras || "", publicarEnWeb: !!r.publicar_en_web,
+          // foto NO se toca aquí (igual que motos.foto): una foto local en base64 se conserva tal cual.
+        };
+      },
     },
 
     cotizaciones: {
@@ -225,7 +296,10 @@
     },
   };
 
-  var orden = ["clientes", "motos", "citas", "categorias_inv", "cotizaciones", "ordenes"];
+  // "inventario" va DESPUÉS de "categorias_inv" (SYNC-7A): su fk categoriaId se resuelve por el mapa
+  // local↔uid, que solo existe una vez que categorias_inv ya se sincronizó (mismo motivo que "ordenes" va
+  // después de "clientes"/"motos").
+  var orden = ["clientes", "motos", "citas", "categorias_inv", "inventario", "cotizaciones", "ordenes"];
 
   global.ENTIMOTORS_SYNC_MAPPERS = mappers;
   global.ENTIMOTORS_SYNC_ORDEN = orden;

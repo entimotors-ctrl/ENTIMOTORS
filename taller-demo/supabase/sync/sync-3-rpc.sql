@@ -11,6 +11,19 @@
 --   · REVERSAL_ONLY: anular/devolver/revertir inserta movimientos compensatorios y una fila en `reversos`; el original
 --     se conserva. Las acciones del cajero exigen una autorización de un solo uso (PIN administrativo, SYNC-3P).
 --   · El servidor calcula totales, costos y márgenes; lo que diga el cliente sobre ellos se ignora.
+--
+-- SYNC-7 (auditoría de errores, sección 2): las 14 validaciones terminales de esta hoja (ya anulado/cerrado/
+-- finalizado/revertido, o "no es la orden esperada") usaban ERRCODE 55000 (object_not_in_prerequisite_state).
+-- SYNC-6 encontró empíricamente que PostgREST mapea la clase 55 a HTTP 500, y sync-rest.js clasifica CUALQUIER
+-- 5xx como "servidor" (reintentable) — un rechazo terminal no debe reintentarse jamás. Cambiadas a ERRCODE
+-- 22000 (data_exception, clase 22 → 400 → "validacion" en sync-cliente, terminal), mismo patrón ya verificado
+-- contra PostgREST real en sync-6-mecanicos-ordenes.sql. sync-engine.js trata "validacion" y "conflicto" IGUAL
+-- (ninguna se reintenta: ver `flush()`, la lista `k === "permiso" || k === "validacion" || k === "conflicto"`),
+-- así que no hace falta distinguir sub-clase aquí. Revisado también sync-3p-pin.sql (PIN_CAMBIADO, ERRCODE
+-- 55000): SIN CAMBIOS — pin.ts (api-server) lo atrapa por el TEXTO del mensaje ("PIN_CAMBIADO"), no por el
+-- status HTTP, así que el bug de mapeo no lo afecta. sync-3b-importacion.sql (10 apariciones de 55000) tampoco
+-- se tocó: es una herramienta de migración de una sola vez que SYNC-7 no consume en el flujo de venta/caja/
+-- crédito del día a día — fuera de alcance ("NO hacer reemplazo ciego global").
 BEGIN;
 
 SET LOCAL search_path = pg_catalog, public;
@@ -146,7 +159,7 @@ DECLARE c record; v_abonado numeric; v_saldo numeric; v_estado text; v_abono uui
 BEGIN
   SELECT total, abonado, anulado INTO c FROM public.creditos WHERE id = p_credito FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'Crédito no encontrado' USING ERRCODE = 'P0002'; END IF;
-  IF c.anulado THEN RAISE EXCEPTION 'El crédito está anulado' USING ERRCODE = '55000'; END IF;
+  IF c.anulado THEN RAISE EXCEPTION 'El crédito está anulado' USING ERRCODE = '22000'; END IF;
   IF p_monto IS NULL OR p_monto <= 0 THEN RAISE EXCEPTION 'El abono debe ser mayor que cero' USING ERRCODE = '22023'; END IF;
   IF p_monto > (c.total - c.abonado) + 0.01 THEN
     RAISE EXCEPTION 'El abono (%) supera el saldo pendiente (%)', p_monto, c.total - c.abonado USING ERRCODE = '23514';
@@ -322,7 +335,7 @@ BEGIN
 
   SELECT ord.id, ord.finalizada, ord.anulada, ord.deleted_at INTO o FROM public.ordenes ord WHERE ord.id = p_orden_id FOR UPDATE;
   IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
-  IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no admite más ítems' USING ERRCODE = '55000'; END IF;
+  IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no admite más ítems' USING ERRCODE = '22000'; END IF;
   v_occ := LEAST(COALESCE(p_occurred_at, clock_timestamp()), clock_timestamp());
   v_off := COALESCE(p_offline, false) AND v_occ < clock_timestamp() - interval '20 seconds';
   v_item := COALESCE(p_item_id, gen_random_uuid());
@@ -354,7 +367,7 @@ BEGIN
   SELECT oi.id, oi.orden_id, oi.inventario_id, oi.cantidad, oi.nombre INTO it FROM public.orden_items oi WHERE oi.id = p_item_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'El ítem ya no existe' USING ERRCODE = 'P0002'; END IF;
   SELECT ord.finalizada, ord.anulada INTO o FROM public.ordenes ord WHERE ord.id = it.orden_id FOR UPDATE;
-  IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no se quitan ítems' USING ERRCODE = '55000'; END IF;
+  IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no se quitan ítems' USING ERRCODE = '22000'; END IF;
   IF it.inventario_id IS NOT NULL THEN
     v_saldo := public.sync_stock_mover(it.inventario_id, it.cantidad, 'reverso_item_orden', p_op, false, clock_timestamp(), NULL, NULL, it.orden_id, it.id, NULL, 'Ítem quitado de la orden');
   END IF;
@@ -383,9 +396,9 @@ BEGIN
 
   SELECT * INTO o FROM public.ordenes WHERE id = p_orden_id FOR UPDATE;
   IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
-  IF o.finalizada THEN RAISE EXCEPTION 'Esta orden ya estaba finalizada: no se vuelve a cobrar' USING ERRCODE = '55000'; END IF;
-  IF o.anulada THEN RAISE EXCEPTION 'La orden está anulada' USING ERRCODE = '55000'; END IF;
-  IF o.estado <> 'entregado' THEN RAISE EXCEPTION 'La orden debe estar entregada para finalizarla' USING ERRCODE = '55000'; END IF;
+  IF o.finalizada THEN RAISE EXCEPTION 'Esta orden ya estaba finalizada: no se vuelve a cobrar' USING ERRCODE = '22000'; END IF;
+  IF o.anulada THEN RAISE EXCEPTION 'La orden está anulada' USING ERRCODE = '22000'; END IF;
+  IF o.estado <> 'entregado' THEN RAISE EXCEPTION 'La orden debe estar entregada para finalizarla' USING ERRCODE = '22000'; END IF;
   v_occ := LEAST(COALESCE(p_occurred_at, clock_timestamp()), clock_timestamp());
 
   SELECT COALESCE(sum(cantidad * precio), 0), COALESCE(sum(CASE WHEN inventario_id IS NOT NULL THEN costo_unitario * cantidad ELSE 0 END), 0)
@@ -438,7 +451,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT * INTO c FROM public.cotizaciones WHERE id = p_cotizacion_id FOR UPDATE;
   IF NOT FOUND OR c.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La cotización no existe' USING ERRCODE = 'P0002'; END IF;
-  IF c.estado <> 'pendiente' THEN RAISE EXCEPTION 'La cotización ya fue %', c.estado USING ERRCODE = '55000'; END IF;
+  IF c.estado <> 'pendiente' THEN RAISE EXCEPTION 'La cotización ya fue %', c.estado USING ERRCODE = '22000'; END IF;
 
   v_cli := c.cliente_id;
   IF v_cli IS NULL THEN INSERT INTO public.clientes (nombre, telefono) VALUES (c.cliente_nombre, COALESCE(c.cliente_telefono, '')) RETURNING id INTO v_cli; END IF;
@@ -566,7 +579,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulada INTO v FROM public.ventas WHERE id = p_venta_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = 'P0002'; END IF;
-  IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '55000'; END IF;
+  IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '22000'; END IF;
   SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_venta', 'ventas', p_venta_id, p_op, v.total)) AS x(o_autorizado uuid, o_admin boolean);
   SELECT COALESCE(sum((r.detalle->>'monto')::numeric), 0) INTO v_dev_monto FROM public.reversos r WHERE r.entidad = 'ventas' AND r.registro_id = p_venta_id AND r.tipo = 'devolucion';
   v_rev := public.sync_registrar_reverso('venta', 'ventas', p_venta_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion,
@@ -601,7 +614,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulada INTO v FROM public.ventas WHERE id = p_venta_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = 'P0002'; END IF;
-  IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '55000'; END IF;
+  IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '22000'; END IF;
   FOR x IN SELECT * FROM jsonb_to_recordset(p_items) AS y(venta_item_id uuid, cantidad numeric) LOOP
     IF x.cantidad IS NULL OR x.cantidad <= 0 THEN RAISE EXCEPTION 'Cantidad de devolución inválida' USING ERRCODE = '22023'; END IF;
     SELECT * INTO vi FROM public.venta_items WHERE id = x.venta_item_id AND venta_id = p_venta_id;
@@ -661,7 +674,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, monto, anulado, credito_id INTO ab FROM public.abonos WHERE id = p_abono_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'El abono no existe' USING ERRCODE = 'P0002'; END IF;
-  IF ab.anulado THEN RAISE EXCEPTION 'El abono ya está anulado' USING ERRCODE = '55000'; END IF;
+  IF ab.anulado THEN RAISE EXCEPTION 'El abono ya está anulado' USING ERRCODE = '22000'; END IF;
   SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_abono', 'abonos', p_abono_id, p_op, ab.monto)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('abono', 'abonos', p_abono_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('monto', ab.monto, 'credito_id', ab.credito_id));
   v_m := public.sync_reversar_abono_i(p_abono_id, clock_timestamp(), 'Reverso de abono a crédito');
@@ -701,7 +714,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulado, orden_id INTO c FROM public.creditos WHERE id = p_credito_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'El crédito no existe' USING ERRCODE = 'P0002'; END IF;
-  IF c.anulado THEN RAISE EXCEPTION 'El crédito ya está anulado' USING ERRCODE = '55000'; END IF;
+  IF c.anulado THEN RAISE EXCEPTION 'El crédito ya está anulado' USING ERRCODE = '22000'; END IF;
   SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_credito', 'creditos', p_credito_id, p_op, c.total)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('credito', 'creditos', p_credito_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('total', c.total));
   v_m := public.sync_reversar_credito_i(p_credito_id, v_rev, p_motivo, c.orden_id IS NULL);   -- créditos de una orden: el stock ya salió con la orden
@@ -724,9 +737,9 @@ BEGIN
   SELECT * INTO m FROM public.caja_movimientos WHERE id = p_caja_id FOR UPDATE;
   IF NOT FOUND THEN RAISE EXCEPTION 'El movimiento no existe' USING ERRCODE = 'P0002'; END IF;
   IF m.venta_id IS NOT NULL OR m.credito_id IS NOT NULL OR m.orden_id IS NOT NULL OR m.id_abono IS NOT NULL OR m.reverso_de IS NOT NULL THEN
-    RAISE EXCEPTION 'Este movimiento respalda otra operación: reviértela desde su origen (venta, crédito, abono u orden)' USING ERRCODE = '55000';
+    RAISE EXCEPTION 'Este movimiento respalda otra operación: reviértela desde su origen (venta, crédito, abono u orden)' USING ERRCODE = '22000';
   END IF;
-  IF EXISTS (SELECT 1 FROM public.caja_movimientos x WHERE x.reverso_de = p_caja_id) THEN RAISE EXCEPTION 'El movimiento ya está revertido' USING ERRCODE = '55000'; END IF;
+  IF EXISTS (SELECT 1 FROM public.caja_movimientos x WHERE x.reverso_de = p_caja_id) THEN RAISE EXCEPTION 'El movimiento ya está revertido' USING ERRCODE = '22000'; END IF;
   SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_caja', 'caja_movimientos', p_caja_id, p_op, m.monto)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('caja', 'caja_movimientos', p_caja_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('monto', m.monto, 'tipo', m.tipo));
   v_id := public.sync_caja(CASE m.tipo WHEN 'ingreso' THEN 'egreso' ELSE 'ingreso' END, 'Reverso de caja', m.monto, m.metodo_pago, 'Reverso: ' || COALESCE(m.descripcion, m.categoria, ''), clock_timestamp(), NULL, NULL, NULL, NULL, NULL, p_caja_id);
@@ -749,7 +762,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT * INTO o FROM public.ordenes WHERE id = p_orden_id FOR UPDATE;
   IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
-  IF o.anulada THEN RAISE EXCEPTION 'La orden ya está anulada' USING ERRCODE = '55000'; END IF;
+  IF o.anulada THEN RAISE EXCEPTION 'La orden ya está anulada' USING ERRCODE = '22000'; END IF;
   v_dinero := o.finalizada OR EXISTS (SELECT 1 FROM public.caja_movimientos c WHERE c.orden_id = p_orden_id)
               OR EXISTS (SELECT 1 FROM public.creditos c WHERE c.orden_id = p_orden_id);
   IF NOT v_dinero THEN

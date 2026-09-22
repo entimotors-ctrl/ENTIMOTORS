@@ -28,6 +28,26 @@ test("clasificar: cada respuesta de error cae en la clase que decide qué hace l
   assert.equal(clasificar(500, "texto plano").clase, "servidor", "un cuerpo que no es JSON no rompe");
 });
 
+test("clasificar: SYNC-7 sección 2 — 22000 (clase 22, la reemplazante de 55000) cae en validacion (terminal, no se reintenta)", () => {
+  // sync-3-rpc.sql cambió sus 14 validaciones terminales (ya anulado/cerrado/finalizado/revertido) de ERRCODE
+  // 55000 a 22000 porque PostgREST mapea la clase 55 a HTTP 500 (confirmado en SYNC-6) y este cliente clasifica
+  // CUALQUIER 5xx como "servidor" (reintentable) — ver flush() en sync-engine.js: "validacion" y "conflicto" son
+  // las únicas clases que NO se reintentan. Este caso documenta el patrón correcto (400) y el bug histórico (500)
+  // para que nadie vuelva a usar 55000 en una validación terminal sin darse cuenta de la consecuencia.
+  assert.equal(clasificar(400, { code: "22000", message: "La orden ya está cerrada: no admite más ítems" }).clase, "validacion");
+  assert.equal(clasificar(400, { code: "22000", message: "La venta ya está anulada" }).clase, "validacion");
+  // documentado a propósito: 55000 a status 500 SIGUE cayendo en "servidor" (reintentable) — es exactamente el bug
+  // que sync-3-rpc.sql dejó de usar. Si esta aserción alguna vez fallara sería porque PostgREST cambió su mapeo,
+  // no porque el cliente se haya "arreglado solo": conviene revisar sync-3-rpc.sql de nuevo en ese caso.
+  assert.equal(clasificar(500, { code: "55000", message: "cualquier cosa" }).clase, "servidor");
+});
+
+test("SYNC-7 · flush(): las clases 'validacion' y 'conflicto' se rechazan sin reintentar; 'servidor'/'red'/'limite'/'esquema'/'auth' sí se conservan para reintentar", () => {
+  const codigo = leer("sync-engine.js");
+  const m = codigo.match(/if \(k === "permiso" \|\| k === "validacion" \|\| k === "conflicto"\) \{[\s\S]{0,40}\/\/ no se arregla reintentando/);
+  assert.ok(m, "flush() debe seguir tratando 'validacion' y 'conflicto' como terminales (no reintentables) igual que 'permiso'");
+});
+
 test("construirQuery codifica todo (incluido el + de los husos horarios) y respeta el orden", () => {
   assert.equal(construirQuery({ select: "*", filtros: [["id", "eq", "a b"], ["rev", "eq", 3]], orden: "updated_at.asc,id.asc", limite: 500 }), "?select=*&id=eq.a%20b&rev=eq.3&order=updated_at.asc%2Cid.asc&limit=500".replace("select=*", "select=*"));
   const c = condicionCursor({ t: "2026-09-21T23:12:30.123456+00:00", id: "u1" });
@@ -172,6 +192,46 @@ test("verificarSinPin: las siete acciones con PIN y cualquier dato de autorizaci
     assert.throws(() => P.verificarSinPin("registrar_credito", { a: { b: { c: { [k]: "x" } } } }), /autorización/, `profundo ${k}`);
   }
   assert.doesNotThrow(() => P.verificarSinPin("registrar_venta_v2", { p_items: [{ id: 1, cantidad: 2 }], p_monto: 5, p_op_id: "x" }));
+});
+
+/* ---------------- SYNC-7: rpcInmediato (motor) — las acciones con PIN nunca se encolan (verificarSinPin
+   las rechaza en encolarRpc), así que necesitan una llamada directa que NO pase por el outbox. ---------------- */
+function motorFalso(o = {}) {
+  const llamadasRpc = [];
+  const rest = { rpc: async (nombre, params) => { llamadasRpc.push({ nombre, params }); return o.respuestaRpc || { ok: true, datos: { ok: true } }; } };
+  const motor = ctx0.SyncEngine.crearMotor({
+    bd: {}, rest, mappers: {}, uuid: o.uuid || (() => "op-fijo-de-prueba"),
+    sesion: o.sesion || (() => ({ uid: "u1" })), habilitado: o.habilitado || (() => true),
+  });
+  return { motor, llamadasRpc };
+}
+
+test("rpcInmediato: llama la RPC AHORA (nunca por la cola), inyecta p_op y devuelve el resultado tal cual", async () => {
+  const { motor, llamadasRpc } = motorFalso({ respuestaRpc: { ok: true, datos: { reverso_id: "r1" } } });
+  const r = await motor.rpcInmediato("reversar_venta", { p_venta_id: "v1", p_motivo: "cliente se arrepintió", p_autorizacion: "auth-1" });
+  assert.equal(llamadasRpc.length, 1);
+  assert.equal(llamadasRpc[0].nombre, "reversar_venta");
+  assert.equal(llamadasRpc[0].params.p_op, "op-fijo-de-prueba", "p_op (no p_op_id) es la clave de idempotencia que lee sync_op_iniciar");
+  assert.equal(llamadasRpc[0].params.p_venta_id, "v1");
+  assert.equal(llamadasRpc[0].params.p_autorizacion, "auth-1");
+  assert.equal(r.ok, true);
+  assert.equal(r.op_id, "op-fijo-de-prueba");
+  assert.deepEqual(r.datos, { reverso_id: "r1" });
+});
+
+test("rpcInmediato: sin sesión no llama a la red; devuelve clase auth", async () => {
+  const { motor, llamadasRpc } = motorFalso({ sesion: () => null });
+  const r = await motor.rpcInmediato("reversar_caja", { p_caja_id: "c1" });
+  assert.equal(r.ok, false);
+  assert.equal(r.clase, "auth");
+  assert.equal(llamadasRpc.length, 0);
+});
+
+test("rpcInmediato: motor apagado (sin ENTIMOTORS_SYNC.enabled) no llama a la red", async () => {
+  const { motor, llamadasRpc } = motorFalso({ habilitado: () => false });
+  const r = await motor.rpcInmediato("ajustar_stock", { p_inventario_id: "i1" });
+  assert.equal(r.ok, false);
+  assert.equal(llamadasRpc.length, 0);
 });
 
 test("guardas estáticas de los tres módulos: sin claves de servidor, sin almacenamiento del navegador para credenciales, sin registrar tokens", () => {

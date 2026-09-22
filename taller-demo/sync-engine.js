@@ -365,6 +365,20 @@
       return { seq: seq, op_id: opId };
     }
 
+    /** Llama una RPC AHORA MISMO, sin pasar por la cola (SYNC-7): las acciones con PIN nunca se
+        encolan (ver verificarSinPin arriba) — necesitan ejecutarse en línea, con la autorización
+        recién emitida por PinUI, y fallar A LA VISTA si algo sale mal (nadie las reintenta solas).
+        p_op se genera aquí igual que en encolarRpc, para que la RPC sea idempotente si la propia
+        UI decide reintentar la MISMA acción tras un error de red. */
+    async function rpcInmediato(nombre, params) {
+      if (apagado()) return { ok: false, clase: "red", codigo: "APAGADO", mensaje: "La sincronización no está activa." };
+      var s = sesion(); if (!s || !s.uid) return { ok: false, clase: "auth", codigo: "SIN_SESION", mensaje: "No hay sesión." };
+      var opId = nuevoUuid();
+      var r = await rest.rpc(nombre, Object.assign({}, params, { p_op: opId }));
+      if (r.ok) emitir("rpc-ok", { op_id: opId, rpc: nombre, resultado: r.datos });
+      return Object.assign({ op_id: opId }, r);
+    }
+
     async function conBloqueo(fn) {
       if (locks && typeof locks.request === "function") {
         return locks.request("entimotors-sync-flush", { ifAvailable: true }, function (lock) { return lock ? fn() : { omitido: "otra-pestana" }; });
@@ -506,7 +520,7 @@
         ultimoError: estadoVivo.ultimoError, ultimoPull: estadoVivo.ultimoPull, cola: cola, conflictos: conflictos.length, deOtraPersona: ajenas };
     }
 
-    return { escribir: escribir, pull: pull, pullTodo: pullTodo, flush: flush, sincronizar: sincronizar, encolarRpc: encolarRpc, resolverConflicto: resolverConflicto,
+    return { escribir: escribir, pull: pull, pullTodo: pullTodo, flush: flush, sincronizar: sincronizar, encolarRpc: encolarRpc, rpcInmediato: rpcInmediato, resolverConflicto: resolverConflicto,
       estado: estado, arrancar: arrancar, detener: detener, onCambio: function (f) { escuchas.push(f); return function () { escuchas = escuchas.filter(function (x) { return x !== f; }); }; } };
   }
 
