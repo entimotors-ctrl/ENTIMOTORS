@@ -40,8 +40,10 @@ function lanzar(nav, url, perfil) {
 const salio = (h, ms) => new Promise((r) => { if (h.exitCode !== null || h.signalCode) return r(true); const t = setTimeout(() => r(false), ms); h.once("exit", () => { clearTimeout(t); r(true); }); });
 async function matar(h) { for (const s of ["SIGTERM", "SIGKILL"]) { try { process.kill(-h.pid, s); } catch { /* ya no está */ } if (await salio(h, s === "SIGTERM" ? 3000 : 2000)) break; } }
 
-/** Abre un dispositivo. opciones: { navegador: "chromium"|"firefox", nombre, sinSW } */
-export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html" } = {}) {
+/** Abre un dispositivo. opciones: { navegador: "chromium"|"firefox", nombre, pagina, real }
+    real:true → `pagina` se sirve desde taller-demo/ tal cual (p. ej. "index.html", la app de verdad), con el
+    puente inyectado (ver arriba); por defecto (real:false) se sirve desde /__h/ (el arnés, pagina.html). */
+export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html", real = false } = {}) {
   if (!NAVEGADORES[navegador]) throw new Error(`no hay ${navegador} instalado`);
   const cola = []; const esperando = []; const pendientes = new Map(); let sigId = 1;
   const peticionesEstaticas = [];
@@ -59,18 +61,35 @@ export async function abrirDispositivo({ navegador = "chromium", nombre = "dispo
       return;
     }
     if (u.pathname === "/__h/cfg.js") { res.writeHead(200, { "Content-Type": TIPOS[".js"], "Cache-Control": "no-store" }); return res.end(`window.__pila = ${JSON.stringify({ restUrl: REST_URL, anonKey: "anon-sintetica", nombre })};`); }
+    // SYNC-6 sección 2 (real:true, index.html de verdad): supabase-config.js de disco apunta a producción
+    // (taller-demo/supabase-config.js, url real + anon key real) — NUNCA se sirve tal cual en una prueba.
+    // Se sustituye por una versión sintética que apunta al gateway local, ANTES de que supabase-client.js
+    // (que se carga justo después en index.html) la lea. index.html/supabase-config.js en disco no se tocan.
+    if (u.pathname === "/supabase-config.js") {
+      res.writeHead(200, { "Content-Type": TIPOS[".js"], "Cache-Control": "no-store" });
+      return res.end(`window.ENTIMOTORS_SUPABASE = ${JSON.stringify({ url: REST_URL, anonKey: "anon-sintetica", habilitado: true, apiUrl: "" })};`);
+    }
     let base = TALLER, rel = decodeURIComponent(u.pathname);
     if (rel.startsWith("/__h/")) { base = HARNESS; rel = rel.slice(4); }
     if (rel === "/") rel = "/index.html";
     const f = path.join(base, path.normalize(rel));
     if (!f.startsWith(base) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { res.writeHead(404); return res.end("no existe"); }
     peticionesEstaticas.push(u.pathname);
-    res.writeHead(200, { "Content-Type": TIPOS[path.extname(f)] || "application/octet-stream", "Cache-Control": "no-store" }); res.end(fs.readFileSync(f));
+    let cuerpo = fs.readFileSync(f);
+    // SYNC-6 sección 2: al servir un .html REAL de taller-demo (no la página del arnés) se inyecta el
+    // puente justo antes de </body> para poder controlarlo con d.eval() igual que pagina.html — el
+    // index.html en disco no se toca. Las pruebas SYNC-1..5 nunca piden un .html de TALLER (solo /__h/
+    // pagina.html), así que esto no las afecta.
+    if (base === TALLER && /\.html?$/i.test(f)) {
+      const texto = cuerpo.toString("utf8");
+      if (/<\/body>/i.test(texto)) cuerpo = Buffer.from(texto.replace(/<\/body>/i, '<script src="/__h/bridge.js"></script></body>'));
+    }
+    res.writeHead(200, { "Content-Type": TIPOS[path.extname(f)] || "application/octet-stream", "Cache-Control": "no-store" }); res.end(cuerpo);
   });
   await new Promise((r) => srv.listen(0, "127.0.0.1", r));
   const puerto = srv.address().port, origen = `http://127.0.0.1:${puerto}`;
   const perfil = fs.mkdtempSync(path.join(os.tmpdir(), `entimotors-sync-${navegador}-`));
-  const hijo = lanzar(navegador, `${origen}/__h/${pagina}`, perfil);
+  const hijo = lanzar(navegador, `${origen}/${real ? String(pagina).replace(/^\/+/, "") : "__h/" + pagina}`, perfil);
   let errBrowser = ""; hijo.stderr.on("data", (d) => { if (errBrowser.length < 4000) errBrowser += d; });
 
   const dispositivo = {

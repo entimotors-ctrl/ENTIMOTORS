@@ -19,7 +19,7 @@ const SECRETO_JWT = "secreto-sintetico-solo-pruebas-locales-0123456789";   // no
 const IMAGEN_REST = "public.ecr.aws/supabase/postgrest:v14.13";
 const CONT_REST = "entimotors-sync-rest";
 export const DB = "t_e2e";
-const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items"];
+const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items", "6-mecanicos-ordenes"];
 
 export const uid = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 export const PERFILES = { admin: uid(1), cajero: uid(2), mecanico: uid(3), mecanico2: uid(4) };
@@ -88,11 +88,16 @@ export async function iniciarPila() {
   const gateway = await arrancarGateway();
   return {
     jwt, sql, uid, PERFILES, REST_URL,
-    /** Vacía los datos operativos (la protección de las tablas de dinero se salta con replica solo aquí, en la base de pruebas). */
+    /** Vacía los datos operativos (la protección de las tablas de dinero se salta con replica solo aquí, en la base de pruebas) y
+        restaura los 4 perfiles sembrados a activo=true — SYNC-6 introdujo pruebas que desactivan un perfil a propósito
+        (perfiles NO se trunca: es la identidad fija que usan TODAS las pruebas), así que sin este reset una prueba que
+        corra después de esa quedaría con un mecánico inactivo por accidente, sin que su propio código lo pida. */
     limpiar() {
       sql(`set session_replication_role = replica;
-           truncate public.clientes, public.motos, public.citas, public.categorias_inv, public.cotizaciones, public.cotizacion_items, public.web_cms cascade;
-           reset session_replication_role;`);
+           truncate public.clientes, public.motos, public.citas, public.categorias_inv, public.cotizaciones, public.cotizacion_items,
+             public.web_cms, public.ordenes, public.orden_items cascade;
+           reset session_replication_role;
+           update public.perfiles set activo = true where id in (${Object.values(PERFILES).map((v) => `'${v}'`).join(",")});`);
     },
     async detener() { gateway.closeAllConnections?.(); gateway.close(); sh("docker", ["rm", "-f", CONT_REST]); sh("bash", [ENTORNO, "borra", DB]); },
   };

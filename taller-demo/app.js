@@ -448,12 +448,14 @@ function tx(store, mode = "readonly") { return db.transaction(store, mode).objec
    de caja) siguen usando db.transaction([...]) directo donde ya estaban:
    pasarlas por aquí una fila a la vez les haría perder la atomicidad.
 
-   SYNC-5: ese día llegó para 5 entidades (clientes, motos, citas,
-   categorias_inv, cotizaciones). Con el motor de sincronización activo
-   (ver prepararModoNube más abajo), get/getAll/save/delete de esas 5 se
-   desvían a `syncBd`/`syncMotor` (entimotors_sync); el resto sigue exactamente
-   igual, byte por byte, contra entimotors_os_demo. */
-const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "cotizaciones"];
+   SYNC-5 sumó 5 entidades (clientes, motos, citas, categorias_inv,
+   cotizaciones); SYNC-6 suma "ordenes" (mapper distinto por producto — ver la
+   cabecera de sync-mappers.js). Con el motor de sincronización activo (ver
+   prepararModoNube más abajo), get/getAll/save/delete de esas 6 se desvían a
+   `syncBd`/`syncMotor` (entimotors_sync); el resto (inventario, ventas_rapidas,
+   dinero) sigue exactamente igual, byte por byte, contra entimotors_os_demo —
+   eso es SYNC-7. */
+const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "cotizaciones", "ordenes"];
 let syncBd = null;
 let syncMotor = null;
 function modoNubeActivo(store) {
@@ -516,7 +518,32 @@ async function guardarSincronizado(store, value) {
     const items = (v.items || []).map((it) => ({ nombre: it.nombre, cantidad: it.cantidad, precio: it.precio, inventario_id: null }));
     await syncMotor.encolarRpc("sync_guardar_items_cotizacion", { p_cotizacion_id: r.uid, p_items: items }, { entidad: "cotizaciones", uid: r.uid });
   }
+  /* SYNC-6: el mapper "ordenes" del mecánico manda columnas=[]/aCloud()={} a propósito (ver sync-mappers.js),
+     así que syncMotor.escribir() de arriba ya escribió la copia LOCAL pero no empujó nada a la nube. El único
+     camino de escritura del mecánico es avanzar_orden_tecnico (sync-6-mecanicos-ordenes.sql): misma RPC por
+     outbox que sync_guardar_items_cotizacion arriba, offline-safe y con reintento. */
+  if (store === "ordenes" && esMecanicoCuenta() && r && r.uid) {
+    await encolarAvanceTecnico(r.uid, v);
+  }
   return r.id;
+}
+
+// Solo estos 7 campos: exactamente los que permite el trigger ordenes_mecanico_avance (fase4d) y que
+// avanzar_orden_tecnico reutiliza — ver la cabecera de sync-6-mecanicos-ordenes.sql.
+function esRutaFoto(v) { return typeof v === "string" && v.length > 0 && !/^data:/i.test(v); }
+async function encolarAvanceTecnico(ordenUid, v) {
+  const campos = {
+    estado: v.estado,
+    diagnostico: v.diagnostico ?? null,
+    reparacion_notas: v.reparacionNotas ?? "",
+    calidad_checklist: v.calidadChecklist ?? null,
+    // nunca base64: si algo se coló localmente como base64 (no debería, Mi Trabajo sube a Storage), se filtra
+    // aquí Y lo rechaza de nuevo el CHECK ordenes_fotos_sin_base64 (SYNC-1) si algo se escapara igual.
+    fotos: Array.isArray(v.fotos) ? v.fotos.filter(esRutaFoto) : [],
+    km_salida: v.kmSalida ?? null,
+    falla: v.falla ?? "",
+  };
+  await syncMotor.encolarRpc("avanzar_orden_tecnico", { p_orden_id: ordenUid, p_campos: campos }, { entidad: "ordenes", uid: ordenUid });
 }
 
 const DB = {
@@ -533,7 +560,16 @@ const DB = {
     return idbSave(store, value);
   },
   async delete(store, id) {
-    if (modoNubeActivo(store)) { await syncMotor.escribir(store, { id }, { borrar: true }); return; }
+    if (modoNubeActivo(store)) {
+      /* SYNC-6 sección 15: borrar una orden con seguridad (revertir stock si algo salió, RPC transaccional
+         en vez de DB.delete directo) es de SYNC-7. Mientras tanto se mantiene exactamente el mismo alcance
+         de ANTES de SYNC-6: un borrado local nada más — nunca toca la nube ni pasa por el outbox. Sin este
+         caso especial, el borrado genérico intentaría un soft-delete contra `ordenes` con una columna
+         (deleted_at) que authenticated no tiene concedida (SYNC-2) y sync-engine.js RESTAURARÍA el registro
+         local en cuanto la nube lo rechazara — el botón de "Eliminar" del Taller parecería no funcionar. */
+      if (store === "ordenes") { await syncBd.transaccion(["ordenes"], "readwrite", (t) => t.borrar("ordenes", id)); return; }
+      await syncMotor.escribir(store, { id }, { borrar: true }); return;
+    }
     return idbDelete(store, id);
   },
   clear(store) {
@@ -578,6 +614,40 @@ async function prepararModoNube(session) {
   // principio. Si no hay red, sigue igual — arrancar() reintentará al volver.
   try { await syncMotor.pullTodo(); } catch (e) { /* sin red: se reintenta al volver a estar online */ }
   syncMotor.arrancar();
+
+  if (session.rol === "mecanico" && session.perfilId) {
+    /* SYNC-6 sección 9: cuando el servidor rechaza un avance técnico (orden reasignada o cerrada mientras
+       el mecánico estaba desconectado), se avisa con el mensaje exacto de avanzar_orden_tecnico y se refresca
+       la vista con lo último que hay en caché local — no se reabre nada por su cuenta. */
+    syncMotor.onCambio((ev) => {
+      if (ev.tipo !== "rechazada" || ev.datos?.entidad !== "ordenes") return;
+      toast(ev.datos.error?.mensaje || "Ese cambio ya no se pudo aplicar.", "off");
+      if (currentOrderId != null) openOrder(currentOrderId);
+      if (document.getElementById("view-mi-trabajo")?.classList.contains("active")) renderMiTrabajo();
+    });
+    // SYNC-6 sección 11: fotos tomadas sin conexión, encoladas en bd.blobs — se reintentan al volver la red.
+    window.addEventListener("online", () => { flushFotosPendientes(); });
+    flushFotosPendientes();
+  }
+}
+
+/** Sube las fotos de órdenes que quedaron pendientes en bd.blobs (offline). Nunca lanza: mejor esfuerzo. */
+async function flushFotosPendientes() {
+  if (!syncBd || !esMecanicoCuenta() || !window.SyncFotos || !window.ENTIMOTORS_SUPABASE) return;
+  try {
+    await SyncFotos.procesarCola({
+      bd: syncBd, baseUrl: window.ENTIMOTORS_SUPABASE.url, anonKey: window.ENTIMOTORS_SUPABASE.anonKey,
+      bucket: "entimotors-taller",
+      obtenerToken: () => { const s = SupabaseCliente.sesion(); return s ? s.access_token : null; },
+      refrescar: () => SupabaseCliente.refrescarSesion().then((r) => r.ok),
+      alSubirUna: async (path, registro) => {
+        const localId = await syncBd.mapa.localDe(registro.uid);
+        if (localId == null) return;
+        await updateOrder(localId, (ord) => { ord.fotos = (ord.fotos || []).concat([path]); });
+        if (currentOrderId === localId) openOrder(localId);
+      },
+    });
+  } catch (e) { /* mejor esfuerzo: se reintenta en el próximo "online" o la próxima foto */ }
 }
 const ALL_STORES = ["clientes", "motos", "ordenes", "inventario", "citas", "cotizaciones", "ventas_rapidas", "caja_movimientos", "creditos", "web_cms", "categorias_inv", "auditoria"];
 // sync_cola queda FUERA del respaldo a propósito: es un registro de "qué falta
@@ -1955,14 +2025,21 @@ async function renderMiTrabajo() {
 
   const abiertas = ordenes.filter(esTrabajoPropio).filter(o => o.estado !== "entregado");
   const entregadas = ordenes.filter(esTrabajoPropio).filter(o => o.estado === "entregado");
+  // SYNC-6: con cuenta real de nube, la orden ya trae cliente/moto aplanados (ver openOrder); las cuentas
+  // locales de TEAM (sin perfilId de verdad) siguen resolviendo por id contra la base del dispositivo, igual
+  // que siempre — esRealDeNube distingue exactamente ese caso.
+  const esRealDeNube = esMecanicoCuenta();
   const tarjeta = (o, historial) => {
-    const m = motoDe(o.motoId);
+    const motoTxt = esRealDeNube ? (o.motoMarca ? `${o.motoMarca} ${o.motoModelo || ""}`.trim() : "Moto")
+      : (() => { const m = motoDe(o.motoId); return m ? `${m.marca} ${m.modelo}` : "Moto"; })();
+    const placa = esRealDeNube ? o.motoPlaca : motoDe(o.motoId)?.placa;
+    const clienteTxt = esRealDeNube ? (o.clienteNombre || "Cliente") : nombreCliente(o.clienteId);
     return `<div class="card orden-mia" data-id="${o.id}" style="margin-bottom:0.6rem; cursor:pointer;">
       <div style="display:flex; justify-content:space-between; gap:0.6rem; align-items:baseline;">
-        <b>#${o.id} — ${esc(m ? `${m.marca} ${m.modelo}` : "Moto")}</b>
+        <b>#${o.id} — ${esc(motoTxt)}</b>
         <span class="pill ${esc(o.estado)}">${esc(etiquetaEtapa(o.estado))}</span>
       </div>
-      <div class="meta">${esc(nombreCliente(o.clienteId))}${m?.placa ? " · placa " + esc(m.placa) : ""}</div>
+      <div class="meta">${esc(clienteTxt)}${placa ? " · placa " + esc(placa) : ""}</div>
       <div class="meta">${esc(o.falla || "Sin descripción de la falla")}</div>
       ${historial ? `<div class="meta">Solo lectura — trabajo entregado.</div>` : ""}
     </div>`;
@@ -2241,8 +2318,15 @@ async function openOrder(id) {
     return;
   }
   currentOrderId = id;
-  const moto = await DB.get("motos", o.motoId);
-  const cliente = await DB.get("clientes", o.clienteId);
+  /* SYNC-6: el mecánico no tiene ni tendrá acceso directo a clientes/motos (SYNC-2), así que su copia de la
+     orden trae el cliente y la moto APLANADOS (clienteNombre, motoMarca…, ver ordenes_tecnico_mias() en
+     sync-6-mecanicos-ordenes.sql). El Taller sigue resolviendo por id, exactamente como siempre. */
+  const moto = esMecanicoCuenta()
+    ? { marca: o.motoMarca || "", modelo: o.motoModelo || "", placa: o.motoPlaca || "", km: null }
+    : await DB.get("motos", o.motoId);
+  const cliente = esMecanicoCuenta()
+    ? { nombre: o.clienteNombre || "Cliente", telefono: o.clienteTelefono || "" }
+    : await DB.get("clientes", o.clienteId);
   currentOrderCache = { o, moto, cliente };
 
   document.getElementById("detalleTitulo").textContent = `Orden #${o.id} — ${moto.marca} ${moto.modelo}`;
@@ -2251,14 +2335,15 @@ async function openOrder(id) {
     : "";
   document.getElementById("detalleSub").innerHTML =
     `${esc(cliente.nombre)} · ${esc(cliente.telefono || "sin teléfono")} · placa ${esc(moto.placa || "s/p")}${desdeCita}`;
-  renderDetalleMecanico(o);
+  await renderDetalleMecanico(o);
   document.getElementById("detalleFalla").textContent = o.falla || "(sin descripción)";
   // lo legacy se sigue viendo: si la orden no trae km propio, se muestra el de
   // la moto, igual que antes
   document.getElementById("inputKm").value = o.kmSalida ?? moto.km ?? "";
   document.getElementById("inputKm").previousElementSibling.textContent = o.estado === "entregado" ? "Kilometraje de salida" : "Kilometraje actual";
 
-  document.getElementById("detalleFotos").innerHTML = (o.fotos || []).map(src => `<img src="${src}">`).join("");
+  await renderDetalleFotos(o);
+  renderDetalleItemsTecnico(o);
 
   renderStageTracker(o.estado, o.finalizada);
   await renderStageContent(o);
@@ -2268,10 +2353,55 @@ async function openOrder(id) {
   showView("detalle");
 }
 
+/* Las fotos del Taller son locales (base64, sin cambios de SYNC-6 — ver la cabecera de sync-mappers.js: el
+   Taller no sincroniza fotos todavía). Las de Mi Trabajo viven en Storage y NUNCA con URL pública permanente
+   (SYNC-6 sección 10): se pide una firmada, de corta duración, cada vez que se abre la orden. */
+async function renderDetalleFotos(o) {
+  const cont = document.getElementById("detalleFotos");
+  if (!esMecanicoCuenta()) {
+    cont.innerHTML = (o.fotos || []).map(src => `<img src="${src}">`).join("");
+    return;
+  }
+  cont.innerHTML = `<p class="meta" style="margin:0;">Cargando fotos…</p>`;
+  const urls = await Promise.all((o.fotos || []).map(obtenerUrlFotoFirmada));
+  cont.innerHTML = urls.filter(Boolean).map(u => `<img src="${esc(u)}">`).join("")
+    || `<p class="meta" style="margin:0;">${(o.fotos || []).length ? "No se pudieron cargar las fotos." : "Sin fotos todavía."}</p>`;
+}
+async function obtenerUrlFotoFirmada(path) {
+  if (!esRutaFoto(path) || !window.SyncFotos || !window.ENTIMOTORS_SUPABASE) return null;
+  try {
+    const r = await SyncFotos.firmar({
+      baseUrl: window.ENTIMOTORS_SUPABASE.url, anonKey: window.ENTIMOTORS_SUPABASE.anonKey,
+      bucket: "entimotors-taller", path,
+      obtenerToken: () => { const s = SupabaseCliente.sesion(); return s ? s.access_token : null; },
+      refrescar: () => SupabaseCliente.refrescarSesion().then(r2 => r2.ok),
+    });
+    return r.ok ? r.url : null;
+  } catch (e) { return null; }
+}
+
+/* Ítems de la orden para el mecánico: solo nombre y cantidad, nunca precio ni costo (SYNC-6 sección 7). El
+   Taller ya ve sus ítems con precio en la sección de presupuesto/cobro (renderPresupuestoStage); esto es
+   SOLO para Mi Trabajo, que hoy no mostraba ningún ítem. */
+function renderDetalleItemsTecnico(o) {
+  const cont = document.getElementById("detalleItemsTecnico");
+  if (!cont) return;
+  if (!esMecanicoCuenta()) { cont.innerHTML = ""; cont.style.display = "none"; return; }
+  cont.style.display = "";
+  const items = Array.isArray(o.items) ? o.items : [];
+  cont.innerHTML = `
+    <div class="card" style="margin-bottom:0.6rem;">
+      <h4 class="font-display" style="font-size:0.95rem; margin-bottom:0.4rem;">Repuestos de esta orden</h4>
+      ${items.length
+        ? `<ul style="margin:0; padding-left:1.1rem;">${items.map(it => `<li>${esc(it.nombre)} × ${esc(it.cantidad)}</li>`).join("")}</ul>`
+        : `<p style="color:var(--text-muted); margin:0;">Sin repuestos registrados todavía.</p>`}
+    </div>`;
+}
+
 // Reasignar mecánico / cambiar origen del trabajo, editable mientras la orden
 // no esté finalizada — una vez cobrada, el trabajo queda fijo, igual que su
 // monto (misma razón: no se toca un registro que ya se usó para cobrar).
-function renderDetalleMecanico(o) {
+async function renderDetalleMecanico(o) {
   const wrap = document.getElementById("detalleMecanicoWrap");
   if (o.finalizada) {
     wrap.innerHTML = `Asignada a <b>${esc(o.mecanico || "Sin asignar")}</b> · <span class="pill ${origenTrabajoDe(o) === "negocio" ? "presupuesto" : "entregado"}">${origenTrabajoDe(o) === "negocio" ? "Negocio" : "Taller"}</span>`;
@@ -2288,7 +2418,7 @@ function renderDetalleMecanico(o) {
     · <select id="detalleOrigenSel" style="display:inline-block; width:auto; padding:0.1rem 0.4rem; margin:0;">
         <option value="taller">Taller</option><option value="negocio">Negocio</option>
       </select>`;
-  poblarSelectMecanico("detalleMecanicoSel", o.mecanico, o.mecanicoId);
+  await poblarSelectMecanico("detalleMecanicoSel", o.mecanico, o.mecanicoId);
   document.getElementById("detalleOrigenSel").value = origenTrabajoDe(o);
   document.getElementById("detalleMecanicoSel").addEventListener("change", async (e) => {
     if (!puedeAsignarMecanico()) { bloquear("Solo el administrador asigna trabajo"); return; }
@@ -2747,11 +2877,24 @@ function asignacionDelUsuarioActual() {
   return { mecanico: currentUser?.nombre || "", mecanicoId: currentUser?.perfilId || null };
 }
 
+/* SYNC-6: mecánicos reales (perfiles.rol=mecanico), no la lista TEAM local, cuando hay sesión de nube.
+   null = sin nube (o no se pudo leer perfiles): se usa TEAM, exactamente como siempre — nunca se deja el
+   selector vacío por un error de red pasajero. Array (posiblemente vacío): perfiles de verdad. */
+async function mecanicosRealesDisponibles() {
+  if (!(currentUser?.origen === "supabase") || !window.SupabaseCliente?.estado().activo) return null;
+  try {
+    const r = await SupabaseCliente.tabla("perfiles").leer("rol=eq.mecanico&select=id,nombre,activo&order=nombre.asc");
+    return r.ok && Array.isArray(r.datos) ? r.datos : null;
+  } catch (e) { return null; }
+}
+
 /* El <option> sigue valiendo el NOMBRE: los huecos de horario, el aviso de
    choque y "Mover" comparan por nombre y seguirían funcionando igual. El uuid
-   viaja aparte en data-perfil-id, así que cuando la lista pase a venir de
-   `perfiles` (4C-2) solo cambia de dónde salen las opciones, no quién las lee. */
-function poblarSelectMecanico(selectId, seleccionado, seleccionadoId) {
+   viaja aparte en data-perfil-id.
+   SYNC-6: con sesión de nube, las opciones vienen de `perfiles` (rol=mecanico,
+   activo=true) — nunca por coincidencia de nombre, nunca un perfil inactivo
+   como opción nueva. Sin nube, sigue la lista TEAM local de siempre. */
+async function poblarSelectMecanico(selectId, seleccionado, seleccionadoId) {
   const sel = document.getElementById(selectId);
   if (sel && !puedeAsignarMecanico()) {
     // el <label> que lo acompaña se va con él; si no, queda un rótulo huérfano
@@ -2761,13 +2904,28 @@ function poblarSelectMecanico(selectId, seleccionado, seleccionadoId) {
     sel.value = "";
     return;
   }
-  sel.innerHTML = '<option value="">Sin asignar</option>' + TEAM.map(t =>
-    `<option value="${esc(t.nombre)}"${t.perfilId ? ` data-perfil-id="${esc(t.perfilId)}"` : ""}>${esc(t.nombre)}</option>`).join("");
+  const reales = await mecanicosRealesDisponibles();
+  if (!reales) {
+    sel.innerHTML = '<option value="">Sin asignar</option>' + TEAM.map(t =>
+      `<option value="${esc(t.nombre)}"${t.perfilId ? ` data-perfil-id="${esc(t.perfilId)}"` : ""}>${esc(t.nombre)}</option>`).join("");
+  } else {
+    const activos = reales.filter(p => p.activo);
+    let html = '<option value="">Sin asignar</option>' + activos.map(p =>
+      `<option value="${esc(p.nombre)}" data-perfil-id="${esc(p.id)}">${esc(p.nombre)}</option>`).join("");
+    // Ya estaba asignada a alguien que ahora es inactivo: se conserva a la vista (marcado), no se borra
+    // la asignación por sí sola — pero no aparece como opción nueva para nadie más que la busque.
+    if (seleccionadoId && !activos.some(p => p.id === seleccionadoId)) {
+      const inactivo = reales.find(p => p.id === seleccionadoId);
+      const nombreMostrado = inactivo ? inactivo.nombre : (seleccionado || "Mecánico");
+      html += `<option value="${esc(nombreMostrado)}" data-perfil-id="${esc(seleccionadoId)}">${esc(nombreMostrado)} (inactivo)</option>`;
+    }
+    sel.innerHTML = html;
+  }
   if (seleccionadoId) {
     const porId = [...sel.options].find(o => o.dataset.perfilId === seleccionadoId);
     if (porId) { sel.value = porId.value; return; }
   }
-  sel.value = seleccionado && TEAM.some(t => t.nombre === seleccionado) ? seleccionado : "";
+  sel.value = seleccionado && [...sel.options].some(o => o.value === seleccionado) ? seleccionado : "";
 }
 
 async function abrirOrdenDesdeCita(citaId) {
@@ -2801,7 +2959,7 @@ async function abrirOrdenDesdeCita(citaId) {
   }
   document.getElementById("ordenFalla").value = cita.motivo || "";
   renderOrdenClienteChip();
-  poblarSelectMecanico("ordenMecanico", cita.mecanico, cita.mecanicoId);
+  await poblarSelectMecanico("ordenMecanico", cita.mecanico, cita.mecanicoId);
   document.getElementById("ordenOrigenTrabajo").value = "taller";
 
   document.getElementById("ordenDesdeCitaAviso").style.display = "block";
@@ -2818,7 +2976,7 @@ document.getElementById("btnNuevaOrden").addEventListener("click", async () => {
   renderOrdenClienteChip();
   ["ordenNombre", "ordenTelefono", "ordenPlaca", "ordenMarca", "ordenModelo", "ordenKm", "ordenFalla"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("ordenFoto").value = "";
-  poblarSelectMecanico("ordenMecanico", currentUser?.nombre, currentUser?.perfilId);
+  await poblarSelectMecanico("ordenMecanico", currentUser?.nombre, currentUser?.perfilId);
   document.getElementById("ordenOrigenTrabajo").value = "taller";
   document.getElementById("modalOrden").classList.add("active");
 });
@@ -3032,7 +3190,13 @@ document.getElementById("inputKm").addEventListener("change", async (e) => {
   toast("Kilometraje actualizado");
 });
 
-/* ---- fotos ---- */
+/* ---- fotos ----
+   SYNC-6: en Mi Trabajo las fotos NUNCA viajan en base64 — se comprimen (máx. ~1600px, JPEG) y se suben a
+   Storage; el PUT mismo es el chequeo de "¿sigue siendo mía esta orden?" (taller_sube_media, SYNC-2). Sin
+   conexión se quedan en bd.blobs (encolar()) como Blob, nunca como texto, y se reintentan solas al volver la
+   red (flushFotosPendientes, más arriba) o la próxima vez que se abra esta pantalla. El Taller sigue exactamente
+   igual que siempre: base64 local, sin subir a ningún lado todavía (eso queda fuera de SYNC-6, ver
+   sync-mappers.js). */
 document.getElementById("inputFotos").addEventListener("change", async (e) => {
   const files = Array.from(e.target.files || []);
   if (!files.length) return;
@@ -3040,6 +3204,18 @@ document.getElementById("inputFotos").addEventListener("change", async (e) => {
     const o = await DB.get("ordenes", currentOrderId);
     if (!esTrabajoPropio(o)) { e.target.value = ""; bloquear("Ese trabajo no está asignado a ti"); return; }
     if (o?.estado === "entregado") { e.target.value = ""; bloquear("Este trabajo ya fue entregado"); return; }
+    e.target.value = "";
+    if (!window.SyncFotos) { toast("No se pudo procesar la foto en este dispositivo", "off"); return; }
+    toast(files.length === 1 ? "Subiendo foto…" : `Subiendo ${files.length} fotos…`);
+    for (const file of files) {
+      try {
+        const { blob } = await SyncFotos.comprimir(file);
+        await SyncFotos.encolar(syncBd, { ordenUid: o.uid, blob });
+      } catch (err) { toast("No se pudo procesar una foto: " + (err?.message || err), "off"); }
+    }
+    await flushFotosPendientes();
+    openOrder(currentOrderId);
+    return;
   }
   const urls = await Promise.all(files.map(fileToDataUrl));
   const o = await updateOrder(currentOrderId, ord => { ord.fotos = (ord.fotos || []).concat(urls); });
@@ -3826,7 +4002,7 @@ async function abrirModalMoverCita(citaId) {
     `${nombre} — ahora está para el ${dt.toLocaleDateString("es-HN")} a las ${cita.hora} con ${cita.mecanico}.`;
   document.getElementById("moverAvisoSinTel").style.display = telefono ? "none" : "block";
 
-  poblarSelectMecanico("moverMecanico", cita.mecanico, cita.mecanicoId);
+  await poblarSelectMecanico("moverMecanico", cita.mecanico, cita.mecanicoId);
   document.getElementById("moverMotivo").value = "cliente";
   document.getElementById("moverFecha").value = cita.fecha;
   await refreshMoverHoraOptions();
@@ -4154,7 +4330,7 @@ async function abrirModalEditarCita(citaId) {
   campoFecha.min = cita.fecha < hoy ? cita.fecha : hoy;
   campoFecha.value = cita.fecha;
 
-  poblarSelectMecanico("citaMecanico", cita.mecanico, cita.mecanicoId);
+  await poblarSelectMecanico("citaMecanico", cita.mecanico, cita.mecanicoId);
   await refreshCitaHoraOptions();
   const selHora = document.getElementById("citaHora");
   // si la hora actual no es uno de los huecos estándar (típico de las citas que
@@ -4189,7 +4365,7 @@ wireAutocompleteCliente(document.getElementById("citaBuscarCliente"), document.g
 document.getElementById("citaBuscarCliente").addEventListener("input", () => { citaClienteSel = null; renderCitaClienteChip(); });
 
 async function refreshCitaClienteSelect() {
-  poblarSelectMecanico("citaMecanico");
+  await poblarSelectMecanico("citaMecanico");
 }
 
 document.getElementById("btnNuevaCita").addEventListener("click", async () => {

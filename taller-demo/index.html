@@ -1173,6 +1173,9 @@
         <div class="photos" id="detalleFotos"></div>
       </div>
 
+      <!-- SYNC-6: solo para Mi Trabajo — nombre y cantidad, nunca precio/costo (renderDetalleItemsTecnico en app.js) -->
+      <div id="detalleItemsTecnico" style="display:none;"></div>
+
       <div id="stageContent"></div>
 
       <div class="card" style="margin-top:1rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.8rem;">
@@ -2373,6 +2376,7 @@
 <script src="sync-db.js?v=3.13.0"></script>
 <script src="sync-engine.js?v=3.13.0"></script>
 <script src="sync-mappers.js?v=3.13.0"></script>
+<script src="sync-fotos.js?v=3.13.0"></script>
 <!-- el ?v= debe cambiar cada vez que se toque app.js (junto con CACHE_NAME en
      sw.js) — es la forma más universal de forzar que CUALQUIER navegador
      pida el archivo de nuevo aunque ya tenga guardada una copia vieja en su

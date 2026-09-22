@@ -1,6 +1,12 @@
 <!doctype html>
 <html><head><meta charset="utf-8"><title>harness sync</title></head>
 <body>
+<!-- SYNC-6: sync-mappers.js decide el mapper de "ordenes" UNA sola vez, al cargarse, leyendo
+     window.ENTIMOTORS_BUILD (que en la app real pone build-target.js, no cargado aquí). Con
+     ?mecanico=1 en la URL de esta página se prueba el mapper de Mi Trabajo (rpc/ordenes_tecnico_mias);
+     sin el parámetro (todas las pruebas SYNC-1..5 y las de admin/cajero de SYNC-6) se prueba el del
+     Taller, exactamente como si ENTIMOTORS_BUILD no existiera — mismo resultado que antes de este cambio. -->
+<script>window.ENTIMOTORS_BUILD = { producto: new URLSearchParams(location.search).get("mecanico") === "1" ? "mecanico" : "admin" };</script>
 <script src="/__h/cfg.js"></script>
 <script src="/__h/red-falsa.js"></script>
 <script src="/sync-rest.js"></script>
