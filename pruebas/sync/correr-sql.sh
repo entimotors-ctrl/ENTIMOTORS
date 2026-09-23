@@ -203,13 +203,37 @@ fase7b() {
   fase3
   fase3p
 }
+# SYNC-9: agregar_foto_orden + límites del bucket privado. Aquí: forward x2 (idempotente), guardas estáticas, rollback
+# y forward de nuevo. El comportamiento en runtime (Storage REAL + RLS + RPC) lo prueban browser/sync9-core y sync9-app-real.
+fase9() {
+  echo "== SYNC-9 · fotos: ligado solo-agregar + límites del bucket (SQL) =="
+  local s q
+  base_con t_sync9_a 1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario || { mal "no se pudo crear la copia con SYNC-1..7A"; return; }
+  q() { "${PSQL[@]}" -U supabase_admin -d t_sync9_a -At -c "$1"; }
+  s=$(correr t_sync9_a "$SQLDIR/sync-9-fotos.sql") && ok "sync-9 aplica" || { mal "sync-9 falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_sync9_a "$SQLDIR/sync-9-fotos.sql") && ok "sync-9 re-aplica (idempotente)" || mal "sync-9 no es idempotente: $(tail -4 <<<"$s")"
+  [ "$(q "SELECT has_function_privilege('anon','public.agregar_foto_orden(uuid,uuid,text,text)','EXECUTE')")" = "f" ] && ok "anon NO ejecuta agregar_foto_orden" || mal "anon ejecuta agregar_foto_orden"
+  [ "$(q "SELECT has_function_privilege('authenticated','public.agregar_foto_orden(uuid,uuid,text,text)','EXECUTE')")" = "t" ] && ok "authenticated ejecuta agregar_foto_orden (la función decide: solo mecánico activo asignado)" || mal "authenticated sin EXECUTE"
+  [ "$(q "SELECT prosecdef FROM pg_proc WHERE proname='agregar_foto_orden'")" = "t" ] && ok "SECURITY DEFINER con search_path fijo" || mal "no es SECURITY DEFINER"
+  [ "$(q "SELECT allowed_mime_types::text || '|' || file_size_limit || '|' || public FROM storage.buckets WHERE id='entimotors-taller'")" = "{image/jpeg}|10485760|false" ] && ok "bucket privado: solo image/jpeg, 10 MiB" || mal "límites del bucket incorrectos"
+  [ "$(q "SELECT count(*) FROM storage.buckets WHERE id='entimotors-media' AND public AND allowed_mime_types IS NULL")" = "1" ] && ok "el bucket público de la web (entimotors-media) no se tocó" || mal "entimotors-media cambió"
+  [ "$(q "SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND policyname IN ('taller_lee_media','taller_sube_media','taller_borra_media')")" = "3" ] && ok "políticas de Storage intactas (SYNC-2 + producción)" || mal "políticas de Storage cambiaron"
+  [ "$(q "SELECT count(*) FROM pg_policies WHERE schemaname='storage' AND tablename='objects' AND cmd='UPDATE'")" = "0" ] && ok "sin política UPDATE en storage.objects (nadie reemplaza fotos)" || mal "apareció una política UPDATE"
+  [ "$(q "SELECT position('v_permitidos' in prosrc) > 0 FROM pg_proc WHERE proname='avanzar_orden_tecnico'")" = "t" ] && ok "avanzar_orden_tecnico (SYNC-6) sin cambios" || mal "avanzar_orden_tecnico cambió"
+  s=$(correr t_sync9_a "$SQLDIR/sync-9-rollback.sql") && ok "rollback aplica" || mal "rollback falló: $(tail -4 <<<"$s")"
+  [ "$(q "SELECT count(*) FROM pg_proc WHERE proname='agregar_foto_orden'")" = "0" ] && ok "rollback: función retirada" || mal "rollback: la función sigue"
+  [ "$(q "SELECT coalesce(allowed_mime_types::text,'null') || '|' || coalesce(file_size_limit::text,'null') FROM storage.buckets WHERE id='entimotors-taller'")" = "null|null" ] && ok "rollback: bucket como estaba (sin límites)" || mal "rollback: bucket no restaurado"
+  s=$(correr t_sync9_a "$SQLDIR/sync-9-fotos.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_sync9_a >/dev/null
+}
 case "${1:-}" in
   1) fase1 ;;
+  9) fase9 ;;
   7b) fase7b ;;
   3p) fase3p ;;
   2) fase2 ;;
   3) fase3 ;;
-  *) echo "uso: $0 {1|2|3|3p|7b}" >&2; exit 2 ;;
+  *) echo "uso: $0 {1|2|3|3p|7b|9}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]

@@ -18,8 +18,15 @@ export const REST_URL = `http://127.0.0.1:${REST_PUERTO}`;
 const SECRETO_JWT = "secreto-sintetico-solo-pruebas-locales-0123456789";   // no es un secreto: la pila solo existe en esta máquina
 const IMAGEN_REST = "public.ecr.aws/supabase/postgrest:v14.13";
 const CONT_REST = "entimotors-sync-rest";
+/* SYNC-9 · STORAGE REAL (opcional: iniciarPila({ storage: true })). La MISMA imagen de Storage de Supabase que ya estaba
+   descargada en la máquina (storage-api v1.60.15), en un contenedor PROPIO de esta pila (no el del laboratorio 4d),
+   escuchando solo en 127.0.0.1, con backend de archivos DENTRO del contenedor (se pierde al borrarlo), contra la base de
+   pruebas t_e2e y el mismo secreto JWT sintético. Nunca toca producción ni el laboratorio. */
+const IMAGEN_STORAGE = "public.ecr.aws/supabase/storage-api:v1.60.15";
+const CONT_STORAGE = "entimotors-sync-storage";
+const STORAGE_INTERNO = 54435;
 export const DB = "t_e2e";
-const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items", "6-mecanicos-ordenes", "7a-inventario"];
+const FASES = ["1-esquema", "2-seguridad", "3-rpc", "3b-importacion", "3p-pin", "5-cotizacion-items", "6-mecanicos-ordenes", "7a-inventario", "9-fotos"];
 
 export const uid = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
 export const PERFILES = { admin: uid(1), cajero: uid(2), mecanico: uid(3), mecanico2: uid(4) };
@@ -89,13 +96,57 @@ function shimAuth(req, res, cors) {
   return responder(404, { msg: "ruta de auth no simulada" });
 }
 
+const gatewayStorage = { activo: false };
+async function esperarStorage() {
+  for (let i = 0; i < 90; i++) {
+    try { const r = await fetch(`http://127.0.0.1:${STORAGE_INTERNO}/status`, { signal: AbortSignal.timeout(1500) }); if (r.status === 200) return; } catch { /* aún no */ }
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  throw new Error("storage-api no respondió: " + sh("docker", ["logs", "--tail", "8", CONT_STORAGE]).stdout.slice(0, 800));
+}
+/* La copia de producción trae `storage` como STUB (tablas reducidas, dueño postgres): la migración real de storage-api no
+   puede adoptarlo. Solo en ESTA base de pruebas: se quita el stub (0 objetos), storage-api crea su esquema real y se
+   restauran EXACTAMENTE los buckets y la política de producción (entimotors-taller privado, entimotors-media público,
+   taller_borra_media). Las políticas de SYNC-2 (taller_lee_media/taller_sube_media) las crea luego la fase 2, como en
+   producción. */
+async function arrancarStorage() {
+  sql(`drop schema storage cascade; grant create on database ${DB} to supabase_storage_admin; create schema storage authorization supabase_storage_admin;`);
+  sql("alter role supabase_storage_admin with password 'postgres'", { db: "postgres" });
+  sh("docker", ["rm", "-f", CONT_STORAGE]);
+  const r = sh("docker", ["run", "-d", "--name", CONT_STORAGE, "--network", "host",
+    "-e", "ANON_KEY=" + jwt(null, { role: "anon" }), "-e", "SERVICE_KEY=" + jwt(null, { role: "service_role" }), "-e", `AUTH_JWT_SECRET=${SECRETO_JWT}`, "-e", "AUTH_JWT_ALGORITHM=HS256",
+    "-e", `DATABASE_URL=postgres://supabase_storage_admin:postgres@${PG.host}:${PG.port}/${DB}`, "-e", "STORAGE_BACKEND=file", "-e", "FILE_STORAGE_BACKEND_PATH=/tmp/entimotors-storage",
+    "-e", "TENANT_ID=stub", "-e", "STORAGE_S3_REGION=local", "-e", "GLOBAL_S3_BUCKET=stub", "-e", `SERVER_PORT=${STORAGE_INTERNO}`, "-e", "SERVER_HOST=127.0.0.1",
+    "-e", `PORT=${STORAGE_INTERNO}`, "-e", "HOST=127.0.0.1", "-e", "FILE_SIZE_LIMIT=52428800", "-e", "ENABLE_IMAGE_TRANSFORMATION=false", "-e", "VECTOR_ENABLED=false", "-e", "S3_PROTOCOL_ENABLED=false", IMAGEN_STORAGE]);
+  if (r.status !== 0) throw new Error("no se pudo arrancar storage-api: " + r.stderr);
+  await esperarStorage();
+  // mismos privilegios que la copia de producción (USAGE en el esquema; arwd en buckets/objects para anon/authenticated/
+  // service_role, con RLS activa: la que decide es la política, igual que en Supabase)
+  sql(`grant usage on schema storage to anon, authenticated, service_role, postgres;
+       grant select, insert, update, delete on storage.buckets, storage.objects to anon, authenticated, service_role;
+       alter table storage.objects enable row level security; alter table storage.buckets enable row level security;`);
+  sql(`insert into storage.buckets (id, name, public) values ('entimotors-taller', 'entimotors-taller', false), ('entimotors-media', 'entimotors-media', true) on conflict (id) do nothing;
+       drop policy if exists taller_borra_media on storage.objects;
+       create policy taller_borra_media on storage.objects for delete to public using ((bucket_id = 'entimotors-taller'::text) AND public.es_admin());`);
+}
+
 function arrancarGateway() {
   const srv = http.createServer((req, res) => {
     const cors = { "Access-Control-Allow-Origin": req.headers.origin || "*", "Access-Control-Allow-Methods": "GET,POST,PATCH,PUT,DELETE,OPTIONS",
       "Access-Control-Allow-Headers": req.headers["access-control-request-headers"] || "*", "Access-Control-Expose-Headers": "Content-Range,Content-Location,Location,Retry-After", "Access-Control-Max-Age": "600", Vary: "Origin" };
     if (req.method === "OPTIONS") { res.writeHead(204, cors); return res.end(); }
-    if (!req.headers.apikey) { res.writeHead(401, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "No API key found in request" })); }
+    // como Kong de Supabase: /storage/v1 NO exige apikey (una URL firmada en un <img> no lleva cabeceras; storage-api
+    // valida el token firmado o el JWT por su cuenta). El resto sí.
+    if (!req.headers.apikey && !req.url.startsWith("/storage/v1/")) { res.writeHead(401, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "No API key found in request" })); }
     if (req.url.startsWith("/auth/v1/")) return shimAuth(req, res, cors);
+    // como Kong: /storage/v1/* → storage-api (sin el prefijo). Sin pila de Storage, 404 como siempre.
+    if (req.url.startsWith("/storage/v1/")) {
+      if (!gatewayStorage.activo) { res.writeHead(404, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "sin storage en esta pila" })); }
+      const cabS = { ...req.headers, host: `127.0.0.1:${STORAGE_INTERNO}` }; delete cabS.origin; delete cabS.referer;
+      const ps = http.request({ host: "127.0.0.1", port: STORAGE_INTERNO, path: req.url.replace(/^\/storage\/v1/, ""), method: req.method, headers: cabS }, (r) => { res.writeHead(r.statusCode, { ...r.headers, ...cors }); r.pipe(res); });
+      ps.on("error", (e) => { res.writeHead(502, cors); res.end(String(e.message)); });
+      return req.pipe(ps);
+    }
     const cab = { ...req.headers, host: `127.0.0.1:${REST_INTERNO}` }; delete cab.origin; delete cab.referer;
     const p = http.request({ host: "127.0.0.1", port: REST_INTERNO, path: req.url.replace(/^\/rest\/v1/, ""), method: req.method, headers: cab }, (r) => { res.writeHead(r.statusCode, { ...r.headers, ...cors }); r.pipe(res); });
     p.on("error", (e) => { res.writeHead(502, cors); res.end(String(e.message)); });
@@ -105,12 +156,13 @@ function arrancarGateway() {
 }
 
 /** Crea la base t_e2e desde cero (producción + SYNC-1..3P), siembra perfiles y arranca PostgREST. */
-export async function iniciarPila() {
+export async function iniciarPila({ storage = false } = {}) {
   if (sh("pg_isready", ["-q", "-h", PG.host, "-p", String(PG.port)]).status !== 0) throw new Error("El Postgres local no responde: ejecuta pruebas/sync/entorno-local.sh up");
   sh("docker", ["rm", "-f", CONT_REST]);
   sh("bash", [ENTORNO, "borra", DB]);
   const c = sh("bash", [ENTORNO, "copia", DB]);
   if (c.status !== 0) throw new Error("no se pudo crear la base: " + c.stderr);
+  if (storage) await arrancarStorage();
   for (const f of FASES) sql(`\\i ${path.join(SQL, `sync-${f}.sql`)}`);
   sql("alter role authenticator with password 'postgres'", { db: "postgres" });
   // Supabase real: auth.uid() lee el claim del JWT tanto de la variable antigua como de request.jwt.claims (lo único que fija PostgREST moderno).
@@ -127,6 +179,7 @@ export async function iniciarPila() {
   if (r.status !== 0) throw new Error("no se pudo arrancar PostgREST: " + r.stderr);
   await esperarRest();
   const gateway = await arrancarGateway();
+  gatewayStorage.activo = storage;
   return {
     jwt, sql, uid, PERFILES, REST_URL,
     /** Vacía los datos operativos (la protección de las tablas de dinero se salta con replica solo aquí, en la base de pruebas) y
@@ -142,6 +195,6 @@ export async function iniciarPila() {
            reset session_replication_role;
            update public.perfiles set activo = true where id in (${Object.values(PERFILES).map((v) => `'${v}'`).join(",")});`);
     },
-    async detener() { gateway.closeAllConnections?.(); gateway.close(); sh("docker", ["rm", "-f", CONT_REST]); sh("bash", [ENTORNO, "borra", DB]); },
+    async detener() { gateway.closeAllConnections?.(); gateway.close(); sh("docker", ["rm", "-f", CONT_REST]); if (storage) sh("docker", ["rm", "-f", CONT_STORAGE]); gatewayStorage.activo = false; sh("bash", [ENTORNO, "borra", DB]); },
   };
 }

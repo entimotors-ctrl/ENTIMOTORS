@@ -561,14 +561,14 @@ async function guardarSincronizado(store, value) {
 // avanzar_orden_tecnico reutiliza — ver la cabecera de sync-6-mecanicos-ordenes.sql.
 function esRutaFoto(v) { return typeof v === "string" && v.length > 0 && !/^data:/i.test(v); }
 async function encolarAvanceTecnico(ordenUid, v) {
+  /* SYNC-9: `fotos` YA NO viaja aquí. Mandar el arreglo completo de la copia local pisaba las fotos que otro
+     dispositivo del mismo mecánico ya había ligado (pérdida demostrada contra la pila real). Cada foto se liga sola,
+     solo-agregar, con agregar_foto_orden (flushFotosPendientes); avanzar_orden_tecnico conserva `fotos` si no viene. */
   const campos = {
     estado: v.estado,
     diagnostico: v.diagnostico ?? null,
     reparacion_notas: v.reparacionNotas ?? "",
     calidad_checklist: v.calidadChecklist ?? null,
-    // nunca base64: si algo se coló localmente como base64 (no debería, Mi Trabajo sube a Storage), se filtra
-    // aquí Y lo rechaza de nuevo el CHECK ordenes_fotos_sin_base64 (SYNC-1) si algo se escapara igual.
-    fotos: Array.isArray(v.fotos) ? v.fotos.filter(esRutaFoto) : [],
     km_salida: v.kmSalida ?? null,
     falla: v.falla ?? "",
   };
@@ -707,18 +707,37 @@ async function prepararModoNube(session) {
 async function flushFotosPendientes() {
   if (!syncBd || !esMecanicoCuenta() || !window.SyncFotos || !window.ENTIMOTORS_SUPABASE) return;
   try {
-    await SyncFotos.procesarCola({
-      bd: syncBd, baseUrl: window.ENTIMOTORS_SUPABASE.url, anonKey: window.ENTIMOTORS_SUPABASE.anonKey,
+    /* SYNC-9: mismas garantías de sesión que la cola (SYNC-8): antes de subir, el motor revalida el perfil (cuenta
+       inactiva → se cierra la sesión, cero subidas) y con la sesión caducada no se sube nada. */
+    const f = syncMotor ? await syncMotor.flush() : null;
+    if (f && (["auth", "cuenta-inactiva"].includes(f.omitido) || ["auth", "cuenta-inactiva", "perfil"].includes(f.detenido))) return;
+    const bdFotos = syncBd;
+    const r = await SyncFotos.procesarCola({
+      bd: bdFotos, baseUrl: window.ENTIMOTORS_SUPABASE.url, anonKey: window.ENTIMOTORS_SUPABASE.anonKey,
       bucket: "entimotors-taller",
       obtenerToken: () => { const s = SupabaseCliente.sesion(); return s ? s.access_token : null; },
       refrescar: () => SupabaseCliente.refrescarSesion().then((r) => r.ok),
+      /* Ligar la foto a su orden: UNA operación solo-agregar por el outbox (dependencias, reintentos, pausa por sesión y
+         «⚠ Por revisar» de SYNC-8), con op_id = operation_id de la foto → un reintento o un cierre a mitad nunca la
+         duplica. Se llama ANTES de borrar el blob (sync-fotos.js) y la caché local la muestra ya; la nube confirma. */
       alSubirUna: async (path, registro) => {
-        const localId = await syncBd.mapa.localDe(registro.uid);
+        const yaEnCola = (await bdFotos.outbox.todos()).some((o) => o.op_id === registro.operation_id);
+        if (!yaEnCola) {
+          await syncMotor.encolarRpc("agregar_foto_orden", { p_orden_id: registro.uid, p_path: path, p_device: await bdFotos.deviceId() },
+            { entidad: "ordenes", uid: registro.uid, op_id: registro.operation_id });
+        }
+        const localId = await bdFotos.mapa.localDe(registro.uid);
         if (localId == null) return;
-        await updateOrder(localId, (ord) => { ord.fotos = (ord.fotos || []).concat([path]); });
+        await bdFotos.transaccion(["ordenes"], "readwrite", async (t) => {
+          const o = await t.get("ordenes", localId);
+          if (o && !(o.fotos || []).includes(path)) { o.fotos = (o.fotos || []).concat([path]); await t.put("ordenes", o); }
+        });
         if (currentOrderId === localId) openOrder(localId);
       },
     });
+    // sin sesión válida la foto espera (no se pierde ni se rechaza): mismo aviso que la cola de SYNC-8
+    if (r && r.detenido === "auth") toast("Tu sesión caducó: vuelve a iniciar sesión para sincronizar. Lo pendiente se conserva en este dispositivo.", "off");
+    if (r && (r.subidas || r.rechazadas)) programarChipNube();
   } catch (e) { /* mejor esfuerzo: se reintenta en el próximo "online" o la próxima foto */ }
 }
 /* ================= SYNC-7B · DINERO Y STOCK EN MODO NUBE =================
@@ -1313,6 +1332,11 @@ function programarChipNube() {
 }
 const ENTIDAD_LEGIBLE = { clientes: "Clientes", motos: "Motos", citas: "Citas", categorias_inv: "Categorías", inventario: "Inventario",
   cotizaciones: "Cotizaciones", ordenes: "Órdenes", ventas_rapidas: "Ventas", creditos: "Créditos", caja_movimientos: "Caja", rpc: "Operación" };
+// SYNC-9: fotos que la nube rechazó de forma definitiva (orden reasignada/cerrada, sin permiso) — nunca en silencio
+async function fotosRechazadas() {
+  if (!syncBd || !window.SyncFotos) return [];
+  try { return await SyncFotos.rechazadas(syncBd); } catch { return []; }
+}
 async function stockEnRevision() {
   if (!syncBd) return [];
   try { return (await syncBd.datos.todos("inventario")).filter((r) => r.requiereRevision); } catch { return []; }
@@ -1322,7 +1346,7 @@ async function renderSyncChipNube() {
   if (!syncMotor || !dot || !label) return;
   let e;
   try { e = await syncMotor.estado(); } catch { return; }
-  const porRevisar = e.rechazadas + e.conflictos + (await stockEnRevision()).length;
+  const porRevisar = e.rechazadas + e.conflictos + (await stockEnRevision()).length + (await fotosRechazadas()).length;
   const pendientes = (e.cola.pending || 0) + (e.cola.syncing || 0);
   let texto, ok = false;
   if (e.pausa === "cuenta-inactiva") texto = "Cuenta inactiva · no se sincroniza";
@@ -1356,6 +1380,11 @@ async function abrirRevisionSync() {
       <button type="button" class="btn small ghost" data-rev-conflicto="${Number(c.id)}" data-decision="servidor">Usar la versión de la nube</button>
       ${c.motivo === "borrado_remoto" ? "" : `<button type="button" class="btn small ghost" data-rev-conflicto="${Number(c.id)}" data-decision="mio">Conservar la mía</button>`}</div>`);
   }
+  for (const b of await fotosRechazadas()) {
+    filas.push(`<div class="card" style="margin:6px 0;padding:8px;"><strong>Fotos</strong> · La nube no aceptó una foto de una orden<br>
+      <small>${esc(b.error || "")}${b.creado_en ? " · " + esc(fechaCorta(b.creado_en)) : ""}</small><br>
+      <button type="button" class="btn small ghost" data-rev-foto="${Number(b.id)}">Entendido, quitar de la lista</button></div>`);
+  }
   for (const it of stock) {
     filas.push(`<div class="card" style="margin:6px 0;padding:8px;"><strong>Inventario</strong> · ${esc(it.nombre)}: existencia ${esc(String(it.cantidad))}<br>
       <small>Una venta hecha sin conexión dejó el stock por debajo de cero. Revisa el conteo con «Ajustar stock».</small></div>`);
@@ -1365,6 +1394,9 @@ async function abrirRevisionSync() {
   lista.innerHTML = filas.join("");
   lista.querySelectorAll("[data-rev-descartar]").forEach((b) => b.addEventListener("click", async () => {
     await syncMotor.descartarRechazada(Number(b.dataset.revDescartar)); abrirRevisionSync(); renderSyncChip();
+  }));
+  lista.querySelectorAll("[data-rev-foto]").forEach((b) => b.addEventListener("click", async () => {
+    await syncBd.blobs.borrar(Number(b.dataset.revFoto)); abrirRevisionSync(); renderSyncChip();
   }));
   lista.querySelectorAll("[data-rev-conflicto]").forEach((b) => b.addEventListener("click", async () => {
     const res = await syncMotor.resolverConflicto(Number(b.dataset.revConflicto), b.dataset.decision);

@@ -136,6 +136,16 @@ test("SYNC-8: aunque la API/Supabase se sirvan desde el MISMO origen (proxy), RE
   assert.equal((await pedir(sw2, "/index.html")).interceptada, true);
 });
 
+test("SYNC-9: fotos privadas — URL firmada (con token en la URL), firmada VENCIDA (400/403) y descarga autenticada: nunca pasan por el caché, ni del mismo origen ni del de Supabase", async () => {
+  const firmada = "/storage/v1/object/sign/entimotors-taller/ordenes/0000/f.jpg?token=eyJfirmaSintetica";
+  const previo = { [`${SUPABASE}${firmada}`]: new Response("foto-vieja"), [`${ORIGEN}${firmada}`]: new Response("foto-vieja") };
+  const sw = cargarSW({ previo, red: async () => new Response('{"statusCode":"403","message":"jwt expired"}', { status: 400 }) });
+  for (const u of [`${SUPABASE}${firmada}`, `${ORIGEN}${firmada}`, `${SUPABASE}/storage/v1/object/authenticated/entimotors-taller/ordenes/0000/f.jpg`, `${ORIGEN}/storage/v1/object/info/authenticated/entimotors-taller/x.jpg`]) {
+    assert.equal((await pedir(sw, u)).interceptada, false, u);
+  }
+  assert.equal(sw.puestos.length, 0, "ni la respuesta vencida ni la foto se guardan");
+});
+
 test("impresion.html sigue sirviéndose desde el caché sin tocar la red", async () => {
   const sw = cargarSW({ red: async () => { throw new Error("no debe llamarse"); } });
   sw.manejadores.message({ data: { tipo: "guardar-impresion", html: "<p>factura</p>" }, source: { postMessage() {} }, waitUntil(p) { return p; } });
