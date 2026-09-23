@@ -188,12 +188,28 @@ SQL
   "$AQUI/entorno-local.sh" borra t_sync3p_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sync3p_ref >/dev/null
 }
 
+fase7b() {
+  echo "== SYNC-7B · dinero, stock, reversos con PIN, invariantes exactas =="
+  local s
+  base_con t_sync7b_a 1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario || { mal "no se pudo crear la copia con SYNC-1..7A"; return; }
+  # las hojas que SYNC-7B cambió se re-aplican encima (idempotentes): ERRCODE 23503 + sync_autorizar con dispositivo
+  s=$(correr t_sync7b_a "$SQLDIR/sync-3-rpc.sql") && ok "sync-3-rpc (7B) re-aplica sobre SYNC-1..7A" || { mal "sync-3-rpc falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_sync7b_a "$SQLDIR/sync-7a-inventario.sql") && ok "sync-7a (7B) re-aplica" || { mal "sync-7a falló: $(tail -4 <<<"$s")"; return; }
+  s=$("${PSQL[@]}" -U supabase_admin -d t_sync7b_a -At -c "SELECT count(*) FROM pg_proc WHERE proname = 'sync_autorizar' AND pronamespace = 'public'::regnamespace")
+  [ "$s" = "1" ] && ok "una sola firma de sync_autorizar (la de 6 argumentos se retiró)" || mal "sync_autorizar tiene $s firmas"
+  pruebas t_sync7b_a "$AQUI/sql/05-finanzas.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sync7b_a >/dev/null
+  # regresión: las pruebas de SYNC-3 y SYNC-3P siguen en verde con los cambios de 7B
+  fase3
+  fase3p
+}
 case "${1:-}" in
   1) fase1 ;;
+  7b) fase7b ;;
   3p) fase3p ;;
   2) fase2 ;;
   3) fase3 ;;
-  *) echo "uso: $0 {1|2|3|3p}" >&2; exit 2 ;;
+  *) echo "uso: $0 {1|2|3|3p|7b}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]

@@ -48,6 +48,15 @@
  *   tenga un único lugar de donde leer la regla (ver puedeEscribirEntidadNube
  *   en app.js) en vez de hardcodear el rol en cada botón.
  *
+ * SYNC-7B — DINERO Y CANTIDAD
+ *   · inventario.aLocal() ahora SÍ baja `cantidad`/`requiere_revision`: en modo nube el Taller ya no mueve
+ *     stock local; todo movimiento va por RPC al ledger (sync-finanzas.js), así que la nube es la única verdad
+ *     y la caché la refleja. Siguen fuera de `columnas`: nunca suben por el CRUD.
+ *   · ventas_rapidas / creditos / caja_movimientos: mappers de SOLO LECTURA (ver el bloque al final).
+ *   · ordenes (Taller): `finalizada`/`anulada` bajan (solo lectura) para que otro dispositivo no cobre dos veces.
+ *     Los ítems de la orden siguen viviendo en la copia local del Taller y en la nube (orden_items) se escriben
+ *     por agregar_item_orden/quitar_item_orden; no bajan embebidos todavía (límite documentado en el STATE).
+ *
  * ORDENES (SYNC-6) ES DOS MAPPERS DISTINTOS SEGÚN EL BUILD, NO UNO
  *   SYNC-2 cerró el acceso DIRECTO del mecánico a `ordenes`/`orden_items`: solo
  *   admin/cajero tienen GRANT de columnas sobre la tabla real. Por eso este
@@ -199,12 +208,17 @@
         };
       },
       aLocal: function (r) {
-        // cantidad: a propósito NO viene aquí — ver la cabecera del archivo.
+        // SYNC-7B: `cantidad` y `requiere_revision` SÍ bajan ahora (ver la cabecera, sección SYNC-7B): el Taller ya
+        // no mueve stock local en modo nube — ventas/créditos/órdenes/ajustes van por RPC al ledger, así que la
+        // cantidad de la nube es la única verdad y la caché solo la refleja. Siguen SIN estar en `columnas`:
+        // nunca suben por el CRUD del maestro.
         return {
           nombre: r.nombre, modelo: r.modelo || "",
           costoCompra: Number(r.costo_compra) || 0, precio: Number(r.precio_venta) || 0, precioVenta: Number(r.precio_venta) || 0,
           stockMinimo: r.stock_minimo == null ? 3 : Number(r.stock_minimo),
           codigoBarras: r.codigo_barras || "", publicarEnWeb: !!r.publicar_en_web,
+          cantidad: Number(r.cantidad) || 0,
+          requiereRevision: !!r.requiere_revision,
           // foto NO se toca aquí (igual que motos.foto): una foto local en base64 se conserva tal cual.
         };
       },
@@ -291,15 +305,106 @@
           origenTrabajo: r.origen_trabajo || "taller",
           kmSalida: r.km_salida == null ? null : Number(r.km_salida),
           garantiaDias: r.garantia_dias == null ? null : Number(r.garantia_dias),
+          // SYNC-7B: solo lectura (NO están en `columnas`, nunca suben): la finalización y la anulación las decide
+          // la nube (finalizar_orden / anular_orden), así otro dispositivo no vuelve a cobrar una orden ya cobrada.
+          finalizada: !!r.finalizada,
+          anulada: !!r.anulada,
         };
       },
     },
   };
 
+  /* ================= SYNC-7B · DINERO (solo lectura por el CRUD) =================
+     ventas_rapidas / creditos / caja_movimientos BAJAN de la nube para la UI y la caché, pero NUNCA suben por
+     escribir(): `soloLectura: true` hace que sync-engine.js lance si alguien lo intenta, y app.js además las
+     bloquea en DB.save/DB.delete. Toda escritura de dinero va por las RPC transaccionales e idempotentes de
+     sync-3-rpc.sql (ver sync-finanzas.js). La caché NUNCA es autoridad para escribir: el servidor calcula
+     totales, saldos y stock. Los hijos (venta_items, credito_items, abonos) bajan EMBEBIDOS en su cabecera
+     (PostgREST `select`); las RPC tocan la cabecera en cada cambio (rev/updated_at), así el cursor los re-baja.
+     Solo el Taller: el mecánico no tiene RLS de lectura de dinero (SYNC-2) y su build no carga estos mappers. */
+  function iso(v) { return v ? new Date(v).toISOString() : null; }
+  function ms(v) { return v ? new Date(v).getTime() : null; }
+  function num(v) { return v === null || v === undefined ? null : Number(v); }
+  // inventario_id (uid) de cada renglón → id local del repuesto, dentro de la misma transacción del pull
+  async function itemsALocal(items, resolver) {
+    var out = [];
+    for (var i = 0; i < (items || []).length; i++) {
+      var it = items[i];
+      out.push(Object.assign({}, it, { inventarioId: it.inventarioUid ? await resolver(it.inventarioUid) : null }));
+    }
+    return out;
+  }
+  function renglon(it) {
+    return {
+      uid: it.id, inventarioUid: it.inventario_id || null, inventarioId: null, nombre: it.nombre,
+      cantidad: Number(it.cantidad), precio: Number(it.precio),
+      costoUnitario: Number(it.costo_unitario) || 0, costoEstimado: !!it.costo_estimado,
+    };
+  }
+  var financieros = {
+    ventas_rapidas: {
+      entidad: "ventas_rapidas", tabla: "ventas", store: "ventas_rapidas", soloLectura: true,
+      select: "*,venta_items(id,inventario_id,nombre,cantidad,precio,costo_unitario,costo_estimado)",
+      columnas: [], tiempos: [], fks: [{ local: "clienteId", cloud: "cliente_id", entidad: "clientes" }],
+      aCloud: function () { return {}; },
+      aLocal: function (r) {
+        return {
+          items: Array.isArray(r.venta_items) ? r.venta_items.map(renglon) : [],
+          clienteNombre: r.cliente_nombre || null, metodoPago: r.metodo_pago, total: Number(r.total),
+          efectivoRecibido: num(r.efectivo_recibido), cambio: Number(r.cambio) || 0,
+          mecanico: r.mecanico || "", mecanicoId: r.mecanico_id || null,
+          fechaISO: iso(r.occurred_at || r.creado_en), creadoEn: ms(r.creado_en),
+          anulada: !!r.anulada, anuladaEn: ms(r.anulada_en), capturadaOffline: !!r.capturada_offline,
+        };
+      },
+      refsALocal: async function (c, resolver) { return Object.assign({}, c, { items: await itemsALocal(c.items, resolver) }); },
+    },
+    creditos: {
+      entidad: "creditos", tabla: "creditos", store: "creditos", soloLectura: true,
+      select: "*,credito_items(id,inventario_id,nombre,cantidad,precio,costo_unitario),abonos(id,id_abono,monto,metodo_pago,occurred_at,creado_en,anulado,anulado_en)",
+      columnas: [], tiempos: [],
+      fks: [{ local: "clienteId", cloud: "cliente_id", entidad: "clientes" }, { local: "ordenId", cloud: "orden_id", entidad: "ordenes" }],
+      aCloud: function () { return {}; },
+      aLocal: function (r) {
+        var abonos = Array.isArray(r.abonos) ? r.abonos.slice().sort(function (a, b) { return String(a.creado_en).localeCompare(String(b.creado_en)); }) : [];
+        var ab = function (a) { return { uid: a.id, idAbono: a.id_abono, monto: Number(a.monto), metodoPago: a.metodo_pago, fechaISO: iso(a.occurred_at || a.creado_en), anulado: !!a.anulado }; };
+        return {
+          clienteNombre: r.cliente_nombre, clienteTelefono: r.cliente_telefono || "",
+          items: Array.isArray(r.credito_items) ? r.credito_items.map(renglon) : [],
+          total: Number(r.total), abonado: Number(r.abonado), saldo: Number(r.saldo), estado: r.estado,
+          vencimiento: r.vencimiento || null, nota: r.nota || "", origen: r.origen || null,
+          historialAbonos: abonos.filter(function (a) { return !a.anulado; }).map(ab),
+          abonosAnulados: abonos.filter(function (a) { return a.anulado; }).map(ab),
+          mecanico: r.mecanico || "", mecanicoId: r.mecanico_id || null,
+          fechaISO: iso(r.occurred_at || r.creado_en), creadoEn: ms(r.creado_en),
+          anulado: !!r.anulado, anuladoEn: ms(r.anulado_en),
+        };
+      },
+      refsALocal: async function (c, resolver) { return Object.assign({}, c, { items: await itemsALocal(c.items, resolver) }); },
+    },
+    caja_movimientos: {
+      entidad: "caja_movimientos", tabla: "caja_movimientos", store: "caja_movimientos", soloLectura: true,
+      columnas: [], tiempos: [],
+      fks: [{ local: "ventaId", cloud: "venta_id", entidad: "ventas_rapidas" }, { local: "creditoId", cloud: "credito_id", entidad: "creditos" },
+        { local: "ordenId", cloud: "orden_id", entidad: "ordenes" }],
+      aCloud: function () { return {}; },
+      aLocal: function (r) {
+        return {
+          tipo: r.tipo, categoria: r.categoria || "", monto: Number(r.monto), metodoPago: r.metodo_pago || null,
+          descripcion: r.descripcion || "", idAbono: r.id_abono || null, reversoDe: r.reverso_de || null,
+          fechaISO: iso(r.occurred_at || r.creado_en), creadoEn: ms(r.creado_en),
+        };
+      },
+    },
+  };
+  if (!esMecanico) Object.keys(financieros).forEach(function (k) { mappers[k] = financieros[k]; });
+
   // "inventario" va DESPUÉS de "categorias_inv" (SYNC-7A): su fk categoriaId se resuelve por el mapa
   // local↔uid, que solo existe una vez que categorias_inv ya se sincronizó (mismo motivo que "ordenes" va
   // después de "clientes"/"motos").
   var orden = ["clientes", "motos", "citas", "categorias_inv", "inventario", "cotizaciones", "ordenes"];
+  // SYNC-7B: el dinero va al final — sus llaves foráneas (clientes, ordenes, ventas, créditos) ya están en el mapa.
+  if (!esMecanico) orden = orden.concat(["ventas_rapidas", "creditos", "caja_movimientos"]);
 
   global.ENTIMOTORS_SYNC_MAPPERS = mappers;
   global.ENTIMOTORS_SYNC_ORDEN = orden;

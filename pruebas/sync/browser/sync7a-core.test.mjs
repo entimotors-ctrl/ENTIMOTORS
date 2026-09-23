@@ -67,8 +67,12 @@ for (const nav of NAVS) {
       assert.equal(fila.nombre, "Filtro de aire");
       assert.equal(Number(fila.cantidad), 0, "el maestro nace en 0: cantidad nunca viaja por el CRUD (ver sync-mappers.js)");
       assert.equal(fila.categoria_id, catUid, "categoria_id resuelve al mismo mapa local↔uid que categorias_inv");
+      // SYNC-7B: la nube es la autoridad del stock y la caché la REFLEJA: tras confirmarse el alta (sin apertura en esta
+      // prueba), la caché muestra lo que dice la nube (0), no lo que se tecleó. Lo importante sigue probado arriba:
+      // la cantidad NUNCA subió por el CRUD del maestro.
       const [local] = (await locales(a, "inventario")).filter((x) => x.uid === repUid);
-      assert.equal(local.cantidad, 40, "localmente SÍ se conserva la cantidad con la que se llenó el formulario");
+      assert.equal(local.cantidad, 0, "la caché refleja la cantidad de la nube, no la del formulario");
+      assert.ok(!(await cola(a)).some((o) => o.cambios && "cantidad" in o.cambios), "ninguna operación lleva cantidad");
     });
 
     test("update del maestro (precio) nunca toca cantidad, ni local ni remota", async () => {
@@ -217,26 +221,26 @@ for (const nav of NAVS) {
       assert.equal(nube("inventario", "nombre")[0].nombre, "Editado dos veces");
     });
 
-    test("pull() nunca pisa la cantidad local con la de la nube, aunque la nube cambie (venta local sin sincronizar, SYNC-7B)", async () => {
+    test("SYNC-7B: la cantidad BAJA de la nube (autoridad) y un cambio local de cantidad NUNCA sube por el CRUD del maestro", async () => {
       pila.limpiar();
       const a = await abrir("admin");
       const { repUid, repLocalId } = await crearRepuesto(a, { cantidad: 20 });
       await encolarRpc(a, "registrar_stock_inicial", { p_inventario_id: repUid, p_cantidad: 20 }, { entidad: "inventario", uid: repUid });
       await flush(a);
 
-      // simula una venta LOCAL que todavía no sincroniza stock (SYNC-7B no conectado): el TPV baja la cantidad
-      // local a mano, exactamente como hace hoy DB.save("inventario", rep) tras un cobro. Como cantidad no es
-      // columna del mapper, esto NO debe generar ningún outbox: es un cambio 100% local.
+      // alguien intenta escribir la cantidad local por el CRUD del maestro: no debe generar NINGUNA operación
       const antes = (await locales(a, "inventario")).find((x) => x.uid === repUid);
       await escribir(a, "inventario", { ...antes, id: repLocalId, cantidad: 3 });
-      assert.equal((await cola(a)).length, 0, "bajar la cantidad local no encola nada: cantidad no es una columna sincronizada");
+      assert.equal((await cola(a)).length, 0, "cantidad no es columna sincronizada: cambiarla local no encola nada");
+      assert.equal(Number(nube("inventario", "cantidad")[0].cantidad), 20, "la nube no se enteró (y nunca se enterará) del 3");
 
-      // otro dispositivo (o la propia apertura) deja la cantidad de la NUBE en un valor distinto (20) a propósito.
+      // el siguiente cambio remoto trae la verdad de la nube: la caché vuelve a 20
       pila.sql(`update public.inventario set nombre = 'Nombre actualizado por otro dispositivo' where id = '${repUid}'`);
       await pull(a, "inventario");
       const tras = (await locales(a, "inventario")).find((x) => x.uid === repUid);
-      assert.equal(tras.nombre, "Nombre actualizado por otro dispositivo", "el nombre SÍ se actualiza con el pull");
-      assert.equal(tras.cantidad, 3, "la cantidad local (venta sin sincronizar) NO se pisa con la de la nube (20)");
+      assert.equal(tras.nombre, "Nombre actualizado por otro dispositivo");
+      assert.equal(tras.cantidad, 20, "la caché refleja la cantidad materializada por el ledger, no un valor local");
+      assert.equal(tras.requiereRevision, false);
     });
   });
 }

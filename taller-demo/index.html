@@ -1996,6 +1996,7 @@
     </div>
     <div class="modal-actions">
       <button class="btn ghost" id="btnCerrarRepuestoDetalle">Cerrar</button>
+      <button class="btn ghost" id="btnAjustarStock" style="display:none;">Ajustar stock</button>
       <button class="btn primary" id="btnEditarRepuesto">Editar</button>
     </div>
   </div>
@@ -2394,6 +2395,8 @@
 <script src="sync-engine.js?v=3.13.0"></script>
 <script src="sync-mappers.js?v=3.13.0"></script>
 <script src="sync-fotos.js?v=3.13.0"></script>
+<!-- SYNC-7B: dinero y stock por RPC en modo nube (antes de app.js: prepararModoNube la arma) -->
+<script src="sync-finanzas.js?v=3.13.0"></script>
 <!-- Autorización con PIN administrativo (SYNC-7, D-7): habla con el api-server, nunca con Supabase
      directo. Va antes de app.js porque prepararModoNube() la inicializa (PinUI.prepararInstancia). -->
 <script src="pin-ui.js?v=3.13.0"></script>

@@ -457,7 +457,12 @@ function tx(store, mode = "readonly") { return db.transaction(store, mode).objec
    `syncBd`/`syncMotor` (entimotors_sync); el resto (ventas_rapidas, dinero,
    movimientos de caja) sigue exactamente igual, byte por byte, contra
    entimotors_os_demo — eso es SYNC-7B. */
-const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "inventario", "cotizaciones", "ordenes"];
+const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "inventario", "cotizaciones", "ordenes",
+  "ventas_rapidas", "creditos", "caja_movimientos"];
+/* SYNC-7B: dinero en modo nube = SOLO LECTURA por DB.*. Se escribe únicamente por las RPC transaccionales
+   (sync-finanzas.js). Nunca hard-delete ni edición directa: se corrige con reversos. */
+const ENTIDADES_FINANCIERAS = ["ventas_rapidas", "creditos", "caja_movimientos"];
+let syncFin = null;
 let syncBd = null;
 let syncMotor = null;
 function modoNubeActivo(store) {
@@ -580,6 +585,7 @@ const DB = {
     return idbGet(store, id);
   },
   async save(store, value) {
+    if (modoNubeActivo(store) && ENTIDADES_FINANCIERAS.includes(store)) throw new Error("FINANCIERO_SOLO_RPC: " + store + " solo se registra por su operación");
     if (modoNubeActivo(store)) {
       // D-4 (SYNC-7A): solo el administrador edita el maestro de inventario/categorías en modo nube.
       if (!puedeEscribirEntidadNube(store)) {
@@ -591,6 +597,7 @@ const DB = {
     return idbSave(store, value);
   },
   async delete(store, id) {
+    if (modoNubeActivo(store) && ENTIDADES_FINANCIERAS.includes(store)) throw new Error("FINANCIERO_SOLO_RPC: el dinero no se borra, se revierte");
     if (modoNubeActivo(store)) {
       if (!puedeEscribirEntidadNube(store)) {
         bloquear(store === "inventario" ? "Solo el administrador edita el inventario" : "Solo el administrador edita las categorías");
@@ -625,7 +632,7 @@ const DB = {
    red, la app sigue funcionando 100% local como siempre (mismo espíritu que
    supabase-client.js). */
 async function prepararModoNube(session) {
-  syncMotor = null; syncBd = null;
+  syncMotor = null; syncBd = null; syncFin = null;
   if (!session || session.origen !== "supabase" || session.activo === false) return;
   if (!window.SyncDB || !window.SyncEngine || !window.SyncRest || !window.ENTIMOTORS_SYNC_MAPPERS) return;
   if (!window.SupabaseCliente || !SupabaseCliente.estado().activo) return;
@@ -649,6 +656,17 @@ async function prepararModoNube(session) {
   // la necesitan (ver PinUI.ACCIONES_CON_PIN) están apagadas fuera de modo nube (mismo criterio que
   // el resto de esta función).
   if (window.PinUI) window.PinUI.prepararInstancia({ sesion: () => SupabaseCliente.sesion() });
+  // SYNC-7B: dinero y stock por RPC (ver sync-finanzas.js). Se arma para TODA sesión de nube a propósito: si un
+  // mecánico llegara a invocar una operación de dinero, va al servidor (que la niega con 42501) y nunca cae al camino
+  // local histórico de entimotors_os_demo. Las acciones con PIN además se bloquean localmente (accionAutorizada).
+  if (window.SyncFinanzas) {
+    syncFin = SyncFinanzas.crear({ motor: syncMotor, bd: syncBd, enLinea: () => isOnline(), autorizar: (o) => PinUI.autorizarAccion(o) });
+    syncMotor.onCambio((ev) => {
+      if (ev.tipo !== "rechazada" || !["ventas_rapidas", "creditos", "caja_movimientos", "inventario"].includes(ev.datos?.entidad)) return;
+      // una operación que quedó en la cola (sin red) y el servidor rechazó al volver: nunca en silencio
+      toast("Una operación guardada sin conexión fue rechazada: " + (ev.datos.error?.mensaje || "revisa la cola de sincronización"), "off");
+    });
+  }
   // Bootstrap (SYNC-5 sección 10): con cursor vacío, pull() pagina desde el
   // principio. Si no hay red, sigue igual — arrancar() reintentará al volver.
   try { await syncMotor.pullTodo(); } catch (e) { /* sin red: se reintenta al volver a estar online */ }
@@ -688,6 +706,168 @@ async function flushFotosPendientes() {
     });
   } catch (e) { /* mejor esfuerzo: se reintenta en el próximo "online" o la próxima foto */ }
 }
+/* ================= SYNC-7B · DINERO Y STOCK EN MODO NUBE =================
+   Toda afectación de dinero o stock va por una RPC transaccional e idempotente (sync-3-rpc.sql) armada por
+   sync-finanzas.js. Aquí solo se traduce la UI de siempre (ids locales) a identidades de nube (uid) y se
+   refleja el resultado. El modo local (3.13 / rollback) no pasa por aquí: finanzasNube() es false. */
+function finanzasNube() { return !!syncFin && modoNubeActivo("ventas_rapidas"); }
+async function uidDe(entidad, idLocal) { return idLocal == null ? null : syncBd.mapa.uidDe(entidad, idLocal); }
+async function bajarNube(entidades) {
+  for (const e of entidades) { try { await syncMotor.pull(e); } catch (err) { /* sin red: el próximo ciclo lo baja */ } }
+}
+/* Copia local provisional de un registro creado por RPC (venta/crédito) mientras la nube no responde: mismo uid
+   que la operación, así el pull lo reemplaza por la versión del servidor en vez de duplicarlo. No-op si ya existe. */
+async function guardarProvisional(store, uid, registro) {
+  await syncBd.transaccion([store, "mapa"], "readwrite", async (t) => {
+    if (await t.get("mapa", uid)) return;
+    const id = await t.put(store, { ...registro, uid, _rev: 0, _base: null, _pend: true });
+    await t.put("mapa", { uid, entidad: store, local_id: id });
+  });
+  return syncBd.mapa.localDe(uid);
+}
+async function itemsConUid(items) {
+  const out = [];
+  for (const it of items) out.push({ ...it, inventarioUid: it.inventarioId ? await uidDe("inventario", it.inventarioId) : null });
+  return out;
+}
+function errorDeOperacion(r, accion) {
+  const e = new Error(r.error?.mensaje || `No se pudo ${accion}`);
+  e.rechazo = true;
+  return e;
+}
+/* Ejecuta por el outbox. ok/pendiente → sigue; rechazada → la persona ya ve el error: se retira de la cola y lanza. */
+async function ejecutarFinanciera(op, accion) {
+  const r = await syncFin.ejecutar(op);
+  if (r.estado === "rechazada") { await syncFin.descartarRechazo(r.seq); throw errorDeOperacion(r, accion); }
+  return r;
+}
+
+async function registrarVentaNube({ items, clienteId, clienteNombre, metodoPago, efectivoRecibido }) {
+  const total = items.reduce((s, it) => s + it.cantidad * it.precio, 0);
+  const op = syncFin.construir.venta({
+    items: await itemsConUid(items), clienteUid: await uidDe("clientes", clienteId), clienteNombre, metodoPago, efectivoRecibido,
+    ocurrioEn: new Date().toISOString(), offline: !isOnline(), deviceId: await syncBd.deviceId(),
+  });
+  const r = await ejecutarFinanciera(op, "registrar la venta");
+  if (r.estado === "ok") await bajarNube(["inventario", "ventas_rapidas", "caja_movimientos"]);
+  const venta = {
+    items: op.params.p_items.map((x, i) => ({ nombre: x.nombre, cantidad: x.cantidad, precio: x.precio, inventarioId: items[i].inventarioId || null })),
+    clienteId: clienteId || null, clienteNombre: clienteNombre || null, metodoPago, total: SyncFinanzas.r2(r.resultado?.total ?? total),
+    efectivoRecibido: metodoPago === "efectivo" ? Number(efectivoRecibido) || 0 : null,
+    cambio: metodoPago === "efectivo" ? Math.max(0, (Number(efectivoRecibido) || 0) - total) : 0,
+    fechaISO: op.params.p_occurred_at, creadoEn: Date.now(), ...asignacionDelUsuarioActual(),
+  };
+  const id = await guardarProvisional("ventas_rapidas", op.meta.uid, venta);
+  const negativos = r.resultado?.stock_negativo || [];
+  return { id, total: venta.total, venta, faltantes: [], estado: r.estado, stockNegativo: negativos };
+}
+
+async function registrarCreditoNube({ clienteId, clienteNombre, clienteTelefono, items, vencimiento, nota, abono, abonoMetodo, origen, ordenId }) {
+  const op = syncFin.construir.credito({
+    items: await itemsConUid(items), clienteUid: await uidDe("clientes", clienteId), clienteNombre, clienteTelefono, vencimiento, nota,
+    abonoInicial: abono || 0, abonoMetodo, origen, ordenUid: await uidDe("ordenes", ordenId),
+    ocurrioEn: new Date().toISOString(), offline: !isOnline(), deviceId: await syncBd.deviceId(),
+  });
+  const r = await ejecutarFinanciera(op, "registrar el crédito");
+  if (r.estado === "ok") await bajarNube(["inventario", "creditos", "caja_movimientos"]);
+  const total = op.params.p_items.reduce((s, x) => s + x.cantidad * x.precio, 0);
+  const ab = op.params.p_abono_inicial;
+  const credito = {
+    clienteId: clienteId || null, clienteNombre, clienteTelefono: clienteTelefono || "",
+    items: op.params.p_items.map((x) => ({ nombre: x.nombre, cantidad: x.cantidad, precio: x.precio })),
+    total, abonado: ab, saldo: SyncFinanzas.r2(total - ab), estado: ab <= 0 ? "pendiente" : (total - ab <= 0.001 ? "pagado" : "parcial"),
+    vencimiento: vencimiento || null, nota: nota || "", origen: origen || null, ordenId: ordenId || null,
+    historialAbonos: ab > 0 ? [{ idAbono: op.meta.uid + ":ini", monto: ab, metodoPago: abonoMetodo || "efectivo", fechaISO: op.params.p_occurred_at }] : [],
+    fechaISO: op.params.p_occurred_at, creadoEn: Date.now(), ...asignacionDelUsuarioActual(),
+  };
+  const id = await guardarProvisional("creditos", op.meta.uid, credito);
+  return { id, credito: (await syncBd.datos.get("creditos", id)) || credito, faltantes: [], estado: r.estado };
+}
+
+async function registrarAbonoNube(creditoId, monto, metodoPago) {
+  const cred = await syncBd.datos.get("creditos", creditoId);
+  if (!cred) throw new Error("Crédito no encontrado");
+  const op = syncFin.construir.abono({ creditoUid: cred.uid, monto, metodo: metodoPago, ocurrioEn: new Date().toISOString(), deviceId: await syncBd.deviceId() });
+  const r = await ejecutarFinanciera(op, "registrar el abono");
+  if (r.estado === "ok") await bajarNube(["creditos", "caja_movimientos"]);
+  else toast("Sin conexión: el abono se enviará al volver la red (el servidor confirma el saldo)", "off");
+  return (await syncBd.datos.get("creditos", creditoId)) || cred;
+}
+
+async function registrarMovimientoCajaNube(mov) {
+  const op = syncFin.construir.movimientoCaja({ ...mov, metodo: mov.metodoPago, ocurrioEn: new Date().toISOString(), deviceId: await syncBd.deviceId() });
+  const r = await ejecutarFinanciera(op, "registrar el movimiento");
+  if (r.estado === "ok") await bajarNube(["caja_movimientos"]);
+  return r;
+}
+
+/* Ítem de orden: SIEMPRE por agregar_item_orden (la nube calcula el total de la orden con orden_items al
+   finalizar). Si trae repuesto, la RPC mueve el ledger; nunca DB.save de cantidad. */
+async function agregarItemOrdenNube(ord, { nombre, cantidad, precio, inventarioId, costoUnitario }) {
+  const op = syncFin.construir.itemOrden({
+    ordenUid: ord.uid, inventarioId: inventarioId || null, inventarioUid: await uidDe("inventario", inventarioId), nombre, cantidad, precio,
+    offline: !isOnline(), ocurrioEn: new Date().toISOString(), deviceId: await syncBd.deviceId(),
+  });
+  const r = await ejecutarFinanciera(op, "agregar el ítem");
+  return { estado: r.estado, item: { uid: op.params.p_item_id, nombre, cantidad, precio, origenInventarioId: inventarioId || null, costoUnitario: costoUnitario || 0, costoEstimado: false } };
+}
+async function quitarItemOrdenNube(ord, item) {
+  if (!item.uid) return { estado: "local" };   // renglón viejo que nunca llegó a la nube: no movió stock allá
+  const op = syncFin.construir.quitarItemOrden({ itemUid: item.uid, ordenUid: ord.uid, deviceId: await syncBd.deviceId() });
+  return ejecutarFinanciera(op, "quitar el ítem");
+}
+
+/* Finalizar/cobrar: UNA sola RPC (finalizar_orden) crea caja o crédito(+entrada) y cierra la orden, todo o nada.
+   Antes se suben los renglones viejos que nunca llegaron a la nube, para que el total del servidor sea el real. */
+async function finalizarOrdenNube(o, total) {
+  let ord = await DB.get("ordenes", o.id);
+  const items = [];
+  for (const it of (ord.items || [])) {
+    if (it.uid) { items.push(it); continue; }
+    const r = await agregarItemOrdenNube(ord, { nombre: it.nombre, cantidad: it.cantidad, precio: it.precio, inventarioId: it.origenInventarioId, costoUnitario: it.costoUnitario });
+    items.push({ ...it, uid: r.item.uid });
+  }
+  if (items.some((it, i) => it !== (ord.items || [])[i])) { ord.items = items; await DB.save("ordenes", ord); }
+  const op = syncFin.construir.finalizarOrden({
+    ordenUid: ord.uid, tipoCobro: o.tipoCobro === "credito" ? "credito" : "contado", metodoPago: o.metodoPago || "efectivo",
+    abono: Math.min(Number(o.abonoInicial) || 0, total), abonoMetodo: o.abonoMetodo || "efectivo",
+    ocurrioEn: new Date().toISOString(), deviceId: await syncBd.deviceId(),
+  });
+  const r = await ejecutarFinanciera(op, "finalizar la orden");
+  if (r.estado === "ok") await bajarNube(["ordenes", "creditos", "caja_movimientos"]);
+  const creditoUid = op.params.p_credito_id;
+  const creditoId = creditoUid ? await syncBd.mapa.localDe(creditoUid) : null;
+  return { estado: r.estado, total: r.resultado?.total ?? total, margen: r.resultado?.margen, creditoUid, creditoId };
+}
+
+/* Acciones con autorización (reversos, anular, ajuste de stock): SIEMPRE en línea, nunca en la cola.
+   Cajero → modal PIN (autorización de un solo uso ligada a esta acción/registro/dispositivo/monto); admin → directo;
+   mecánico → negado. Devuelve true si se aplicó. */
+async function accionAutorizada(construirFn, datos, entidadesABajar, textoOk) {
+  if (!finanzasNube()) return false;
+  if (esMecanicoCuenta()) { bloquear("Un mecánico no puede hacer esta operación"); return false; }
+  if (!isOnline()) { toast(SyncFinanzas.SIN_CONEXION_PIN, "off"); return false; }
+  let accion;
+  try { accion = construirFn({ ...datos, deviceId: await syncBd.deviceId() }); }
+  catch (e) { toast(e.message, "off"); return false; }
+  const r = await syncFin.conAutorizacion(accion, currentUser?.rol);
+  if (!r.ok) {
+    // PinUI ya avisó sus propios errores (PIN incorrecto, bloqueos…); aquí solo los de la operación en sí
+    if (r.op_id || r.motivo === "sin-conexion" || r.motivo === "sin-permiso") toast(r.mensaje, "off");
+    return false;
+  }
+  await bajarNube(entidadesABajar);
+  toast(textoOk);
+  markDirty();
+  return true;
+}
+async function pedirMotivo(titulo) {
+  const m = await showPrompt("Motivo (queda en la auditoría)", { titulo });
+  if (m === null || m === undefined) return null;
+  if (String(m).trim().length < 3) { toast("El motivo es obligatorio (mínimo 3 caracteres)", "off"); return null; }
+  return String(m).trim();
+}
+
 const ALL_STORES = ["clientes", "motos", "ordenes", "inventario", "citas", "cotizaciones", "ventas_rapidas", "caja_movimientos", "creditos", "web_cms", "categorias_inv", "auditoria"];
 // sync_cola queda FUERA del respaldo a propósito: es un registro de "qué falta
 // subir" que solo tiene sentido en el dispositivo donde se generó. Restaurarla
@@ -802,6 +982,8 @@ function costoDelItem(it, inventario) {
    request falla, el navegador aborta TODA la transacción automáticamente (no hay
    que revertir nada a mano) y t.onerror/t.onabort se disparan en vez de t.oncomplete. */
 function registrarVentaRapida({ items, clienteId, clienteNombre, metodoPago, efectivoRecibido }) {
+  // SYNC-7B: en modo nube la venta es UNA RPC (venta+renglones+ledger+caja+auditoría, todo o nada)
+  if (finanzasNube()) return registrarVentaNube({ items, clienteId, clienteNombre, metodoPago, efectivoRecibido });
   return new Promise((resolve, reject) => {
     if (!items || !items.length) { reject(new Error("El carrito está vacío")); return; }
 
@@ -866,6 +1048,7 @@ function registrarVentaRapida({ items, clienteId, clienteNombre, metodoPago, efe
    (ver registrarAbonoCredito), y es lo que hace que los créditos se vean
    reflejados en Finanzas y caja. */
 function registrarCredito({ clienteId, clienteNombre, clienteTelefono, items, vencimiento, nota }) {
+  if (finanzasNube()) return registrarCreditoNube({ clienteId, clienteNombre, clienteTelefono, items, vencimiento, nota, abono: 0 });
   return new Promise((resolve, reject) => {
     if (!items || !items.length) { reject(new Error("Agrega al menos un repuesto o servicio")); return; }
 
@@ -917,6 +1100,8 @@ function registrarCredito({ clienteId, clienteNombre, clienteTelefono, items, ve
    idAbono además hace la operación idempotente: si el mismo abono se manda dos
    veces (doble toque, reintento), la segunda se ignora en vez de cobrar doble. */
 function registrarAbonoCredito(creditoId, monto, metodoPago, idAbono) {
+  // SYNC-7B: el saldo lo decide el servidor (registrar_abono_v2); el operation_id es la idempotencia
+  if (finanzasNube()) return registrarAbonoNube(creditoId, monto, metodoPago);
   return new Promise((resolve, reject) => {
     const t = db.transaction(["creditos", "caja_movimientos"], "readwrite");
     const credStore = t.objectStore("creditos");
@@ -973,6 +1158,13 @@ function registrarAbonoCredito(creditoId, monto, metodoPago, idAbono) {
 async function eliminarCredito(id) {
   const cred = await DB.get("creditos", id);
   if (!cred) return;
+  if (finanzasNube()) {
+    // SYNC-7B: un crédito nunca se borra: se revierte (abonos + caja compensatoria + stock), con autorización
+    const motivo = await pedirMotivo("Anular crédito #" + id);
+    if (!motivo) return false;
+    return accionAutorizada((d) => syncFin.construir.reversarCredito(d), { creditoUid: cred.uid, total: cred.total, motivo },
+      ["creditos", "caja_movimientos", "inventario"], "Crédito anulado (queda en el historial)");
+  }
   if (cred.abonado > 0) { toast("No se puede eliminar un crédito que ya tiene abonos registrados", "off"); return; }
 
   const t = db.transaction(["creditos", "inventario"], "readwrite");
@@ -1019,6 +1211,8 @@ async function resolverClienteCredito(clienteId, nombreLibre) {
    algo de entrada, registra ese abono de una vez — que es lo que hace que el
    dinero recibido sí entre a caja y el saldo quede en lo que falta. */
 async function cobrarAlCredito({ clienteId, clienteNombre, clienteTelefono, items, abono, abonoMetodo, nota, origen, ordenId }) {
+  // SYNC-7B: crédito + entrada en UNA RPC (registrar_credito con p_abono_inicial): nunca un crédito sin su abono
+  if (finanzasNube()) return registrarCreditoNube({ clienteId, clienteNombre, clienteTelefono, items, vencimiento: null, nota, abono, abonoMetodo, origen, ordenId });
   const { id, credito } = await registrarCredito({ clienteId, clienteNombre, clienteTelefono, items, vencimiento: null, nota });
   if (origen || ordenId) {
     const cred = await DB.get("creditos", id);
@@ -1034,6 +1228,8 @@ async function cobrarAlCredito({ clienteId, clienteNombre, clienteTelefono, item
 
 /* ---------------- caja chica: registrar un ingreso de una orden de taller entregada ---------------- */
 function registrarIngresoTaller(orden, total, metodoPago) {
+  // en modo nube el ingreso de una orden lo crea finalizar_orden (ver finalizarOrdenNube): nunca por separado
+  if (finanzasNube()) return Promise.reject(new Error("En modo nube el cobro de la orden va por finalizar_orden"));
   return new Promise((resolve, reject) => {
     const t = db.transaction(["caja_movimientos"], "readwrite");
     t.objectStore("caja_movimientos").add({
@@ -2210,7 +2406,9 @@ function chartColors() {
 async function renderFinanzasCharts() {
   if (typeof Chart === "undefined") return; // sin internet la primera vez, la librería no llegó a cargar
 
-  const [movs, ventas, ordenes, inv, creditos] = await Promise.all([DB.getAll("caja_movimientos"), DB.getAll("ventas_rapidas"), DB.getAll("ordenes"), DB.getAll("inventario"), DB.getAll("creditos")]);
+  const [movs, ventasTodas, ordenes, inv, creditosTodos] = await Promise.all([DB.getAll("caja_movimientos"), DB.getAll("ventas_rapidas"), DB.getAll("ordenes"), DB.getAll("inventario"), DB.getAll("creditos")]);
+  // SYNC-7B: lo anulado se conserva (reverso) pero no cuenta como venta ni como deuda
+  const ventas = ventasTodas.filter(v => !v.anulada), creditos = creditosTodos.filter(c => !c.anulado);
   const { grid, text } = chartColors();
   Chart.defaults.color = text;
   Chart.defaults.borderColor = grid;
@@ -2283,8 +2481,29 @@ async function renderFinanzasCharts() {
 /* ================= ÓRDENES ================= */
 let ordenesFiltro = null; // null (todas) | "activas" | "entregadas"
 
+/* SYNC-7B · borrar una orden en modo nube: sin dinero → borrado suave SOLO admin, y la RPC devuelve al inventario
+   los repuestos que salieron (anular_orden); cobrada → NO se borra, se anula (caja/crédito compensados), con PIN
+   para el cajero. Nunca DB.delete de una orden con dinero. */
+async function anularOrdenNube(id) {
+  const o = await DB.get("ordenes", id);
+  if (!o) return;
+  const conDinero = !!o.finalizada;
+  if (!conDinero && currentUser?.rol !== "admin") { bloquear("Solo el administrador elimina órdenes"); return; }
+  const motivo = await pedirMotivo(conDinero ? "Anular orden cobrada #" + id : "Eliminar orden #" + id);
+  if (!motivo) return;
+  const devolverStock = conDinero
+    ? await showConfirm("¿Los repuestos de esta orden vuelven al inventario?", { titulo: "Anular orden", textoOk: "Sí, devolver al inventario" })
+    : true;
+  const ok = await accionAutorizada((d) => syncFin.construir.anularOrden(d), { ordenUid: o.uid, motivo, devolverStock },
+    ["ordenes", "inventario", "creditos", "caja_movimientos"], conDinero ? "Orden anulada (queda en el historial)" : "Orden eliminada");
+  if (!ok) return;
+  renderOrdersList();
+  renderDashboard();
+}
+
 async function renderOrdersList() {
-  const [ordenesAll, motos, clientes] = await Promise.all([DB.getAll("ordenes"), DB.getAll("motos"), DB.getAll("clientes")]);
+  const [ordenesTodas, motos, clientes] = await Promise.all([DB.getAll("ordenes"), DB.getAll("motos"), DB.getAll("clientes")]);
+  const ordenesAll = ordenesTodas.filter(o => !o.anulada);   // SYNC-7B: anulada = se conserva en la nube, no se lista
 
   const entregadasMes = ordenesAll.filter(o => o.estado === "entregado" && o.entregadoEn && sameMonth(new Date(o.entregadoEn), new Date()));
   const activas = ordenesAll.filter(o => o.estado !== "entregado");
@@ -2333,8 +2552,9 @@ async function renderOrdersList() {
     });
   });
   list.querySelectorAll("[data-del]").forEach(btn => {
-    btn.addEventListener("click", (e) => {
+    btn.addEventListener("click", async (e) => {
       e.stopPropagation();
+      if (finanzasNube()) { await anularOrdenNube(Number(btn.dataset.del)); return; }
       requestAdminCode(async () => {
         await DB.delete("ordenes", Number(btn.dataset.del));
         markDirty();
@@ -2751,6 +2971,18 @@ async function renderPresupuestoStage(o) {
     btn.addEventListener("click", async () => {
       const idx = Number(btn.dataset.quitar);
       const ord = await DB.get("ordenes", o.id);
+      if (finanzasNube()) {
+        // SYNC-7B: quitar_item_orden devuelve el stock con un movimiento compensatorio (idempotente por op_id)
+        const it = (ord.items || [])[idx];
+        if (!it) return;
+        try { await quitarItemOrdenNube(ord, it); } catch (err) { toast("No se pudo quitar: " + err.message, "off"); return; }
+        ord.items.splice(idx, 1);
+        await DB.save("ordenes", ord);
+        await bajarNube(["inventario"]);
+        toast(it.origenInventarioId ? "Ítem quitado y stock devuelto al inventario" : "Ítem quitado");
+        renderPresupuestoStage(ord);
+        return;
+      }
       const [removido] = (ord.items || []).splice(idx, 1);
       if (removido?.origenInventarioId) {
         const rep = await DB.get("inventario", removido.origenInventarioId);
@@ -3150,7 +3382,14 @@ alHacerClicUnaVez(document.getElementById("btnAvanzar"), async () => {
     let mensaje = "Trabajo finalizado y guardado como registro";
 
     try {
-      if (total > 0 && o.tipoCobro === "credito") {
+      if (finanzasNube()) {
+        // SYNC-7B: UNA operación transaccional — caja o crédito(+entrada) y cierre de la orden, todo o nada
+        const f = await finalizarOrdenNube(o, total);
+        creditoIdCreado = f.creditoId;
+        mensaje = f.estado === "pendiente"
+          ? "Cobro guardado sin conexión: la orden se cierra en la nube al volver la red"
+          : `Trabajo finalizado · total ${money(f.total)}${f.creditoUid ? " al crédito" : ""}`;
+      } else if (total > 0 && o.tipoCobro === "credito") {
         // al crédito NO entra dinero a caja todavía: se crea la factura pendiente
         // y, si dejó algo de entrada, ese abono sí se registra como ingreso.
         const cliente = await DB.get("clientes", o.clienteId);
@@ -3283,6 +3522,30 @@ alHacerClicUnaVez(document.getElementById("btnGuardarItem"), async () => {
   // stock en vez de restarlo (rep.cantidad -= cantidad con cantidad negativo).
   if (cantidad <= 0) { toast("La cantidad debe ser mayor a cero", "off"); return; }
   if (precio < 0) { toast("El precio no puede ser negativo", "off"); return; }
+
+  if (finanzasNube()) {
+    // SYNC-7B: agregar_item_orden — el servidor decide la existencia (online bloquea sin stock; offline acepta y marca revisión)
+    let invId = null, nom, costo = 0;
+    if (fromInv) {
+      invId = Number(document.getElementById("itemInventarioSelect").value);
+      const rep = await DB.get("inventario", invId);
+      if (!rep) { toast("Elige un repuesto", "off"); return; }
+      nom = rep.nombre; costo = rep.costoCompra || 0;
+    } else {
+      nom = document.getElementById("itemNombre").value.trim();
+      if (!nom) { toast("Falta el nombre del ítem", "off"); return; }
+    }
+    const ord = await DB.get("ordenes", currentOrderId);
+    let r;
+    try { r = await agregarItemOrdenNube(ord, { nombre: nom, cantidad, precio, inventarioId: invId, costoUnitario: costo }); }
+    catch (err) { toast("No se agregó: " + err.message, "off"); return; }
+    const o2 = await updateOrder(currentOrderId, x => { x.items = (x.items || []).concat([r.item]); });
+    if (r.estado === "ok") await bajarNube(["inventario"]); else toast("Ítem guardado sin conexión: se enviará al volver la red", "off");
+    registrarAuditoria("agregar-item", "ordenes", currentOrderId, `${nom} x${cantidad} a ${money(precio)}`);
+    document.getElementById("modalItem").classList.remove("active");
+    openOrder(o2.id);
+    return;
+  }
 
   if (fromInv) {
     const repId = Number(document.getElementById("itemInventarioSelect").value);
@@ -3859,6 +4122,42 @@ alHacerClicUnaVez(document.getElementById("btnCotAceptar"), async () => {
   const items = [];
   const sinStock = [];
   let descontados = 0;
+
+  if (finanzasNube()) {
+    // SYNC-7B: la orden nace vacía y cada renglón entra por agregar_item_orden (el ledger descuenta el stock).
+    // Mismo criterio que siempre: si ya no hay existencia, el renglón pasa como ítem manual y se avisa.
+    const ordenIdN = await DB.save("ordenes", {
+      clienteId, motoId, estado: "recibido", falla: cot.diagnostico || `Trabajo cotizado en la cotización #${cot.id}`,
+      items: [], fotos: [], aprobacion: null, diagnostico: null, reparacionNotas: "", calidadChecklist: null,
+      mecanico: currentUser?.nombre || "—", citaId: null, citaFechaISO: null, cotizacionId: cot.id, creadoEn: Date.now(),
+    });
+    const ordN = await DB.get("ordenes", ordenIdN);
+    for (const it of (cot.items || [])) {
+      const rep = it.inventarioId ? inventario.find(r => r.id === it.inventarioId) : null;
+      let r = null;
+      if (rep) {
+        try { r = await agregarItemOrdenNube(ordN, { nombre: it.nombre, cantidad: it.cantidad, precio: it.precio, inventarioId: rep.id, costoUnitario: rep.costoCompra || 0 }); }
+        catch (err) { sinStock.push(it.nombre); r = null; }
+      }
+      if (!r) {
+        try { r = await agregarItemOrdenNube(ordN, { nombre: it.nombre, cantidad: it.cantidad, precio: it.precio, inventarioId: null }); }
+        catch (err) { toast("No se pudo pasar «" + it.nombre + "» a la orden: " + err.message, "off"); continue; }
+      }
+      items.push(r.item);
+    }
+    await updateOrder(ordenIdN, x => { x.items = items; });
+    await bajarNube(["inventario"]);
+    cot.estado = "aceptada"; cot.ordenId = ordenIdN; cot.aceptadaEn = Date.now();
+    await DB.save("cotizaciones", cot);
+    markDirty();
+    cerrarCotDetalle();
+    toast(sinStock.length ? `Orden #${ordenIdN} creada · sin stock de: ${sinStock.join(", ")}` : `Orden #${ordenIdN} creada desde la cotización`, sinStock.length ? "off" : undefined);
+    await renderCotizaciones();
+    await renderOrdersList();
+    renderDashboard();
+    openOrder(ordenIdN);
+    return;
+  }
 
   for (const it of (cot.items || [])) {
     const rep = it.inventarioId ? inventario.find(r => r.id === it.inventarioId) : null;
@@ -4726,6 +5025,8 @@ async function openClienteDetalle(id) {
 let clienteEnEdicion = null;
 
 async function propagarCambioCliente(clienteId, nombre, telefono) {
+  // SYNC-7B: en modo nube ventas y créditos son registros financieros inmutables (el nombre queda como se facturó)
+  if (finanzasNube()) return 0;
   let tocados = 0;
   for (const cred of (await DB.getAll("creditos")).filter(c => c.clienteId === clienteId)) {
     if (cred.clienteNombre === nombre && cred.clienteTelefono === telefono) continue;
@@ -4750,7 +5051,7 @@ async function abrirModalEditarCliente(clienteId) {
   document.getElementById("editClienteNombre").value = cliente.nombre || "";
   document.getElementById("editClienteTelefono").value = cliente.telefono || "";
 
-  const creditosAbiertos = (await DB.getAll("creditos")).filter(c => c.clienteId === clienteId && c.saldo > 0.01).length;
+  const creditosAbiertos = (await DB.getAll("creditos")).filter(c => c.clienteId === clienteId && !c.anulado && c.saldo > 0.01).length;
   const aviso = document.getElementById("editClienteAviso");
   if (creditosAbiertos) {
     aviso.textContent = `Este cliente tiene ${creditosAbiertos} crédito${creditosAbiertos === 1 ? "" : "s"} pendiente${creditosAbiertos === 1 ? "" : "s"}: el cambio también se aplicará a esa${creditosAbiertos === 1 ? "" : "s"} factura${creditosAbiertos === 1 ? "" : "s"}.`;
@@ -4931,7 +5232,7 @@ async function renderInventario() {
     <tr class="rep-row" data-id="${r.id}">
       <td style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">${r.foto ? `<img class="thumb-sm" src="${r.foto}">` : ""}${esc(r.nombre)}</td>
       <td style="cursor:pointer;">${esc(r.modelo || "Todos")}</td>
-      <td class="num" style="cursor:pointer;">${r.cantidad}</td>
+      <td class="num" style="cursor:pointer;">${r.cantidad}${r.requiereRevision ? ` <span title="Stock negativo por una venta sin conexión: revisar">⚠</span>` : ""}</td>
       <td class="num" style="cursor:pointer;">${money(r.precio)}</td>
       <td><label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; margin:0;"><input type="checkbox" class="chk-publicar" data-id="${r.id}" ${r.publicarEnWeb ? "checked" : ""} style="width:1.05rem; height:1.05rem; margin:0; accent-color:var(--red);"></label></td>
     </tr>`).join("");
@@ -4965,12 +5266,28 @@ async function openRepuestoDetalle(id) {
   repDetalleActualId = id;
   document.getElementById("repDetalleNombre").textContent = r.nombre;
   document.getElementById("repDetalleModelo").textContent = `Modelo compatible: ${r.modelo || "Todos"}`;
-  document.getElementById("repDetalleCantidad").textContent = r.cantidad;
+  document.getElementById("repDetalleCantidad").textContent = r.cantidad + (r.requiereRevision ? " ⚠ revisar" : "");
+  // SYNC-7B: ajuste manual por ledger (ajustar_stock). Admin directo, cajero con PIN; el mecánico no lo ve.
+  document.getElementById("btnAjustarStock").style.display = finanzasNube() && ["admin", "cajero"].includes(currentUser?.rol) ? "" : "none";
   document.getElementById("repDetallePrecio").textContent = money(r.precio);
   document.getElementById("repDetalleFotoWrap").innerHTML = r.foto ? `<img src="${r.foto}" style="width:100%; max-height:220px; object-fit:cover; border-radius:0.6rem; border:1px solid var(--border);">` : "";
   document.getElementById("modalRepuestoDetalle").classList.add("active");
 }
 document.getElementById("btnCerrarRepuestoDetalle").addEventListener("click", () => document.getElementById("modalRepuestoDetalle").classList.remove("active"));
+document.getElementById("btnAjustarStock").addEventListener("click", async () => {
+  const r = await DB.get("inventario", repDetalleActualId);
+  if (!r || !finanzasNube()) return;
+  const txt = await showPrompt(`Hay ${r.cantidad}. Diferencia: positiva entra, negativa sale (p. ej. -2)`, { titulo: "Ajustar stock de " + r.nombre });
+  if (txt === null || txt === undefined || String(txt).trim() === "") return;
+  const delta = Number(String(txt).replace(",", "."));
+  if (!Number.isFinite(delta) || delta === 0) { toast("La diferencia debe ser un número distinto de cero", "off"); return; }
+  const motivo = await pedirMotivo("Motivo del ajuste");
+  if (!motivo) return;
+  if (await accionAutorizada((d) => syncFin.construir.ajusteStock(d), { inventarioUid: r.uid, delta, motivo }, ["inventario"], "Stock ajustado")) {
+    openRepuestoDetalle(r.id);
+    renderInventario();
+  }
+});
 document.getElementById("btnEditarRepuesto").addEventListener("click", async () => {
   const r = await DB.get("inventario", repDetalleActualId);
   if (!r) return;
@@ -5039,7 +5356,20 @@ alHacerClicUnaVez(document.getElementById("btnGuardarRepuesto"), async () => {
     foto,
   };
   if (repuestoEditId) registro.id = repuestoEditId;
+  // SYNC-7B: en modo nube la cantidad de un repuesto EXISTENTE nunca se escribe: si cambió, es un conteo que va
+  // por ajustar_stock (ledger, con motivo). El alta sigue entrando por registrar_stock_inicial (SYNC-7A).
+  let conteoNuevo = null, previoNube = null;
+  if (finanzasNube() && repuestoEditId) {
+    previoNube = await DB.get("inventario", repuestoEditId);
+    if (previoNube && Number(previoNube.cantidad) !== cantidad) conteoNuevo = cantidad;
+    registro.cantidad = previoNube ? previoNube.cantidad : cantidad;
+  }
   await DB.save("inventario", registro);
+  if (conteoNuevo !== null) {
+    const motivo = await pedirMotivo(`Conteo: de ${previoNube.cantidad} a ${conteoNuevo}`);
+    if (motivo) await accionAutorizada((d) => syncFin.construir.ajusteStock(d), { inventarioUid: previoNube.uid, conteo: conteoNuevo, motivo }, ["inventario"], "Stock ajustado al conteo");
+    else toast("Los datos se guardaron; la cantidad NO cambió (falta el motivo del ajuste)", "off");
+  }
   markDirty();
   document.getElementById("modalRepuesto").classList.remove("active");
   toast(repuestoEditId ? "Repuesto actualizado" : "Repuesto agregado");
@@ -5391,6 +5721,7 @@ async function cobrarCreditoPOS() {
       nota: "Venta al crédito desde el TPV", origen: "pos",
     });
     ultimoCreditoPOS = credito;
+    if (finanzasNube() && credito?._pend) toast("Crédito guardado sin conexión: se enviará al volver la red", "off");
     imprimirFacturaCredito(credito, abrirVentanaImpresion());
     toast(abono > 0
       ? `Crédito #${id} registrado — abonó ${money(abono)}, queda debiendo ${money(credito.saldo)}`
@@ -5424,10 +5755,12 @@ async function cobrarVentaPOS(metodoPago, efectivoRecibido) {
     : (posClienteLibre || null);
 
   try {
-    const { id, venta, faltantes } = await registrarVentaRapida({
+    const { id, venta, faltantes, estado, stockNegativo } = await registrarVentaRapida({
       items: posCarrito.map(it => ({ inventarioId: it.inventarioId, nombre: it.nombre, cantidad: it.cantidad, precio: it.precio })),
       clienteId, clienteNombre, metodoPago, efectivoRecibido,
     });
+    if (estado === "pendiente") toast("Venta guardada sin conexión: se enviará sola al volver la red", "off");
+    if (stockNegativo?.length) toast("Ojo: la venta dejó stock negativo — el administrador debe revisarlo", "off");
     markDirty();
     registrarAuditoria("venta", "ventas_rapidas", id, `${money(total)} por ${metodoPago}`);
     encolarSync("ventas_rapidas", id, "crear", null);
@@ -5550,7 +5883,8 @@ function motivoNoBorrable(m) {
    distinto del criterio de "Ganancias por línea de negocio" (que cuenta por
    estado==="entregado" sin mirar finalizada) — ver informe de Fase 3A. */
 async function calcularProduccion(desde, hasta) {
-  const [ordenes, ventas, creditos] = await Promise.all([DB.getAll("ordenes"), DB.getAll("ventas_rapidas"), DB.getAll("creditos")]);
+  const [ordenesTodas, ventasTodas, creditosTodos] = await Promise.all([DB.getAll("ordenes"), DB.getAll("ventas_rapidas"), DB.getAll("creditos")]);
+  const ordenes = ordenesTodas.filter(o => !o.anulada), ventas = ventasTodas.filter(v => !v.anulada), creditos = creditosTodos.filter(c => !c.anulado);
   const enRango = (iso) => { const d = (iso || "").slice(0, 10); return !!d && d >= desde && d <= hasta; };
   const totalItems = (x) => (x.items || []).reduce((s, it) => s + it.cantidad * it.precio, 0);
   // se agrupa por identidadMecanico(): por uuid cuando lo hay, y si no por
@@ -5655,7 +5989,7 @@ async function renderFinanzas() {
      borrarlo del inventario la inflaba (costo cero). Ahora manda lo que costaba
      el día de la venta; solo los registros anteriores a la v6 caen al costo
      actual, y se avisa de cuántos son. */
-  const ventas = (await DB.getAll("ventas_rapidas")).filter(v => { const d = v.fechaISO.slice(0, 10); return d >= desde && d <= hasta; });
+  const ventas = (await DB.getAll("ventas_rapidas")).filter(v => { if (v.anulada) return false; const d = v.fechaISO.slice(0, 10); return d >= desde && d <= hasta; });
   let costoVentas = 0;
   let renglonesEstimados = 0;
   const inv = await DB.getAll("inventario");
@@ -5670,7 +6004,7 @@ async function renderFinanzas() {
 
   // saldo pendiente de créditos: es un saldo vivo, no depende del rango de
   // fechas filtrado — por eso se calcula aparte de "filtrados".
-  const creditos = await DB.getAll("creditos");
+  const creditos = (await DB.getAll("creditos")).filter(c => !c.anulado);
   const creditosPendientes = creditos.filter(c => c.estado !== "pagado");
   const cuentasPorCobrar = creditosPendientes.reduce((s, c) => s + c.saldo, 0);
 
@@ -5696,6 +6030,10 @@ async function renderFinanzas() {
 
   const body = document.getElementById("movimientosBody");
   document.getElementById("movimientosEmpty").style.display = filtrados.length ? "none" : "block";
+  // SYNC-7B: qué movimientos ya tienen su compensación, y las ventas (para anular/devolver desde su línea de caja)
+  const revertidos = new Set(movs.map(m => m.reversoDe).filter(Boolean));
+  const ventasPorId = {};
+  if (finanzasNube()) (await DB.getAll("ventas_rapidas")).forEach(v => { ventasPorId[v.id] = v; });
   const metodoLabel = { efectivo: "Efectivo", transferencia: "Transferencia", tarjeta: "Tarjeta" };
   body.innerHTML = filtrados.map(m => `
     <tr>
@@ -5705,10 +6043,11 @@ async function renderFinanzas() {
       <td>${esc(metodoLabel[m.metodoPago] || "—")}</td>
       <td>${esc(m.descripcion || "")}</td>
       <td class="num">${money(m.monto)}</td>
-      <td class="num">${movimientoEsBorrable(m)
+      <td class="num">${finanzasNube() ? accionesCajaNube(m, revertidos, ventasPorId) : movimientoEsBorrable(m)
         ? `<button type="button" class="btn ghost small danger" data-eliminar-movi="${m.id}" title="Eliminar" aria-label="Eliminar movimiento">🗑</button>`
         : `<span class="mov-ligado" title="${esc(motivoNoBorrable(m))}">🔒</span>`}</td>
     </tr>`).join("");
+  if (finanzasNube()) conectarAccionesCajaNube(body, ventasPorId);
   body.querySelectorAll("[data-eliminar-movi]").forEach(btn => {
     btn.addEventListener("click", () => {
       requestAdminCode(async () => {
@@ -5735,11 +6074,71 @@ async function renderFinanzas() {
   await renderRendimiento(desde, hasta);
 }
 
+/* SYNC-7B · caja en modo nube: nada se borra. Un movimiento manual se REVIERTE (reversar_caja); el de una venta se
+   corrige desde la venta (anular = reversar_venta, devolución parcial = registrar_devolucion); los de crédito u
+   orden, desde su origen. Cajero → PIN; admin → directo; todo en línea y auditado. */
+function accionesCajaNube(m, revertidos, ventasPorId) {
+  if (m.reversoDe) return `<span class="mov-ligado" title="Compensación de otro movimiento">↩</span>`;
+  if (m.uid && revertidos.has(m.uid)) return `<span class="mov-ligado" title="Ya revertido">revertido</span>`;
+  const v = m.ventaId != null ? ventasPorId[m.ventaId] : null;
+  if (v) {
+    if (v.anulada) return `<span class="mov-ligado" title="Venta anulada">anulada</span>`;
+    if (m.categoria !== "Venta mostrador") return `<span class="mov-ligado">🔒</span>`;
+    return `<button type="button" class="btn ghost small danger" data-anular-venta="${v.id}" title="Anular venta">Anular</button>
+      <button type="button" class="btn ghost small" data-devolver-venta="${v.id}" title="Devolución">Devolver</button>`;
+  }
+  if (movimientoEsBorrable(m) && m.uid && !m._pend) return `<button type="button" class="btn ghost small danger" data-revertir-movi="${m.id}" title="Revertir" aria-label="Revertir movimiento">↩</button>`;
+  return `<span class="mov-ligado" title="${esc(movimientoEsBorrable(m) ? "Pendiente de sincronizar" : motivoNoBorrable(m))}">🔒</span>`;
+}
+function conectarAccionesCajaNube(body, ventasPorId) {
+  const refrescar = () => { renderFinanzas(); renderDashboard(); };
+  body.querySelectorAll("[data-revertir-movi]").forEach(btn => btn.addEventListener("click", async () => {
+    const mov = await DB.get("caja_movimientos", Number(btn.dataset.revertirMovi));
+    if (!mov) return;
+    const motivo = await pedirMotivo(`Revertir ${mov.tipo} de ${money(mov.monto)}`);
+    if (!motivo) return;
+    if (await accionAutorizada((d) => syncFin.construir.reversarCaja(d), { cajaUid: mov.uid, monto: mov.monto, motivo }, ["caja_movimientos"], "Movimiento revertido (queda en el historial)")) refrescar();
+  }));
+  body.querySelectorAll("[data-anular-venta]").forEach(btn => btn.addEventListener("click", async () => {
+    const v = ventasPorId[Number(btn.dataset.anularVenta)];
+    if (!v) return;
+    const motivo = await pedirMotivo(`Anular venta de ${money(v.total)}`);
+    if (!motivo) return;
+    if (await accionAutorizada((d) => syncFin.construir.reversarVenta(d), { ventaUid: v.uid, total: v.total, motivo }, ["ventas_rapidas", "caja_movimientos", "inventario"], "Venta anulada: stock devuelto y caja compensada")) refrescar();
+  }));
+  body.querySelectorAll("[data-devolver-venta]").forEach(btn => btn.addEventListener("click", async () => {
+    const v = ventasPorId[Number(btn.dataset.devolverVenta)];
+    if (!v) return;
+    const lista = (v.items || []).map((it, i) => `${i + 1}) ${it.nombre} ×${it.cantidad}`).join("  ");
+    const resp = await showPrompt(`Renglón y cantidad a devolver, p. ej. 1:1 — ${lista}`, { titulo: "Devolución" });
+    if (!resp) return;
+    const [n, c] = String(resp).split(":").map(x => Number(x.trim()));
+    const it = (v.items || [])[n - 1];
+    if (!it || !(c > 0) || c > it.cantidad) { toast("Renglón o cantidad inválidos", "off"); return; }
+    const motivo = await pedirMotivo("Devolución de " + it.nombre);
+    if (!motivo) return;
+    if (await accionAutorizada((d) => syncFin.construir.devolucion(d), { ventaUid: v.uid, items: [{ ventaItemUid: it.uid, cantidad: c, precio: it.precio }], motivo },
+      ["ventas_rapidas", "caja_movimientos", "inventario"], "Devolución registrada")) refrescar();
+  }));
+}
+
 document.getElementById("btnFiltrarFinanzas").addEventListener("click", renderFinanzas);
 alHacerClicUnaVez(document.getElementById("btnGuardarMovimiento"), async () => {
   const monto = Number(document.getElementById("moviMonto").value) || 0;
   if (monto <= 0) { toast("El monto debe ser mayor a cero", "off"); return; }
   const tipoMovi = document.getElementById("moviTipo").value;
+  if (finanzasNube()) {
+    try {
+      const r = await registrarMovimientoCajaNube({ tipo: tipoMovi, categoria: document.getElementById("moviCategoria").value, monto,
+        metodoPago: document.getElementById("moviMetodo").value, descripcion: document.getElementById("moviDescripcion").value.trim() });
+      toast(r.estado === "pendiente" ? "Movimiento guardado sin conexión: se enviará al volver la red" : "Movimiento registrado");
+    } catch (e) { toast("No se pudo registrar: " + e.message, "off"); return; }
+    document.getElementById("moviMonto").value = "";
+    document.getElementById("moviDescripcion").value = "";
+    renderFinanzas();
+    renderDashboard();
+    return;
+  }
   const idMovi = await DB.save("caja_movimientos", {
     tipo: tipoMovi,
     categoria: document.getElementById("moviCategoria").value,
@@ -5837,7 +6236,8 @@ function agruparCreditosPorCliente(creditos) {
 }
 
 async function renderCreditos() {
-  const creditos = (await DB.getAll("creditos")).sort((a, b) => b.fechaISO.localeCompare(a.fechaISO));
+  // SYNC-7B: un crédito anulado (reverso) se conserva en la nube pero ya no se cobra ni se lista como deuda
+  const creditos = (await DB.getAll("creditos")).filter(c => !c.anulado).sort((a, b) => b.fechaISO.localeCompare(a.fechaISO));
   creditosCache = {};
   creditos.forEach(c => { creditosCache[c.id] = c; });
 
@@ -5973,8 +6373,10 @@ function abrirCreditoDetalle(clave) {
         ${c.estado !== "pagado" ? `<button type="button" class="btn small" data-act="abonar">Abonar</button>` : ""}
         <button type="button" class="btn wa small" data-act="enviar">📲 Enviar</button>
         <button type="button" class="btn ghost small" data-act="imprimir">🖨️ Factura</button>
-        ${c.abonado === 0 ? `<button type="button" class="btn ghost small danger" data-act="eliminar">🗑</button>` : ""}
+        ${(finanzasNube() ? true : c.abonado === 0) ? `<button type="button" class="btn ghost small danger" data-act="eliminar" title="${finanzasNube() ? "Anular crédito" : "Eliminar"}">🗑</button>` : ""}
       </div>
+      ${finanzasNube() && (c.historialAbonos || []).length ? `<div class="hint" style="margin-top:0.4rem;">Abonos: ${(c.historialAbonos || []).map((a, i) =>
+        `${money(a.monto)} (${new Date(a.fechaISO).toLocaleDateString("es-HN")}) ${a.uid ? `<button type="button" class="btn ghost small" data-act="revertir-abono" data-abono="${i}" title="Revertir abono">↩</button>` : "<em>pendiente</em>"}`).join(" · ")}</div>` : ""}
     </div>
   `).join("");
 
@@ -5999,6 +6401,32 @@ document.getElementById("credDetLista").addEventListener("click", (e) => {
   if (act === "abonar") {
     document.getElementById("modalCreditoDetalle").classList.remove("active");
     abrirModalAbonoCredito(id);
+    return;
+  }
+  if (act === "revertir-abono") {
+    (async () => {
+      const cred = creditosCache[id];
+      const ab = cred?.historialAbonos?.[Number(btn.dataset.abono)];
+      if (!ab) return;
+      const motivo = await pedirMotivo(`Revertir abono de ${money(ab.monto)}`);
+      if (!motivo) return;
+      const ok = await accionAutorizada((d) => syncFin.construir.reversarAbono(d), { abonoUid: ab.uid, monto: ab.monto, motivo },
+        ["creditos", "caja_movimientos"], "Abono revertido (queda en el historial)");
+      if (!ok) return;
+      await renderCreditos();
+      if (creditoDetalleClave && creditosPorCliente[creditoDetalleClave]) abrirCreditoDetalle(creditoDetalleClave);
+    })();
+    return;
+  }
+  if (act === "eliminar" && finanzasNube()) {
+    (async () => {
+      if (await eliminarCredito(id) !== true) return;
+      await renderCreditos();
+      if (!creditosPorCliente[creditoDetalleClave]) {
+        document.getElementById("modalCreditoDetalle").classList.remove("active");
+        creditoDetalleClave = null;
+      } else abrirCreditoDetalle(creditoDetalleClave);
+    })();
     return;
   }
   if (act === "eliminar") {
@@ -6895,12 +7323,15 @@ async function seedIfEmpty() {
   const inv = await DB.getAll("inventario");
   const aceite = inv.find(r => r.nombre.startsWith("Aceite"));
   const haceDos = new Date(); haceDos.setDate(haceDos.getDate() - 2);
+  // SYNC-7B: nunca se inventa dinero en la nube (solo se registra por RPC real)
+  if (!modoNubeActivo("caja_movimientos")) {
   await DB.save("caja_movimientos", { tipo: "ingreso", categoria: "Servicio taller", monto: 330, metodoPago: "efectivo", descripcion: "Orden de taller #entregada", fechaISO: haceDos.toISOString(), creadoEn: haceDos.getTime() });
   await DB.save("caja_movimientos", { tipo: "egreso", categoria: "Compra de repuestos", monto: 900, metodoPago: "efectivo", descripcion: "Reposición de aceite y pastillas", fechaISO: haceDos.toISOString(), creadoEn: haceDos.getTime() });
   if (aceite) {
     const ventaDemo = { items: [{ inventarioId: aceite.id, nombre: aceite.nombre, cantidad: 2, precio: aceite.precio, costoUnitario: aceite.costoCompra || 0, costoEstimado: false }], clienteId: null, metodoPago: "efectivo", total: aceite.precio * 2, efectivoRecibido: aceite.precio * 2, cambio: 0, fechaISO: new Date().toISOString(), creadoEn: Date.now(), mecanico: "Wilkin" };
     const ventaId = await DB.save("ventas_rapidas", ventaDemo);
     await DB.save("caja_movimientos", { tipo: "ingreso", categoria: "Venta mostrador", monto: ventaDemo.total, metodoPago: "efectivo", descripcion: `Venta rápida #${ventaId}`, ventaId, fechaISO: ventaDemo.fechaISO, creadoEn: Date.now() });
+  }
   }
 
   await DB.save("web_cms", { key: "landing_hero", titulo: "Tu moto en las mejores manos", subtitulo: "Repuestos, mantenimiento y reparación de motocicletas en Honduras" });

@@ -34,6 +34,7 @@ DROP FUNCTION IF EXISTS public.sync_reversar_abono_i(uuid, timestamptz, text);
 DROP FUNCTION IF EXISTS public.sync_registrar_reverso(text, text, uuid, text, uuid, text, uuid, boolean, uuid, jsonb);
 DROP FUNCTION IF EXISTS public.sync_compensar_caja(text, uuid, text, timestamptz, text, numeric);
 DROP FUNCTION IF EXISTS public.sync_abonar(uuid, numeric, text, timestamptz, uuid, text);
+DROP FUNCTION IF EXISTS public.sync_autorizar(uuid, text, text, uuid, uuid, numeric, text);
 DROP FUNCTION IF EXISTS public.sync_autorizar(uuid, text, text, uuid, uuid, numeric);
 DROP FUNCTION IF EXISTS public.sync_hash_critico(text, uuid, numeric);
 DROP FUNCTION IF EXISTS public.sync_caja(text, text, numeric, text, text, timestamptz, uuid, uuid, uuid, uuid, text, uuid);

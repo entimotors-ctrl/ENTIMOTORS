@@ -24,6 +24,18 @@
 -- status HTTP, así que el bug de mapeo no lo afecta. sync-3b-importacion.sql (10 apariciones de 55000) tampoco
 -- se tocó: es una herramienta de migración de una sola vez que SYNC-7 no consume en el flujo de venta/caja/
 -- crédito del día a día — fuera de alcance ("NO hacer reemplazo ciego global").
+--
+-- SYNC-7B (auditoría del ERRCODE restante, sección 3): las 15 validaciones "X no existe / no encontrado" de esta hoja
+-- usaban P0002 (no_data_found). PostgREST mapea toda la clase P0 salvo P0001 a HTTP 500 → sync-rest.js "servidor" →
+-- reintento infinito de un rechazo que nunca se arregla solo (p. ej. una venta offline de un repuesto que otro
+-- dispositivo borró). Revisadas una por una: TODAS son "la referencia no existe" → cambiadas a 23503
+-- (foreign_key_violation → HTTP 409 → "conflicto", terminal). Mismo cambio en sync-7a-inventario.sql. Lo que se
+-- queda reintentable A PROPÓSITO: 55P03 (lock_timeout), 40001/40P01 (serialización/deadlock), 57014 (timeout) —
+-- son temporales de verdad. 23514 (stock insuficiente online, abono > saldo) y 22xxx ya caen en 400 → "validacion".
+-- 23505 OP_ID_REUTILIZADO → 409 → "conflicto". sync-5/sync-6 conservan P0002 (fuera de alcance de SYNC-7B; anotado
+-- en ENTIMOTORS-SYNC-3.14-STATE.md).
+-- SYNC-7B (sección 14): sync_autorizar recibe además p_device y exige que coincida con el device_id con el que el
+-- backend del PIN emitió la autorización — la autorización ya no es transferible a otro dispositivo del mismo usuario.
 BEGIN;
 
 SET LOCAL search_path = pg_catalog, public;
@@ -84,7 +96,7 @@ DECLARE v_stock numeric; v_nombre text; v_saldo numeric;
 BEGIN
   IF p_delta = 0 THEN RETURN NULL; END IF;
   SELECT i.cantidad, i.nombre INTO v_stock, v_nombre FROM public.inventario i WHERE i.id = p_inv AND i.deleted_at IS NULL FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto % ya no existe en el inventario', p_inv USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto % ya no existe en el inventario', p_inv USING ERRCODE = '23503'; END IF;
   IF p_delta < 0 AND NOT COALESCE(p_offline, false) AND v_stock + p_delta < 0 THEN
     RAISE EXCEPTION 'Sin stock suficiente de % (hay %, se piden %)', v_nombre, v_stock, -p_delta USING ERRCODE = '23514';
   END IF;
@@ -123,8 +135,11 @@ AS $function$
   SELECT md5(p_accion || '|' || p_registro::text || '|' || to_char(round(COALESCE(p_monto, 0), 2), 'FM999999999990.00'))
 $function$;
 
+-- SYNC-7B: la autorización también queda ligada al DISPOSITIVO que la pidió (no transferible): la firma de 6 argumentos
+-- de SYNC-3 se retira y la nueva recibe p_device (el mismo `p_device` que cada RPC ya recibía para auditoría).
+DROP FUNCTION IF EXISTS public.sync_autorizar(uuid, text, text, uuid, uuid, numeric);
 CREATE OR REPLACE FUNCTION public.sync_autorizar(p_auth uuid, p_accion text, p_entidad text, p_registro uuid,
-    p_op uuid, p_monto numeric)
+    p_op uuid, p_monto numeric, p_device text)
  RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
 AS $function$
 DECLARE v_aut uuid;
@@ -140,6 +155,7 @@ BEGIN
      SET consumida_en = clock_timestamp(), consumida_op = p_op
    WHERE a.id = p_auth AND a.solicitante_id = auth.uid() AND a.accion = p_accion AND a.entidad = p_entidad
      AND a.registro_id = p_registro AND a.consumida_en IS NULL AND a.expira_en > clock_timestamp()
+     AND a.device_id IS NOT DISTINCT FROM p_device
      AND a.pin_version = (SELECT p.version FROM public.admin_pin p WHERE p.perfil_id = a.autorizado_por)
      AND (a.payload_hash IS NULL OR a.payload_hash = public.sync_hash_critico(p_accion, p_registro, p_monto))
   RETURNING a.autorizado_por INTO v_aut;
@@ -158,7 +174,7 @@ AS $function$
 DECLARE c record; v_abonado numeric; v_saldo numeric; v_estado text; v_abono uuid;
 BEGIN
   SELECT total, abonado, anulado INTO c FROM public.creditos WHERE id = p_credito FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'Crédito no encontrado' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'Crédito no encontrado' USING ERRCODE = '23503'; END IF;
   IF c.anulado THEN RAISE EXCEPTION 'El crédito está anulado' USING ERRCODE = '22000'; END IF;
   IF p_monto IS NULL OR p_monto <= 0 THEN RAISE EXCEPTION 'El abono debe ser mayor que cero' USING ERRCODE = '22023'; END IF;
   IF p_monto > (c.total - c.abonado) + 0.01 THEN
@@ -334,7 +350,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
 
   SELECT ord.id, ord.finalizada, ord.anulada, ord.deleted_at INTO o FROM public.ordenes ord WHERE ord.id = p_orden_id FOR UPDATE;
-  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = '23503'; END IF;
   IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no admite más ítems' USING ERRCODE = '22000'; END IF;
   v_occ := LEAST(COALESCE(p_occurred_at, clock_timestamp()), clock_timestamp());
   v_off := COALESCE(p_offline, false) AND v_occ < clock_timestamp() - interval '20 seconds';
@@ -342,7 +358,7 @@ BEGIN
   v_nom := p_nombre;
   IF p_inventario_id IS NOT NULL THEN
     SELECT i.costo_compra, i.nombre INTO v_costo, v_nom FROM public.inventario i WHERE i.id = p_inventario_id AND i.deleted_at IS NULL;
-    IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto ya no existe en el inventario' USING ERRCODE = 'P0002'; END IF;
+    IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto ya no existe en el inventario' USING ERRCODE = '23503'; END IF;
     v_saldo := public.sync_stock_mover(p_inventario_id, -p_cantidad, 'orden_item', p_op, v_off, v_occ, NULL, NULL, p_orden_id, v_item);
   END IF;
   IF COALESCE(btrim(v_nom), '') = '' THEN RAISE EXCEPTION 'Falta el nombre del ítem' USING ERRCODE = '22023'; END IF;
@@ -365,7 +381,7 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'quitar_item_orden', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT oi.id, oi.orden_id, oi.inventario_id, oi.cantidad, oi.nombre INTO it FROM public.orden_items oi WHERE oi.id = p_item_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El ítem ya no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El ítem ya no existe' USING ERRCODE = '23503'; END IF;
   SELECT ord.finalizada, ord.anulada INTO o FROM public.ordenes ord WHERE ord.id = it.orden_id FOR UPDATE;
   IF o.finalizada OR o.anulada THEN RAISE EXCEPTION 'La orden ya está cerrada: no se quitan ítems' USING ERRCODE = '22000'; END IF;
   IF it.inventario_id IS NOT NULL THEN
@@ -395,7 +411,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
 
   SELECT * INTO o FROM public.ordenes WHERE id = p_orden_id FOR UPDATE;
-  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = '23503'; END IF;
   IF o.finalizada THEN RAISE EXCEPTION 'Esta orden ya estaba finalizada: no se vuelve a cobrar' USING ERRCODE = '22000'; END IF;
   IF o.anulada THEN RAISE EXCEPTION 'La orden está anulada' USING ERRCODE = '22000'; END IF;
   IF o.estado <> 'entregado' THEN RAISE EXCEPTION 'La orden debe estar entregada para finalizarla' USING ERRCODE = '22000'; END IF;
@@ -450,7 +466,7 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'convertir_cotizacion', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT * INTO c FROM public.cotizaciones WHERE id = p_cotizacion_id FOR UPDATE;
-  IF NOT FOUND OR c.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La cotización no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND OR c.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La cotización no existe' USING ERRCODE = '23503'; END IF;
   IF c.estado <> 'pendiente' THEN RAISE EXCEPTION 'La cotización ya fue %', c.estado USING ERRCODE = '22000'; END IF;
 
   v_cli := c.cliente_id;
@@ -502,9 +518,9 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'ajustar_stock', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT i.cantidad INTO v_actual FROM public.inventario i WHERE i.id = p_inventario_id AND i.deleted_at IS NULL FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El repuesto no existe' USING ERRCODE = '23503'; END IF;
   v_delta := COALESCE(p_delta, p_conteo - v_actual);
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'ajustar_stock', 'inventario', p_inventario_id, p_op, v_delta)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'ajustar_stock', 'inventario', p_inventario_id, p_op, v_delta, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   IF v_delta <> 0 THEN
     v_saldo := public.sync_stock_mover(p_inventario_id, v_delta, 'ajuste', p_op, true, clock_timestamp(), NULL, NULL, NULL, NULL, NULL, p_motivo);
   ELSE v_saldo := v_actual; END IF;
@@ -578,9 +594,9 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'reversar_venta', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulada INTO v FROM public.ventas WHERE id = p_venta_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = '23503'; END IF;
   IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '22000'; END IF;
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_venta', 'ventas', p_venta_id, p_op, v.total)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_venta', 'ventas', p_venta_id, p_op, v.total, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   SELECT COALESCE(sum((r.detalle->>'monto')::numeric), 0) INTO v_dev_monto FROM public.reversos r WHERE r.entidad = 'ventas' AND r.registro_id = p_venta_id AND r.tipo = 'devolucion';
   v_rev := public.sync_registrar_reverso('venta', 'ventas', p_venta_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion,
                                          jsonb_build_object('total', v.total, 'ya_devuelto', v_dev_monto));
@@ -613,7 +629,7 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'registrar_devolucion', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulada INTO v FROM public.ventas WHERE id = p_venta_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'La venta no existe' USING ERRCODE = '23503'; END IF;
   IF v.anulada THEN RAISE EXCEPTION 'La venta ya está anulada' USING ERRCODE = '22000'; END IF;
   FOR x IN SELECT * FROM jsonb_to_recordset(p_items) AS y(venta_item_id uuid, cantidad numeric) LOOP
     IF x.cantidad IS NULL OR x.cantidad <= 0 THEN RAISE EXCEPTION 'Cantidad de devolución inválida' USING ERRCODE = '22023'; END IF;
@@ -625,7 +641,7 @@ BEGIN
     v_monto := v_monto + round(x.cantidad * vi.precio, 2);
     v_items := v_items || jsonb_build_object('venta_item_id', x.venta_item_id, 'cantidad', x.cantidad, 'reingresa', COALESCE(p_reingresa_stock, true));
   END LOOP;
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'registrar_devolucion', 'ventas', p_venta_id, p_op, v_monto)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'registrar_devolucion', 'ventas', p_venta_id, p_op, v_monto, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('devolucion', 'ventas', p_venta_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion,
                                          jsonb_build_object('monto', v_monto, 'items', v_items));
   IF COALESCE(p_reingresa_stock, true) THEN
@@ -650,7 +666,7 @@ AS $function$
 DECLARE ab record; c record; v_abonado numeric; v_saldo numeric; v_caja uuid;
 BEGIN
   SELECT * INTO ab FROM public.abonos WHERE id = p_abono FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El abono no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El abono no existe' USING ERRCODE = '23503'; END IF;
   IF ab.anulado THEN RETURN 0; END IF;
   SELECT total, abonado INTO c FROM public.creditos WHERE id = ab.credito_id FOR UPDATE;
   v_abonado := GREATEST(0, c.abonado - ab.monto); v_saldo := c.total - v_abonado;
@@ -673,9 +689,9 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'reversar_abono', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, monto, anulado, credito_id INTO ab FROM public.abonos WHERE id = p_abono_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El abono no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El abono no existe' USING ERRCODE = '23503'; END IF;
   IF ab.anulado THEN RAISE EXCEPTION 'El abono ya está anulado' USING ERRCODE = '22000'; END IF;
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_abono', 'abonos', p_abono_id, p_op, ab.monto)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_abono', 'abonos', p_abono_id, p_op, ab.monto, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('abono', 'abonos', p_abono_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('monto', ab.monto, 'credito_id', ab.credito_id));
   v_m := public.sync_reversar_abono_i(p_abono_id, clock_timestamp(), 'Reverso de abono a crédito');
   UPDATE public.abonos SET last_op_id = p_op WHERE id = p_abono_id;
@@ -713,9 +729,9 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'reversar_credito', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT id, total, anulado, orden_id INTO c FROM public.creditos WHERE id = p_credito_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El crédito no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El crédito no existe' USING ERRCODE = '23503'; END IF;
   IF c.anulado THEN RAISE EXCEPTION 'El crédito ya está anulado' USING ERRCODE = '22000'; END IF;
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_credito', 'creditos', p_credito_id, p_op, c.total)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_credito', 'creditos', p_credito_id, p_op, c.total, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('credito', 'creditos', p_credito_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('total', c.total));
   v_m := public.sync_reversar_credito_i(p_credito_id, v_rev, p_motivo, c.orden_id IS NULL);   -- créditos de una orden: el stock ya salió con la orden
   UPDATE public.creditos SET last_op_id = p_op WHERE id = p_credito_id;
@@ -735,12 +751,12 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'reversar_caja', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT * INTO m FROM public.caja_movimientos WHERE id = p_caja_id FOR UPDATE;
-  IF NOT FOUND THEN RAISE EXCEPTION 'El movimiento no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND THEN RAISE EXCEPTION 'El movimiento no existe' USING ERRCODE = '23503'; END IF;
   IF m.venta_id IS NOT NULL OR m.credito_id IS NOT NULL OR m.orden_id IS NOT NULL OR m.id_abono IS NOT NULL OR m.reverso_de IS NOT NULL THEN
     RAISE EXCEPTION 'Este movimiento respalda otra operación: reviértela desde su origen (venta, crédito, abono u orden)' USING ERRCODE = '22000';
   END IF;
   IF EXISTS (SELECT 1 FROM public.caja_movimientos x WHERE x.reverso_de = p_caja_id) THEN RAISE EXCEPTION 'El movimiento ya está revertido' USING ERRCODE = '22000'; END IF;
-  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_caja', 'caja_movimientos', p_caja_id, p_op, m.monto)) AS x(o_autorizado uuid, o_admin boolean);
+  SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'reversar_caja', 'caja_movimientos', p_caja_id, p_op, m.monto, p_device)) AS x(o_autorizado uuid, o_admin boolean);
   v_rev := public.sync_registrar_reverso('caja', 'caja_movimientos', p_caja_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('monto', m.monto, 'tipo', m.tipo));
   v_id := public.sync_caja(CASE m.tipo WHEN 'ingreso' THEN 'egreso' ELSE 'ingreso' END, 'Reverso de caja', m.monto, m.metodo_pago, 'Reverso: ' || COALESCE(m.descripcion, m.categoria, ''), clock_timestamp(), NULL, NULL, NULL, NULL, NULL, p_caja_id);
   PERFORM public.sync_auditar('reversar-caja', 'caja_movimientos', p_caja_id::text, p_motivo, p_op, p_device, a.o_autorizado);
@@ -761,7 +777,7 @@ BEGIN
   v_prev := public.sync_op_iniciar(p_op, 'anular_orden', v_hash);
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
   SELECT * INTO o FROM public.ordenes WHERE id = p_orden_id FOR UPDATE;
-  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002'; END IF;
+  IF NOT FOUND OR o.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La orden no existe' USING ERRCODE = '23503'; END IF;
   IF o.anulada THEN RAISE EXCEPTION 'La orden ya está anulada' USING ERRCODE = '22000'; END IF;
   v_dinero := o.finalizada OR EXISTS (SELECT 1 FROM public.caja_movimientos c WHERE c.orden_id = p_orden_id)
               OR EXISTS (SELECT 1 FROM public.creditos c WHERE c.orden_id = p_orden_id);
@@ -776,7 +792,7 @@ BEGIN
     UPDATE public.ordenes SET deleted_at = clock_timestamp(), last_op_id = p_op WHERE id = p_orden_id;
   ELSE
     v_modo := 'anular';
-    SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'anular_orden', 'ordenes', p_orden_id, p_op, NULL)) AS x(o_autorizado uuid, o_admin boolean);
+    SELECT * INTO a FROM jsonb_to_record(public.sync_autorizar(p_autorizacion, 'anular_orden', 'ordenes', p_orden_id, p_op, NULL, p_device)) AS x(o_autorizado uuid, o_admin boolean);
     v_aut := a.o_autorizado;
     v_rev := public.sync_registrar_reverso('orden', 'ordenes', p_orden_id, p_motivo, p_op, p_device, a.o_autorizado, a.o_admin, p_autorizacion, jsonb_build_object('modo', v_modo, 'devolver_stock', p_devolver_stock));
     v_comp := public.sync_compensar_caja('orden_id', p_orden_id, 'Reverso de orden', clock_timestamp(), 'Anulación de orden #' || substr(p_orden_id::text, 1, 8));
@@ -837,8 +853,8 @@ REVOKE EXECUTE ON FUNCTION public.sync_stock_mover(uuid,numeric,text,uuid,boolea
 GRANT EXECUTE ON FUNCTION public.sync_stock_mover(uuid,numeric,text,uuid,boolean,timestamptz,uuid,uuid,uuid,uuid,uuid,text) TO service_role;
 REVOKE EXECUTE ON FUNCTION public.sync_caja(text,text,numeric,text,text,timestamptz,uuid,uuid,uuid,uuid,text,uuid) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.sync_caja(text,text,numeric,text,text,timestamptz,uuid,uuid,uuid,uuid,text,uuid) TO service_role;
-REVOKE EXECUTE ON FUNCTION public.sync_autorizar(uuid,text,text,uuid,uuid,numeric) FROM PUBLIC, anon, authenticated;
-GRANT EXECUTE ON FUNCTION public.sync_autorizar(uuid,text,text,uuid,uuid,numeric) TO service_role;
+REVOKE EXECUTE ON FUNCTION public.sync_autorizar(uuid,text,text,uuid,uuid,numeric,text) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.sync_autorizar(uuid,text,text,uuid,uuid,numeric,text) TO service_role;
 REVOKE EXECUTE ON FUNCTION public.sync_abonar(uuid,numeric,text,timestamptz,uuid,text) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.sync_abonar(uuid,numeric,text,timestamptz,uuid,text) TO service_role;
 REVOKE EXECUTE ON FUNCTION public.sync_compensar_caja(text,uuid,text,timestamptz,text,numeric) FROM PUBLIC, anon, authenticated;

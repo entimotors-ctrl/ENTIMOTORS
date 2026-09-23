@@ -16,7 +16,7 @@ const SHELL = ["./", "./index.html",
   // Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5) + fotos de Mi Trabajo (SYNC-6): mismo
   // motivo que la capa de Supabase, index.html los carga antes de app.js.
   "./sync-rest.js?v=3.13.0", "./sync-db.js?v=3.13.0", "./sync-engine.js?v=3.13.0", "./sync-mappers.js?v=3.13.0",
-  "./sync-fotos.js?v=3.13.0",
+  "./sync-fotos.js?v=3.13.0", "./sync-finanzas.js?v=3.13.0",
   // Autorización con PIN administrativo (SYNC-7): mismo motivo, index.html la carga antes de app.js.
   "./pin-ui.js?v=3.13.0",
   "./app.js?v=3.13.0", "./usuarios.js?v=3.13.0",

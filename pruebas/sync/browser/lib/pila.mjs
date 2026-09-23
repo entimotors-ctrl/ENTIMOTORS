@@ -49,12 +49,53 @@ async function esperarRest() {
 
 /* GATEWAY: en Supabase, Kong va delante de PostgREST: exige `apikey`, contesta el CORS del navegador (permite apikey/prefer/…) y expone
    Content-Range. PostgREST suelto no hace nada de eso, así que aquí se reproduce lo mínimo. Reenvía el resto tal cual. */
+/* ═══ SHIM DE AUTH — SOLO PRUEBAS LOCALES (SYNC-7B) ═══
+   La pila local no tiene GoTrue, y el api-server real valida la sesión con `auth.getUser(token)` (GET /auth/v1/user)
+   y re-autentica al admin con /auth/v1/token?grant_type=password. Este shim responde SOLO esas dos rutas, SOLO dentro
+   de este gateway de pruebas (127.0.0.1, vive y muere con iniciarPila()/detener()), y SOLO para tokens firmados con el
+   secreto sintético de ESTA pila (cualquier otro → 401). No hay bandera ni variable que lo active en producción: el
+   código no existe fuera de pruebas/sync (guarda estática en pruebas/sync/node/sync7b.test.mjs). La identidad sale del
+   `sub` del JWT (UUIDs deterministas de PERFILES); el rol y `activo` los decide `perfiles` en la base, como en producción. */
+export const CLAVE_CUENTA_PRUEBA = "clave-sintetica-solo-pruebas";   // no es un secreto: solo la acepta este shim local
+function verificarJwtLocal(token) {
+  const [h, p, f] = String(token || "").split(".");
+  if (!h || !p || !f) return null;
+  const esperado = crypto.createHmac("sha256", SECRETO_JWT).update(`${h}.${p}`).digest("base64url");
+  if (f.length !== esperado.length || !crypto.timingSafeEqual(Buffer.from(f), Buffer.from(esperado))) return null;
+  let c; try { c = JSON.parse(Buffer.from(p, "base64url").toString("utf8")); } catch { return null; }
+  if (!c.sub || typeof c.exp !== "number" || c.exp * 1000 < Date.now()) return null;
+  return c;
+}
+function correoDe(sub) { const e = Object.entries(PERFILES).find(([, v]) => v === sub); return e ? `${e[0]}@example.test` : `${sub}@example.test`; }
+function shimAuth(req, res, cors) {
+  const u = new URL(req.url, "http://x");
+  const responder = (st, cuerpo) => { res.writeHead(st, { ...cors, "Content-Type": "application/json" }); res.end(JSON.stringify(cuerpo)); };
+  if (u.pathname === "/auth/v1/user" && req.method === "GET") {
+    const tok = (req.headers.authorization || "").replace(/^Bearer\s+/i, "");
+    const c = verificarJwtLocal(tok);
+    if (!c || c.role !== "authenticated") return responder(401, { code: 401, msg: "invalid JWT" });
+    return responder(200, { id: c.sub, aud: "authenticated", role: "authenticated", email: correoDe(c.sub) });
+  }
+  if (u.pathname === "/auth/v1/token" && u.searchParams.get("grant_type") === "password" && req.method === "POST") {
+    let cuerpo = ""; req.on("data", (d) => { cuerpo += d; });
+    req.on("end", () => {
+      let b = {}; try { b = JSON.parse(cuerpo); } catch { /* vacío */ }
+      const e = Object.entries(PERFILES).find(([k]) => `${k}@example.test` === b.email);
+      if (!e || b.password !== CLAVE_CUENTA_PRUEBA) return responder(400, { error: "invalid_grant" });
+      responder(200, { access_token: jwt(e[1]), token_type: "bearer" });
+    });
+    return true;
+  }
+  return responder(404, { msg: "ruta de auth no simulada" });
+}
+
 function arrancarGateway() {
   const srv = http.createServer((req, res) => {
     const cors = { "Access-Control-Allow-Origin": req.headers.origin || "*", "Access-Control-Allow-Methods": "GET,POST,PATCH,PUT,DELETE,OPTIONS",
       "Access-Control-Allow-Headers": req.headers["access-control-request-headers"] || "*", "Access-Control-Expose-Headers": "Content-Range,Content-Location,Location,Retry-After", "Access-Control-Max-Age": "600", Vary: "Origin" };
     if (req.method === "OPTIONS") { res.writeHead(204, cors); return res.end(); }
     if (!req.headers.apikey) { res.writeHead(401, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "No API key found in request" })); }
+    if (req.url.startsWith("/auth/v1/")) return shimAuth(req, res, cors);
     const cab = { ...req.headers, host: `127.0.0.1:${REST_INTERNO}` }; delete cab.origin; delete cab.referer;
     const p = http.request({ host: "127.0.0.1", port: REST_INTERNO, path: req.url.replace(/^\/rest\/v1/, ""), method: req.method, headers: cab }, (r) => { res.writeHead(r.statusCode, { ...r.headers, ...cors }); r.pipe(res); });
     p.on("error", (e) => { res.writeHead(502, cors); res.end(String(e.message)); });
@@ -95,7 +136,9 @@ export async function iniciarPila() {
     limpiar() {
       sql(`set session_replication_role = replica;
            truncate public.clientes, public.motos, public.citas, public.categorias_inv, public.cotizaciones, public.cotizacion_items,
-             public.web_cms, public.ordenes, public.orden_items, public.inventario, public.inventario_movimientos cascade;
+             public.web_cms, public.ordenes, public.orden_items, public.inventario, public.inventario_movimientos,
+             public.ventas, public.venta_items, public.creditos, public.credito_items, public.abonos, public.caja_movimientos,
+             public.reversos, public.sync_ops, public.autorizaciones_admin cascade;
            reset session_replication_role;
            update public.perfiles set activo = true where id in (${Object.values(PERFILES).map((v) => `'${v}'`).join(",")});`);
     },

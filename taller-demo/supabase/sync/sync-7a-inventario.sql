@@ -22,6 +22,7 @@
 -- existencia histórica volviendo a aplicar aperturas (eso duplicaría el stock encima de ventas/ajustes ya
 -- aplicados). Esta regla es del SERVIDOR (no confía en que el cliente solo la llame una vez): se comprueba
 -- con un EXISTS sobre inventario_movimientos, no con el operation_id.
+-- SYNC-7B: "El repuesto no existe" pasa de P0002 (HTTP 500, se reintentaba para siempre) a 23503 (409, terminal).
 BEGIN;
 
 SET LOCAL search_path = pg_catalog, public;
@@ -73,7 +74,7 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
 
   IF NOT EXISTS (SELECT 1 FROM public.inventario i WHERE i.id = p_inventario_id AND i.deleted_at IS NULL FOR UPDATE) THEN
-    RAISE EXCEPTION 'El repuesto no existe' USING ERRCODE = 'P0002';
+    RAISE EXCEPTION 'El repuesto no existe' USING ERRCODE = '23503';
   END IF;
   -- contrato de migración (SYNC-9, ver cabecera del archivo): como máximo una apertura por producto, para
   -- siempre, sin importar el operation_id.

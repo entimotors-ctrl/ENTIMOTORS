@@ -132,12 +132,22 @@
       for (var i = 0; i < (m.fks || []).length; i++) { var f = m.fks[i]; out[f.local] = await localDeUid(t, row[f.cloud]); }
       return out;
     }
+    /* SYNC-7B: referencias DENTRO de hijos embebidos (p. ej. venta_items.inventario_id → id local del repuesto).
+       El mapper declara `refsALocal(campos, resolver)`; `resolver(uid)` consulta el mapa dentro de la MISMA
+       transacción. Sin ese campo en el mapper, no cambia nada (las entidades de SYNC-5/6/7A no lo usan). */
+    async function camposLocales(t, m, row) {
+      var campos = Object.assign({}, m.aLocal(row), await fksALocal(t, m, row));
+      if (typeof m.refsALocal === "function") campos = await m.refsALocal(campos, function (uid) { return localDeUid(t, uid); });
+      return campos;
+    }
 
     /* ============ ESCRITURA LOCAL (registro + cola en UNA transacción) ============ */
     async function escribir(entidad, local, opciones) {
       if (apagado()) return { omitido: "apagado" };
       opciones = opciones || {};
       var m = mapper(entidad), s = sesion();
+      // SYNC-7B: dinero (ventas, créditos, caja) es de SOLO LECTURA por el CRUD: se escribe únicamente por RPC.
+      if (m.soloLectura) throw new Error("«" + entidad + "» solo se modifica por su operación (RPC), nunca por el CRUD.");
       if (!s || !s.uid) throw new Error("No hay sesión: no se puede guardar en modo nube.");
       var dev = await bd.deviceId();
       return bd.transaccion([m.store, "mapa", "outbox"], "readwrite", async function (t) {
@@ -224,7 +234,7 @@
             continue;
           }
           if (local && (row.rev || 0) <= (local._rev || 0)) continue;             // ya lo tengo (solapamiento)
-          var campos = Object.assign({}, m.aLocal(row), await fksALocal(t, m, row));
+          var campos = await camposLocales(t, m, row);
           var snap = columnasNube(m, row);
           if (local && ops.some(function (x) { return x.estado === "pending" || x.estado === "syncing" || x.estado === "conflict"; })) {
             // Hay un cambio mío sin enviar: lo mío se queda a la vista y la revisión conocida NO avanza: al enviar,
@@ -278,7 +288,7 @@
         var hayMas = restantes.some(function (x) { return x.estado === "pending" || x.estado === "syncing" || x.estado === "conflict"; });
         var reg;
         if (!hayMas) {
-          reg = Object.assign({}, local, m.aLocal(row), await fksALocal(t, m, row), { _rev: row.rev || 0, _base: snap, _pend: false });
+          reg = Object.assign({}, local, await camposLocales(t, m, row), { _rev: row.rev || 0, _base: snap, _pend: false });
         } else {
           reg = Object.assign({}, local, { _rev: row.rev || 0, _base: snap, _pend: true });
           for (var i = 0; i < restantes.length; i++) if (restantes[i].estado === "pending" && restantes[i].kind !== "insert") { restantes[i].base = snap; restantes[i].base_rev = row.rev || 0; await t.put("outbox", restantes[i]); }
@@ -369,11 +379,13 @@
         encolan (ver verificarSinPin arriba) — necesitan ejecutarse en línea, con la autorización
         recién emitida por PinUI, y fallar A LA VISTA si algo sale mal (nadie las reintenta solas).
         p_op se genera aquí igual que en encolarRpc, para que la RPC sea idempotente si la propia
-        UI decide reintentar la MISMA acción tras un error de red. */
-    async function rpcInmediato(nombre, params) {
+        UI decide reintentar la MISMA acción tras un error de red.
+        SYNC-7B: `opciones.op_id` permite que la UI genere el operation_id UNA vez y lo reutilice en un
+        reintento de la MISMA acción (mismo efecto una sola vez, sync_op_iniciar). Sin él, uno nuevo. */
+    async function rpcInmediato(nombre, params, opciones) {
       if (apagado()) return { ok: false, clase: "red", codigo: "APAGADO", mensaje: "La sincronización no está activa." };
       var s = sesion(); if (!s || !s.uid) return { ok: false, clase: "auth", codigo: "SIN_SESION", mensaje: "No hay sesión." };
-      var opId = nuevoUuid();
+      var opId = (opciones && opciones.op_id) || nuevoUuid();
       var r = await rest.rpc(nombre, Object.assign({}, params, { p_op: opId }));
       if (r.ok) emitir("rpc-ok", { op_id: opId, rpc: nombre, resultado: r.datos });
       return Object.assign({ op_id: opId }, r);
@@ -447,7 +459,7 @@
       var m = mapper(op.entidad);
       await bd.transaccion([m.store, "mapa"], "readwrite", async function (t) {
         var mp = await t.get("mapa", op.uid);
-        var reg = Object.assign({}, m.aLocal(filaServidor), await fksALocal(t, m, filaServidor), { uid: op.uid, _rev: filaServidor.rev || 0, _base: columnasNube(m, filaServidor), _pend: false });
+        var reg = Object.assign({}, await camposLocales(t, m, filaServidor), { uid: op.uid, _rev: filaServidor.rev || 0, _base: columnasNube(m, filaServidor), _pend: false });
         if (mp) reg.id = mp.local_id;
         var id = await t.put(m.store, reg);
         if (!mp) await t.put("mapa", { uid: op.uid, entidad: op.entidad, local_id: id });

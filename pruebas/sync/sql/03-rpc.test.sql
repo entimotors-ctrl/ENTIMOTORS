@@ -102,7 +102,7 @@ BEGIN
   PERFORM pg_temp.falla('el cajero no puede mover stock llamando al helper interno',
     format('SELECT public.sync_stock_mover(%L, 100, ''ajuste'', NULL, true, now())', pg_temp.id(213)), 'permission denied');
   PERFORM pg_temp.falla('el cajero no puede escribir en caja con el helper interno', 'SELECT public.sync_caja(''ingreso'', ''x'', 99999, ''efectivo'', NULL, now(), NULL)', 'permission denied');
-  PERFORM pg_temp.falla('el cajero no puede fabricar autorizaciones con el helper interno', format('SELECT * FROM public.sync_autorizar(NULL, ''reversar_venta'', ''ventas'', %L, NULL, 0)', pg_temp.id(300)), 'permission denied');
+  PERFORM pg_temp.falla('el cajero no puede fabricar autorizaciones con el helper interno', format('SELECT * FROM public.sync_autorizar(NULL, ''reversar_venta'', ''ventas'', %L, NULL, 0, NULL)', pg_temp.id(300)), 'permission denied');
   PERFORM pg_temp.fin();
 END $$;
 

@@ -33,14 +33,18 @@ describe("SYNC-7A · sync-mappers.js — mapper \"inventario\" (solo el maestro,
     assert.equal(nube.precio_venta, 250);
   });
 
-  test("aLocal() nunca trae cantidad, aunque la fila remota la incluya (evita que pull() la pise — ver cabecera del archivo)", () => {
+  // SYNC-7B cambió este contrato A PROPÓSITO (pendiente nº 3 de SYNC-7A en el STATE): con las ventas/créditos/órdenes
+  // del Taller ya por RPC al ledger, la cantidad de la nube es la única verdad y aLocal() la BAJA. Sigue sin SUBIR
+  // nunca (prueba de arriba: ni columnas ni aCloud()).
+  test("aLocal() trae la cantidad y requiere_revision de la nube (SYNC-7B: la nube es la autoridad del stock)", () => {
     const fila = {
       id: "inv-1", nombre: "Aceite 20W-50", modelo: "Todos", cantidad: 30, requiere_revision: false,
       costo_compra: 110, precio_venta: 180, stock_minimo: 8, codigo_barras: "750100000029", publicar_en_web: true,
       foto_url: null, categoria_id: "cat-uid-1", updated_at: "2026-09-22T10:00:00Z", rev: 1, deleted_at: null,
     };
     const l = inv.aLocal(fila);
-    assert.ok(!("cantidad" in l), "aLocal() no debe traer cantidad: la fusiona el merge de aplicarPagina() con lo que ya había local");
+    assert.equal(l.cantidad, 30, "la cantidad materializada del ledger baja tal cual");
+    assert.equal(l.requiereRevision, false);
     assert.equal(l.nombre, "Aceite 20W-50");
     assert.equal(l.costoCompra, 110);
     assert.equal(l.precio, 180);
