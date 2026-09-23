@@ -125,10 +125,13 @@ test("los fallos de red y los tiempos agotados son clase «red» y NUNCA lanzan;
   const r = await c.insertar("clientes", [{ a: 1 }]); assert.equal(r.ok, false); assert.equal(r.clase, "red"); assert.equal(r.codigo, "SIN_RED");
   const lento = cliente({}, { timeoutMs: 20, fetch: (u, i) => new Promise((ok, mal) => { i.signal.addEventListener("abort", () => { const e = new Error("abortado"); e.name = "AbortError"; mal(e); }); }) });
   const r2 = await lento.seleccionar("clientes"); assert.equal(r2.clase, "red"); assert.equal(r2.codigo, "TIMEOUT");
+  // SYNC-8 (contrato nuevo): sin token la petición NO sale como anónima — la RLS la negaría (403 → terminal) y la cola
+  // descartaría trabajo bueno por una sesión caducada. Es «auth» (la cola se pausa) y no toca la red.
   const srv = servidor(() => ({ cuerpo: [] }));
   const c3 = cliente(srv, { getToken: async () => { throw new Error("sin sesión"); } });
-  assert.equal((await c3.seleccionar("clientes")).ok, true, "sin token la petición sale sin Authorization (la nube decidirá)");
-  assert.equal(srv.reg[0].h.Authorization, undefined);
+  const r3 = await c3.seleccionar("clientes");
+  assert.equal(r3.ok, false); assert.equal(r3.clase, "auth"); assert.equal(r3.codigo, "SIN_SESION");
+  assert.equal(srv.reg.length, 0, "ninguna petición anónima");
 });
 
 test("errores de servidor y límites: clase, código de Postgres y Retry-After; el token no aparece en los resultados", async () => {

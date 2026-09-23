@@ -122,6 +122,20 @@ test("una respuesta VIEJA de la nube que quedó en el caché de un SW anterior n
   assert.equal(interceptada, false, "no hay respondWith: el navegador falla o responde la nube, jamás un dato viejo");
 });
 
+test("SYNC-8: aunque la API/Supabase se sirvan desde el MISMO origen (proxy), REST/RPC/Auth/Storage/api y cualquier petición con apikey NO pasan por el caché", async () => {
+  const vieja = `${ORIGEN}/rest/v1/inventario?select=*`;
+  const sw = cargarSW({ previo: { [vieja]: new Response('[{"cantidad":99}]') }, red: async () => { throw new TypeError("Failed to fetch"); } });
+  for (const ruta of ["/rest/v1/inventario?select=*", "/rest/v1/rpc/registrar_venta_v2", "/auth/v1/user", "/storage/v1/object/sign/x", "/functions/v1/f", "/api/admin/pin", "/api/caja/resumen"]) {
+    const { interceptada } = await pedir(sw, ruta);
+    assert.equal(interceptada, false, `${ruta}: jamás respondida desde el caché, ni con la red caída`);
+  }
+  assert.equal((await pedir(sw, "/cualquier-cosa.json", { cabeceras: { apikey: "A" } })).interceptada, false, "con apikey es de Supabase, no de la app");
+  assert.equal(sw.puestos.length, 0);
+  // el shell sigue funcionando offline
+  const sw2 = cargarSW();
+  assert.equal((await pedir(sw2, "/index.html")).interceptada, true);
+});
+
 test("impresion.html sigue sirviéndose desde el caché sin tocar la red", async () => {
   const sw = cargarSW({ red: async () => { throw new Error("no debe llamarse"); } });
   sw.manejadores.message({ data: { tipo: "guardar-impresion", html: "<p>factura</p>" }, source: { postMessage() {} }, waitUntil(p) { return p; } });

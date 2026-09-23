@@ -19,6 +19,8 @@ window.__montar = async function (o) {
     sesion: function () { return window.__sesion || null; },
     habilitado: function () { return window.__habilitado !== false; },
     locks: o.sinLocks ? null : undefined, autoenvio: !!o.autoenvio, aleatorio: function () { return 0.5; },
+    // SYNC-8: opcionales (sin ellos, el motor se comporta como en SYNC-4..7B)
+    validarPerfil: !!o.validarPerfil, leaseMs: o.leaseMs, pausaAuthMs: o.pausaAuthMs,
   });
   window.__bd = bd; window.__rest = rest; window.__motor = motor; window.__eventos = [];
   motor.onCambio(function (e) { window.__eventos.push(e.tipo); });

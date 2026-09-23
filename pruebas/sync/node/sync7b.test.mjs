@@ -35,7 +35,7 @@ describe("SYNC-7B · constructores de operaciones (sync-finanzas.js)", () => {
       ocurrioEn: OCURRIO, offline: false, deviceId: "dev-1",
     });
     assert.equal(op.rpc, "registrar_venta_v2");
-    assert.deepEqual(J(op.meta), { entidad: "ventas_rapidas", uid: "id-1" });
+    assert.deepEqual(J(op.meta), { entidad: "ventas_rapidas", uid: "id-1", crea: true });   // SYNC-8: da de alta su uid
     assert.deepEqual(J(op.params), {
       p_venta_id: "id-1", p_cliente_id: "cli-uuid", p_cliente_nombre: "Ana", p_metodo_pago: "efectivo", p_efectivo: 500,
       p_items: [{ item_id: "id-2", inventario_id: "inv-uuid-7", nombre: "Aceite", cantidad: 2, precio: 180 },
@@ -68,6 +68,7 @@ describe("SYNC-7B · constructores de operaciones (sync-finanzas.js)", () => {
     });
     assert.equal(op.rpc, "registrar_credito");
     assert.equal(op.params.p_credito_id, op.meta.uid);
+    assert.equal(op.meta.crea, true, "SYNC-8: el crédito da de alta su uid (sus abonos sin red esperan a que exista)");
     assert.equal(op.params.p_abono_inicial, 100);
     assert.equal(op.params.p_abono_metodo, "transferencia");
     assert.equal(op.params.p_items[0].inventario_id, "inv-1");
@@ -80,7 +81,7 @@ describe("SYNC-7B · constructores de operaciones (sync-finanzas.js)", () => {
     const op = F().abono({ creditoUid: "cr-1", monto: 50.555, metodo: "efectivo", ocurrioEn: OCURRIO, deviceId: "d" });
     assert.equal(op.rpc, "registrar_abono_v2");
     assert.deepEqual(J(op.params), { p_credito_id: "cr-1", p_monto: 50.56, p_metodo: "efectivo", p_occurred_at: OCURRIO, p_device: "d" });
-    assert.deepEqual(J(op.meta), { entidad: "creditos", uid: "cr-1" });
+    assert.deepEqual(J(op.meta), { entidad: "creditos", uid: "cr-1" });   // un abono NO da de alta nada (SYNC-8)
     assert.throws(() => F().abono({ creditoUid: "cr-1", monto: 0 }), /mayor a cero/);
     assert.throws(() => F().abono({ monto: 5 }), /identidad/);
   });

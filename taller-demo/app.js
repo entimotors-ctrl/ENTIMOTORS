@@ -651,6 +651,21 @@ async function prepararModoNube(session) {
     bd: syncBd, rest, mappers: window.ENTIMOTORS_SYNC_MAPPERS, orden: window.ENTIMOTORS_SYNC_ORDEN,
     sesion: () => (currentUser && currentUser.uid ? { uid: currentUser.uid } : null),
     autoenvio: true,
+    // SYNC-8: antes de enviar nada con esta sesión se revalida el perfil (rol/activo); inactivo → fail closed
+    validarPerfil: true,
+  });
+  /* SYNC-8: sesión caducada → la cola se PAUSA (nada sale como anónimo; lo pendiente se conserva) hasta un nuevo inicio
+     de sesión. Cuenta desactivada → fail closed: se detiene la sincronización y se cierra la sesión (la cola queda en
+     este dispositivo, sin enviarse). Cualquier cambio de la cola refresca el indicador. */
+  let avisoSesion = false;
+  syncMotor.onCambio((ev) => {
+    if (ev.tipo === "auth-requerida" && !avisoSesion) { avisoSesion = true; toast("Tu sesión caducó: vuelve a iniciar sesión para sincronizar. Lo pendiente se conserva en este dispositivo.", "off"); }
+    if (ev.tipo === "cuenta-inactiva") { syncMotor?.detener(); denegarSesion("Tu cuenta está desactivada. Habla con el administrador."); return; }
+    if (ev.tipo === "rechazada" && ev.datos && !["ventas_rapidas", "creditos", "caja_movimientos", "inventario", "ordenes"].includes(ev.datos.entidad)) {
+      toast(`Un cambio de «${ENTIDAD_LEGIBLE[ev.datos.entidad] || ev.datos.entidad}» no se pudo sincronizar: revísalo en ⚠ Por revisar`, "off");
+    }
+    if (ev.tipo === "rechazada" && ev.datos?.entidad === "ordenes" && !esMecanicoCuenta()) toast("Un cambio de una orden no se pudo sincronizar: revísalo en ⚠ Por revisar", "off");
+    programarChipNube();
   });
   // SYNC-7: autorización con PIN (D-7) — solo se arma con sesión de nube activa; las acciones que
   // la necesitan (ver PinUI.ACCIONES_CON_PIN) están apagadas fuera de modo nube (mismo criterio que
@@ -1261,6 +1276,8 @@ function markDirty() {
 const HAY_SERVIDOR = false;
 
 function renderSyncChip() {
+  // SYNC-8: con sesión de nube el indicador dice lo que de verdad pasa con la cola (ver renderSyncChipNube)
+  if (syncMotor) { programarChipNube(); return; }
   const dot = document.getElementById("syncDot");
   const label = document.getElementById("syncLabel");
 
@@ -1285,6 +1302,79 @@ function renderSyncChip() {
     label.textContent = "En línea · sincronizado";
   }
 }
+
+/* ---------------- SYNC-8 · estado real de la sincronización y lo que requiere revisión ----------------
+   Solo en modo nube (syncMotor armado). Lo que la nube no aceptó, los conflictos, las dependencias rechazadas y el
+   stock negativo por ventas sin conexión se juntan en UN lugar (⚠ Por revisar): nada se pierde en un log. */
+let chipNubeT = null;
+function programarChipNube() {
+  if (chipNubeT) return;
+  chipNubeT = setTimeout(() => { chipNubeT = null; renderSyncChipNube(); }, 150);
+}
+const ENTIDAD_LEGIBLE = { clientes: "Clientes", motos: "Motos", citas: "Citas", categorias_inv: "Categorías", inventario: "Inventario",
+  cotizaciones: "Cotizaciones", ordenes: "Órdenes", ventas_rapidas: "Ventas", creditos: "Créditos", caja_movimientos: "Caja", rpc: "Operación" };
+async function stockEnRevision() {
+  if (!syncBd) return [];
+  try { return (await syncBd.datos.todos("inventario")).filter((r) => r.requiereRevision); } catch { return []; }
+}
+async function renderSyncChipNube() {
+  const dot = document.getElementById("syncDot"), label = document.getElementById("syncLabel"), btn = document.getElementById("btnRevisionSync");
+  if (!syncMotor || !dot || !label) return;
+  let e;
+  try { e = await syncMotor.estado(); } catch { return; }
+  const porRevisar = e.rechazadas + e.conflictos + (await stockEnRevision()).length;
+  const pendientes = (e.cola.pending || 0) + (e.cola.syncing || 0);
+  let texto, ok = false;
+  if (e.pausa === "cuenta-inactiva") texto = "Cuenta inactiva · no se sincroniza";
+  else if (e.pausa === "auth") texto = "Sesión caducada · inicia sesión para sincronizar";
+  else if (!isOnline()) texto = pendientes ? `Sin conexión · ${pendientes} cambio${pendientes === 1 ? "" : "s"} sin subir` : "Sin conexión · guardado en este dispositivo";
+  else if (!e.bootstrapCompleto) texto = "Descarga inicial incompleta · reintentando";
+  else if (pendientes) texto = `Subiendo ${pendientes}…`;
+  else { texto = "En línea · sincronizado"; ok = true; }
+  if (e.deOtraPersona) texto += ` · ${e.deOtraPersona} de otra cuenta en espera`;
+  dot.className = ok && !porRevisar ? "dot on" : "dot off";
+  label.textContent = texto;
+  if (btn) { btn.style.display = porRevisar ? "" : "none"; btn.textContent = `⚠ ${porRevisar} por revisar`; }
+}
+function fechaCorta(ms) { return ms ? new Date(ms).toLocaleString() : ""; }
+async function abrirRevisionSync() {
+  if (!syncMotor) return;
+  const r = await syncMotor.revision();
+  const stock = await stockEnRevision();
+  const lista = document.getElementById("revisionSyncLista");
+  const filas = [];
+  for (const x of r.rechazadas) {
+    const que = x.tipo === "dependencia" ? "No se envió: depende de un registro que la nube rechazó" : "La nube no lo aceptó";
+    filas.push(`<div class="card" style="margin:6px 0;padding:8px;"><strong>${esc(ENTIDAD_LEGIBLE[x.entidad] || x.entidad)}</strong> · ${esc(que)}<br>
+      <small>${esc(x.mensaje || x.codigo || "")}${x.creadoEn ? " · " + esc(fechaCorta(x.creadoEn)) : ""}</small><br>
+      <button type="button" class="btn small ghost" data-rev-descartar="${Number(x.seq)}">Entendido, quitar de la lista</button></div>`);
+  }
+  for (const c of r.conflictos) {
+    const que = c.motivo === "borrado_remoto" ? "Se borró en otro dispositivo mientras lo editabas" : "Otro dispositivo cambió el mismo dato";
+    filas.push(`<div class="card" style="margin:6px 0;padding:8px;"><strong>${esc(ENTIDAD_LEGIBLE[c.entidad] || c.entidad)}</strong> · ${esc(que)}<br>
+      <small>${c.campos.length ? "Campos: " + esc(c.campos.join(", ")) + " · " : ""}${esc(fechaCorta(c.creadoEn))}</small><br>
+      <button type="button" class="btn small ghost" data-rev-conflicto="${Number(c.id)}" data-decision="servidor">Usar la versión de la nube</button>
+      ${c.motivo === "borrado_remoto" ? "" : `<button type="button" class="btn small ghost" data-rev-conflicto="${Number(c.id)}" data-decision="mio">Conservar la mía</button>`}</div>`);
+  }
+  for (const it of stock) {
+    filas.push(`<div class="card" style="margin:6px 0;padding:8px;"><strong>Inventario</strong> · ${esc(it.nombre)}: existencia ${esc(String(it.cantidad))}<br>
+      <small>Una venta hecha sin conexión dejó el stock por debajo de cero. Revisa el conteo con «Ajustar stock».</small></div>`);
+  }
+  if (r.esperandoOtraPersona) filas.push(`<p class="hint">${r.esperandoOtraPersona} cambio(s) de otra cuenta esperan a que esa persona inicie sesión en este dispositivo.</p>`);
+  document.getElementById("revisionSyncResumen").textContent = filas.length ? "Nada de esto se resolvió solo: decide qué hacer con cada uno." : "No hay nada pendiente de revisión.";
+  lista.innerHTML = filas.join("");
+  lista.querySelectorAll("[data-rev-descartar]").forEach((b) => b.addEventListener("click", async () => {
+    await syncMotor.descartarRechazada(Number(b.dataset.revDescartar)); abrirRevisionSync(); renderSyncChip();
+  }));
+  lista.querySelectorAll("[data-rev-conflicto]").forEach((b) => b.addEventListener("click", async () => {
+    const res = await syncMotor.resolverConflicto(Number(b.dataset.revConflicto), b.dataset.decision);
+    if (!res.ok) toast("No se pudo resolver: " + res.motivo, "off");
+    abrirRevisionSync(); renderSyncChip();
+  }));
+  document.getElementById("modalRevisionSync").classList.add("active");
+}
+document.getElementById("btnRevisionSync")?.addEventListener("click", () => abrirRevisionSync());
+document.getElementById("btnRevisionSyncCerrar")?.addEventListener("click", () => document.getElementById("modalRevisionSync").classList.remove("active"));
 
 /* ---------------- botones que cobran/registran: bloquea doble-tap ----------------
    en un taller usando esto en pantalla táctil, un toque doble accidental en

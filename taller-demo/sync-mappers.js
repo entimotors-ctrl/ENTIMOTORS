@@ -54,8 +54,17 @@
  *     y la caché la refleja. Siguen fuera de `columnas`: nunca suben por el CRUD.
  *   · ventas_rapidas / creditos / caja_movimientos: mappers de SOLO LECTURA (ver el bloque al final).
  *   · ordenes (Taller): `finalizada`/`anulada` bajan (solo lectura) para que otro dispositivo no cobre dos veces.
- *     Los ítems de la orden siguen viviendo en la copia local del Taller y en la nube (orden_items) se escriben
- *     por agregar_item_orden/quitar_item_orden; no bajan embebidos todavía (límite documentado en el STATE).
+ *
+ * SYNC-8 — ÍTEMS DE ORDEN MULTIDISPOSITIVO Y CAMPOS DEL SERVIDOR
+ *   · ordenes (Taller) baja `orden_items` EMBEBIDOS (select) → `items` locales con su uid, precio, costo y el repuesto
+ *     resuelto a id local (refsALocal). Es SOLO lectura/caché: bajar un ítem nunca mueve stock (el stock ya lo movió
+ *     agregar_item_orden en el servidor, y la cantidad del repuesto baja por su propio mapper). Así otro dispositivo
+ *     reconstruye el detalle y el reporte de producción (también bajan finalizado_en/entregado_en).
+ *     Los renglones locales SIN uid (nunca llegaron a la nube) se conservan al bajar (fusionarLocal). Una respuesta que
+ *     no trae el embebido (el PATCH de la cabecera) NO toca `items`. El mecánico no usa este mapper: sigue con
+ *     ordenes_tecnico_mias (solo nombre y cantidad, nunca precio ni costo).
+ *   · soloServidor: campos que decide solo el servidor (existencia y revisión del repuesto; cobro/anulación de la
+ *     orden). Bajan aunque haya un cambio local pendiente del mismo registro (ver aplicarPagina en sync-engine.js).
  *
  * ORDENES (SYNC-6) ES DOS MAPPERS DISTINTOS SEGÚN EL BUILD, NO UNO
  *   SYNC-2 cerró el acceso DIRECTO del mecánico a `ordenes`/`orden_items`: solo
@@ -222,6 +231,8 @@
           // foto NO se toca aquí (igual que motos.foto): una foto local en base64 se conserva tal cual.
         };
       },
+      // SYNC-8: la existencia la decide el ledger del servidor, aunque haya una edición del maestro sin enviar.
+      soloServidor: ["cantidad", "requiereRevision"],
     },
 
     cotizaciones: {
@@ -241,17 +252,20 @@
       aLocal: function (r) {
         var venceMs = r.vence_en ? new Date(r.vence_en).getTime() : null;
         var diasMs = (r.validez_dias || 15) * 86400000;
-        return {
+        var c = {
           clienteNombre: r.cliente_nombre || "", clienteTelefono: r.cliente_telefono || "",
           motoDesc: r.moto_desc || "", diagnostico: r.diagnostico || "", notas: r.notas || "",
           validezDias: r.validez_dias || 15, venceISO: r.vence_en || null,
           // fechaISO no tiene columna propia: se deriva de vence_en - validez_dias (ver cabecera del archivo).
           fechaISO: venceMs ? new Date(venceMs - diasMs).toISOString() : (r.creado_en || null),
           estado: r.estado || "pendiente",
-          items: Array.isArray(r.cotizacion_items) ? r.cotizacion_items.map(function (it) {
-            return { nombre: it.nombre, cantidad: Number(it.cantidad), precio: Number(it.precio), inventarioId: null };
-          }) : [],
         };
+        // SYNC-8: solo si la fila trae los renglones embebidos (la descarga). La respuesta de un PATCH de la cabecera no
+        // los trae: devolver [] ahí borraba de la caché los renglones que sí existen.
+        if (Array.isArray(r.cotizacion_items)) c.items = r.cotizacion_items.map(function (it) {
+          return { nombre: it.nombre, cantidad: Number(it.cantidad), precio: Number(it.precio), inventarioId: null };
+        });
+        return c;
       },
     },
     // SYNC-6: ver la cabecera del archivo — el Taller y Mi Trabajo usan objetos
@@ -281,7 +295,10 @@
       },
     } : {
       entidad: "ordenes", tabla: "ordenes", store: "ordenes",
-      // Sin fotos ni items a propósito (ver cabecera): eso queda 100% local en el Taller hasta SYNC-7.
+      // Sin fotos a propósito (ver cabecera). SYNC-8: los ítems BAJAN embebidos (solo lectura: suben por
+      // agregar_item_orden/quitar_item_orden, nunca por `columnas`).
+      select: "*,orden_items(id,inventario_id,nombre,cantidad,precio,costo_unitario,costo_estimado,creado_en)",
+      soloServidor: ["finalizada", "anulada", "finalizadoEn", "entregadoEn"],
       columnas: ["estado", "falla", "diagnostico", "reparacion_notas", "calidad_checklist",
         "mecanico", "mecanico_id", "origen_trabajo", "km_salida", "garantia_dias"],
       tiempos: [],
@@ -298,7 +315,7 @@
         };
       },
       aLocal: function (r) {
-        return {
+        var c = {
           estado: r.estado, falla: r.falla || "", diagnostico: r.diagnostico || null,
           reparacionNotas: r.reparacion_notas || "", calidadChecklist: r.calidad_checklist || null,
           mecanico: r.mecanico || "", mecanicoId: r.mecanico_id || null,
@@ -310,6 +327,34 @@
           finalizada: !!r.finalizada,
           anulada: !!r.anulada,
         };
+        // SYNC-8: fechas de cobro/entrega (el reporte de producción las usa) solo si la fila las trae
+        if (r.finalizado_en !== undefined) c.finalizadoEn = r.finalizado_en ? new Date(r.finalizado_en).getTime() : null;
+        if (r.entregado_en !== undefined) c.entregadoEn = r.entregado_en ? new Date(r.entregado_en).getTime() : null;
+        if (Array.isArray(r.orden_items)) {
+          c.items = r.orden_items.slice().sort(function (a, b) { return String(a.creado_en || "").localeCompare(String(b.creado_en || "")) || String(a.id).localeCompare(String(b.id)); })
+            .map(function (it) {
+              return { uid: it.id, nombre: it.nombre, cantidad: Number(it.cantidad), precio: Number(it.precio),
+                costoUnitario: Number(it.costo_unitario) || 0, costoEstimado: !!it.costo_estimado,
+                inventarioUid: it.inventario_id || null, origenInventarioId: null };
+            });
+        }
+        return c;
+      },
+      // el repuesto de cada renglón (uid de nube) → id local, dentro de la misma transacción del pull
+      refsALocal: async function (c, resolver) {
+        if (!Array.isArray(c.items)) return c;
+        var items = [];
+        for (var i = 0; i < c.items.length; i++) {
+          var it = c.items[i];
+          items.push(Object.assign({}, it, { origenInventarioId: it.inventarioUid ? await resolver(it.inventarioUid) : null }));
+        }
+        return Object.assign({}, c, { items: items });
+      },
+      // los renglones que SOLO existen aquí (sin uid: nunca llegaron a la nube) no se pierden al bajar
+      fusionarLocal: function (local, c) {
+        if (!Array.isArray(c.items)) return c;
+        var soloLocales = (local.items || []).filter(function (it) { return it && !it.uid; });
+        return soloLocales.length ? Object.assign({}, c, { items: c.items.concat(soloLocales) }) : c;
       },
     },
   };

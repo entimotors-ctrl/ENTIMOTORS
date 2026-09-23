@@ -24,6 +24,11 @@
   var ENTIDADES = ["clientes", "motos", "citas", "ordenes", "inventario", "cotizaciones", "categorias_inv",
     "ventas_rapidas", "caja_movimientos", "creditos", "web_cms", "auditoria"];
   var OTRAS = ["meta", "mapa", "outbox", "cursores", "conflictos", "blobs"];
+  /* SYNC-8: la identidad del DISPOSITIVO vive en su propia base, aparte de las cachés. Así es UNA por dispositivo
+     (perfil de navegador), la misma para el Taller y para cada caché de mecánico (entimotors_sync_mec_*), no cambia al
+     recargar ni al cambiar de usuario, y no forma parte de ningún respaldo (el respaldo es de la base de siempre): ni se
+     restaura de un archivo ni se copia a otro equipo (SYNC-9). Otro perfil de navegador = otro almacenamiento = otro id. */
+  var NOMBRE_DISPOSITIVO = "entimotors_dispositivo";
 
   function nombreParaSesion(sesion) {
     if (sesion && sesion.rol === "mecanico" && sesion.perfilId) return NOMBRE + "_mec_" + sesion.perfilId;
@@ -53,6 +58,27 @@
     });
   }
 
+  /** device_id del dispositivo. `sugerido`: el que esta caché ya tenía (antes de SYNC-8 cada caché guardaba el suyo):
+      si el dispositivo aún no tiene uno, se ADOPTA ese, para no cambiarle la identidad a un Taller ya en uso. */
+  function idDispositivo(idbf, sugerido) {
+    return new Promise(function (ok, mal) {
+      var req = idbf.open(NOMBRE_DISPOSITIVO, 1);
+      req.onupgradeneeded = function () { req.result.createObjectStore("meta", { keyPath: "k" }); };
+      req.onerror = function () { mal(req.error || new Error("no se pudo abrir " + NOMBRE_DISPOSITIVO)); };
+      req.onsuccess = function () {
+        var d = req.result, t = d.transaction(["meta"], "readwrite"), st = t.objectStore("meta"), id = null;
+        var g = st.get("device_id");
+        g.onsuccess = function () {
+          if (g.result && g.result.v) { id = g.result.v; return; }
+          id = sugerido || uuid();
+          st.put({ k: "device_id", v: id });
+        };
+        t.oncomplete = function () { d.close(); ok(id); };
+        t.onerror = t.onabort = function () { d.close(); mal(t.error || new Error("device_id")); };
+      };
+    });
+  }
+
   function abrir(o) {
     o = o || {};
     var idbf = o.indexedDB || global.indexedDB;
@@ -78,11 +104,11 @@
       };
       req.onblocked = function () { /* otra pestaña con la versión anterior abierta: no ocurre con v1 */ };
       req.onerror = function () { mal(req.error || new Error("no se pudo abrir " + nombre)); };
-      req.onsuccess = function () { ok(envolver(req.result, nombre)); };
+      req.onsuccess = function () { ok(envolver(req.result, nombre, idbf)); };
     });
   }
 
-  function envolver(idb, nombre) {
+  function envolver(idb, nombre, idbf) {
     var bd = { nombre: nombre, idb: idb };
 
     /* Transacción con varias tablas. `fn` recibe un acceso `t` cuyas operaciones devuelven promesas de IndexedDB:
@@ -110,14 +136,26 @@
       get: function (k) { return bd.transaccion(["meta"], "readonly", function (t) { return t.get("meta", k); }).then(function (r) { return r ? r.v : undefined; }); },
       set: function (k, v) { return bd.transaccion(["meta"], "readwrite", function (t) { return t.put("meta", { k: k, v: v }); }); },
     };
+    var idCache = null;
     bd.deviceId = function () {
-      return bd.transaccion(["meta"], "readwrite", function (t) {
-        return t.get("meta", "device_id").then(function (r) {
-          if (r && r.v) return r.v;
-          var id = uuid();
-          return t.put("meta", { k: "device_id", v: id }).then(function () { return id; });
+      if (idCache) return idCache;
+      var local = function () {
+        return bd.transaccion(["meta"], "readwrite", function (t) {
+          return t.get("meta", "device_id").then(function (r) {
+            if (r && r.v) return r.v;
+            var id = uuid();
+            return t.put("meta", { k: "device_id", v: id }).then(function () { return id; });
+          });
         });
+      };
+      idCache = bd.meta.get("device_id").then(function (propio) {
+        if (!idbf) return local();
+        return idDispositivo(idbf, propio).then(function (id) {
+          return propio === id ? id : bd.meta.set("device_id", id).then(function () { return id; });   // la caché lo refleja
+        }, function () { return local(); });   // sin la base del dispositivo (bloqueada): el de la caché, como antes
       });
+      idCache.catch(function () { idCache = null; });
+      return idCache;
     };
     bd.cursor = {
       get: function (entidad) { return bd.transaccion(["cursores"], "readonly", function (t) { return t.get("cursores", entidad); }); },
@@ -170,5 +208,5 @@
     return bd;
   }
 
-  global.SyncDB = { abrir: abrir, nombre: NOMBRE, version: VERSION, ENTIDADES: ENTIDADES, OTRAS: OTRAS, nombreParaSesion: nombreParaSesion, uuid: uuid };
+  global.SyncDB = { abrir: abrir, nombre: NOMBRE, nombreDispositivo: NOMBRE_DISPOSITIVO, version: VERSION, ENTIDADES: ENTIDADES, OTRAS: OTRAS, nombreParaSesion: nombreParaSesion, uuid: uuid };
 })(typeof window !== "undefined" ? window : this);

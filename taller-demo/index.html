@@ -1026,6 +1026,7 @@
         <button type="button" class="icon-btn" id="btnCuenta" aria-label="Cuenta y estado de conexión" title="Cuenta">👤</button>
         <div class="account-panel" id="accountPanel">
           <span class="chip" id="syncChip"><span class="dot on" id="syncDot"></span><span id="syncLabel">En línea · datos locales</span></span>
+          <button class="btn small ghost" id="btnRevisionSync" style="display:none;" title="Cambios que la nube no aceptó, conflictos y stock a revisar">⚠ Por revisar</button>
           <button class="btn small ghost" id="offlineToggle" title="Simular pérdida de señal para probar el modo sin internet">Simular sin conexión</button>
           <button class="btn small ghost" id="btnTema" title="Cambiar entre modo claro y oscuro">🌙 Modo oscuro</button>
           <span class="chip user-chip"><span class="who"><span id="loggedUserName">—</span><small id="loggedUserRole"></small></span></span>
@@ -2030,6 +2031,19 @@
     <div class="modal-actions">
       <button class="btn ghost" id="btnPinAutorizarCancelar">Cancelar</button>
       <button class="btn primary" id="btnPinAutorizarOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<!-- SYNC-8: lo que la nube no pudo aplicar sola (rechazos, conflictos, dependencias, stock en revisión).
+     Mínimo a propósito: qué pasó, con qué, cuándo — nunca montos ni datos enviados. -->
+<div class="modal-bg" id="modalRevisionSync">
+  <div class="modal">
+    <h3>Cambios por revisar</h3>
+    <p class="hint" style="margin-top:0;" id="revisionSyncResumen"></p>
+    <div id="revisionSyncLista"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnRevisionSyncCerrar">Cerrar</button>
     </div>
   </div>
 </div>

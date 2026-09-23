@@ -109,6 +109,17 @@
       var u = url(ruta, query);
       var conToken = function (yaRefrescado) {
         return Promise.resolve(cfg.getToken ? cfg.getToken() : null).catch(function () { return null; }).then(function (token) {
+          // SYNC-8: con un cliente que trabaja con sesión (getToken), una petición SIN token saldría como ANÓNIMA: la RLS la
+          // negaría (403 → «permiso», terminal) y la cola descartaría trabajo bueno por una sesión caducada. Nunca sale:
+          // se intenta refrescar UNA vez y, si sigue sin token, es «auth» (la cola se pausa y espera un inicio de sesión).
+          if (cfg.getToken && !token) {
+            if (!yaRefrescado && cfg.refrescar) {
+              return Promise.resolve(cfg.refrescar()).catch(function () { return false; }).then(function (ok) {
+                return ok ? conToken(true) : { ok: false, clase: "auth", status: 0, codigo: "SIN_SESION", mensaje: "No hay sesión válida." };
+              });
+            }
+            return { ok: false, clase: "auth", status: 0, codigo: "SIN_SESION", mensaje: "No hay sesión válida." };
+          }
           return unaVez(metodo, u, opciones, token).then(function (r) {
             if (r.falloRed) return { ok: false, clase: "red", status: 0, codigo: r.abortado ? "TIMEOUT" : "SIN_RED", mensaje: r.mensaje };
             if (r.status === 401 && !yaRefrescado && cfg.refrescar) {

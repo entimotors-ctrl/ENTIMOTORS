@@ -90,11 +90,17 @@ self.addEventListener("message", (event) => {
    sesión, y —peor— una lectura vieja tapando a la nube cuando hay señal. Solo se cachea la propia app (mismo origen) y las librerías
    del CDN que index.html ya cargaba. Todo lo demás se deja pasar SIN respondWith: el navegador lo resuelve directo. */
 const ORIGENES_CACHEABLES = new Set([self.location.origin, "https://cdn.jsdelivr.net"]);
+// 3.14.0 · SYNC-8 (defensa en profundidad): aunque un proxy o un despliegue sirviera la API, Supabase o Storage desde el
+// MISMO origen que la app, esas rutas tampoco pasan por el caché — una lectura vieja de stock, saldo o caja nunca puede
+// contestar en lugar del servidor, ni con la red caída.
+const RUTAS_NUNCA_CACHE = /^\/(?:rest|auth|storage|functions|realtime)\/v1\/|^\/api\//;
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   if (!ORIGENES_CACHEABLES.has(new URL(event.request.url).origin)) return;   // API / Supabase / Storage: jamás por el caché
   if (event.request.headers && event.request.headers.has("authorization")) return;   // una petición con credenciales no es un archivo de la app
+  if (event.request.headers && event.request.headers.has("apikey")) return;          // ni una de Supabase (lleva apikey aunque no tenga sesión)
+  if (RUTAS_NUNCA_CACHE.test(new URL(event.request.url).pathname)) return;             // API / REST / Auth / Storage del mismo origen
 
   // este documento solo existe en el caché (no está en el servidor), así que
   // se responde directo sin intentar la red — si no, el 404 taparía la factura.

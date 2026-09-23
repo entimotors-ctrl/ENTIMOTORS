@@ -43,7 +43,7 @@ async function matar(h) { for (const s of ["SIGTERM", "SIGKILL"]) { try { proces
 /** Abre un dispositivo. opciones: { navegador: "chromium"|"firefox", nombre, pagina, real }
     real:true → `pagina` se sirve desde taller-demo/ tal cual (p. ej. "index.html", la app de verdad), con el
     puente inyectado (ver arriba); por defecto (real:false) se sirve desde /__h/ (el arnés, pagina.html). */
-export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html", real = false, apiUrl = "" } = {}) {
+export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html", real = false, apiUrl = "", producto = null } = {}) {
   if (!NAVEGADORES[navegador]) throw new Error(`no hay ${navegador} instalado`);
   const cola = []; const esperando = []; const pendientes = new Map(); let sigId = 1;
   const peticionesEstaticas = [];
@@ -68,6 +68,11 @@ export async function abrirDispositivo({ navegador = "chromium", nombre = "dispo
     if (u.pathname === "/supabase-config.js") {
       res.writeHead(200, { "Content-Type": TIPOS[".js"], "Cache-Control": "no-store" });
       return res.end(`window.ENTIMOTORS_SUPABASE = ${JSON.stringify({ url: REST_URL, anonKey: "anon-sintetica", habilitado: true, apiUrl })};`);   // apiUrl: el api-server LOCAL de pruebas (SYNC-7B) o vacío
+    }
+    // SYNC-8: producto:"mecanico" sirve «Mi Trabajo» (lo que hace hacer-build-mecanicos.sh) sin tocar build-target.js en disco
+    if (producto && u.pathname === "/build-target.js") {
+      res.writeHead(200, { "Content-Type": TIPOS[".js"], "Cache-Control": "no-store" });
+      return res.end(`window.ENTIMOTORS_BUILD = ${JSON.stringify({ producto })};`);
     }
     let base = TALLER, rel = decodeURIComponent(u.pathname);
     if (rel.startsWith("/__h/")) { base = HARNESS; rel = rel.slice(4); }

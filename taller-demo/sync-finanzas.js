@@ -17,6 +17,8 @@
  *     OFFLINE_SALE_ACCEPT_AND_REVIEW: la venta hecha sin red se acepta aunque deje stock
  *     negativo; el servidor marca requiere_revision. Nunca se recorta ni se descarta.
  *   · Los repuestos viajan por su UUID de nube (inventario.uid), jamás por el id entero local.
+ *   · meta.crea (SYNC-8): la venta y el crédito DAN DE ALTA su uid; lo que dependa de ellos (un abono a ese crédito
+ *     guardado sin red) espera en la cola a que existan y, si la nube los rechaza, no se envía (sync-engine.js).
  *   · Acciones con PIN (reversos, devoluciones, ajuste de stock, anular orden): SOLO en
  *     línea, nunca al outbox (sync-engine.js lo impide además). El PIN no pasa por aquí:
  *     lo pide PinUI (pin-ui.js) y esta hoja solo recibe el autorizacion_id de un solo uso.
@@ -55,7 +57,7 @@
       venta: function (o) {
         var uid = o.ventaUid || nuevoUuid();
         var metodo = texto(o.metodoPago); if (!metodo) falla("Falta el método de pago");
-        return { rpc: "registrar_venta_v2", meta: { entidad: "ventas_rapidas", uid: uid }, params: {
+        return { rpc: "registrar_venta_v2", meta: { entidad: "ventas_rapidas", uid: uid, crea: true }, params: {
           p_venta_id: uid, p_cliente_id: o.clienteUid || null, p_cliente_nombre: texto(o.clienteNombre),
           p_metodo_pago: metodo, p_efectivo: metodo === "efectivo" ? r2(Number(o.efectivoRecibido) || 0) : null,
           p_items: renglones(o.items, nuevoUuid), p_occurred_at: o.ocurrioEn, p_offline: !!o.offline, p_device: o.deviceId || null,
@@ -69,7 +71,7 @@
         var items = renglones(o.items, nuevoUuid);
         var total = r2(items.reduce(function (s, it) { return s + it.cantidad * it.precio; }, 0));
         if (abono > total + 0.01) falla("La entrada supera el total del crédito");
-        return { rpc: "registrar_credito", meta: { entidad: "creditos", uid: uid }, params: {
+        return { rpc: "registrar_credito", meta: { entidad: "creditos", uid: uid, crea: true }, params: {
           p_credito_id: uid, p_cliente_id: o.clienteUid || null, p_cliente_nombre: texto(o.clienteNombre), p_cliente_telefono: texto(o.clienteTelefono),
           p_items: items, p_vencimiento: o.vencimiento || null, p_nota: texto(o.nota), p_abono_inicial: abono,
           p_abono_metodo: abono > 0 ? (texto(o.abonoMetodo) || "efectivo") : null, p_occurred_at: o.ocurrioEn, p_offline: !!o.offline,
