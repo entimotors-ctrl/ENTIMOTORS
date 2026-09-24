@@ -7,6 +7,8 @@
 //   node pruebas/multiusuario/verificar-backend-manifest.mjs                 → MATCH N archivos  (salida 0)  |  MANIFEST_MISMATCH <archivo> … + FAIL (salida 1)
 //   node pruebas/multiusuario/verificar-backend-manifest.mjs --raiz <dir>    → lo mismo sobre OTRA raiz (una copia temporal); lee el manifest de <dir>/pruebas/multiusuario/
 //   node pruebas/multiusuario/verificar-backend-manifest.mjs --regenerar     → SOLO para quien mantiene el freeze: reescribe sha256/bytes de los archivos YA listados (no añade ni quita)
+//   … --manifest pruebas/multiusuario/release-3.14.0-backend-manifest.json  → otro manifest (3.14.0: backend y, con formato
+//                                                                            entimotors-release-freeze/1, el del frontend). Sin la opción: el de 3.13.0, como siempre.
 //
 // Como se calcula cada hash (para reproducirlo a mano): SHA-256 de los BYTES EXACTOS del archivo en disco (sin normalizar saltos de linea ni codificacion);
 // `bytes` es su tamaño. `sha256sum <archivo>` da el mismo valor. Cada ruta es RELATIVA a la raiz del repositorio y con «/» como separador.
@@ -16,12 +18,15 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { fileURLToPath } from "node:url";
 
-const GRUPOS = ["runtime_files", "test_files", "generated_build_artifacts"];
+// grupos por formato: el backend lleva además lo compilado (dist/); el manifest de release del frontend, la documentación
+const GRUPOS_POR_FORMATO = { "entimotors-backend-freeze/1": ["runtime_files", "test_files", "generated_build_artifacts"], "entimotors-release-freeze/1": ["runtime_files", "documentation_files", "test_files"] };
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 const opcion = (n) => { const i = args.indexOf(`--${n}`); return i >= 0 ? args[i + 1] : undefined; };
 const RAIZ = path.resolve(opcion("raiz") ?? path.join(AQUI, "..", ".."));
-const RUTA_MANIFEST = path.join(RAIZ, "pruebas", "multiusuario", "release-3.13.0-backend-manifest.json");
+const REL_MANIFEST = opcion("manifest") ?? "pruebas/multiusuario/release-3.13.0-backend-manifest.json";
+if (path.isAbsolute(REL_MANIFEST) || REL_MANIFEST.split(/[\\/]/).includes("..")) { console.log(`MANIFEST_RUTA_INVALIDA ${REL_MANIFEST}`); console.log("FAIL 1 problemas"); process.exit(1); }
+const RUTA_MANIFEST = path.join(RAIZ, ...REL_MANIFEST.split("/"));
 const REGENERAR = args.includes("--regenerar");
 
 const problemas = [];
@@ -31,7 +36,8 @@ const sha = (b) => crypto.createHash("sha256").update(b).digest("hex");
 let manifiesto;
 try { manifiesto = JSON.parse(fs.readFileSync(RUTA_MANIFEST, "utf8")); }
 catch (e) { console.log(`MANIFEST_ILEGIBLE ${path.relative(RAIZ, RUTA_MANIFEST)}`); console.log("FAIL 1 problemas"); process.exit(1); }
-if (manifiesto.format !== "entimotors-backend-freeze/1") marca("MANIFEST_FORMATO", String(manifiesto.format));
+const GRUPOS = GRUPOS_POR_FORMATO[manifiesto.format] || [];
+if (!GRUPOS.length) marca("MANIFEST_FORMATO", String(manifiesto.format));
 
 let total = 0; const vistos = new Set();
 for (const grupo of GRUPOS) {

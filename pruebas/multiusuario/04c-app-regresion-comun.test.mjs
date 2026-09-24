@@ -6,7 +6,9 @@ import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import { marcadoPeligroso } from "./helpers/dom.mjs";
 import { idbFalsa } from "./helpers/idb-falsa.mjs";
-import { leer } from "./helpers/entorno.mjs";
+import fs from "node:fs";
+import path from "node:path";
+import { leer, RUNTIME } from "./helpers/entorno.mjs";
 import { nuevoEntorno, enviarLogin, toasts, como, dbFalsa, activo } from "./helpers/flujos.mjs";
 import { UUID } from "./helpers/supabase-mock.mjs";
 
@@ -183,8 +185,9 @@ describe("UI del mecanico con cuenta (barra de acciones, etapas, presupuesto)", 
     for (const u of [CAJERO, MEC_SB]) { const e = nuevoEntorno(); como(e, u); e.win.renderDetalleMecanico(ord("recibido", { mecanico: "Ana" })); const h = e.doc.getElementById("detalleMecanicoWrap").innerHTML; assert.match(h, /Asignada a <b>Ana<\/b>/); assert.ok(!/<select/.test(h), u.rol); }
     const a = nuevoEntorno(); como(a, ADMIN_SB); a.win.renderDetalleMecanico(ord("recibido")); assert.match(a.doc.getElementById("detalleMecanicoWrap").innerHTML, /<select id="detalleMecanicoSel"/);
   });
+  // 3.14.0 (SYNC-6): renderDetalleMecanico es async (espera poblarSelectMecanico antes de poner el oyente) → se espera
   test("renderDetalleMecanico: aunque el rol cambie despues de pintar el selector, el cambio se BLOQUEA y no se guarda nada", async () => {
-    const e = nuevoEntorno(); como(e, ADMIN_SB); const db = dbFalsa(e, { ordenes: [ord("recibido")] }); e.win.renderDetalleMecanico(ord("recibido")); como(e, CAJERO);
+    const e = nuevoEntorno(); como(e, ADMIN_SB); const db = dbFalsa(e, { ordenes: [ord("recibido")] }); await e.win.renderDetalleMecanico(ord("recibido")); como(e, CAJERO);
     await e.doc.getElementById("detalleMecanicoSel").disparar("change", { target: { value: "Mecánico 1" } }); await e.asentar(); assert.deepEqual(db.guardados(), []); assert.ok(toasts(e).includes("Solo el administrador asigna trabajo"));
   });
   test("renderDetalleMecanico: el nombre de un mecanico hostil se escapa", () => {
@@ -308,13 +311,19 @@ describe("renderCitasList — cada boton de una cita esta protegido por rol (exi
 });
 
 describe("GAPS de producto detectados al probar (caracterizaciones, no fallos)", () => {
-  test("GAP-PROD-1: la lista TEAM es estatica y NO trae perfilId → el selector de mecanico del admin no puede asignar trabajo a un mecanico CON CUENTA (mecanicoId siempre null desde la UI)", () => {
-    const e = nuevoEntorno(); como(e, ADMIN_SB); e.win.poblarSelectMecanico("ordenMecanico", "Mecánico 1", UUID(3));
+  test("GAP-PROD-1: la lista TEAM es estatica y NO trae perfilId → SIN NUBE, el selector de mecanico del admin no puede asignar trabajo a un mecanico CON CUENTA (en 3.14.0, con nube, usa perfiles reales: sync10/sync6)", async () => {
+    const e = nuevoEntorno(); como(e, ADMIN_SB); await e.win.poblarSelectMecanico("ordenMecanico", "Mecánico 1", UUID(3));
+    assert.match(e.doc.getElementById("ordenMecanico").innerHTML, /Mecánico 1/, "sin nube cae a TEAM (no queda vacío)");
     const html = e.doc.getElementById("ordenMecanico").innerHTML; assert.ok(!/data-perfil-id/.test(html), "ninguna opcion lleva perfilId");
     assert.ok(e.evaluar("TEAM").every((t) => t.perfilId === undefined));
   });
-  test("GAP-PROD-2: los datos del taller son LOCALES a cada dispositivo — ningun archivo del runtime lee ni escribe tablas de negocio en Supabase (solo «perfiles» en auth.js); por eso este QA NO puede probar un flujo admin→mecanico entre dispositivos", () => {
+  /* GAP-PROD-2 (3.13.0: datos solo locales) QUEDA CERRADO en 3.14.0: la guarda de 3.13.0 sigue vigente sobre el tag (este mismo
+     archivo en v3.13.0). Aquí, el contrato de 3.14.0: las tablas de negocio viajan SOLO por el cliente de sincronización
+     (sync-*.js, import-313.js, por PostgREST con token y RLS); app.js, usuarios.js, recovery.js y auth.js siguen sin tocar
+     tablas de negocio directo: solo «perfiles» (auth.js y la lista de mecánicos reales de app.js). */
+  test("GAP-PROD-2 (3.14.0): la nube se usa SOLO por el cliente de sincronización; fuera de él, únicamente «perfiles» (auth.js y app.js) y ninguna RPC directa", () => {
     const usos = []; for (const f of ["app.js", "usuarios.js", "recovery.js", "auth.js", "supabase-client.js"]) for (const m of leer(f).matchAll(/\.tabla\(\s*["']([a-z_]+)["']\s*\)/g)) usos.push(`${f}:${m[1]}`);
-    assert.deepEqual(usos, ["auth.js:perfiles"]); assert.ok(!/\.tabla\(|SupabaseCliente\.rpc\(/.test(leer("app.js")));
+    assert.deepEqual(usos.sort(), ["app.js:perfiles", "auth.js:perfiles"]); assert.ok(!/SupabaseCliente\.rpc\(/.test(leer("app.js")), "app.js no llama RPC por SupabaseCliente");
+    for (const f of ["sync-rest.js", "sync-engine.js", "sync-finanzas.js", "sync-mappers.js", "import-313.js"]) assert.ok(fs.existsSync(path.join(RUNTIME, f)), f);
   });
 });

@@ -6,6 +6,9 @@
 //   aviso final (1200 ms despues)      «Todo sincronizado»                                    → «Cambios guardados localmente»
 // Unica mencion restante de «sincroniz…» con texto visible: la nota HONESTA de Mi Trabajo («…estará disponible en una versión posterior»).
 // Unica cadena de codigo restante: la rama de renderSyncChip() bajo `HAY_SERVIDOR = true`, INALCANZABLE hoy (const false; retorno previo).
+// 3.14.0: este es el CONTRATO de la release 3.13.0 → se ejecuta, sin cambiar una sola aserción, contra la instantánea inmutable
+// del tag v3.13.0 (helpers/usar-313.mjs, PRIMER import). El contrato vigente de 3.14.0 está en su archivo hermano (3.14.0 / 16b / 17b).
+import "./helpers/usar-313.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

@@ -4,46 +4,45 @@ Sistema de gestión para un taller de motocicletas. Recibe la moto, la sigue por
 seis etapas de reparación, cobra, controla el inventario, lleva la caja y los
 créditos, y le manda al cliente su factura por WhatsApp.
 
-**Versión actual:** 3.13.0 · **Esquema de datos:** IndexedDB v6
+**Versión actual:** 3.14.0 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
 
 ---
 
-## Alcance de 3.13.0: identidad, acceso y roles
+## Alcance de 3.14.0: el taller en la nube
 
-La 3.13.0 añade **cuentas, roles y acceso multiusuario** al sistema de siempre. No cambia
-dónde viven los datos del taller.
+La 3.14.0 lleva los **datos del taller a Supabase**: todos los dispositivos con sesión ven lo mismo.
+Sigue funcionando sin señal: lo que se hace sin conexión queda en una cola y se envía al volver la red.
 
 **Incluye**
 
-- Autenticación por cuentas (Supabase Auth): correo y contraseña, sesión que se restaura al abrir.
-- Roles: administrador, cajero, mecánico y desarrollador.
-- Administración de usuarios desde la pantalla «Usuarios y equipo» (solo administrador).
-- **ENTIMOTORS Mi Trabajo**: producto separado, con su propio origen, para el acceso de mecánicos.
-- Alta sin contraseña con enlace de un solo uso.
-- **Recuperación de contraseña mediada por el administrador:** «Usuarios y equipo» → «Generar enlace»
-  → compartir el enlace con la persona (ver más abajo). No hay recuperación por correo ni autoservicio.
-- `activo=false` falla cerrado: una cuenta dada de baja no abre ninguna base de datos.
-- Endurecimiento de seguridad y correcciones de la fase de QA (ver `CHANGELOG.md`).
-- PWA con caché propia `entimotors-v3.13.0` y actualización controlada.
+- Todo lo de 3.13.0 (cuentas, roles, Mi Trabajo, recuperación mediada, `activo=false` falla cerrado).
+- **Sincronización entre dispositivos** de clientes, motos, citas, cotizaciones, inventario, órdenes y dinero
+  (ventas, créditos, abonos, caja) por operaciones transaccionales e idempotentes en el servidor.
+- **Asignación real de trabajo** a cuentas de mecánico; Mi Trabajo recibe sus órdenes y sube sus fotos.
+- **PIN administrativo** para operaciones sensibles (anulaciones, ajustes).
+- «⚠ Por revisar»: rechazos, conflictos y dependencias a la vista; nada se pierde en silencio.
+- **Importador 3.13 → nube** (Ajustes o aviso en la página principal, solo administrador): vista previa,
+  confirmación, importación atómica y verificación. El teléfono y el archivo **no se borran**.
+- Con sesión de nube **no hay datos de ejemplo** ni «Restaurar»/«Empezar de cero».
+- PWA con caché propia `entimotors-v3.14.0` y actualización controlada.
 
 **No incluye** (limitaciones conocidas, ver más abajo)
 
-- Asignación real de trabajo del administrador a una **cuenta** de mecánico.
-- Transporte de órdenes o citas hacia Mi Trabajo.
-- Sincronización entre dispositivos ni datos operativos compartidos por Supabase.
+- Subir las fotos que la 3.13 guardó dentro del teléfono.
+- Asignar automáticamente a cuentas las órdenes históricas de la 3.13 (se asignan a mano).
 
 ---
 
 ## Cómo funciona hoy
 
-Es una **aplicación web instalable (PWA)** que corre **entera dentro del teléfono o
-la computadora** y **funciona sin internet**: el taller no se detiene cuando se cae la señal.
-Solo necesitan red iniciar sesión con correo, la recuperación de cuenta y la pantalla de usuarios.
+Es una **aplicación web instalable (PWA)**: se instala en el teléfono o la computadora y **funciona sin
+internet** con la última copia descargada. Con sesión de nube, la fuente de verdad es **Supabase**;
+el dispositivo guarda una caché (`entimotors_sync`) y una cola de cambios pendientes que se envía sola
+al volver la red. El dinero y el stock solo cambian por operaciones del servidor (nunca a mano en el
+dispositivo), y la base impone invariantes (stock = movimientos, saldo = total − abonos).
 
-Toda la información operativa (clientes, motos, órdenes, citas, ventas, caja, créditos,
-inventario…) se guarda en **IndexedDB, en el dispositivo**. Esa decisión es también su
-límite principal: si se borra la aplicación o se pierde el teléfono, los datos se van con él.
-Por eso el sistema insiste tanto con las copias de seguridad (Ajustes → respaldo y restauración).
+La base local de la 3.13 (`entimotors_os_demo`) **no se borra**: sus datos se pasan a la nube con el
+importador y quedan en el teléfono como respaldo de la transición.
 
 ### Lo que hace
 
@@ -71,8 +70,8 @@ auditoría y seis documentos imprimibles que se pueden enviar como imagen o PDF.
 
 | Producto | Quién entra | Caché | Base local |
 |---|---|---|---|
-| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.13.0` | `entimotors_os_demo` |
-| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.13.0` | `entimotors_os_demo_mec_<id del perfil>` |
+| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.14.0` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
+| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.14.0` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
 
 Se publican en **dos orígenes distintos** (la política de mismo origen del navegador es la que
 separa sus datos). `build-target.js` declara qué producto es cada copia y **lo decide el build,
@@ -103,9 +102,9 @@ cuenta con `activo=false` no entra.
 
 > **Qué protege el servidor y qué no.** La administración de **cuentas** (crear, cambiar rol, dar de
 > baja) la protege el servidor: el api-server revalida el token y el perfil en cada petición y las
-> políticas de la base hacen el resto. Los **datos operativos** viven en IndexedDB, en el
-> dispositivo, y están sujetos a los controles de la aplicación: IndexedDB no tiene políticas de
-> seguridad, y lo que llegue al dispositivo se puede leer con las herramientas del navegador.
+> políticas de la base hacen el resto. Los **datos operativos** los protege la base (RLS por rol y
+> funciones del servidor para dinero, stock y avances del mecánico). Lo que llega a la caché del
+> dispositivo se puede leer con las herramientas del navegador: por eso cada rol solo descarga lo suyo.
 
 ---
 
@@ -173,27 +172,28 @@ No pegues contraseñas, claves ni enlaces en chats, capturas ni en el repositori
 
 ---
 
-## Limitaciones conocidas de 3.13.0
+## Limitaciones conocidas de 3.14.0
 
-Estas limitaciones **no son bugs corregidos**: son lo que 3.13.0 no hace.
+Estas limitaciones **no son bugs corregidos**: son lo que 3.14.0 no hace.
 
-- **No incluye asignación de trabajo a cuentas de mecánico.** El selector «Mecánico asignado» usa
-  la lista local `TEAM` (por nombre); no está vinculado a las cuentas de Supabase.
-- **No incluye sincronización entre dispositivos.** Lo que se hace en un dispositivo no aparece en otro.
-- **Mi Trabajo no recibe órdenes ni citas desde otro dispositivo todavía.** Es el acceso de los
-  mecánicos, y así lo dice la propia pantalla; sus listas solo mostrarían trabajo que ya estuviera
-  en ese mismo dispositivo.
-- **Los datos operativos permanecen locales en IndexedDB.** No se leen ni se escriben en Supabase:
-  la aplicación solo usa Supabase para cuentas (`perfiles` y las funciones de rol).
+- **Las fotos que la 3.13 guardó dentro del teléfono no se suben a la nube.** Se quedan en el
+  respaldo y en el teléfono; las fotos nuevas de Mi Trabajo sí van a la nube.
+- **Las órdenes importadas de la 3.13 llegan sin cuenta de mecánico.** El nombre se conserva como
+  texto; el administrador asigna a mano las órdenes abiertas. En el reporte de producción, el nombre
+  antiguo puede verse en una fila aparte de la cuenta nueva.
+- **Un respaldo 3.13 con los datos de «Ver un ejemplo» no se importa.** El importador lo rechaza
+  entero: los datos de ejemplo nunca llegan a la nube del taller.
+- **La importación 3.13 es una sola vez y exige la nube vacía.** Nada se mezcla ni se duplica.
+- **El PIN administrativo requiere `ADMIN_PIN_PEPPER` en el servidor**; sin él, esas operaciones responden
+  «no disponible» y quedan apagadas.
+- **El Taller no muestra las fotos que sube el mecánico.**
 - **Cerrar sesión en otra pestaña no es inmediato.** La sesión abierta en otra pestaña no se invalida
-  visualmente hasta que se recarga; el servidor sí vuelve a comprobar cada acción de administración.
+  visualmente hasta que se recarga; el servidor sí vuelve a comprobar cada acción.
 - **La administración de usuarios requiere configurar `apiUrl`** (arriba; ya viene con el backend
   de producción y se comprueba antes de publicar).
 - **No hay recuperación por correo ni autoservicio.** La recuperación de una persona la genera el
   administrador («Generar enlace»).
 - **La cuenta administradora se recupera desde el panel de Supabase**, no desde la aplicación.
-
-La sincronización y la asignación de trabajo a cuentas quedan para una versión posterior.
 
 ---
 
@@ -262,13 +262,18 @@ Al cambiar el código hay que subir el número de versión en **todos** estos si
 se queda con la copia vieja:
 
 1. `app.js` → `const VERSION_APP`.
-2. `index.html` → las **8** etiquetas `<script src="…?v=X.Y.Z">` (`build-target`, `supabase-config`,
-   `supabase-client`, `auth`, `recovery`, `config-local`, `app` y `usuarios`).
-3. `sw.js` → `CACHE_NAME` y las **7** entradas versionadas de `SHELL`.
+2. `index.html` → las **16** etiquetas `<script src="…?v=X.Y.Z">` (`build-target`, `supabase-config`,
+   `supabase-client`, `auth`, `recovery`, `config-local`, `sync-rest`, `sync-db`, `sync-engine`,
+   `sync-mappers`, `sync-fotos`, `sync-finanzas`, `pin-ui`, `import-313`, `app` y `usuarios`).
+3. `sw.js` → `CACHE_NAME` y las **15** entradas versionadas de `SHELL` (todas menos `config-local`).
 4. `panel-tecnico.html` → el literal visual de la versión (cosmético: no afecta a la caché).
 
+No se toca `versionApp: "3.13.0"` de `armarRespaldoLocal313` (app.js): identifica el formato de los
+datos de la 3.13, no la versión de la app.
+
 El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z`: no se edita a mano.
-`pruebas/multiusuario/01-pwa-3.13.0.test.mjs` comprueba la coherencia de todo esto.
+`pruebas/multiusuario/01-pwa-3.14.0.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.13.0` la del
+release 3.13.0 sobre la instantánea inmutable del tag `v3.13.0`).
 
 ---
 
@@ -286,8 +291,8 @@ El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z
 
 ## Estado
 
-3.13.0 está lista para un **piloto con cuentas y roles**, con los datos del taller **locales a cada
-dispositivo** y respaldo semanal guardado fuera del teléfono. **Todavía no** para trabajo compartido
-entre varios dispositivos: eso llega con la sincronización.
+3.14.0 es el **release de la nube**: datos compartidos entre dispositivos, asignación real de trabajo y
+el importador para traer los datos de la 3.13. El orden de publicación es **base de datos → backend →
+frontends**; la 3.13 sigue funcionando contra la base nueva (rollback de código sin tocar la base).
 
 Ver [`CHANGELOG.md`](CHANGELOG.md) para el detalle de cada versión.

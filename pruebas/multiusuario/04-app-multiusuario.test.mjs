@@ -207,10 +207,11 @@ describe("Guardas de identidad y de gestion", () => {
     assert.deepEqual(JSON.parse(JSON.stringify(con(MEC_SB).win.asignacionDelUsuarioActual())), { mecanico: MEC_SB.nombre, mecanicoId: MEC_SB.perfilId });
     assert.deepEqual(JSON.parse(JSON.stringify(con(null).win.asignacionDelUsuarioActual())), { mecanico: "", mecanicoId: null });
   });
-  test("poblarSelectMecanico: quien no puede asignar NO ve el selector (queda «Sin asignar»); el admin lo ve poblado y escapado", () => {
+  // 3.14.0 (SYNC-6): poblarSelectMecanico es async (espera la lista real de mecánicos de la nube) → se espera antes de afirmar
+  test("poblarSelectMecanico: quien no puede asignar NO ve el selector (queda «Sin asignar»); el admin lo ve poblado y escapado", async () => {
     const e = con(CAJERO); const sel = e.doc.getElementById("ordenMecanico");
-    e.win.poblarSelectMecanico("ordenMecanico"); assert.equal(sel.style.display, "none"); assert.equal(sel.innerHTML, '<option value="">Sin asignar</option>'); assert.equal(sel.value, "");
-    const a = con(ADMIN_SB); a.win.poblarSelectMecanico("ordenMecanico");
+    await e.win.poblarSelectMecanico("ordenMecanico"); assert.equal(sel.style.display, "none"); assert.equal(sel.innerHTML, '<option value="">Sin asignar</option>'); assert.equal(sel.value, "");
+    const a = con(ADMIN_SB); await a.win.poblarSelectMecanico("ordenMecanico");
     assert.match(a.doc.getElementById("ordenMecanico").innerHTML, /Mecánico 1/);
   });
   test("openClienteDetalle: el mecanico con cuenta NO abre la ficha del cliente y ni siquiera lee la base", async () => {

@@ -1,0 +1,32 @@
+{
+ "app.js": [
+  "async function guardarSincronizado(store, value) {",
+  "return guardarSincronizado(store, value);",
+  "if (ev.tipo === \"auth-requerida\" && !avisoSesion) { avisoSesion = true; toast(\"Tu sesión caducó: vuelve a iniciar sesión para sincronizar. Lo pendiente se conserva en este dispositivo.\", \"off\"); }",
+  "toast(`Un cambio de «${ENTIDAD_LEGIBLE[ev.datos.entidad] || ev.datos.entidad}» no se pudo sincronizar: revísalo en ⚠ Por revisar`, \"off\");",
+  "if (ev.tipo === \"rechazada\" && ev.datos?.entidad === \"ordenes\" && !esMecanicoCuenta()) toast(\"Un cambio de una orden no se pudo sincronizar: revísalo en ⚠ Por revisar\", \"off\");",
+  "toast(\"Una operación guardada sin conexión fue rechazada: \" + (ev.datos.error?.mensaje || \"revisa la cola de sincronización\"), \"off\");",
+  "if (r && r.detenido === \"auth\") toast(\"Tu sesión caducó: vuelve a iniciar sesión para sincronizar. Lo pendiente se conserva en este dispositivo.\", \"off\");",
+  "label.textContent = \"En línea · sincronizado\";",
+  "if (e.pausa === \"cuenta-inactiva\") texto = \"Cuenta inactiva · no se sincroniza\";",
+  "else if (e.pausa === \"auth\") texto = \"Sesión caducada · inicia sesión para sincronizar\";",
+  "else { texto = \"En línea · sincronizado\"; ok = true; }",
+  "return `<span class=\"mov-ligado\" title=\"${esc(movimientoEsBorrable(m) ? \"Pendiente de sincronizar\" : motivoNoBorrable(m))}\">🔒</span>`;"
+ ],
+ "sync-engine.js": [
+  "if (CLAVES_PROHIBIDAS.test(k)) throw new Error(\"La cola de sincronización no admite datos de autorización (\" + k + \").\");",
+  "var estadoVivo = { sincronizando: false, ultimaOk: null, ultimoError: null, ultimoPull: null };",
+  "var nuncaSincronizado = !previo || (!previo._base && !(previo._rev > 0));",
+  "if (nuncaSincronizado) {",
+  "if (apagado()) return { ok: false, clase: \"red\", codigo: \"APAGADO\", mensaje: \"La sincronización no está activa.\" };",
+  "estadoVivo.sincronizando = true; emitir(\"estado\", null);",
+  "} finally { estadoVivo.sincronizando = false; }",
+  "temporizadorEnvio = setTimeout(function () { temporizadorEnvio = null; sincronizar(); }, o.retardoEnvioMs === undefined ? 400 : o.retardoEnvioMs);",
+  "async function sincronizar() {",
+  "var alVolver = function () { if (!global.document || global.document.visibilityState === \"visible\") sincronizar(); };",
+  "intervalo = setInterval(function () { sincronizar(); }, o.cadaMs || 30000);",
+  "sincronizar();",
+  "return { habilitado: !apagado(), enLinea: !(global.navigator && global.navigator.onLine === false), sincronizando: estadoVivo.sincronizando, ultimaOk: estadoVivo.ultimaOk,",
+  "return { escribir: escribir, pull: pull, pullTodo: pullTodo, flush: flush, sincronizar: sincronizar, encolarRpc: encolarRpc, rpcInmediato: rpcInmediato, resolverConflicto: resolverConflicto,"
+ ]
+}

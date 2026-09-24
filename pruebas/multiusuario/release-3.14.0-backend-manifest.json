@@ -1,0 +1,327 @@
+{
+  "format": "entimotors-backend-freeze/1",
+  "version": "3.14.0",
+  "phase": "SYNC-12A-A",
+  "base_commit": "58dd31f5335ca43086262297820490221395bc42",
+  "branch": "feature/sync-3.14.0",
+  "scope": "api-server 3.14.0: PIN administrativo (rutas /admin/pin*, /autorizaciones), CORS selectivo y el dist/ regenerado",
+  "runtime_files": [
+    {
+      "path": "api-server/.env.example",
+      "sha256": "4ac99afcdba49e9622853c9e647c71304da19ae5d5084c097bb7de7724f2ef46",
+      "bytes": 4804
+    },
+    {
+      "path": "api-server/.gitignore",
+      "sha256": "0d74fb9ee14424e799b6856f4d44ecc118d4408780c8796cc8fe35cbf94868d4",
+      "bytes": 30
+    },
+    {
+      "path": "api-server/build.mjs",
+      "sha256": "a268757bc319f2ccaf2f2661d6616ea9cab3c8d8bc45b46b0ebfdb2bc6180267",
+      "bytes": 3455
+    },
+    {
+      "path": "api-server/package.json",
+      "sha256": "c96ef2412bd9c314aa2e6b0d0794c697d3c65fc8852b7c12d82af96c2736c6e2",
+      "bytes": 895
+    },
+    {
+      "path": "api-server/pnpm-lock.yaml",
+      "sha256": "12359dd3f72bf168f0b78aebdb2c57876fe47bbe52e05aece88d8e48ba4cb695",
+      "bytes": 44036
+    },
+    {
+      "path": "api-server/pnpm-workspace.yaml",
+      "sha256": "4c114032c79d06c2b5f280c94d893ab41e73b2d30d48b641fa24bde39cb086da",
+      "bytes": 1095
+    },
+    {
+      "path": "api-server/public/admin.html",
+      "sha256": "97850b17ae65caf57113d395ca91816de42f7297fde3deffee09c2ba23bbcbe5",
+      "bytes": 29535
+    },
+    {
+      "path": "api-server/public/catalogo.html",
+      "sha256": "41473ca09c900cf4c61a831984dac3f01ba75e5af3a4e8f9313ab4a7868aa0ea",
+      "bytes": 13993
+    },
+    {
+      "path": "api-server/public/img/logo2.webp",
+      "sha256": "6d0db088f7515dcfa041ac530ed9cddb7c128718a1802219bb7b60411bc1fdbc",
+      "bytes": 28748
+    },
+    {
+      "path": "api-server/public/img/logo_personal.webp",
+      "sha256": "b97cc3543ec0f4c996ad056ccf1b585c0e4b025876abbe840e512db9446bf8e7",
+      "bytes": 161976
+    },
+    {
+      "path": "api-server/public/index.html",
+      "sha256": "71e7555ab274b5eaf3d94e14fabc611175310185f4fff222ef242174960393ff",
+      "bytes": 16860
+    },
+    {
+      "path": "api-server/public/js/catalogo.js",
+      "sha256": "3ef95771f87848fc9d1314940f00d4c775f21d1147e8c31d3d6cfee524175fee",
+      "bytes": 4719
+    },
+    {
+      "path": "api-server/public/js/main.js",
+      "sha256": "68772965c490b9622cb81e8092adea799b3a220a8e25d21a7115b59a8d723682",
+      "bytes": 7395
+    },
+    {
+      "path": "api-server/public/js/seguro.js",
+      "sha256": "0e5a3cfe31eec35d47973c721aa6eeba5c0588bf1082a8d6efe3b9ed3b659e48",
+      "bytes": 5999
+    },
+    {
+      "path": "api-server/public/js/trabajos.js",
+      "sha256": "cc0ece773a11ff8402d492dd7624719e753cc1a56d1138725bb0185d14eb35a0",
+      "bytes": 6328
+    },
+    {
+      "path": "api-server/public/js/videos.js",
+      "sha256": "23270e29e121f3cc053fdc9ee4e0e13de1b26077b055bfe365622a74fff6b815",
+      "bytes": 4349
+    },
+    {
+      "path": "api-server/public/trabajos.html",
+      "sha256": "dcba39edd39d346805eeb8c347195c054b930bbf77309e20257a31cfc8932a84",
+      "bytes": 14444
+    },
+    {
+      "path": "api-server/public/videos.html",
+      "sha256": "40cb5171bf5be0ebfd9a863c48047b4142701a462359e64adfa77df8b17475d8",
+      "bytes": 12930
+    },
+    {
+      "path": "api-server/src/app.ts",
+      "sha256": "1e9efba81cf1631aa4bbef1cedcb10745945d8b8a1facc39fec79de6a23018e1",
+      "bytes": 1756
+    },
+    {
+      "path": "api-server/src/db/database.ts",
+      "sha256": "b9364842c19f5b7f77ce6504cb7b8c75d6a71458815abadafd7818b820b067d7",
+      "bytes": 168
+    },
+    {
+      "path": "api-server/src/index.ts",
+      "sha256": "9c1f296e0008006b40d766ee436697e43ef99cf907f2c7afe9a6cd2d6c118d3c",
+      "bytes": 511
+    },
+    {
+      "path": "api-server/src/lib/cors-origenes.ts",
+      "sha256": "085abe9b1a594c2a79f484b2bab4ad57f1ca808db176b750d5d028e38aeba0e9",
+      "bytes": 2659
+    },
+    {
+      "path": "api-server/src/lib/logger.ts",
+      "sha256": "86d76c70954229ef6432e425e49fd19f2940d7e79cb1e70b987fe9bd337593be",
+      "bytes": 703
+    },
+    {
+      "path": "api-server/src/lib/pin.ts",
+      "sha256": "c7ab6c0b44615c99afcf58307917652220df4aa934487aeb292d58a5bb770244",
+      "bytes": 14681
+    },
+    {
+      "path": "api-server/src/lib/proxy.ts",
+      "sha256": "5b06fcbdef210c5001ac4b31d242d72b52644f2cba925de2c2df876d16c13d57",
+      "bytes": 1387
+    },
+    {
+      "path": "api-server/src/lib/supabase.ts",
+      "sha256": "b2105c32f96d68c415964f0d0af943b1ad9e95923f2b737d1fb1b9edc22ee788",
+      "bytes": 475
+    },
+    {
+      "path": "api-server/src/lib/video-url.ts",
+      "sha256": "da22cdc950c8d1d4ecf865c64e8d34db5a51f261d9c68941ef353531f555b7cd",
+      "bytes": 7092
+    },
+    {
+      "path": "api-server/src/routes/admin-auth.ts",
+      "sha256": "cf329ad09b0b2b4dccde2e279bde761cbff3142265910eb0cfaebd696a5b1ed1",
+      "bytes": 8938
+    },
+    {
+      "path": "api-server/src/routes/admin-usuarios.ts",
+      "sha256": "98921e771f367ce6728fadc1767d552f0684b1004f8695d5d8bb18f3cb02b957",
+      "bytes": 26470
+    },
+    {
+      "path": "api-server/src/routes/health.ts",
+      "sha256": "c6bc3d5ec9506016f56b8edc8eb4ccfc75f5d1a71a55195e6c3a6d8dcec225df",
+      "bytes": 182
+    },
+    {
+      "path": "api-server/src/routes/index.ts",
+      "sha256": "12b6dcfe92934ed089e013d5630cf65258821e0ec9176890d713f5b41ad862b9",
+      "bytes": 839
+    },
+    {
+      "path": "api-server/src/routes/pin.ts",
+      "sha256": "63f33a2a7b21005f1a227e6ec57b0d48625fa6b972101d2d1e528630250be9d6",
+      "bytes": 9558
+    },
+    {
+      "path": "api-server/src/routes/products.ts",
+      "sha256": "59b12cc1ce6cb19a86276dd8d1209e7c0263cc41ec37587bc99bc929edf785be",
+      "bytes": 2863
+    },
+    {
+      "path": "api-server/src/routes/projects.ts",
+      "sha256": "0d462e3cc5194f3928d0521ed0c6e28bfc06688ee57f6987b59c3524d9d8317b",
+      "bytes": 7457
+    },
+    {
+      "path": "api-server/src/routes/videos.ts",
+      "sha256": "f1e4ed8d954feb44865f4e533463eb81691bb58811042427e7e91197814f5bbf",
+      "bytes": 1892
+    },
+    {
+      "path": "api-server/tsconfig.json",
+      "sha256": "d0c83f11369bd09ad7b6767e0668184475b8fe89324713e4c6d6faf711532fee",
+      "bytes": 271
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/21-backend-enlace-recuperacion.test.mjs",
+      "sha256": "bed9a6bdec74e7c193ada852216bb51fa727629ed5757dd54371e95f54346e4e",
+      "bytes": 35219
+    },
+    {
+      "path": "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "sha256": "d77d4606722b07736fbe1dfb4014a47d95239e2044eb2fb7d791f2faf187d783",
+      "bytes": 17288
+    },
+    {
+      "path": "pruebas/multiusuario/24-backend-dist-enlace.test.mjs",
+      "sha256": "0ba26bde3dc3e6e2c0398743f0c44e651808b0de4c7464d7794db6a74e68345f",
+      "bytes": 15988
+    },
+    {
+      "path": "pruebas/multiusuario/26-manifest-3.14.0.test.mjs",
+      "sha256": "d9f724b7d62ff2c78f161da02721696d2ad1fa9060b4b9fec147c08ff848ff0f",
+      "bytes": 4075
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "sha256": "396b567f3b6c1c41d7f9709f0fd087d8b01cfdb8b482d8fdabe3cb59f2bbb2d3",
+      "bytes": 5177
+    },
+    {
+      "path": "pruebas/sync/node/pin-lib.test.mjs",
+      "sha256": "a2d0126529152faeee3f031100472fd9d764bb02229dd38c484778c38b0c2739",
+      "bytes": 16389
+    },
+    {
+      "path": "pruebas/sync/node/pin-logger.test.mjs",
+      "sha256": "b0194491e095d9fffbcf9aab63490ab405779bf0e3262a476d923a756423d9dd",
+      "bytes": 2264
+    },
+    {
+      "path": "pruebas/sync/node/pin-rutas.test.mjs",
+      "sha256": "818d046eddfc67b0dbf33e67f5e662d7065b5ab81c19e4db2999fd9a66d774ed",
+      "bytes": 17964
+    }
+  ],
+  "generated_build_artifacts": [
+    {
+      "path": "api-server/dist/index.mjs",
+      "sha256": "357d7262c3997720b1f8b92e7da42c7001bc8e40258e274967776ff467511e59",
+      "bytes": 2778523
+    },
+    {
+      "path": "api-server/dist/index.mjs.map",
+      "sha256": "91152987132a876d646783b1774586a60750e25004029ddbafdc4823f7a71a0e",
+      "bytes": 4466219
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs",
+      "sha256": "bf31ab01323cc0659d4f9ba5c6e8616cef088f9d2f1198463153105a16d2cd7b",
+      "bytes": 145134
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs.map",
+      "sha256": "ee2cf49dc3c693ea899aa6dd49b27b858c616f22d51a96760130210325d76c7f",
+      "bytes": 234391
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs",
+      "sha256": "cf71a8b7a8c0684fe283ebab253d95b2c5e795b15c26523d48149ce44121066f",
+      "bytes": 116870
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs.map",
+      "sha256": "7e31e5fbff959c8ae7e58c3f7f90de1740a253bee942c374f02dc220ff4f9777",
+      "bytes": 208647
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs",
+      "sha256": "47544f3c5b391f58bd37735de2cef81c561783b561fbd00dce9fa560a8eaa4c4",
+      "bytes": 156724
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs.map",
+      "sha256": "5a9763ecbf3940bf55c32b14524809e57784be4042d0c9bad4bcc2f0ab6b2a25",
+      "bytes": 262859
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs",
+      "sha256": "b490228463d2d47a57932bcbe6bb307af9c54d1b4f3953191e1077e791bb188d",
+      "bytes": 7459
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs.map",
+      "sha256": "9db59f00b9b60ea947471e8a27d98934dac9419be8b6e6332df4ce868ee80cc9",
+      "bytes": 12296
+    }
+  ],
+  "how_to_reproduce": "desde la raíz: npm install -g pnpm@12.3.4 && cd api-server && pnpm install && node ./build.mjs (el mismo Build Command de Render). La ruta absoluta de compilación queda incrustada en 6 archivos de dist/ (no es un secreto).",
+  "render": {
+    "verificado_por": "el usuario, en el panel de Render (SYNC-12A)",
+    "branch": "main",
+    "root_directory": "",
+    "build_command": "npm install -g pnpm@12.3.4 && cd api-server && pnpm install && node ./build.mjs",
+    "start_command": "node api-server/dist/index.mjs",
+    "pre_deploy_command": "",
+    "auto_deploy": "On Commit",
+    "ojo": "un push a main puede desplegar producción: PUSH = ACCIÓN DE PRODUCCIÓN",
+    "variables_requeridas": [
+      "PORT (la pone Render)",
+      "NODE_ENV=production",
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_KEY (secreta)",
+      "SUPABASE_ANON_KEY",
+      "ADMIN_PASSWORD (secreta)",
+      "ADMIN_PIN_PEPPER (secreta, NUEVA, ≥32)",
+      "ENTIMOTORS_ADMIN_ORIGIN",
+      "ENTIMOTORS_MECHANIC_ORIGIN"
+    ],
+    "variables_opcionales": [
+      "CORS_ORIGINS_EXTRA",
+      "TRUST_PROXY_SALTOS",
+      "LOG_LEVEL",
+      "PIN_TTL_SEGUNDOS",
+      "PIN_MAX_FALLOS_SOLICITANTE",
+      "PIN_MAX_FALLOS_GLOBAL",
+      "PIN_VENTANA_MIN",
+      "PIN_BLOQUEO_MIN",
+      "PIN_MAX_BLOQUEOS_24H",
+      "RENDER (la pone Render)"
+    ]
+  },
+  "verificaciones": {
+    "build_render_simulado": "PASS (copia limpia de HEAD, pnpm 12.3.4, lockfile sin cambios)",
+    "start_desde_la_raiz": "PASS (/api/healthz 200; rutas PIN 503 sin ADMIN_PIN_PEPPER, fail closed)"
+  },
+  "no_ejecutado": [
+    "render",
+    "supabase_real",
+    "sql_produccion"
+  ]
+}

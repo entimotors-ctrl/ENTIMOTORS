@@ -15,7 +15,12 @@ import { crearServidor, URL_SB, URL_API, ANON } from "./supabase-mock.mjs";
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 export const RAIZ = path.resolve(AQUI, "..", "..", "..");
-export const RUNTIME = path.join(RAIZ, "taller-demo");
+/* 3.14.0: las pruebas del CONTRATO de 3.13.0 (versionado, alcance y copia de esa release) se ejecutan contra la instantánea
+   inmutable del tag v3.13.0 (helpers/usar-313.mjs, importado PRIMERO por esas pruebas → ENTIMOTORS_RUNTIME_RAIZ). El resto,
+   contra el árbol de trabajo. Así las guardas de 3.13.0 siguen intactas y sin debilitar, y las de 3.14.0 van aparte. */
+export const RAIZ_RUNTIME = process.env.ENTIMOTORS_RUNTIME_RAIZ || RAIZ;
+export const ES_313 = RAIZ_RUNTIME !== RAIZ;
+export const RUNTIME = path.join(RAIZ_RUNTIME, "taller-demo");
 export const leer = (rel) => fs.readFileSync(path.join(RUNTIME, rel), "utf8");
 export const existe = (rel) => fs.existsSync(path.join(RUNTIME, rel));
 

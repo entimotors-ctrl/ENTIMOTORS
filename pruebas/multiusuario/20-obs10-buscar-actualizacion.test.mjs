@@ -116,7 +116,8 @@ describe("OBS-10 · el handler nuevo NO puede destruir nada (afirmado sobre el c
     const sw = sinComentarios(leer("sw.js"));
     assert.equal((sw.match(/skipWaiting\s*\(/g) || []).length, 1); assert.match(sw, /event\.data\?\.tipo === "activar-ya"\) \{ self\.skipWaiting\(\); return; \}/);
   });
-  test("la versión NO cambió: VERSION_APP 3.13.0", () => assert.match(APP, /const VERSION_APP = "3\.13\.0";/));
+  // OBS-10 no subió versión (era de 3.13.0); desde el release 3.14.0 la versión vigente es 3.14.0 (y 3.13.0 la vigila 01-pwa-3.13.0 sobre el tag)
+  test("la versión es la del release vigente: VERSION_APP 3.14.0", () => assert.match(APP, /const VERSION_APP = "3\.14\.0";/));
 });
 
 // ═════════════════════════════ COMPORTAMIENTO ═════════════════════════════

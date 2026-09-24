@@ -1,6 +1,9 @@
 // ALCANCE HONESTO de 3.13.0 (4E-C4-FIX) — «identidad, acceso y roles multiusuario»; NO trabajo compartido ni sincronizado.
 // Guardas de que la UI visible, el manifest de Mi Trabajo, el README y el CHANGELOG (1) no prometen asignacion ni sincronizacion que no existen,
 // (2) dicen expresamente las limitaciones y (3) siguen coherentes con el codigo (versiones, enlaces, cuentas de referencias).
+// 3.14.0: este es el CONTRATO de la release 3.13.0 → se ejecuta, sin cambiar una sola aserción, contra la instantánea inmutable
+// del tag v3.13.0 (helpers/usar-313.mjs, PRIMER import). El contrato vigente de 3.14.0 está en su archivo hermano (3.14.0 / 16b / 17b).
+import "./helpers/usar-313.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

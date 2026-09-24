@@ -9,11 +9,13 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { RUNTIME } from "./helpers/entorno.mjs";
-import { ejecutarServiceWorker, VERSION_ESPERADA } from "./helpers/pwa.mjs";
+import { ejecutarServiceWorker, VERSION_ESPERADA, CONTRATOS } from "./helpers/pwa.mjs";
 
 const SCRIPT = path.join(RUNTIME, "hacer-build-mecanicos.sh");
 const RAIZ_TMP = fs.mkdtempSync(path.join(os.tmpdir(), "entimotors-c3-build-"));
 const V = VERSION_ESPERADA;
+// cifras del contrato de la release (helpers/pwa.mjs): Mi Trabajo lleva las mismas etiquetas que el taller MENOS config-local.js
+const K = CONTRATOS[V], ETIQUETAS_MT = K.etiquetas - 1;
 let n = 0;
 const nuevoDir = (etiqueta) => path.join(RAIZ_TMP, `${etiqueta}-${++n}`);
 
@@ -36,13 +38,13 @@ function verificarBuild(dir) {
   const cn = [...sw.matchAll(/const CACHE_NAME = "([^"]+)"/g)].map((m) => m[1]);
   chk("CACHE_NAME", cn.length === 1 && cn[0] === `entimotors-mitrabajo-v${V}`, `CACHE_NAME=${JSON.stringify(cn)}`);
   const tags = [...index.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => ({ a: m[1], v: m[2] }));
-  chk("INDEX_QUERY_VERSIONES", tags.length === 7 && tags.every((t) => t.v === V), `?v= en index: ${tags.map((t) => `${t.a}?v=${t.v}`)}`);
+  chk("INDEX_QUERY_VERSIONES", tags.length === ETIQUETAS_MT && tags.every((t) => t.v === V), `?v= en index: ${tags.map((t) => `${t.a}?v=${t.v}`)}`);
   const shell = [...((/const SHELL = \[(.*?)\];/s.exec(sw) || [, ""])[1]).matchAll(/"(\.\/[^"]*)"/g)].map((m) => m[1]);
   const shellV = shell.filter((s) => s.includes("?v="));
-  chk("SHELL_QUERY_VERSIONES", shellV.length === 7 && shellV.every((s) => s.endsWith(`?v=${V}`)), `SHELL ?v=: ${shellV}`);
+  chk("SHELL_QUERY_VERSIONES", shellV.length === K.shellV && shellV.every((s) => s.endsWith(`?v=${V}`)), `SHELL ?v=: ${shellV}`);
   const mapa = new Map(tags.map((t) => [t.a, t.v]));
   chk("SHELL_COHERENTE_CON_INDEX", shellV.every((s) => mapa.get(s.slice(2).split("?v=")[0]) === s.split("?v=")[1]), "SHELL e index.html no coinciden");
-  chk("SHELL_RECURSOS_EXISTEN", shell.length === 12 && shell.filter((s) => s !== "./").every((s) => hay(s.slice(2).split("?")[0])), `faltan: ${shell.filter((s) => s !== "./" && !hay(s.slice(2).split("?")[0]))}`);
+  chk("SHELL_RECURSOS_EXISTEN", shell.length === K.shell && shell.filter((s) => s !== "./").every((s) => hay(s.slice(2).split("?")[0])), `faltan: ${shell.filter((s) => s !== "./" && !hay(s.slice(2).split("?")[0]))}`);
   chk("INDEX_SCRIPTS_EXISTEN", tags.length > 0 && tags.every((t) => hay(t.a)), `scripts de index inexistentes: ${tags.filter((t) => !hay(t.a)).map((t) => t.a)}`);
   chk("SHELL_CUBRE_LOS_SCRIPTS", tags.every((t) => shell.some((s) => s.split("?")[0] === "./" + t.a)), "scripts de index fuera del SHELL");
   const texto = app + sw + index;
@@ -82,13 +84,15 @@ describe("el script sobre el runtime real", () => {
 });
 
 describe("contenido del build de «Mi Trabajo»", () => {
-  test("CACHE_NAME = entimotors-mitrabajo-v3.13.0 (una sola vez) y ninguna referencia a 3.12.x", () => {
+  test("CACHE_NAME = entimotors-mitrabajo-v3.14.0 (una sola vez) y ninguna referencia a 3.12.x", () => {
     const sw = leerEn(destino, "sw.js"); assert.deepEqual([...sw.matchAll(/const CACHE_NAME = "([^"]+)"/g)].map((m) => m[1]), [`entimotors-mitrabajo-v${V}`]);
     for (const f of ["app.js", "sw.js", "index.html"]) assert.ok(!/3\.12\.[12](?![0-9])|entimotors-(mitrabajo-)?v3\.12\./.test(leerEn(destino, f)), f);
   });
-  test("los 7 <script ?v=> de index.html apuntan a 3.13.0 y el SHELL del service worker coincide", () => {
+  test("los 15 <script ?v=> de index.html (los 16 del taller sin config-local.js) apuntan a 3.14.0 y el SHELL del service worker coincide", () => {
     const idx = leerEn(destino, "index.html"); assert.deepEqual([...idx.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`).sort(),
-      ["app.js", "auth.js", "build-target.js", "recovery.js", "supabase-client.js", "supabase-config.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
+      ["app.js", "auth.js", "build-target.js", "import-313.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
+       "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-rest.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
+    assert.equal(ETIQUETAS_MT, 15);
   });
   test("index.html = el del taller SIN el bloque de config-local, con titulo y textos de «Mi Trabajo» (transformacion documentada del script)", () => {
     const src = leerEn(RUNTIME, "index.html");
@@ -124,12 +128,12 @@ describe("contenido del build de «Mi Trabajo»", () => {
     const sw = leerEn(destino, "sw.js"); const w = ejecutarServiceWorker({ sw });
     assert.equal(w.nombreCache(), `entimotors-mitrabajo-v${V}`); await w.instalar();
     assert.deepEqual(w.llamadas.abiertas, [`entimotors-mitrabajo-v${V}`]); assert.equal(w.llamadas.skipWaiting, 0, "skipWaiting automatico en install");
-    const shell = w.shell(); assert.equal(shell.length, 12);
+    const shell = w.shell(); assert.equal(shell.length, K.shell); assert.equal(K.shell, 20);
     for (const url of shell) { assert.ok(w.llamadas.fetch.some((f) => f.url === url && f.opciones?.cache === "no-store"), `no se precacheo ${url} con no-store`); if (url !== "./") assert.ok(fs.existsSync(path.join(destino, url.slice(2).split("?")[0])), `SHELL: ${url} no existe en el build`); }
   });
   test("al activarse, el service worker del build borra caches VIEJAS de Mi Trabajo, conserva la actual y llama clients.claim() sin skipWaiting", async () => {
-    const w = ejecutarServiceWorker({ sw: leerEn(destino, "sw.js"), cachesExistentes: ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", `entimotors-mitrabajo-v${V}`] }); await w.activar();
-    assert.deepEqual(w.llamadas.borradas.sort(), ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2"]); assert.deepEqual([...w.almacenes.keys()], [`entimotors-mitrabajo-v${V}`]);
+    const w = ejecutarServiceWorker({ sw: leerEn(destino, "sw.js"), cachesExistentes: ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0", `entimotors-mitrabajo-v${V}`] }); await w.activar();
+    assert.deepEqual(w.llamadas.borradas.sort(), ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0"]); assert.deepEqual([...w.almacenes.keys()], [`entimotors-mitrabajo-v${V}`]);
     assert.equal(w.llamadas.claim, 1); assert.equal(w.llamadas.skipWaiting, 0);
   });
 });

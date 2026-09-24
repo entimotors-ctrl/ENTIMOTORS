@@ -6993,7 +6993,7 @@ alHacerClicUnaVez(document.getElementById("btnForzarActualizacion"), buscarActua
    fecha e identificador, para que al restaurarlo se sepa exactamente de dónde
    salió y si el esquema es compatible. */
 
-const VERSION_APP = "3.13.0";
+const VERSION_APP = "3.14.0";
 const VERSION_RESPALDO = 2; // formato del archivo, no de la app
 
 async function armarRespaldo() {

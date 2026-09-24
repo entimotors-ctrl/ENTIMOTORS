@@ -1,4 +1,7 @@
 // PWA / cache 3.13.0: versionado coherente, SHELL, service worker (estatico Y ejecutado) y mutantes.
+// 3.14.0: este es el CONTRATO de la release 3.13.0 → se ejecuta, sin cambiar una sola aserción, contra la instantánea inmutable
+// del tag v3.13.0 (helpers/usar-313.mjs, PRIMER import). El contrato vigente de 3.14.0 está en su archivo hermano (3.14.0 / 16b / 17b).
+import "./helpers/usar-313.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import { leer } from "./helpers/entorno.mjs";

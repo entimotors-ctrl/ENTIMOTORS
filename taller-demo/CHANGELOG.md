@@ -1,5 +1,38 @@
 # Registro de cambios · ENTIMOTORS OS
 
+## 3.14.0 — candidato (septiembre de 2026, aún sin publicar)
+
+> **Alcance: el taller en la nube.** Los datos del taller pasan a Supabase y se comparten entre
+> dispositivos; el trabajo se asigna a cuentas reales de mecánico. Orden de publicación obligatorio:
+> base de datos (sync-1 → 2 → 3 → 3b → 3p → 5 → 6 → 7a → 9 → 10) → backend → frontends.
+
+### Nube y sincronización
+- Cliente de sincronización (`sync-rest.js`, `sync-db.js`, `sync-engine.js`, `sync-mappers.js`): caché local
+  `entimotors_sync`, cola de cambios que sobrevive cierres y cortes, reintento idempotente, conflictos a la vista.
+- Dinero y stock por operaciones transaccionales del servidor (`sync-finanzas.js`): ventas, créditos, abonos,
+  caja y reversos; invariantes verificadas por la base.
+- Mi Trabajo recibe sus órdenes y sube fotos a Storage (`sync-fotos.js`); asignación real a cuentas.
+- «⚠ Por revisar»: rechazos, dependencias y conflictos visibles, nunca en silencio.
+- PIN administrativo (`pin-ui.js` + api-server) para operaciones sensibles.
+
+### Migración desde 3.13
+- **Importador 3.13 → nube** (`import-313.js`, `sync-10-importacion.sql`): datos del teléfono o archivo de
+  respaldo → validación → vista previa → confirmación → importación atómica (todo o nada) → verificación.
+  Idempotente, una sola vez, exige la nube vacía; no borra `entimotors_os_demo` ni el archivo.
+- Con sesión de nube no se siembran datos de ejemplo, y «Restaurar»/«Empezar de cero» no están disponibles.
+
+### Correcciones
+- Una operación pendiente sobre una orden o cotización ya borrada deja de reintentarse para siempre:
+  se rechaza una vez y queda en «⚠ Por revisar».
+
+### PWA
+- Caché nueva **`entimotors-v3.14.0`** (Mi Trabajo: `entimotors-mitrabajo-v3.14.0`); las cachés anteriores
+  se borran al activar la versión nueva. Sin activación automática: el aviso de versión sigue pidiendo respaldo.
+
+### Limitaciones conocidas
+- Las fotos que la 3.13 guardó en el teléfono no se suben; las órdenes importadas llegan sin cuenta de
+  mecánico (el administrador asigna las abiertas); un respaldo con datos de «Ver un ejemplo» no se importa.
+
 ## 3.13.0 — candidato (septiembre de 2026, aún sin publicar)
 
 > **Alcance: identidad, acceso y roles multiusuario.** Esta versión añade cuentas, roles y

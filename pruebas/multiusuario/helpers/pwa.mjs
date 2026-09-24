@@ -2,9 +2,15 @@
 // `verificarPwa` es una funcion pura sobre textos: asi las pruebas pueden alimentarla con el runtime real
 // (debe pasar) y con MUTANTES en memoria (deben fallar por el id correcto). No escribe nada.
 import vm from "node:vm";
-import { leer, existe } from "./entorno.mjs";
+import { leer, existe, ES_313 } from "./entorno.mjs";
 
-export const VERSION_ESPERADA = "3.13.0";
+/* Contrato de versionado por release. 3.13.0: 8 etiquetas ?v=, 7 entradas versionadas del SHELL, 12 entradas en total.
+   3.14.0: + sync-rest, sync-db, sync-engine, sync-mappers, sync-fotos, sync-finanzas, pin-ui, import-313 → 16 / 15 / 20. */
+export const CONTRATOS = {
+  "3.13.0": { etiquetas: 8, shellV: 7, shell: 12 },
+  "3.14.0": { etiquetas: 16, shellV: 15, shell: 20 },
+};
+export const VERSION_ESPERADA = ES_313 ? "3.13.0" : "3.14.0";
 export const fuentesReales = () => ({ app: leer("app.js"), sw: leer("sw.js"), index: leer("index.html"), existe });
 
 function manejador(txt, evento) {
@@ -19,6 +25,8 @@ const sinComentarios = (s) => String(s || "").replace(/\/\/[^\n]*/g, "");
 
 export function verificarPwa({ app, sw, index, existe: hay }, version = VERSION_ESPERADA) {
   const R = [];
+  // exigir una versión sin contrato (p. ej. 3.12.2, control negativo) usa las cifras del runtime: falla por la VERSIÓN, que es lo que se prueba
+  const K = CONTRATOS[version] || CONTRATOS[VERSION_ESPERADA];
   const chk = (id, ok, detalle = "") => R.push({ id, ok: Boolean(ok), detalle: ok ? "" : detalle });
 
   const va = [...app.matchAll(/const VERSION_APP = "([^"]+)"/g)].map((m) => m[1]);
@@ -29,18 +37,18 @@ export function verificarPwa({ app, sw, index, existe: hay }, version = VERSION_
 
   const tags = [...index.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => ({ archivo: m[1], v: m[2] }));
   const malas = tags.filter((t) => t.v !== version).map((t) => `${t.archivo}?v=${t.v}`);
-  chk("INDEX_QUERY_VERSIONES", tags.length === 8 && !malas.length, `${tags.length} etiquetas ?v= (8 esperadas); distintas de ${version}: [${malas}]`);
+  chk("INDEX_QUERY_VERSIONES", tags.length === K.etiquetas && !malas.length, `${tags.length} etiquetas ?v= (${K.etiquetas} esperadas); distintas de ${version}: [${malas}]`);
   chk("INDEX_APP_Y_CONFIG_LOCAL", tags.some((t) => t.archivo === "app.js" && t.v === version) && tags.some((t) => t.archivo === "config-local.js" && t.v === version), "app.js y config-local.js deben llevar ?v=" + version);
 
   const shellTxt = (/const SHELL = \[(.*?)\];/s.exec(sw) || [, ""])[1];
   const shell = [...shellTxt.matchAll(/"(\.\/[^"]*)"/g)].map((m) => m[1]);
   const shellV = shell.filter((s) => s.includes("?v="));
-  chk("SHELL_QUERY_VERSIONES", shellV.length === 7 && shellV.every((s) => s.endsWith(`?v=${version}`)), `SHELL con ?v= distintas de ${version}: [${shellV.filter((s) => !s.endsWith("?v=" + version))}] (${shellV.length}/7)`);
+  chk("SHELL_QUERY_VERSIONES", shellV.length === K.shellV && shellV.every((s) => s.endsWith(`?v=${version}`)), `SHELL con ?v= distintas de ${version}: [${shellV.filter((s) => !s.endsWith("?v=" + version))}] (${shellV.length}/${K.shellV})`);
   const mapaIndex = new Map(tags.map((t) => [t.archivo, t.v]));
   const incoh = shellV.filter((s) => mapaIndex.get(s.slice(2).split("?v=")[0]) !== s.split("?v=")[1]);
   chk("SHELL_COHERENTE_CON_INDEX", !incoh.length, `SHELL y index.html no coinciden en: [${incoh}]`);
   const faltan = shell.filter((s) => s !== "./" && !hay(s.slice(2).split("?")[0]));
-  chk("SHELL_RECURSOS_EXISTEN", shell.length === 12 && !faltan.length, `${shell.length} entradas (12 esperadas); no existen: [${faltan}]`);
+  chk("SHELL_RECURSOS_EXISTEN", shell.length === K.shell && !faltan.length, `${shell.length} entradas (${K.shell} esperadas); no existen: [${faltan}]`);
   const enShell = new Set(shell.map((s) => s.split("?")[0]));
   const sinShell = tags.map((t) => t.archivo).filter((a) => a !== "config-local.js" && !enShell.has("./" + a));
   chk("SHELL_CUBRE_LOS_SCRIPTS", !sinShell.length, `scripts de index.html fuera del SHELL: [${sinShell}]`);

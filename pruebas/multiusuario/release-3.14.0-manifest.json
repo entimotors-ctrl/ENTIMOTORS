@@ -1,0 +1,456 @@
+{
+  "format": "entimotors-release-freeze/1",
+  "version": "3.14.0",
+  "phase": "SYNC-12A-A",
+  "base_commit": "58dd31f5335ca43086262297820490221395bc42",
+  "branch": "feature/sync-3.14.0",
+  "scope": "frontend 3.14.0 (repo B / GitHub Pages) y la base de Mi Trabajo (Netlify: hacer-build-mecanicos.sh sobre esta misma lista)",
+  "version_matrix": {
+    "VERSION_APP": "3.14.0",
+    "CACHE_NAME": "entimotors-v3.14.0",
+    "CACHE_NAME_MI_TRABAJO": "entimotors-mitrabajo-v3.14.0 (derivado por el build)",
+    "index_html_query_v": 16,
+    "sw_shell_query_v": 15,
+    "sw_shell_total": 20,
+    "panel_tecnico": "3.14.0",
+    "no_se_cambia": [
+      "app.js versionApp \"3.13.0\" (procedencia de los datos 3.13 del importador)",
+      "comentario histórico de sync-db.js"
+    ]
+  },
+  "runtime_files": [
+    {
+      "path": "taller-demo/app.js",
+      "sha256": "fd56c99ec141b5b1c7486ea6a51f55c2db7607e7044a5b8c5741705bc6af65ac",
+      "bytes": 435587
+    },
+    {
+      "path": "taller-demo/auth.js",
+      "sha256": "a7c6914beb933fb4340cf6592db41a5e5691265de3b617ef8d06bc5a17f5ffe7",
+      "bytes": 13643
+    },
+    {
+      "path": "taller-demo/build-mecanicos/_headers",
+      "sha256": "ae57bedbe84d365de9aa67f0f23d24806f5132b21a2c87a45b77c7d6dcb3bb73",
+      "bytes": 798
+    },
+    {
+      "path": "taller-demo/build-mecanicos/build-target.js",
+      "sha256": "ee3640821f2483b19fda1315c6b0012dd954a397ffdb092d40f5f62712c4bd1f",
+      "bytes": 208
+    },
+    {
+      "path": "taller-demo/build-mecanicos/manifest.json",
+      "sha256": "c26ed7840ee0250d7f6552ce8369d831dd82ba995fcc47274a3b5772c8f1deeb",
+      "bytes": 715
+    },
+    {
+      "path": "taller-demo/build-target.js",
+      "sha256": "b943b38532811fa50be5c7c4f7754cf194bc8af638be9d8189628b6e2714cdce",
+      "bytes": 1581
+    },
+    {
+      "path": "taller-demo/config-local.example.js",
+      "sha256": "8d4d1f6e616bb40adaf12d4931486000816affb359c6289b1561bc683bb496b2",
+      "bytes": 1002
+    },
+    {
+      "path": "taller-demo/hacer-build-mecanicos.sh",
+      "sha256": "794232b693bf0fbb144fc6f2e6f7768e39e10d4397cca55d13cbb94582da7eeb",
+      "bytes": 4311
+    },
+    {
+      "path": "taller-demo/icons/icon-192-maskable.png",
+      "sha256": "80b3d171e3325a207705b9c25993b0a0004d24ce6556e4f2051b9f210ccd7dee",
+      "bytes": 15141
+    },
+    {
+      "path": "taller-demo/icons/icon-192.png",
+      "sha256": "a0ba3b2bb2da6e77be89d9a8327585766b3a7d0fc617e6a09cff2646e2712803",
+      "bytes": 20035
+    },
+    {
+      "path": "taller-demo/icons/icon-512-maskable.png",
+      "sha256": "19da11c8bf669d79bbad194d8b0c5b147af8a360904b77fb77745198aaffcde7",
+      "bytes": 69811
+    },
+    {
+      "path": "taller-demo/icons/icon-512.png",
+      "sha256": "028475e77655b240c4457f94e386b93029b120d153bcd2a4c3ccafa538204175",
+      "bytes": 94548
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark-doc.png",
+      "sha256": "f3d57e4c3f4b5f3dbd3d9eabd8f9af0dea634f326c226e457459e4caf72a38fe",
+      "bytes": 162214
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark.png",
+      "sha256": "4aa40f666fe981c280729b08b575d885ba1850861b01f5186752dcaaa3bc1733",
+      "bytes": 311256
+    },
+    {
+      "path": "taller-demo/import-313.js",
+      "sha256": "a7d215034cece8ba1c55a2a7fa92f029a20d6aec3d6fc8b79a234ba2932cef2f",
+      "bytes": 37787
+    },
+    {
+      "path": "taller-demo/index.html",
+      "sha256": "959233f4924d10cee7b2cba40795f90e60b5f5b68372610ded318174698121f8",
+      "bytes": 259578
+    },
+    {
+      "path": "taller-demo/manifest.json",
+      "sha256": "0389761bd3de44a6c2fa3ca93623cd88b7348a397c691fe0334cbe2139c0ae75",
+      "bytes": 709
+    },
+    {
+      "path": "taller-demo/panel-tecnico.html",
+      "sha256": "84eeae848bf6a95322d8db617aa4b4790423734946d2c321db8666ee54ade0d7",
+      "bytes": 11497
+    },
+    {
+      "path": "taller-demo/pin-ui.js",
+      "sha256": "3a4c858cfbfc7d7d4ed57e6081d85b9167db52c672dce6f1434dbde548265b85",
+      "bytes": 12110
+    },
+    {
+      "path": "taller-demo/recovery.js",
+      "sha256": "ea74ae97d4c282bebc9e0e3372c3c4d233db6ef06f12df43a2b7cb145218beef",
+      "bytes": 13716
+    },
+    {
+      "path": "taller-demo/supabase-client.js",
+      "sha256": "c028a34290c00c13af4a417a8fe93b42a9bc58af5055cbcfda6b5c5903f12114",
+      "bytes": 12393
+    },
+    {
+      "path": "taller-demo/supabase-config.js",
+      "sha256": "d325f87a17be2f155be42c7b20c2e817213c8210150192f31e5e41b14f052437",
+      "bytes": 1694
+    },
+    {
+      "path": "taller-demo/sw.js",
+      "sha256": "5c72f925d061428306c5914a3972a252dc8b6557a195dc188af24d7dfee8ad39",
+      "bytes": 7509
+    },
+    {
+      "path": "taller-demo/sync-db.js",
+      "sha256": "f4ebc0e3c2898e00fd8fe653cac00a98d6fc71c83d7be4b0afb66950ab9a8eaa",
+      "bytes": 12728
+    },
+    {
+      "path": "taller-demo/sync-engine.js",
+      "sha256": "a711fcf2df963ebdeb4baec7aa9a9bc31b3c84aba7d75a71d55681f66a7bf9c6",
+      "bytes": 51450
+    },
+    {
+      "path": "taller-demo/sync-finanzas.js",
+      "sha256": "8425fa2c1b90bbab12864124a4936e3b24e88f7146c2b1d400c75b3eee1566fd",
+      "bytes": 16552
+    },
+    {
+      "path": "taller-demo/sync-fotos.js",
+      "sha256": "be12bfa015b9a7073c6f998b680f7bb4945a1633305e0693a5b70c0d6eb11929",
+      "bytes": 17836
+    },
+    {
+      "path": "taller-demo/sync-mappers.js",
+      "sha256": "de5bda0841e5502b59eaee380e60c3394b0c31616b7ce1ece317ee39d92050be",
+      "bytes": 29655
+    },
+    {
+      "path": "taller-demo/sync-rest.js",
+      "sha256": "b6f492351a4713df988b3a5f3b1ff9dec1f4735f51e8f3c54b92c2f79b34c587",
+      "bytes": 12152
+    },
+    {
+      "path": "taller-demo/usuarios.js",
+      "sha256": "c60286306ffe492452ce458be45086902a74523c7619789119069ec348ff5553",
+      "bytes": 22174
+    }
+  ],
+  "documentation_files": [
+    {
+      "path": "taller-demo/CHANGELOG.md",
+      "sha256": "5f1fff2d25b8b0d2462c52874bb3b645ac3529a540b7598cfd6e8f3d0657b525",
+      "bytes": 16951
+    },
+    {
+      "path": "taller-demo/README.md",
+      "sha256": "369249b2f14a9a39efe06ee54ac71207427b0ad93ea1798cdfb7d1b2abdbfe2b",
+      "bytes": 16907
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.13.0.test.mjs",
+      "sha256": "90d3d7d4327e5d1f718b98dda2850660a4c36e23e3c549b0d7e5d7feadc4f680",
+      "bytes": 7931
+    },
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.14.0.test.mjs",
+      "sha256": "976ecc75ee3358004d2f5c5cd2a9e798a687b32d5e6d7573fc62eff7cea3884d",
+      "bytes": 8495
+    },
+    {
+      "path": "pruebas/multiusuario/02-build-target.test.mjs",
+      "sha256": "e4965d6a879c7433bcbf7c5b8fd54fb4774ba67089998f52af62efffa45c4d12",
+      "bytes": 9497
+    },
+    {
+      "path": "pruebas/multiusuario/03-auth.test.mjs",
+      "sha256": "26be2f4e1ed4055c815d9b175252bdf18eeb1158aa536c392a172d52b9d9dbcb",
+      "bytes": 24559
+    },
+    {
+      "path": "pruebas/multiusuario/04-app-multiusuario.test.mjs",
+      "sha256": "a09ad1a1ddef16d4e1134827a635f13526539f3af6e01f87dd72edadfe1007e1",
+      "bytes": 40320
+    },
+    {
+      "path": "pruebas/multiusuario/04b-app-mutantes.test.mjs",
+      "sha256": "4c0d52237a2d352805e37cd9989736f59bbc3564656c2c4c4601f0d60d7fc409",
+      "bytes": 18252
+    },
+    {
+      "path": "pruebas/multiusuario/04c-app-regresion-comun.test.mjs",
+      "sha256": "5bbd6182be98adc1c27f3f14581211159c81df4d540754110bbd484c3c4505b0",
+      "bytes": 37123
+    },
+    {
+      "path": "pruebas/multiusuario/05-usuarios.test.mjs",
+      "sha256": "03155c988c909d27daf119a1e6fad96d048909250221c7575b6d72032148dc56",
+      "bytes": 54277
+    },
+    {
+      "path": "pruebas/multiusuario/06-recovery.test.mjs",
+      "sha256": "d455ee5a95a2608fff538cca4c003e6fe1d53dd94b9b2239b5d2dd4e57fadfc9",
+      "bytes": 32517
+    },
+    {
+      "path": "pruebas/multiusuario/07-panel-tecnico.test.mjs",
+      "sha256": "545eaaf0866737cc65598a29f54f2bc2ad6524fcb82cdc1149f46df34c012131",
+      "bytes": 16911
+    },
+    {
+      "path": "pruebas/multiusuario/08-build-mecanicos.test.mjs",
+      "sha256": "46fa096d13864ddb8bd477837920b91fdad292d190a725e224c160c6591ff1e6",
+      "bytes": 20533
+    },
+    {
+      "path": "pruebas/multiusuario/09-hallazgos.test.mjs",
+      "sha256": "d16f83905927e2ded7a4db4de735d846e73a75399afa279b5736aae6297591e3",
+      "bytes": 6807
+    },
+    {
+      "path": "pruebas/multiusuario/10-fsec1-mensajes-error.test.mjs",
+      "sha256": "d3150a8b823d31673595fc39b7e6aaf7948984b896e4d80ab6a1557798ffbaa0",
+      "bytes": 14790
+    },
+    {
+      "path": "pruebas/multiusuario/11-fsec2-rol-en-ajustes.test.mjs",
+      "sha256": "86b705e2e556c1e10c9370b293b316d6a339479dc30a469027e89b0cedc06041",
+      "bytes": 12992
+    },
+    {
+      "path": "pruebas/multiusuario/12-ffunc1-establecer-clave.test.mjs",
+      "sha256": "6d8c5e2cdbba1b7a5e0cb30d8287da4b302f9f83ac1098cc45836677947cb279",
+      "bytes": 18472
+    },
+    {
+      "path": "pruebas/multiusuario/13-obs3-eliminar-cita.test.mjs",
+      "sha256": "4461f964969e67e2d16a839a597350195b7b4fd76b3df9cb6e267087c80b3a16",
+      "bytes": 8275
+    },
+    {
+      "path": "pruebas/multiusuario/14-obs4-obs5-respuestas.test.mjs",
+      "sha256": "cd16db88f9a4d0445b633a6ec44f1aa5e2c7f0a7ca5a356040d048c5b7545468",
+      "bytes": 18121
+    },
+    {
+      "path": "pruebas/multiusuario/15-rol-desconocido-portero.test.mjs",
+      "sha256": "7dea481858abe8e40b1d17b059a2bc20c66bf8becd336600669d654395fb02c0",
+      "bytes": 10556
+    },
+    {
+      "path": "pruebas/multiusuario/16-alcance-honesto.test.mjs",
+      "sha256": "dfdd58d37d2fc0c3b7283bbb27fb69fde3454576f0190e494d6a289fa09d6aaf",
+      "bytes": 14046
+    },
+    {
+      "path": "pruebas/multiusuario/16b-alcance-3.14.test.mjs",
+      "sha256": "6cd1b2f6cc68971e48478342af5ea1d45aa75af54d55dc3e32c0d3910fda08b1",
+      "bytes": 5059
+    },
+    {
+      "path": "pruebas/multiusuario/17-copy-sin-sincronizacion.test.mjs",
+      "sha256": "6b394719854cbd9184ad650e180f1cbee146c03ce2a5bf632c6405e18feb4586",
+      "bytes": 14063
+    },
+    {
+      "path": "pruebas/multiusuario/17b-copy-sincronizacion-3.14.lista.json",
+      "sha256": "4f14d4bd924a94492de3b00e651fcd2573d1cf582b02e64b42ae2d368128ce30",
+      "bytes": 2856
+    },
+    {
+      "path": "pruebas/multiusuario/17b-copy-sincronizacion-3.14.test.mjs",
+      "sha256": "b403272e7ee4509ef87407271cc81aef6877691ea9c1d26991356185fdc0427f",
+      "bytes": 5026
+    },
+    {
+      "path": "pruebas/multiusuario/18-obs7-chip-usuario.test.mjs",
+      "sha256": "e455e7c8a585455e70b795d43d49a08348dd0efc5e21454376ebb26b5cf84e5f",
+      "bytes": 9836
+    },
+    {
+      "path": "pruebas/multiusuario/19-obs8-nuevo-usuario-arriba.test.mjs",
+      "sha256": "657c3562c130546d1a05b84584ed9eefe2955b3f437385ef49bd7ce4859ac8c2",
+      "bytes": 10983
+    },
+    {
+      "path": "pruebas/multiusuario/20-obs10-buscar-actualizacion.test.mjs",
+      "sha256": "97d112e316babe07ca6c403c9034ac4b0faa4c06d2ad003cd60382c6fda29fad",
+      "bytes": 28430
+    },
+    {
+      "path": "pruebas/multiusuario/21-backend-enlace-recuperacion.test.mjs",
+      "sha256": "bed9a6bdec74e7c193ada852216bb51fa727629ed5757dd54371e95f54346e4e",
+      "bytes": 35219
+    },
+    {
+      "path": "pruebas/multiusuario/22-obs9-recuperacion-mediada.test.mjs",
+      "sha256": "a2a4f4a6761dea60447f14e343daebd9007fb1cd80f6a1cd9d0fb3da8470f356",
+      "bytes": 13316
+    },
+    {
+      "path": "pruebas/multiusuario/23-backend-manifest.test.mjs",
+      "sha256": "d77d4606722b07736fbe1dfb4014a47d95239e2044eb2fb7d791f2faf187d783",
+      "bytes": 17288
+    },
+    {
+      "path": "pruebas/multiusuario/24-backend-dist-enlace.test.mjs",
+      "sha256": "0ba26bde3dc3e6e2c0398743f0c44e651808b0de4c7464d7794db6a74e68345f",
+      "bytes": 15988
+    },
+    {
+      "path": "pruebas/multiusuario/25-config-produccion-apiurl.test.mjs",
+      "sha256": "c401bb20737293697de380b62e8feec322f93b4c406a09dca01d1ae2599baa58",
+      "bytes": 10903
+    },
+    {
+      "path": "pruebas/multiusuario/26-manifest-3.14.0.test.mjs",
+      "sha256": "d9f724b7d62ff2c78f161da02721696d2ad1fa9060b4b9fec147c08ff848ff0f",
+      "bytes": 4075
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/mock-navegador.js",
+      "sha256": "9a48376d5c1be969927ede4413772113e9f243c5c219a6cbd94c1fca428c4371",
+      "bytes": 615
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/pagina.js",
+      "sha256": "9c8a9c4c49a59ba182d7a73e8234411b6143500c037918580fc4b2615f5d2239",
+      "bytes": 8726
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/prelude.js",
+      "sha256": "c15c46dd870fc9085c47ca5cbb40d7f8cd0c0b4c795525e890ab84367ee72061",
+      "bytes": 5473
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-app.js",
+      "sha256": "bb7a63a575fd84a95b931f27cd4a2ecc69b9d599f2c2afe9f6661ede472f836e",
+      "bytes": 55771
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-c7fixa.js",
+      "sha256": "d1fa10d3a37ad2bd99d5d88b820d8168c8156c670bba0505b23a0a5e821e410b",
+      "bytes": 22660
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-c7fixb.js",
+      "sha256": "e1bbd0bbc07b6eb902b4075fe3b243698320d4b5fbc3c86ab84e65c512198e75",
+      "bytes": 21084
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-mutantes.js",
+      "sha256": "f45467dc7fd92a386f8b4100c755b3a0db8c2cb2d9708e40a7ab33290fb40210",
+      "bytes": 6107
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-pwa.js",
+      "sha256": "3048152b4eb2b856da8fc246642ed5f6c67ad9dad01eb811698cdc1bf990d12d",
+      "bytes": 10635
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/backend-admin-usuarios.mjs",
+      "sha256": "6a443cce43656b9d60d9a2f6eee0f037fca7002d20f93f276f999ac625247e1a",
+      "bytes": 12821
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/congelado.mjs",
+      "sha256": "b335887b8fcd1a46b892bedf305a090c7d3af379964f4c9b16475b885cd103ab",
+      "bytes": 2228
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/dom.mjs",
+      "sha256": "01626e3c3c4cd18be371f712671700f6c4cbd7396d99e75793caf387bf929226",
+      "bytes": 9518
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/entorno.mjs",
+      "sha256": "41d62e24f1a57cd77477e55afaab8cd1f05ac881f56c60c943118e4ba77292a2",
+      "bytes": 11159
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/flujos.mjs",
+      "sha256": "adc5ac563da536d16db4c455a5cd24b145a579703e6c76571592acb29945ec6e",
+      "bytes": 4024
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/idb-falsa.mjs",
+      "sha256": "a0eb1b087831747a10d73a8265e1be8355f16fe9c6c85eeca973ac5eddf1cd3f",
+      "bytes": 2660
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/pwa.mjs",
+      "sha256": "f3f77d60fc4ee6e4bde55a2c5dd36d1ac8b0ba28f9f9cdadb329d40ab76c5301",
+      "bytes": 7701
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/supabase-mock.mjs",
+      "sha256": "c49d5a74df161b3442bbcf96d86b4f38e24c1b229b0d047f40c19bb5f67677c6",
+      "bytes": 12897
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/ts-a-js.mjs",
+      "sha256": "06b7a73747028bb7b551f2b189c86252144981d45f81f3472a420d8138c68738",
+      "bytes": 11688
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/usar-313.mjs",
+      "sha256": "03fbd0d2c24645a5f414f3f08ca0a99d6aee28550872403061365087170c1da5",
+      "bytes": 353
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "sha256": "396b567f3b6c1c41d7f9709f0fd087d8b01cfdb8b482d8fdabe3cb59f2bbb2d3",
+      "bytes": 5177
+    },
+    {
+      "path": "pruebas/multiusuario/verificar-config-produccion.mjs",
+      "sha256": "b7ce5742cd178906948a5651ab042fa24df3bc1144875131cc086a3e49e261b0",
+      "bytes": 5494
+    }
+  ],
+  "publicacion": {
+    "repo_b": "copiar EXACTAMENTE runtime_files (sin taller-demo/ delante) y comparar sha256; NUNCA rsync --delete",
+    "mi_trabajo": "bash taller-demo/hacer-build-mecanicos.sh <destino> → Netlify"
+  },
+  "no_ejecutado": [
+    "publicacion_repo_b",
+    "netlify",
+    "produccion"
+  ]
+}

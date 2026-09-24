@@ -90,7 +90,7 @@ describe("Separacion de apps: nombre de base, vistas y login local", () => {
     for (const u of [sAdminSB, sAdminLocal, sMecLocal, null]) assert.equal(con(u), "dashboard", JSON.stringify(u));
   });
   test("el CACHE del taller y el de mecanicos no se comparten (el build renombra el prefijo)", () => {
-    assert.match(leer("sw.js"), /const CACHE_NAME = "entimotors-v3\.13\.0";/);
+    assert.match(leer("sw.js"), /const CACHE_NAME = "entimotors-v3\.14\.0";/);   // 3.14.0 (3.13.0 lo vigila 01-pwa-3.13.0 sobre el tag)
     assert.match(leer("hacer-build-mecanicos.sh"), /s\/\^const CACHE_NAME = "entimotors-\/const CACHE_NAME = "entimotors-mitrabajo-\//);
   });
 });
