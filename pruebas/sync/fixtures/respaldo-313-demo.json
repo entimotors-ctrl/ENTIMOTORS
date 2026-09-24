@@ -1,0 +1,334 @@
+{
+ "version": 2,
+ "versionApp": "3.13.0",
+ "esquemaDB": 6,
+ "idRespaldo": "ENTI-2026-09-24-0WBM5H",
+ "exportadoEn": "2026-09-24T21:28:45.342Z",
+ "exportadoPor": "Admin Sintético",
+ "dispositivo": "generador-sintetico",
+ "conteos": {
+  "clientes": 3,
+  "motos": 3,
+  "ordenes": 3,
+  "inventario": 3,
+  "citas": 2,
+  "cotizaciones": 0,
+  "ventas_rapidas": 1,
+  "caja_movimientos": 3,
+  "creditos": 0,
+  "web_cms": 3,
+  "categorias_inv": 4,
+  "auditoria": 0
+ },
+ "totalRegistros": 25,
+ "data": {
+  "clientes": [
+   {
+    "nombre": "Carlos Reyes",
+    "telefono": "9704-1122",
+    "id": 5
+   },
+   {
+    "nombre": "Marlon Zúniga",
+    "telefono": "9988-3344",
+    "id": 6
+   },
+   {
+    "nombre": "Deysi Martínez",
+    "telefono": "9811-5566",
+    "id": 7
+   }
+  ],
+  "motos": [
+   {
+    "clienteId": 5,
+    "marca": "Honda",
+    "modelo": "CB190R",
+    "cilindraje": "190cc",
+    "placa": "HAX-4471",
+    "km": 8200,
+    "foto": null,
+    "mantenimiento": {
+     "fecha": "2026-09-27",
+     "tipo": "Cambio de aceite",
+     "recordatorioEnviado": false
+    },
+    "id": 4
+   },
+   {
+    "clienteId": 6,
+    "marca": "Suzuki",
+    "modelo": "GN125",
+    "cilindraje": "125cc",
+    "placa": "PAO-0912",
+    "km": 21500,
+    "foto": null,
+    "mantenimiento": null,
+    "id": 5
+   },
+   {
+    "clienteId": 7,
+    "marca": "Yamaha",
+    "modelo": "FZ150",
+    "cilindraje": "150cc",
+    "placa": "MDC-2201",
+    "km": 5400,
+    "foto": null,
+    "mantenimiento": null,
+    "id": 6
+   }
+  ],
+  "ordenes": [
+   {
+    "clienteId": 5,
+    "motoId": 4,
+    "estado": "presupuesto",
+    "falla": "Ruido metálico en la cadena y cuesta que agarre marcha.",
+    "items": [
+     {
+      "nombre": "Kit de arrastre",
+      "cantidad": 1,
+      "precio": 1450
+     },
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 350
+     }
+    ],
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": {
+     "notas": "Kit de arrastre desgastado, cambio recomendado.",
+     "horas": 2
+    },
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "mecanico": "Wilkin",
+    "creadoEn": 1790285325319,
+    "id": 7
+   },
+   {
+    "clienteId": 6,
+    "motoId": 5,
+    "estado": "recibido",
+    "falla": "Frenos chillan al frenar.",
+    "items": [],
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "mecanico": "Mecánico 1",
+    "creadoEn": 1790285325319,
+    "id": 8
+   },
+   {
+    "clienteId": 7,
+    "motoId": 6,
+    "estado": "entregado",
+    "falla": "Mantenimiento de rutina.",
+    "items": [
+     {
+      "nombre": "Aceite 20W-50 (litro)",
+      "cantidad": 1,
+      "precio": 180
+     },
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 150
+     }
+    ],
+    "fotos": [],
+    "aprobacion": {
+     "via": "local",
+     "en": 1790285325322
+    },
+    "diagnostico": {
+     "notas": "Todo en orden.",
+     "horas": 1
+    },
+    "reparacionNotas": "Cambio de aceite realizado.",
+    "calidadChecklist": {
+     "pruebaManejo": true,
+     "fugas": true,
+     "torque": true,
+     "limpieza": true
+    },
+    "mecanico": "Wilkin",
+    "creadoEn": 1790285325322,
+    "entregadoEn": 1790285325322,
+    "id": 9
+   }
+  ],
+  "inventario": [
+   {
+    "nombre": "Kit de arrastre",
+    "modelo": "CB190R",
+    "cantidad": 4,
+    "precio": 1450,
+    "precioVenta": 1450,
+    "costoCompra": 950,
+    "stockMinimo": 2,
+    "codigoBarras": "750100000012",
+    "categoriaId": 5,
+    "publicarEnWeb": true,
+    "id": 6
+   },
+   {
+    "nombre": "Aceite 20W-50 (litro)",
+    "modelo": "Todos",
+    "cantidad": 30,
+    "precio": 180,
+    "precioVenta": 180,
+    "costoCompra": 110,
+    "stockMinimo": 8,
+    "codigoBarras": "750100000029",
+    "categoriaId": 6,
+    "publicarEnWeb": true,
+    "id": 7
+   },
+   {
+    "nombre": "Pastillas de freno delanteras",
+    "modelo": "GN125",
+    "cantidad": 6,
+    "precio": 320,
+    "precioVenta": 320,
+    "costoCompra": 190,
+    "stockMinimo": 3,
+    "codigoBarras": "750100000036",
+    "categoriaId": 7,
+    "publicarEnWeb": false,
+    "id": 8
+   }
+  ],
+  "citas": [
+   {
+    "clienteId": 6,
+    "nombreTmp": "",
+    "telefonoTmp": "",
+    "fecha": "2026-09-25",
+    "hora": "10:00",
+    "motivo": "Revisión de frenos",
+    "mecanico": "Wilkin",
+    "origen": "interna",
+    "recordatorioEnviado": false,
+    "creadoEn": 1790285325322,
+    "id": 4
+   },
+   {
+    "clienteId": null,
+    "nombreTmp": "Héctor Padilla",
+    "telefonoTmp": "9600-7788",
+    "fecha": "2026-09-27",
+    "hora": "14:30",
+    "motivo": "Cotización de kit de arrastre",
+    "mecanico": "Wilkin",
+    "origen": "web",
+    "recordatorioEnviado": false,
+    "creadoEn": 1790285325323,
+    "id": 5
+   }
+  ],
+  "cotizaciones": [],
+  "ventas_rapidas": [
+   {
+    "items": [
+     {
+      "inventarioId": 7,
+      "nombre": "Aceite 20W-50 (litro)",
+      "cantidad": 2,
+      "precio": 180,
+      "costoUnitario": 110,
+      "costoEstimado": false
+     }
+    ],
+    "clienteId": null,
+    "metodoPago": "efectivo",
+    "total": 360,
+    "efectivoRecibido": 360,
+    "cambio": 0,
+    "fechaISO": "2026-09-24T21:28:45.325Z",
+    "creadoEn": 1790285325325,
+    "mecanico": "Wilkin",
+    "id": 4
+   }
+  ],
+  "caja_movimientos": [
+   {
+    "tipo": "ingreso",
+    "categoria": "Servicio taller",
+    "monto": 330,
+    "metodoPago": "efectivo",
+    "descripcion": "Orden de taller #entregada",
+    "fechaISO": "2026-09-22T21:28:45.324Z",
+    "creadoEn": 1790112525324,
+    "id": 11
+   },
+   {
+    "tipo": "egreso",
+    "categoria": "Compra de repuestos",
+    "monto": 900,
+    "metodoPago": "efectivo",
+    "descripcion": "Reposición de aceite y pastillas",
+    "fechaISO": "2026-09-22T21:28:45.324Z",
+    "creadoEn": 1790112525324,
+    "id": 12
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Venta mostrador",
+    "monto": 360,
+    "metodoPago": "efectivo",
+    "descripcion": "Venta rápida #4",
+    "ventaId": 4,
+    "fechaISO": "2026-09-24T21:28:45.325Z",
+    "creadoEn": 1790285325325,
+    "id": 13
+   }
+  ],
+  "creditos": [],
+  "web_cms": [
+   {
+    "key": "landing_hero",
+    "titulo": "Tu moto en las mejores manos",
+    "subtitulo": "Repuestos, mantenimiento y reparación de motocicletas en Honduras"
+   },
+   {
+    "key": "promociones",
+    "items": [
+     "10% de descuento en cambio de aceite este mes"
+    ]
+   },
+   {
+    "key": "servicios_catalogo",
+    "items": [
+     "Diagnóstico general",
+     "Cambio de aceite",
+     "Frenos",
+     "Kit de arrastre"
+    ]
+   }
+  ],
+  "categorias_inv": [
+   {
+    "nombre": "Repuestos",
+    "id": 5
+   },
+   {
+    "nombre": "Aceites y lubricantes",
+    "id": 6
+   },
+   {
+    "nombre": "Frenos",
+    "id": 7
+   },
+   {
+    "nombre": "Accesorios",
+    "id": 8
+   }
+  ],
+  "auditoria": []
+ }
+}

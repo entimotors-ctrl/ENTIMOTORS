@@ -463,6 +463,7 @@ const ENTIDADES_SYNC = ["clientes", "motos", "citas", "categorias_inv", "inventa
    (sync-finanzas.js). Nunca hard-delete ni edición directa: se corrige con reversos. */
 const ENTIDADES_FINANCIERAS = ["ventas_rapidas", "creditos", "caja_movimientos"];
 let syncFin = null;
+let syncRest = null;   // SYNC-10: el mismo cliente REST del motor (token, refresco, clasificación) para el importador 3.13
 let syncBd = null;
 let syncMotor = null;
 function modoNubeActivo(store) {
@@ -632,7 +633,7 @@ const DB = {
    red, la app sigue funcionando 100% local como siempre (mismo espíritu que
    supabase-client.js). */
 async function prepararModoNube(session) {
-  syncMotor = null; syncBd = null; syncFin = null;
+  syncMotor = null; syncBd = null; syncFin = null; syncRest = null;
   if (!session || session.origen !== "supabase" || session.activo === false) return;
   if (!window.SyncDB || !window.SyncEngine || !window.SyncRest || !window.ENTIMOTORS_SYNC_MAPPERS) return;
   if (!window.SupabaseCliente || !SupabaseCliente.estado().activo) return;
@@ -647,6 +648,7 @@ async function prepararModoNube(session) {
     getToken: () => { const s = SupabaseCliente.sesion(); return s ? s.access_token : null; },
     refrescar: () => SupabaseCliente.refrescarSesion().then((r) => r.ok),
   });
+  syncRest = rest;
   syncMotor = SyncEngine.crearMotor({
     bd: syncBd, rest, mappers: window.ENTIMOTORS_SYNC_MAPPERS, orden: window.ENTIMOTORS_SYNC_ORDEN,
     sesion: () => (currentUser && currentUser.uid ? { uid: currentUser.uid } : null),
@@ -6882,6 +6884,12 @@ async function renderAjustes() {
     document.getElementById("ajustesVersion").textContent = activa ? activa.replace("entimotors-v", "") : "sin Service Worker";
   }
   pintarUltimoRespaldo();
+  // SYNC-10: con nube, «Restaurar» y «Empezar de cero» no aplican (ver sus manejadores); el importador 3.13 sí (admin)
+  const nube = demoProhibido();
+  document.getElementById("cardRestaurar").style.display = nube ? "none" : "";
+  document.getElementById("cardEmpezarDeCero").style.display = nube ? "none" : "";
+  document.getElementById("cardImport313").style.display = nube && currentUser?.rol === "admin" ? "" : "none";
+  if (nube && currentUser?.rol === "admin") pintarEstadoImport313();
 }
 
 /* ---- Buscar actualización ahora ----
@@ -7143,6 +7151,9 @@ document.getElementById("inputRestaurar").addEventListener("change", async (e) =
   const file = e.target.files[0];
   e.target.value = "";
   if (!file) return;
+  // SYNC-10: con nube, «Restaurar» mezclaría el archivo registro a registro con la base real (y el dinero ni siquiera se
+  // puede escribir así). Un respaldo de la 3.13 va por el importador: validado, atómico y sin duplicar.
+  if (demoProhibido()) { toast("Con la nube no se restaura aquí: usa «Pasar los datos de la versión 3.13 a la nube».", "off"); return; }
 
   let respaldo;
   try { respaldo = JSON.parse(await file.text()); }
@@ -7267,6 +7278,8 @@ alHacerClicUnaVez(document.getElementById("btnConfirmarRestaurar"), async () => 
 });
 
 document.getElementById("btnEmpezarDeCero").addEventListener("click", async () => {
+  // SYNC-10: con nube esto vaciaría entimotors_os_demo (los datos de la 3.13 que quizá aún no se importaron): nunca.
+  if (demoProhibido()) { toast("Con la nube no se borra nada desde este teléfono.", "off"); return; }
   const ok = await showConfirm(
     "Esto borra TODA la información guardada en este dispositivo: clientes, órdenes, ventas, caja, inventario, todo. No se puede deshacer.",
     { titulo: "Borrar todo y empezar de cero", textoOk: "Borrar todo" }
@@ -7283,6 +7296,217 @@ document.getElementById("btnEmpezarDeCero").addEventListener("click", async () =
   });
 });
 
+/* ================= SYNC-10 · pasar los datos de la 3.13 a la nube =================
+   La 3.13 guardaba todo SOLO en este teléfono (entimotors_os_demo). Con la 3.14 y sesión de nube, esos datos siguen ahí
+   pero ya no se ven (la app lee la nube): nunca deben quedar invisibles sin explicación. El administrador los pasa con
+   el importador (import-313.js): fuente → validación → vista previa (solo cantidades) → confirmación → UNA llamada
+   atómica → verificación. Nunca se borra el origen: ni entimotors_os_demo ni el archivo. La marca local
+   (enti_import_313) solo sirve para recuperarse si la app se cierra a mitad; la verdad la tiene el servidor. */
+const CLAVE_IMPORT_313 = "enti_import_313";
+const STORES_313_OPERATIVOS = ["clientes", "motos", "ordenes", "inventario", "citas", "cotizaciones", "ventas_rapidas", "caja_movimientos", "creditos", "categorias_inv"];
+let imp313 = null;   // { prep, origen }
+
+function leerMarcaImport313() { try { return JSON.parse(localStorage.getItem(CLAVE_IMPORT_313) || "null"); } catch (e) { return null; } }
+function guardarMarcaImport313(m) { try { localStorage.setItem(CLAVE_IMPORT_313, JSON.stringify(m)); } catch (e) { /* sin almacenamiento: el servidor sigue mandando */ } }
+const rpcImport313 = (nombre, params, o) => syncRest
+  ? syncRest.rpc(nombre, params, o)
+  : Promise.resolve({ ok: false, clase: "auth", codigo: "SIN_NUBE", mensaje: "No hay sesión de nube." });
+
+/* Lo que la 3.13 dejó en ESTE teléfono. En modo nube DB.getAll de estos stores lee la caché de la nube: aquí se lee
+   entimotors_os_demo directo, solo lectura. */
+async function contarDatosLocales313() {
+  if (!db || db.name !== BASE_TALLER) return 0;
+  let n = 0;
+  for (const s of STORES_313_OPERATIVOS) if (db.objectStoreNames.contains(s)) n += (await idbGetAll(s)).length;
+  return n;
+}
+/* El mismo formato que armarRespaldo() de la 3.13 (versión 2, esquema 6), leído SIEMPRE de entimotors_os_demo. */
+async function armarRespaldoLocal313() {
+  const data = {}, conteos = {};
+  for (const s of ALL_STORES) { data[s] = db.objectStoreNames.contains(s) ? await idbGetAll(s) : []; conteos[s] = data[s].length; }
+  const ahora = new Date().toISOString();
+  return {
+    version: VERSION_RESPALDO, versionApp: "3.13.0",   // los datos son los de la base v6 que escribió la 3.13
+    generadoPor: VERSION_APP, esquemaDB: db.version,
+    idRespaldo: `ENTI-${ahora.slice(0, 10)}-LOCAL313`, exportadoEn: ahora, exportadoPor: currentUser?.nombre || "—",
+    dispositivo: "este-telefono", conteos, totalRegistros: Object.values(conteos).reduce((a, b) => a + b, 0), data,
+  };
+}
+
+async function revisarDatos313() {
+  const el = document.getElementById("aviso313");
+  if (!el) return;
+  el.style.display = "none";
+  if (!demoProhibido() || esMecanicoCuenta()) return;
+  const marca = leerMarcaImport313();
+  if (marca?.estado === "terminado") return;
+  const n = await contarDatosLocales313();
+  if (!n && !["aplicado", "enviando"].includes(marca?.estado)) return;
+  const admin = currentUser?.rol === "admin";
+  let txt;
+  if (marca?.estado === "aplicado") txt = `<b>Los datos de la versión anterior ya están en la nube.</b> Revisa que todo cuadre y dala por terminada.`;
+  else if (marca?.estado === "enviando") txt = `<b>Una importación de los datos de la versión anterior quedó sin confirmar.</b> Ábrela para ver en qué quedó (nada queda a medias).`;
+  else txt = `<b>Este teléfono tiene ${n} registros de la versión anterior (3.13) que todavía no están en la nube.</b> No se han borrado: ${admin ? "pásalos a la nube para verlos aquí." : "pídele al administrador que los pase a la nube."}`;
+  el.innerHTML = txt + (admin ? ` <button type="button" class="btn small primary" id="btnAviso313" style="margin-top:0.5rem;">Revisar e importar</button>` : "");
+  el.style.display = "block";
+  document.getElementById("btnAviso313")?.addEventListener("click", () => abrirImport313());
+}
+
+async function pintarEstadoImport313() {
+  const el = document.getElementById("import313Estado");
+  if (!el) return;
+  const marca = leerMarcaImport313();
+  const n = await contarDatosLocales313();
+  el.textContent = marca?.estado === "terminado" ? `Importación terminada (${marca.idRespaldo || "respaldo"}). Los datos originales siguen en este teléfono.`
+    : marca?.estado === "aplicado" ? "Importado: falta revisar y darlo por terminado."
+    : marca?.estado === "enviando" ? "Hay una importación sin confirmar: ábrela para ver en qué quedó."
+    : n ? `Este teléfono tiene ${n} registros de la 3.13.` : "Este teléfono no tiene datos de la 3.13. También puedes usar un archivo de respaldo.";
+}
+
+function imp313Mostrar(id, html, clase) {
+  const el = document.getElementById(id);
+  if (html === null) { el.style.display = "none"; el.innerHTML = ""; return; }
+  el.style.display = "block"; el.innerHTML = html;
+  if (clase !== undefined) el.className = clase;
+}
+function imp313Reiniciar() {
+  imp313 = null;
+  document.getElementById("imp313Origen").textContent = "";
+  for (const id of ["imp313Resumen", "imp313Avisos", "imp313Destino", "imp313Resultado"]) imp313Mostrar(id, null);
+  document.getElementById("btnConfirmarImp313").style.display = "none";
+  document.getElementById("btnFinalizarImp313").style.display = "none";
+  document.getElementById("imp313Fuente").style.display = "";
+}
+
+async function abrirImport313() {
+  if (!demoProhibido() || currentUser?.rol !== "admin") { toast("Solo el administrador, con sesión de nube, importa los datos del taller.", "off"); return; }
+  imp313Reiniciar();
+  document.getElementById("btnImp313Local").style.display = (await contarDatosLocales313()) ? "" : "none";
+  document.getElementById("modalImport313").classList.add("active");
+  // recuperación tras un cierre: el servidor dice en qué quedó el lote (todo o nada, nunca a medias)
+  const marca = leerMarcaImport313();
+  if (marca?.lote && marca.estado !== "terminado") {
+    const e = await rpcImport313("import_estado", { p_lote: marca.lote });
+    if (e.ok && ["aplicado", "confirmado"].includes(e.datos?.estado)) {
+      guardarMarcaImport313({ ...marca, estado: e.datos.estado === "confirmado" ? "terminado" : "aplicado" });
+      await imp313Verificar(marca, "Los datos ya están en la nube (importación del " + esc(String(marca.en || "").slice(0, 10)) + ").");
+    } else if (e.ok) {
+      imp313Mostrar("imp313Resultado", "La importación anterior no llegó a aplicarse: no quedó nada a medias. Vuelve a elegir los datos para intentarlo otra vez.", "respaldo-estado");
+    } else {
+      imp313Mostrar("imp313Resultado", "No se pudo consultar la nube (" + esc(e.mensaje || "sin conexión") + "). Inténtalo con conexión.", "respaldo-estado mal");
+    }
+  }
+}
+
+async function imp313Verificar(marca, titulo) {
+  const t = await rpcImport313("import_totales", {});
+  const cmp = t.ok && marca.esperado ? Import313.compararTotales(marca.esperado, t.datos) : null;
+  imp313Mostrar("imp313Resultado", `<b>${titulo}</b><br>` + (cmp === null ? "No se pudo verificar ahora contra la nube."
+    : cmp.ok ? "✅ Verificado: clientes, órdenes, inventario, ventas, créditos, abonos y caja cuadran con el respaldo."
+    : "⚠️ No cuadra con el respaldo en: " + esc(cmp.diferencias.join(", ")) + ". No des por terminada la importación: pide ayuda técnica."), `respaldo-estado ${cmp?.ok ? "ok" : "mal"}`);
+  document.getElementById("imp313Fuente").style.display = "none";
+  document.getElementById("btnFinalizarImp313").style.display = cmp?.ok && leerMarcaImport313()?.estado === "aplicado" ? "" : "none";
+}
+
+async function imp313Cargar(respaldo, origen) {
+  imp313Reiniciar();
+  document.getElementById("imp313Origen").textContent = origen;
+  const prep = await Import313.preparar(respaldo);
+  if (prep.avisos?.length) imp313Mostrar("imp313Avisos", prep.avisos.map(esc).join("<br>"), "aviso-fuerte");
+  if (!prep.ok) {
+    imp313Mostrar("imp313Resumen", `<b>⚠️ Este respaldo no se puede importar. No se subió nada.</b><br>${prep.errores.map(esc).join("<br>")}`, "respaldo-estado mal");
+    return;
+  }
+  imp313 = { prep, origen, respaldo };
+  const c = prep.resumen.conteos;
+  const nombres = { clientes: "Clientes", motos: "Motos", ordenes: "Órdenes", productos: "Productos", categorias: "Categorías", citas: "Citas",
+    cotizaciones: "Cotizaciones", ventas: "Ventas", creditos: "Créditos", abonos: "Abonos", movimientosCaja: "Movimientos de caja" };
+  imp313Mostrar("imp313Resumen", `<b>Esto es lo que se pasaría a la nube:</b><div class="respaldo-conteos">${Object.keys(nombres)
+    .map((k) => `<span>${nombres[k]} <b>${c[k]}</b></span>`).join("")}</div>`, "respaldo-estado ok");
+  imp313Mostrar("imp313Destino", "Comprobando la nube…", "aviso-fuerte");
+  const d = await Import313.comprobarDestino(rpcImport313, prep.lote);
+  const yaEsta = ["aplicado", "confirmado"].includes(d.lote?.estado);
+  if (yaEsta) {
+    imp313Mostrar("imp313Destino", "Estos mismos datos ya se importaron antes: no se vuelven a subir.", "aviso-fuerte");
+    guardarMarcaImport313({ ...(leerMarcaImport313() || {}), lote: prep.lote, idRespaldo: prep.cabecera.idRespaldo, esperado: prep.esperado,
+      estado: d.lote.estado === "confirmado" ? "terminado" : "aplicado" });
+    await imp313Verificar(leerMarcaImport313(), "Ya importado.");
+  } else if (d.destino === "EMPTY") {
+    imp313Mostrar("imp313Destino", "La nube del taller está vacía: lista para recibir estos datos.", "aviso-fuerte");
+    document.getElementById("btnConfirmarImp313").style.display = "";
+  } else if (d.destino === "NON_EMPTY") {
+    imp313Mostrar("imp313Destino", "<b>La nube ya tiene datos del taller.</b> Por seguridad no se importa encima (no se mezclan ni se duplican datos). Revísalo con soporte técnico.", "aviso-fuerte peligro");
+  } else {
+    imp313Mostrar("imp313Destino", `No se pudo comprobar la nube (${esc(d.error?.mensaje || "sin conexión")}). Sin esa comprobación no se importa.`, "aviso-fuerte peligro");
+  }
+}
+
+document.getElementById("btnAbrirImport313").addEventListener("click", () => abrirImport313());
+document.getElementById("btnCerrarImp313").addEventListener("click", () => {
+  imp313 = null;
+  document.getElementById("modalImport313").classList.remove("active");
+  revisarDatos313();
+  if (demoProhibido() && currentUser?.rol === "admin") pintarEstadoImport313();
+});
+document.getElementById("btnImp313Local").addEventListener("click", async () => {
+  await imp313Cargar(await armarRespaldoLocal313(), "Datos de este teléfono (versión 3.13)");
+});
+document.getElementById("inputImp313").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  e.target.value = "";
+  if (!file) return;
+  if (file.size > Import313.LIMITE_BYTES) { imp313Reiniciar(); imp313Mostrar("imp313Resumen", "El archivo es demasiado grande para importarlo desde el teléfono.", "respaldo-estado mal"); return; }
+  const l = Import313.leerTexto(await file.text());
+  if (!l.ok) { imp313Reiniciar(); imp313Mostrar("imp313Resumen", `<b>⚠️ ${esc(l.errores[0])}</b> No se subió nada.`, "respaldo-estado mal"); return; }
+  await imp313Cargar(l.respaldo, `Archivo: ${file.name}`);
+});
+
+alHacerClicUnaVez(document.getElementById("btnConfirmarImp313"), async () => {
+  if (!imp313) return;
+  const { prep, respaldo } = imp313;
+  const total = Object.values(prep.resumen.conteos).reduce((a, b) => a + b, 0);
+  const ok = await showConfirm(`Se van a subir ${total} registros a la nube del taller, en una sola operación: o entra todo o no entra nada. Los datos de este teléfono y el archivo no se borran.`,
+    { titulo: "Importar a la nube", textoOk: "Importar" });
+  if (!ok) return;
+  if (!isOnline()) { toast("Sin conexión: la importación necesita internet. No se tocó nada.", "off"); return; }
+  // copia del origen ANTES de subir (el archivo elegido ya es su propia copia)
+  // (verificarRespaldo() no sirve aquí: en modo nube compara contra la nube, no contra entimotors_os_demo)
+  if (imp313.origen.startsWith("Datos de este teléfono")) {
+    descargarArchivo(`entimotors-3.13-antes-de-importar-${respaldo.exportadoEn.slice(0, 10)}.json`, JSON.stringify(respaldo));
+  }
+  const marca = { lote: prep.lote, huella: prep.huella, idRespaldo: prep.cabecera.idRespaldo, esperado: prep.esperado, en: new Date().toISOString(), estado: "enviando" };
+  guardarMarcaImport313(marca);
+  document.getElementById("btnConfirmarImp313").style.display = "none";
+  imp313Mostrar("imp313Resultado", "Subiendo… no cierres la app.", "respaldo-estado");
+  const r = await Import313.importar({ rpc: rpcImport313, preparado: prep, enLinea: () => isOnline(),
+    onPaso: (p) => imp313Mostrar("imp313Resultado", { destino: "Comprobando la nube…", iniciar: "Preparando…", aplicar: "Subiendo… no cierres la app.", verificar: "Verificando contra la nube…" }[p] || "…", "respaldo-estado") });
+  if (!r.ok) {
+    if (r.codigo !== "SIN_CONFIRMAR") guardarMarcaImport313({ ...marca, estado: "fallido" });
+    imp313Mostrar("imp313Resultado", `<b>⚠️ No se importó.</b> ${esc(r.mensaje)}`, "respaldo-estado mal");
+    if (r.reintentable || r.codigo === "SIN_RED") document.getElementById("btnConfirmarImp313").style.display = "";
+    return;
+  }
+  guardarMarcaImport313({ ...marca, estado: "aplicado" });
+  localStorage.setItem("enti_modo_datos", "blanco");
+  try { await syncMotor?.pullTodo(); } catch (e) { /* se reintenta solo al volver la red */ }
+  await imp313Verificar(leerMarcaImport313(), r.repetida ? "Estos datos ya estaban en la nube." : "¡Listo! Los datos de la 3.13 están en la nube.");
+  renderOrdersList(); renderClientes(); renderInventario(); renderDashboard();
+});
+
+alHacerClicUnaVez(document.getElementById("btnFinalizarImp313"), async () => {
+  const marca = leerMarcaImport313();
+  if (!marca?.lote) return;
+  const ok = await showConfirm("Darla por terminada cierra la importación: ya no se podrá deshacer ni volver a importar. Hazlo solo si revisaste que todo cuadra.",
+    { titulo: "Terminar la importación", textoOk: "Terminar" });
+  if (!ok) return;
+  const r = await rpcImport313("import_confirmar_lote", { p_lote: marca.lote });
+  if (!r.ok) { toast("No se pudo terminar: " + (r.mensaje || "sin conexión"), "off"); return; }
+  guardarMarcaImport313({ ...marca, estado: "terminado" });
+  document.getElementById("btnFinalizarImp313").style.display = "none";
+  toast("Importación terminada. Los datos originales siguen guardados en este teléfono.");
+  revisarDatos313();
+});
+
 /* ================= datos de prueba adicionales (inventario, clientes, citas) =================
    No hay botón visible en Ajustes a propósito — esto es solo para la cuenta
    "prueba" (ver TEAM), que abre únicamente Wilkin, no el cliente. Se ejecuta
@@ -7292,6 +7516,7 @@ document.getElementById("btnEmpezarDeCero").addEventListener("click", async () =
    dispositivos, así que en cada celular donde se use "prueba" se siembra sola
    la primera vez que se entra ahí. */
 async function sembrarDatosPrueba() {
+  if (demoProhibido()) { console.info("[ENTIMOTORS] sesión de nube: no se siembran datos de prueba"); return; }
   const catsExistentes = await DB.getAll("categorias_inv");
   async function idDeCategoria(nombre) {
     const encontrada = catsExistentes.find(c => c.nombre === nombre);
@@ -7382,6 +7607,7 @@ window.addEventListener("offline", renderSyncChip);
 
 /* ================= datos de ejemplo (solo la primera vez) ================= */
 async function seedIfEmpty() {
+  if (demoProhibido()) { console.info("[ENTIMOTORS] sesión de nube: no se siembran datos de ejemplo"); return; }
   const clientes = await DB.getAll("clientes");
   if (clientes.length) return;
   const c1 = await DB.save("clientes", { nombre: "Carlos Reyes", telefono: "9704-1122" });
@@ -7492,6 +7718,7 @@ async function startApp(session) {
   const modo = localStorage.getItem("enti_modo_datos");
   if (!clientesExistentes.length && !modo) {
     // base vacía y todavía no se eligió cómo arrancar: preguntamos antes de mostrar nada del sistema
+    prepararGateModo();
     document.getElementById("gateModo").classList.add("active");
     return;
   }
@@ -7500,7 +7727,21 @@ async function startApp(session) {
   await continuarArranque(modo);
 }
 
+/* SYNC-10 · B2 — DEMO DATA MUST NEVER BE WRITTEN TO PRODUCTION CLOUD.
+   Con sesión de nube NUNCA se siembran datos de ejemplo: ni en la nube (es la base real del taller, esté vacía o no —
+   el día del cambio lo está y sigue siendo producción) ni en entimotors_os_demo (después se importaría como si fuera
+   trabajo real). Se decide por la SESIÓN, no por si el motor arrancó ni por lo que haya en la nube: fail closed. El
+   modo demo sigue igual que siempre en una sesión local (sin nube). */
+function demoProhibido() { return currentUser?.origen === "supabase"; }
+function prepararGateModo() {
+  const nube = demoProhibido();
+  document.getElementById("btnModoDemo").style.display = nube ? "none" : "";
+  document.getElementById("gateModoNubeAviso").style.display = nube ? "" : "none";
+  document.getElementById("btnModoImportar").style.display = nube && currentUser?.rol === "admin" ? "" : "none";
+}
+
 async function elegirModoDatos(modo) {
+  if (modo === "demo" && demoProhibido()) modo = "blanco";
   localStorage.setItem("enti_modo_datos", modo);
   document.getElementById("gateModo").classList.remove("active");
   document.getElementById("shell").classList.add("active");
@@ -7508,6 +7749,7 @@ async function elegirModoDatos(modo) {
 }
 document.getElementById("btnModoDemo").addEventListener("click", () => elegirModoDatos("demo"));
 document.getElementById("btnModoBlanco").addEventListener("click", () => elegirModoDatos("blanco"));
+document.getElementById("btnModoImportar").addEventListener("click", async () => { await elegirModoDatos("blanco"); abrirImport313(); });
 
 async function continuarArranque(modo) {
   if (modo === "demo") await seedIfEmpty();
@@ -7549,6 +7791,7 @@ async function continuarArranque(modo) {
   await renderNotificaciones();
   renderSyncChip();
   document.getElementById("fabHome").classList.add("fab-hidden"); // arranca siempre en la página principal
+  revisarDatos313();   // SYNC-10: datos de la 3.13 en este teléfono que aún no están en la nube → a la vista
 
   wireServiceWorkerUpdates();
 }

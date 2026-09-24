@@ -130,7 +130,10 @@ BEGIN
   SELECT ord.id, ord.mecanico_id, ord.estado, ord.finalizada, ord.anulada, ord.deleted_at
     INTO o FROM public.ordenes ord WHERE ord.id = p_orden_id FOR UPDATE;
   IF NOT FOUND OR o.deleted_at IS NOT NULL THEN
-    RAISE EXCEPTION 'La orden no existe' USING ERRCODE = 'P0002';
+    -- SYNC-10 (P0002, reproducido en SYNC-11): P0002 llega por PostgREST como HTTP 500 → clase «servidor» → la cola lo
+    -- reintentaba cada ≤5 min PARA SIEMPRE (la orden ya no existe: nunca va a funcionar). 23503 (dependencia inexistente)
+    -- → 409 → clase «conflicto» → rechazo terminal, visible en «⚠ Por revisar». Mismo criterio que SYNC-7B con el dinero.
+    RAISE EXCEPTION 'La orden no existe' USING ERRCODE = '23503';
   END IF;
   -- SYNC-6 sección 9, caso 1: reasignada mientras el mecánico estaba desconectado.
   IF o.mecanico_id IS DISTINCT FROM auth.uid() THEN

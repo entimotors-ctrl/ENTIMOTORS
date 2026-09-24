@@ -1,0 +1,865 @@
+{
+ "version": 2,
+ "versionApp": "3.13.0",
+ "esquemaDB": 6,
+ "idRespaldo": "ENTI-2026-09-24-IHORBJ",
+ "exportadoEn": "2026-09-24T21:28:45.291Z",
+ "exportadoPor": "Admin Sintético",
+ "dispositivo": "generador-sintetico",
+ "conteos": {
+  "clientes": 4,
+  "motos": 3,
+  "ordenes": 6,
+  "inventario": 4,
+  "citas": 3,
+  "cotizaciones": 3,
+  "ventas_rapidas": 3,
+  "caja_movimientos": 10,
+  "creditos": 4,
+  "web_cms": 1,
+  "categorias_inv": 4,
+  "auditoria": 4
+ },
+ "totalRegistros": 49,
+ "data": {
+  "clientes": [
+   {
+    "nombre": "Ñoño Pérez Álvarez",
+    "telefono": "9900-0001",
+    "id": 1
+   },
+   {
+    "nombre": "Ana María Ruíz",
+    "telefono": "9900-0002",
+    "id": 2
+   },
+   {
+    "nombre": "José «Chepe» Díaz",
+    "telefono": "",
+    "id": 3
+   },
+   {
+    "nombre": "Cliente Sin Moto",
+    "telefono": "9900-0004",
+    "id": 4
+   }
+  ],
+  "motos": [
+   {
+    "clienteId": 1,
+    "marca": "Honda",
+    "modelo": "XR150",
+    "cilindraje": "150cc",
+    "placa": "SIN-0001",
+    "km": 12000,
+    "foto": "data:image/png;base64,iVBORw0KGgo=",
+    "mantenimiento": null,
+    "id": 1
+   },
+   {
+    "clienteId": 2,
+    "marca": "Yamaha",
+    "modelo": "FZ",
+    "cilindraje": "150cc",
+    "placa": "SIN-0002",
+    "km": 3000,
+    "foto": null,
+    "mantenimiento": null,
+    "id": 2
+   },
+   {
+    "clienteId": null,
+    "marca": "Bajaj",
+    "modelo": "Boxer",
+    "cilindraje": "100cc",
+    "placa": "SIN-HUERF",
+    "km": 0,
+    "foto": null,
+    "mantenimiento": null,
+    "id": 3
+   }
+  ],
+  "ordenes": [
+   {
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "taller",
+    "clienteId": 1,
+    "motoId": 1,
+    "estado": "recibido",
+    "falla": "Ruido en recibido",
+    "mecanico": "Mec Uno",
+    "items": [
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 250,
+      "origenInventarioId": null,
+      "costoUnitario": 0,
+      "costoEstimado": false
+     }
+    ],
+    "id": 1
+   },
+   {
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "taller",
+    "clienteId": 1,
+    "motoId": 1,
+    "estado": "diagnostico",
+    "falla": "Ruido en diagnostico",
+    "mecanico": "Juan Legado",
+    "items": [
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 250,
+      "origenInventarioId": null,
+      "costoUnitario": 0,
+      "costoEstimado": false
+     }
+    ],
+    "id": 2
+   },
+   {
+    "fotos": [
+     "data:image/jpeg;base64,/9j/4AAQSkZJRg=="
+    ],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "taller",
+    "clienteId": 1,
+    "motoId": 1,
+    "estado": "reparacion",
+    "falla": "Ruido en reparacion",
+    "mecanico": "Juan Legado",
+    "items": [
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 250,
+      "origenInventarioId": null,
+      "costoUnitario": 0,
+      "costoEstimado": false
+     }
+    ],
+    "id": 3
+   },
+   {
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "taller",
+    "clienteId": 1,
+    "motoId": 1,
+    "estado": "calidad",
+    "falla": "Ruido en calidad",
+    "mecanico": "",
+    "items": [
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 250,
+      "origenInventarioId": null,
+      "costoUnitario": 0,
+      "costoEstimado": false
+     }
+    ],
+    "id": 4
+   },
+   {
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "taller",
+    "clienteId": 2,
+    "motoId": 2,
+    "estado": "entregado",
+    "falla": "Cambio de aceite",
+    "mecanico": "Mec Uno",
+    "tipoCobro": "contado",
+    "metodoPago": "efectivo",
+    "items": [
+     {
+      "nombre": "Aceite 2T (litro)",
+      "cantidad": 1,
+      "precio": 150,
+      "origenInventarioId": 3,
+      "costoUnitario": 95,
+      "costoEstimado": false
+     },
+     {
+      "nombre": "Mano de obra",
+      "cantidad": 1,
+      "precio": 200,
+      "origenInventarioId": null,
+      "costoUnitario": 0,
+      "costoEstimado": false
+     }
+    ],
+    "id": 5,
+    "finalizada": true,
+    "finalizadoEn": 1790179200000,
+    "entregadoEn": 1790179200000,
+    "margen": 255
+   },
+   {
+    "fotos": [],
+    "aprobacion": null,
+    "diagnostico": null,
+    "reparacionNotas": "",
+    "calidadChecklist": null,
+    "citaId": null,
+    "citaFechaISO": null,
+    "creadoEn": 1789833600000,
+    "origenTrabajo": "negocio",
+    "clienteId": 3,
+    "motoId": null,
+    "estado": "entregado",
+    "falla": "Frenos",
+    "mecanico": "Juan Legado",
+    "tipoCobro": "credito",
+    "items": [
+     {
+      "nombre": "Pastillas",
+      "cantidad": 2,
+      "precio": 160,
+      "origenInventarioId": null,
+      "costoUnitario": 90,
+      "costoEstimado": true
+     }
+    ],
+    "id": 6,
+    "finalizada": true,
+    "finalizadoEn": 1790265600000,
+    "creditoId": 4,
+    "abonoInicial": 100,
+    "abonoMetodo": "efectivo"
+   }
+  ],
+  "inventario": [
+   {
+    "nombre": "Bujía NGK",
+    "modelo": "Varios",
+    "cantidad": 0,
+    "precio": 90,
+    "precioVenta": 90,
+    "costoCompra": 45,
+    "stockMinimo": 5,
+    "codigoBarras": "SIN-BUJ",
+    "categoriaId": 1,
+    "publicarEnWeb": false,
+    "id": 1
+   },
+   {
+    "nombre": "Cadena 428",
+    "modelo": "125-150",
+    "cantidad": 0,
+    "precio": 520,
+    "precioVenta": 520,
+    "costoCompra": 300,
+    "stockMinimo": 1,
+    "codigoBarras": "SIN-CAD",
+    "categoriaId": 1,
+    "publicarEnWeb": true,
+    "id": 2
+   },
+   {
+    "nombre": "Aceite 2T (litro)",
+    "modelo": "Todos",
+    "cantidad": 245,
+    "precio": 150,
+    "precioVenta": 150,
+    "costoCompra": 95,
+    "stockMinimo": 20,
+    "codigoBarras": "SIN-2T",
+    "categoriaId": null,
+    "publicarEnWeb": false,
+    "id": 3
+   },
+   {
+    "nombre": "Filtro de aire",
+    "modelo": "XR150",
+    "cantidad": 1,
+    "precio": 210,
+    "precioVenta": 210,
+    "costoCompra": 120,
+    "stockMinimo": 1,
+    "codigoBarras": "SIN-FIL",
+    "categoriaId": 2,
+    "publicarEnWeb": false,
+    "id": 4
+   }
+  ],
+  "citas": [
+   {
+    "clienteId": 4,
+    "nombreTmp": "",
+    "telefonoTmp": "",
+    "fecha": "2026-09-24",
+    "hora": "09:00",
+    "mecanico": "Mec Uno",
+    "mecanicoId": null,
+    "motivo": "Revisión",
+    "origen": "taller",
+    "reprogramaciones": [],
+    "recordatorioEnviado": false,
+    "id": 1
+   },
+   {
+    "clienteId": 2,
+    "nombreTmp": "",
+    "telefonoTmp": "",
+    "fecha": "2026-09-24",
+    "hora": "10:30",
+    "mecanico": "Juan Legado",
+    "mecanicoId": null,
+    "motivo": "Aceite",
+    "origen": "web",
+    "estado": "atendida",
+    "ordenId": 5,
+    "cerradaEn": 1790285325275,
+    "reprogramaciones": [
+     {
+      "de": {
+       "fecha": "2026-09-24",
+       "hora": "08:00",
+       "mecanico": "Mec Uno"
+      },
+      "a": {
+       "fecha": "2026-09-24",
+       "hora": "10:30",
+       "mecanico": "Juan Legado"
+      },
+      "motivo": "cliente llegó tarde",
+      "fechaISO": "2026-09-24T16:00:00.000Z"
+     }
+    ],
+    "recordatorioEnviado": true,
+    "confirmada": true,
+    "id": 2
+   },
+   {
+    "clienteId": null,
+    "nombreTmp": "Persona de la web",
+    "telefonoTmp": "9900-0099",
+    "fecha": "2026-09-24",
+    "hora": "15:00",
+    "mecanico": "",
+    "mecanicoId": null,
+    "motivo": "Cotizar",
+    "origen": "web",
+    "estado": "ausente",
+    "cerradaEn": 1790285325276,
+    "reprogramaciones": [],
+    "recordatorioEnviado": false,
+    "id": 3
+   }
+  ],
+  "cotizaciones": [
+   {
+    "clienteId": 1,
+    "clienteNombre": "Ñoño Pérez Álvarez",
+    "clienteTelefono": "9900-0001",
+    "motoId": 1,
+    "moto": {
+     "marca": "Honda",
+     "modelo": "XR150",
+     "placa": "SIN-0001"
+    },
+    "motoDesc": "Honda XR150",
+    "diagnostico": "Kit de arrastre",
+    "notas": "",
+    "items": [
+     {
+      "nombre": "Kit de arrastre",
+      "cantidad": 1,
+      "precio": 1450,
+      "inventarioId": null
+     }
+    ],
+    "validezDias": 15,
+    "fechaISO": "2026-09-24T16:00:00.000Z",
+    "venceISO": "2026-10-09T21:28:45.273Z",
+    "estado": "pendiente",
+    "ordenId": null,
+    "creadoPor": "Admin Sintético",
+    "id": 1
+   },
+   {
+    "clienteId": 2,
+    "clienteNombre": "Ana María Ruíz",
+    "clienteTelefono": "9900-0002",
+    "motoId": 2,
+    "moto": null,
+    "motoDesc": "Yamaha FZ",
+    "diagnostico": "Cambio de aceite",
+    "notas": "aceptó por WhatsApp",
+    "items": [
+     {
+      "nombre": "Aceite",
+      "cantidad": 1,
+      "precio": 150,
+      "inventarioId": 3
+     }
+    ],
+    "validezDias": 10,
+    "fechaISO": "2026-09-24T16:00:00.000Z",
+    "venceISO": "2026-10-04T21:28:45.274Z",
+    "estado": "aceptada",
+    "ordenId": 5,
+    "aceptadaEn": 1790285325274,
+    "creadoPor": "Admin Sintético",
+    "id": 2
+   },
+   {
+    "clienteId": null,
+    "clienteNombre": "Walk-in",
+    "clienteTelefono": "",
+    "motoId": null,
+    "moto": null,
+    "motoDesc": "",
+    "diagnostico": "Pintura",
+    "notas": "",
+    "items": [],
+    "validezDias": 7,
+    "fechaISO": "2026-09-24T16:00:00.000Z",
+    "venceISO": "2026-09-23T21:28:45.274Z",
+    "estado": "rechazada",
+    "ordenId": null,
+    "creadoPor": "Admin Sintético",
+    "id": 3
+   }
+  ],
+  "ventas_rapidas": [
+   {
+    "items": [
+     {
+      "inventarioId": 3,
+      "nombre": "Aceite 2T (litro)",
+      "cantidad": 3,
+      "precio": 150,
+      "costoUnitario": 95,
+      "costoEstimado": false
+     },
+     {
+      "inventarioId": null,
+      "nombre": "Revisión rápida",
+      "cantidad": 1,
+      "precio": 100
+     }
+    ],
+    "clienteId": 1,
+    "clienteNombre": "Ñoño Pérez Álvarez",
+    "metodoPago": "efectivo",
+    "total": 550,
+    "efectivoRecibido": 600,
+    "cambio": 50,
+    "fechaISO": "2026-09-24T21:28:45.233Z",
+    "creadoEn": 1790285325233,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 1
+   },
+   {
+    "items": [
+     {
+      "inventarioId": 2,
+      "nombre": "Cadena 428",
+      "cantidad": 1,
+      "precio": 520,
+      "costoUnitario": 300,
+      "costoEstimado": false
+     }
+    ],
+    "clienteId": null,
+    "clienteNombre": null,
+    "metodoPago": "tarjeta",
+    "total": 520,
+    "efectivoRecibido": null,
+    "cambio": 0,
+    "fechaISO": "2026-09-24T21:28:45.236Z",
+    "creadoEn": 1790285325236,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 2
+   },
+   {
+    "items": [
+     {
+      "inventarioId": 5,
+      "nombre": "Espejo retrovisor",
+      "cantidad": 2,
+      "precio": 180,
+      "costoUnitario": 80,
+      "costoEstimado": false
+     }
+    ],
+    "clienteId": 2,
+    "clienteNombre": "Ana María Ruíz",
+    "metodoPago": "transferencia",
+    "total": 360,
+    "efectivoRecibido": null,
+    "cambio": 0,
+    "fechaISO": "2026-09-24T21:28:45.237Z",
+    "creadoEn": 1790285325237,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 3
+   }
+  ],
+  "caja_movimientos": [
+   {
+    "tipo": "ingreso",
+    "categoria": "Venta mostrador",
+    "monto": 550,
+    "metodoPago": "efectivo",
+    "descripcion": "Venta rápida #1",
+    "ventaId": 1,
+    "fechaISO": "2026-09-24T21:28:45.233Z",
+    "creadoEn": 1790285325235,
+    "id": 1
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Venta mostrador",
+    "monto": 520,
+    "metodoPago": "tarjeta",
+    "descripcion": "Venta rápida #2",
+    "ventaId": 2,
+    "fechaISO": "2026-09-24T21:28:45.236Z",
+    "creadoEn": 1790285325237,
+    "id": 2
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Venta mostrador",
+    "monto": 360,
+    "metodoPago": "transferencia",
+    "descripcion": "Venta rápida #3",
+    "ventaId": 3,
+    "fechaISO": "2026-09-24T21:28:45.237Z",
+    "creadoEn": 1790285325238,
+    "id": 3
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Cobro de crédito",
+    "monto": 200,
+    "metodoPago": "efectivo",
+    "descripcion": "Abono crédito #2 — Ana María Ruíz",
+    "creditoId": 2,
+    "idAbono": "2-1790285325243-fqttfl",
+    "fechaISO": "2026-09-24T21:28:45.243Z",
+    "creadoEn": 1790285325243,
+    "id": 4
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Cobro de crédito",
+    "monto": 300,
+    "metodoPago": "transferencia",
+    "descripcion": "Abono crédito #2 — Ana María Ruíz",
+    "creditoId": 2,
+    "idAbono": "2-1790285325246-n05kgg",
+    "fechaISO": "2026-09-24T21:28:45.246Z",
+    "creadoEn": 1790285325246,
+    "id": 5
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Cobro de crédito",
+    "monto": 400,
+    "metodoPago": "efectivo",
+    "descripcion": "Abono crédito #3 — Ñoño Pérez Álvarez",
+    "creditoId": 3,
+    "idAbono": "3-1790285325251-mfgrzs",
+    "fechaISO": "2026-09-24T21:28:45.250Z",
+    "creadoEn": 1790285325252,
+    "id": 6
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Servicio taller",
+    "monto": 350,
+    "metodoPago": "efectivo",
+    "descripcion": "Orden de taller #5",
+    "ordenId": 5,
+    "fechaISO": "2026-09-24T21:28:45.260Z",
+    "creadoEn": 1790285325260,
+    "id": 7
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Cobro de crédito",
+    "monto": 100,
+    "metodoPago": "efectivo",
+    "descripcion": "Abono crédito #4 — José «Chepe» Díaz",
+    "creditoId": 4,
+    "idAbono": "4-1790285325268-n9bxpx",
+    "fechaISO": "2026-09-24T21:28:45.268Z",
+    "creadoEn": 1790285325269,
+    "id": 8
+   },
+   {
+    "tipo": "ingreso",
+    "categoria": "Otro ingreso",
+    "monto": 75.5,
+    "metodoPago": "efectivo",
+    "descripcion": "Venta de chatarra",
+    "fechaISO": "2026-09-24T16:00:00.000Z",
+    "creadoEn": 1790285325276,
+    "id": 9
+   },
+   {
+    "tipo": "egreso",
+    "categoria": "Pago de servicios",
+    "monto": 1234.56,
+    "metodoPago": "transferencia",
+    "descripcion": "Luz del local",
+    "fechaISO": "2026-09-24T16:00:00.000Z",
+    "creadoEn": 1790285325277,
+    "id": 10
+   }
+  ],
+  "creditos": [
+   {
+    "clienteId": 3,
+    "clienteNombre": "José «Chepe» Díaz",
+    "clienteTelefono": "",
+    "items": [
+     {
+      "inventarioId": 3,
+      "nombre": "Aceite 2T (litro)",
+      "cantidad": 2,
+      "precio": 150,
+      "costoUnitario": 95,
+      "costoEstimado": false
+     }
+    ],
+    "total": 300,
+    "abonado": 0,
+    "saldo": 300,
+    "estado": "pendiente",
+    "vencimiento": null,
+    "nota": "",
+    "historialAbonos": [],
+    "fechaISO": "2026-09-24T21:28:45.239Z",
+    "creadoEn": 1790285325239,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 1
+   },
+   {
+    "clienteId": 2,
+    "clienteNombre": "Ana María Ruíz",
+    "clienteTelefono": "9900-0002",
+    "items": [
+     {
+      "inventarioId": null,
+      "nombre": "Pintura de tanque",
+      "cantidad": 1,
+      "precio": 1200
+     }
+    ],
+    "total": 1200,
+    "abonado": 500,
+    "saldo": 700,
+    "estado": "parcial",
+    "vencimiento": null,
+    "nota": "",
+    "historialAbonos": [
+     {
+      "idAbono": "2-1790285325243-fqttfl",
+      "monto": 200,
+      "metodoPago": "efectivo",
+      "fechaISO": "2026-09-24T21:28:45.243Z"
+     },
+     {
+      "idAbono": "2-1790285325246-n05kgg",
+      "monto": 300,
+      "metodoPago": "transferencia",
+      "fechaISO": "2026-09-24T21:28:45.246Z"
+     }
+    ],
+    "fechaISO": "2026-09-24T21:28:45.242Z",
+    "creadoEn": 1790285325242,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 2,
+    "actualizadoEn": 1790285325246
+   },
+   {
+    "clienteId": 1,
+    "clienteNombre": "Ñoño Pérez Álvarez",
+    "clienteTelefono": "9900-0001",
+    "items": [
+     {
+      "inventarioId": null,
+      "nombre": "Soldadura de parrilla",
+      "cantidad": 1,
+      "precio": 400
+     }
+    ],
+    "total": 400,
+    "abonado": 400,
+    "saldo": 0,
+    "estado": "pagado",
+    "vencimiento": null,
+    "nota": "",
+    "historialAbonos": [
+     {
+      "idAbono": "3-1790285325251-mfgrzs",
+      "monto": 400,
+      "metodoPago": "efectivo",
+      "fechaISO": "2026-09-24T21:28:45.250Z"
+     }
+    ],
+    "fechaISO": "2026-09-24T21:28:45.248Z",
+    "creadoEn": 1790285325248,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 3,
+    "actualizadoEn": 1790285325251
+   },
+   {
+    "clienteId": 3,
+    "clienteNombre": "José «Chepe» Díaz",
+    "clienteTelefono": "",
+    "items": [
+     {
+      "inventarioId": null,
+      "nombre": "Pastillas",
+      "cantidad": 2,
+      "precio": 160
+     }
+    ],
+    "total": 320,
+    "abonado": 100,
+    "saldo": 220,
+    "estado": "parcial",
+    "vencimiento": null,
+    "nota": "",
+    "historialAbonos": [
+     {
+      "idAbono": "4-1790285325268-n9bxpx",
+      "monto": 100,
+      "metodoPago": "efectivo",
+      "fechaISO": "2026-09-24T21:28:45.268Z"
+     }
+    ],
+    "fechaISO": "2026-09-24T21:28:45.266Z",
+    "creadoEn": 1790285325266,
+    "mecanico": "Admin Sintético",
+    "mecanicoId": null,
+    "id": 4,
+    "origen": "orden",
+    "ordenId": 6,
+    "actualizadoEn": 1790285325269
+   }
+  ],
+  "web_cms": [
+   {
+    "key": "landing_hero",
+    "titulo": "Taller sintético",
+    "subtitulo": "Solo para pruebas"
+   }
+  ],
+  "categorias_inv": [
+   {
+    "nombre": "Repuestos",
+    "id": 1
+   },
+   {
+    "nombre": "Aceites y lubricantes",
+    "id": 2
+   },
+   {
+    "nombre": "Frenos",
+    "id": 3
+   },
+   {
+    "nombre": "Accesorios",
+    "id": 4
+   }
+  ],
+  "auditoria": [
+   {
+    "usuario": "Admin Sintético",
+    "usuarioLogin": "admin",
+    "rol": "admin",
+    "accion": "abono",
+    "entidad": "creditos",
+    "entidadId": 2,
+    "detalle": "L. 200.00 por efectivo · saldo L. 1000.00",
+    "fechaISO": "2026-09-24T21:28:45.244Z",
+    "creadoEn": 1790285325244,
+    "id": 1
+   },
+   {
+    "usuario": "Admin Sintético",
+    "usuarioLogin": "admin",
+    "rol": "admin",
+    "accion": "abono",
+    "entidad": "creditos",
+    "entidadId": 2,
+    "detalle": "L. 300.00 por transferencia · saldo L. 700.00",
+    "fechaISO": "2026-09-24T21:28:45.247Z",
+    "creadoEn": 1790285325247,
+    "id": 2
+   },
+   {
+    "usuario": "Admin Sintético",
+    "usuarioLogin": "admin",
+    "rol": "admin",
+    "accion": "abono",
+    "entidad": "creditos",
+    "entidadId": 3,
+    "detalle": "L. 400.00 por efectivo · saldo L. 0.00",
+    "fechaISO": "2026-09-24T21:28:45.253Z",
+    "creadoEn": 1790285325253,
+    "id": 3
+   },
+   {
+    "usuario": "Admin Sintético",
+    "usuarioLogin": "admin",
+    "rol": "admin",
+    "accion": "abono",
+    "entidad": "creditos",
+    "entidadId": 4,
+    "detalle": "L. 100.00 por efectivo · saldo L. 220.00",
+    "fechaISO": "2026-09-24T21:28:45.270Z",
+    "creadoEn": 1790285325270,
+    "id": 4
+   }
+  ]
+ }
+}

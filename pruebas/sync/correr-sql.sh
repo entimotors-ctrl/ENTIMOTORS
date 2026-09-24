@@ -226,14 +226,45 @@ fase9() {
   s=$(correr t_sync9_a "$SQLDIR/sync-9-fotos.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
   "$AQUI/entorno-local.sh" borra t_sync9_a >/dev/null
 }
+# SYNC-10: importación atómica del respaldo 3.13 + P0002 → 23503 en sync-5/sync-6. Cadena COMPLETA sobre la base de
+# referencia (1, 2, 3, 3b, 3p, 5, 6, 7a, 9) + 10; forward x2; pruebas; rollback; forward de nuevo. Además: la cadena
+# entera aplicada DOS veces (idempotencia) y las fases que cambiaron (5 y 6) re-aplicadas encima.
+fase10() {
+  echo "== SYNC-10 · importación 3.13 → nube (atómica, idempotente, solo admin) + P0002 → 23503 =="
+  local s q f
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos"
+  base_con t_sync10_ref $CADENA || { mal "no se pudo crear la referencia (cadena 1..9)"; return; }
+  base_con t_sync10_a $CADENA || { mal "no se pudo crear la copia con la cadena 1..9"; return; }
+  q() { "${PSQL[@]}" -U supabase_admin -d t_sync10_a -At -c "$1"; }
+  ok "cadena 1 → 2 → 3 → 3b → 3p → 5 → 6 → 7a → 9 aplica sobre la base de producción"
+  s=$(correr t_sync10_a "$SQLDIR/sync-10-importacion.sql") && ok "sync-10 aplica" || { mal "sync-10 falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_sync10_a "$SQLDIR/sync-10-importacion.sql") && ok "sync-10 re-aplica (idempotente)" || mal "sync-10 no es idempotente: $(tail -4 <<<"$s")"
+  for f in $CADENA; do correr t_sync10_a "$SQLDIR/sync-$f.sql" >/dev/null || { mal "re-aplicar sync-$f sobre la cadena completa falló"; }; done
+  ok "la cadena completa re-aplica encima (idempotente, incluidas 5 y 6 con 23503)"
+  [ "$(q "SELECT has_function_privilege('anon','public.import_aplicar_paquete(uuid,jsonb)','EXECUTE')")" = "f" ] && ok "anon NO ejecuta import_aplicar_paquete" || mal "anon ejecuta import_aplicar_paquete"
+  [ "$(q "SELECT prosecdef FROM pg_proc WHERE proname='import_aplicar_paquete'")" = "t" ] && ok "SECURITY DEFINER con search_path fijo" || mal "no es SECURITY DEFINER"
+  pruebas t_sync10_a "$AQUI/sql/10-importacion.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sync10_a >/dev/null
+  # regresión: las pruebas SQL de la importación por lote de SYNC-3b siguen en verde con la cadena completa + 10
+  base_con t_sync10_b $CADENA 10-importacion || { mal "no se pudo crear la copia B"; return; }
+  pruebas t_sync10_b "$AQUI/sql/03b-importacion.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sync10_b >/dev/null
+  # rollback: quita SOLO las funciones nuevas; el esquema vuelve a ser idéntico al de la cadena 1..9 (con 5/6 de SYNC-10)
+  base_con t_sync10_c $CADENA 10-importacion || { mal "no se pudo crear la copia C"; return; }
+  s=$(correr t_sync10_c "$SQLDIR/sync-10-rollback.sql") && ok "rollback aplica" || { mal "rollback falló: $(tail -4 <<<"$s")"; return; }
+  comparar t_sync10_ref t_sync10_c "tras el rollback el esquema es IDÉNTICO a la cadena 1..9" "el rollback de SYNC-10 no restauró el estado anterior"
+  s=$(correr t_sync10_c "$SQLDIR/sync-10-importacion.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_sync10_c >/dev/null; "$AQUI/entorno-local.sh" borra t_sync10_ref >/dev/null
+}
 case "${1:-}" in
+  10) fase10 ;;
   1) fase1 ;;
   9) fase9 ;;
   7b) fase7b ;;
   3p) fase3p ;;
   2) fase2 ;;
   3) fase3 ;;
-  *) echo "uso: $0 {1|2|3|3p|7b|9}" >&2; exit 2 ;;
+  *) echo "uso: $0 {1|2|3|3p|7b|9|10}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]

@@ -41,7 +41,8 @@ BEGIN
   IF v_prev IS NOT NULL THEN RETURN v_prev || jsonb_build_object('repetida', true); END IF;
 
   SELECT co.id, co.deleted_at INTO c FROM public.cotizaciones co WHERE co.id = p_cotizacion_id FOR UPDATE;
-  IF NOT FOUND OR c.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La cotización no existe' USING ERRCODE = 'P0002'; END IF;
+  -- SYNC-10: 23503 (no P0002 → HTTP 500 → reintento infinito): la cotización borrada es un rechazo terminal, a la vista.
+  IF NOT FOUND OR c.deleted_at IS NOT NULL THEN RAISE EXCEPTION 'La cotización no existe' USING ERRCODE = '23503'; END IF;
 
   -- reemplazo atómico: fuera de aquí nadie hace INSERT/UPDATE/DELETE directo en cotizacion_items (RLS D-2)
   DELETE FROM public.cotizacion_items WHERE cotizacion_id = p_cotizacion_id;

@@ -19,6 +19,8 @@ const SHELL = ["./", "./index.html",
   "./sync-fotos.js?v=3.13.0", "./sync-finanzas.js?v=3.13.0",
   // Autorización con PIN administrativo (SYNC-7): mismo motivo, index.html la carga antes de app.js.
   "./pin-ui.js?v=3.13.0",
+  // Importador 3.13 → nube (SYNC-10): mismo motivo, index.html lo carga antes de app.js.
+  "./import-313.js?v=3.13.0",
   "./app.js?v=3.13.0", "./usuarios.js?v=3.13.0",
   "./manifest.json", "./icons/icon-192.png", "./icons/logo-watermark-doc.png"];
 

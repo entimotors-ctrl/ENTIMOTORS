@@ -11,7 +11,7 @@ import { REST_URL } from "./pila.mjs";
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const RAIZ = path.resolve(AQUI, "../../../..");
-const TALLER = path.join(RAIZ, "taller-demo");
+const TALLER_REPO = path.join(RAIZ, "taller-demo");
 const HARNESS = path.resolve(AQUI, "../harness");
 const TIPOS = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".json": "application/json", ".css": "text/css", ".png": "image/png", ".webmanifest": "application/manifest+json" };
 
@@ -43,7 +43,10 @@ async function matar(h) { for (const s of ["SIGTERM", "SIGKILL"]) { try { proces
 /** Abre un dispositivo. opciones: { navegador: "chromium"|"firefox", nombre, pagina, real }
     real:true → `pagina` se sirve desde taller-demo/ tal cual (p. ej. "index.html", la app de verdad), con el
     puente inyectado (ver arriba); por defecto (real:false) se sirve desde /__h/ (el arnés, pagina.html). */
-export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html", real = false, apiUrl = "", producto = null } = {}) {
+export async function abrirDispositivo({ navegador = "chromium", nombre = "dispositivo", pagina = "pagina.html", real = false, apiUrl = "", producto = null, raiz = null } = {}) {
+  // SYNC-10: raiz = otra carpeta a servir en lugar de taller-demo/ (p. ej. la app 3.13.0 extraída del tag, para generar un
+  // respaldo 3.13 REAL con su propio código). Sin raiz, idéntico a antes.
+  const TALLER = raiz ? path.resolve(raiz) : TALLER_REPO;
   if (!NAVEGADORES[navegador]) throw new Error(`no hay ${navegador} instalado`);
   const cola = []; const esperando = []; const pendientes = new Map(); let sigId = 1;
   const peticionesEstaticas = [];
