@@ -58,13 +58,18 @@ async function esperarRest() {
 /* GATEWAY: en Supabase, Kong va delante de PostgREST: exige `apikey`, contesta el CORS del navegador (permite apikey/prefer/…) y expone
    Content-Range. PostgREST suelto no hace nada de eso, así que aquí se reproduce lo mínimo. Reenvía el resto tal cual. */
 /* ═══ SHIM DE AUTH — SOLO PRUEBAS LOCALES (SYNC-7B) ═══
-   La pila local no tiene GoTrue, y el api-server real valida la sesión con `auth.getUser(token)` (GET /auth/v1/user)
-   y re-autentica al admin con /auth/v1/token?grant_type=password. Este shim responde SOLO esas dos rutas, SOLO dentro
+   La pila local no tiene GoTrue, y el api-server real valida la sesión con `auth.getUser(token)` (GET /auth/v1/user),
+   re-autentica al admin con /auth/v1/token?grant_type=password y (SECURITY-1B) cierra esa sesión temporal con
+   POST /auth/v1/logout?scope=local. Como GoTrue, el login devuelve también `user` (id, email) y el cierre exige un JWT
+   válido de esta pila; `global`, `others` o sin scope se rechazan aquí (el api-server nunca debe usarlos; se registran
+   en `pila.cierres`). Este shim responde SOLO esas tres rutas, SOLO dentro
    de este gateway de pruebas (127.0.0.1, vive y muere con iniciarPila()/detener()), y SOLO para tokens firmados con el
    secreto sintético de ESTA pila (cualquier otro → 401). No hay bandera ni variable que lo active en producción: el
    código no existe fuera de pruebas/sync (guarda estática en pruebas/sync/node/sync7b.test.mjs). La identidad sale del
    `sub` del JWT (UUIDs deterministas de PERFILES); el rol y `activo` los decide `perfiles` en la base, como en producción. */
-export const CLAVE_CUENTA_PRUEBA = "clave-sintetica-solo-pruebas";   // no es un secreto: solo la acepta este shim local
+export const CLAVE_CUENTA_PRUEBA = "clave-sintetica-solo-pruebas";
+/** Cada POST /auth/v1/logout que recibe el shim: { scope, sub } (SECURITY-1B). */
+export const CIERRES = [];   // no es un secreto: solo la acepta este shim local
 function verificarJwtLocal(token) {
   const [h, p, f] = String(token || "").split(".");
   if (!h || !p || !f) return null;
@@ -90,14 +95,33 @@ function shimAuth(req, res, cors) {
       let b = {}; try { b = JSON.parse(cuerpo); } catch { /* vacío */ }
       const e = Object.entries(PERFILES).find(([k]) => `${k}@example.test` === b.email);
       if (!e || b.password !== CLAVE_CUENTA_PRUEBA) return responder(400, { error: "invalid_grant" });
-      responder(200, { access_token: jwt(e[1]), token_type: "bearer" });
+      responder(200, { access_token: jwt(e[1]), token_type: "bearer", user: { id: e[1], email: `${e[0]}@example.test` } });
     });
     return true;
+  }
+  if (u.pathname === "/auth/v1/logout" && req.method === "POST") {
+    const c = verificarJwtLocal((req.headers.authorization || "").replace(/^Bearer\s+/i, ""));
+    CIERRES.push({ scope: u.searchParams.get("scope"), sub: c?.sub ?? null });
+    if (!c) return responder(401, { code: 401, msg: "invalid JWT" });
+    if (u.searchParams.get("scope") !== "local") return responder(400, { msg: "el api-server solo debe cerrar con scope=local" });
+    res.writeHead(204, cors); res.end(); return true;
   }
   return responder(404, { msg: "ruta de auth no simulada" });
 }
 
 const gatewayStorage = { activo: false };
+/* SECURITY-1D · GoTrue REAL (opcional: iniciarPila({ authReal: { url, anon } })): /auth/v1/* se reenvía al Auth LOCAL del laboratorio
+   (nunca producción; solo http://127.0.0.1) en vez del shim. El `apikey` que manda el api-server (sintético) se sustituye por la clave
+   anon LOCAL del laboratorio; el Authorization (token del usuario emitido por ese GoTrue) viaja tal cual. */
+const authReal = { url: null, anon: null };
+function proxyAuthReal(req, res, cors) {
+  const u = new URL(authReal.url);
+  const cab = { ...req.headers, host: u.host, apikey: authReal.anon }; delete cab.origin; delete cab.referer;
+  const p = http.request({ host: u.hostname, port: u.port, path: req.url, method: req.method, headers: cab }, (r) => { res.writeHead(r.statusCode, { ...r.headers, ...cors }); r.pipe(res); });
+  p.on("error", (e) => { res.writeHead(502, cors); res.end(String(e.message)); });
+  req.pipe(p);
+  return true;
+}
 async function esperarStorage() {
   for (let i = 0; i < 90; i++) {
     try { const r = await fetch(`http://127.0.0.1:${STORAGE_INTERNO}/status`, { signal: AbortSignal.timeout(1500) }); if (r.status === 200) return; } catch { /* aún no */ }
@@ -139,7 +163,7 @@ function arrancarGateway() {
     // como Kong de Supabase: /storage/v1 NO exige apikey (una URL firmada en un <img> no lleva cabeceras; storage-api
     // valida el token firmado o el JWT por su cuenta). El resto sí.
     if (!req.headers.apikey && !req.url.startsWith("/storage/v1/")) { res.writeHead(401, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "No API key found in request" })); }
-    if (req.url.startsWith("/auth/v1/")) return shimAuth(req, res, cors);
+    if (req.url.startsWith("/auth/v1/")) return authReal.url ? proxyAuthReal(req, res, cors) : shimAuth(req, res, cors);
     // como Kong: /storage/v1/* → storage-api (sin el prefijo). Sin pila de Storage, 404 como siempre.
     if (req.url.startsWith("/storage/v1/")) {
       if (!gatewayStorage.activo) { res.writeHead(404, { ...cors, "Content-Type": "application/json" }); return res.end(JSON.stringify({ message: "sin storage en esta pila" })); }
@@ -157,7 +181,9 @@ function arrancarGateway() {
 }
 
 /** Crea la base t_e2e desde cero (producción + SYNC-1..3P), siembra perfiles y arranca PostgREST. */
-export async function iniciarPila({ storage = false } = {}) {
+export async function iniciarPila({ storage = false, fasesExtra = [], authReal: real = null } = {}) {
+  if (real && !/^http:\/\/127\.0\.0\.1:\d+$/.test(real.url)) throw new Error("authReal debe ser el laboratorio LOCAL (http://127.0.0.1:puerto)");
+  authReal.url = real?.url ?? null; authReal.anon = real?.anon ?? null;
   if (sh("pg_isready", ["-q", "-h", PG.host, "-p", String(PG.port)]).status !== 0) throw new Error("El Postgres local no responde: ejecuta pruebas/sync/entorno-local.sh up");
   sh("docker", ["rm", "-f", CONT_REST]);
   sh("bash", [ENTORNO, "borra", DB]);
@@ -165,6 +191,7 @@ export async function iniciarPila({ storage = false } = {}) {
   if (c.status !== 0) throw new Error("no se pudo crear la base: " + c.stderr);
   if (storage) await arrancarStorage();
   for (const f of FASES) sql(`\\i ${path.join(SQL, `sync-${f}.sql`)}`);
+  for (const f of fasesExtra) sql(`\\i ${path.join(SQL, `${f}.sql`)}`);   // p. ej. «sec-1c-clave-intentos» (3.14.1)
   sql("alter role authenticator with password 'postgres'", { db: "postgres" });
   // Supabase real: auth.uid() lee el claim del JWT tanto de la variable antigua como de request.jwt.claims (lo único que fija PostgREST moderno).
   // La imagen local solo lee la antigua; se iguala aquí (solo en esta base de pruebas) para que el token viaje como en producción.
@@ -183,6 +210,8 @@ export async function iniciarPila({ storage = false } = {}) {
   gatewayStorage.activo = storage;
   return {
     jwt, sql, uid, PERFILES, REST_URL,
+    /** SECURITY-1D: simular la caída del Auth real (url a un puerto cerrado de 127.0.0.1) y restaurarlo. */
+    authRealUrl(u) { if (!/^http:\/\/127\.0\.0\.1:\d+$/.test(u)) throw new Error("solo 127.0.0.1"); authReal.url = u; },
     /** Vacía los datos operativos (la protección de las tablas de dinero se salta con replica solo aquí, en la base de pruebas) y
         restaura los 4 perfiles sembrados a activo=true — SYNC-6 introdujo pruebas que desactivan un perfil a propósito
         (perfiles NO se trunca: es la identidad fija que usan TODAS las pruebas), así que sin este reset una prueba que

@@ -144,19 +144,38 @@ test("un fallo interno responde 500 genérico: no filtra el mensaje de la base n
   assert.ok(!volcado(e).includes("482913"), "el PIN no está en logs ni en llamadas a la base");
 });
 
+/* GoTrue FALSO para la re-autenticación con la contraseña de la cuenta (SECURITY-1B): el login devuelve un token con session_id y el
+   usuario; /logout contesta según `cierre` (lista de respuestas por intento: número = status, "red" = excepción). Registra cada llamada. */
+const SESION_TMP = "00000000-0000-4000-a000-00000000cafe";
+const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+const TOKEN_TMP = `${b64({ alg: "HS256" })}.${b64({ sub: uid(1), session_id: SESION_TMP })}.firma-sintetica-TOKEN`;
+function gotrueFalso({ clave = "clave-buena", usuario = { id: uid(1), email: "admin@example.test" }, cierre = [204], sinToken = false } = {}) {
+  const llamadas = []; let i = 0;
+  const f = async (url, init) => {
+    const u = String(url); llamadas.push({ url: u, metodo: init?.method, auth: init?.headers?.Authorization, apikey: init?.headers?.apikey, cuerpo: init?.body });
+    if (u.includes("/auth/v1/token?grant_type=password")) {
+      const ok = JSON.parse(init.body).password === clave;
+      return { ok, status: ok ? 200 : 400, json: async () => (ok ? { access_token: sinToken ? "" : TOKEN_TMP, refresh_token: "REFRESH-SINTETICO", user: usuario } : { error: "invalid_grant" }) };
+    }
+    if (u.includes("/auth/v1/logout")) { const r = cierre[Math.min(i++, cierre.length - 1)]; if (r === "red") throw new Error("red caída"); return { ok: r >= 200 && r < 300, status: r, json: async () => null }; }
+    throw new Error(`petición inesperada ${u}`);
+  };
+  return { f, llamadas, cierres: () => llamadas.filter((l) => l.url.includes("/auth/v1/logout")) };
+}
+async function conGotrue(g, fn) { const real = globalThis.fetch; globalThis.fetch = g.f; try { return await fn(); } finally { globalThis.fetch = real; } }
+const volcadoSecretos = (e, extra = []) => { const v = JSON.stringify(e.logs); for (const s of ["clave-buena", "clave-mala", "REFRESH-SINTETICO", "firma-sintetica-TOKEN", TOKEN_TMP, ...extra]) assert.ok(!v.includes(s), `el log contiene un secreto (${s.slice(0, 12)}…)`); };
+
 test("establecer PIN: la contraseña de la cuenta se verifica contra Auth (sin guardarse) y el hash guardado no contiene el PIN", async () => {
   const { e, llamar } = await montar();
-  const peticiones = [];
-  const fetchReal = globalThis.fetch;
-  globalThis.fetch = async (url, init) => { peticiones.push({ url: String(url), init }); return { ok: JSON.parse(init.body).password === "clave-buena", json: async () => ({ access_token: "tk-sintetico" }) }; };
-  try {
+  const gt = gotrueFalso(); const peticiones = gt.llamadas;
+  await conGotrue(gt, async () => {
     const mala = await llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: "clave-mala" } });
     assert.equal(mala.status, 401); assert.equal(mala.cuerpo.codigo, "CLAVE_INCORRECTA");
     const buena = await llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: "clave-buena" } });
     assert.equal(buena.status, 200); assert.deepEqual(buena.cuerpo, { ok: true, version: 4 });
-  } finally { globalThis.fetch = fetchReal; }
+  });
   assert.match(peticiones[0].url, /\/auth\/v1\/token\?grant_type=password$/);
-  assert.equal(JSON.parse(peticiones[0].init.body).email, "admin@example.test", "usa el correo de la cuenta del token, no uno enviado por el cliente");
+  assert.equal(JSON.parse(peticiones[0].cuerpo).email, "admin@example.test", "usa el correo de la cuenta del token, no uno enviado por el cliente");
   const g = e.rpc.find((r) => r.nombre === "pin_guardar").args;
   assert.match(g.p_hash, /^scrypt\$/); assert.equal(g.p_admin, uid(1)); assert.equal(g.p_por, uid(1));
   assert.ok(!volcado(e).includes("739205") && !volcado(e).includes("clave-buena") && !volcado(e).includes("clave-mala"), "ni el PIN nuevo ni las contraseñas llegan a la base o a los logs");
@@ -166,10 +185,67 @@ test("desbloquear y eliminar PIN llegan a la base solo con un admin", async () =
   const { e, llamar } = await montar();
   assert.equal((await llamar("POST", "/admin/pin/desbloquear", { token: "tk-admin" })).status, 200);
   assert.equal(e.rpc.at(-1).nombre, "pin_desbloquear"); assert.equal(e.rpc.at(-1).args.p_admin, uid(1));
-  const fetchReal = globalThis.fetch; globalThis.fetch = async () => ({ ok: true, json: async () => ({ access_token: "t" }) });
-  try { assert.equal((await llamar("DELETE", "/admin/pin", { token: "tk-admin", body: { clave_cuenta: "x" } })).status, 200); } finally { globalThis.fetch = fetchReal; }
+  const g = gotrueFalso({ clave: "x" });
+  await conGotrue(g, async () => { assert.equal((await llamar("DELETE", "/admin/pin", { token: "tk-admin", body: { clave_cuenta: "x" } })).status, 200); });
+  assert.equal(g.cierres().length, 1, "también al quitar el PIN se cierra la sesión temporal");
   assert.deepEqual(e.deletes, [{ tabla: "admin_pin", c: "perfil_id", v: uid(1) }]);
 });
+
+/* ───────── SECURITY-1B: sesión temporal de la verificación con la contraseña de la cuenta ───────── */
+const cambiarPin = (llamar, clave = "clave-buena") => llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: clave } });
+
+test("SECURITY-1B · contraseña correcta: 1 login + EXACTAMENTE 1 cierre con scope=local y el token TEMPORAL; nunca global/others/sin scope", async () => {
+  const { e, llamar } = await montar(); const g = gotrueFalso();
+  const r = await conGotrue(g, () => cambiarPin(llamar));
+  assert.equal(r.status, 200);
+  assert.deepEqual(g.llamadas.map((l) => l.url), ["https://proyecto-sintetico.example.test/auth/v1/token?grant_type=password", "https://proyecto-sintetico.example.test/auth/v1/logout?scope=local"]);
+  const c = g.cierres()[0]; assert.equal(c.metodo, "POST"); assert.equal(c.auth, `Bearer ${TOKEN_TMP}`); assert.equal(c.apikey, "ANONIMA-SINTETICA");
+  for (const l of g.llamadas) assert.doesNotMatch(l.url, /scope=(global|others)|\/logout$/);
+  assert.equal(e.logs.filter((l) => l.n === "warn").length, 0); volcadoSecretos(e);
+  assert.ok(!JSON.stringify(r.cuerpo).includes("TOKEN") && !JSON.stringify(r.cuerpo).includes("clave-buena"));
+});
+
+test("SECURITY-1B · contraseña incorrecta: 401 CLAVE_INCORRECTA y NINGÚN cierre (GoTrue no creó sesión)", async () => {
+  const { e, llamar } = await montar(); const g = gotrueFalso();
+  const r = await conGotrue(g, () => cambiarPin(llamar, "clave-mala"));
+  assert.equal(r.status, 401); assert.equal(r.cuerpo.codigo, "CLAVE_INCORRECTA"); assert.equal(g.cierres().length, 0); volcadoSecretos(e);
+  assert.equal(e.rpc.filter((x) => x.nombre === "pin_guardar").length, 0);
+});
+
+for (const [nombre, usuario] of [["otro id", { id: uid(2), email: "admin@example.test" }], ["otro correo", { id: uid(1), email: "otra@example.test" }], ["sin usuario", null]]) {
+  test(`SECURITY-1B · identidad distinta (${nombre}): primero se cierra la temporal y después se rechaza (401); el PIN no se guarda`, async () => {
+    const { e, llamar } = await montar(); const g = gotrueFalso({ usuario });
+    const r = await conGotrue(g, () => cambiarPin(llamar));
+    assert.equal(r.status, 401); assert.equal(r.cuerpo.codigo, "CLAVE_INCORRECTA");
+    assert.equal(g.cierres().length, 1); assert.match(g.llamadas[1].url, /\/auth\/v1\/logout\?scope=local$/);
+    assert.equal(e.rpc.filter((x) => x.nombre === "pin_guardar").length, 0, "el PIN no cambia");
+    assert.ok(e.logs.some((l) => l.n === "warn" && l.a[0]?.evento === "pin-clave-identidad-distinta")); volcadoSecretos(e);
+  });
+}
+
+test("SECURITY-1B · login correcto pero sin access_token: 401 y ningún cierre", async () => {
+  const { llamar } = await montar(); const g = gotrueFalso({ sinToken: true });
+  const r = await conGotrue(g, () => cambiarPin(llamar)); assert.equal(r.status, 401); assert.equal(g.cierres().length, 0);
+});
+
+for (const [nombre, cierre, llamadas, aviso, estado] of [
+  ["5xx y luego 204 → reintento con éxito", [503, 204], 2, false, null],
+  ["red caída y luego 204 → reintento con éxito", ["red", 204], 2, false, null],
+  ["429 dos veces → reintento y aviso", [429, 429], 2, true, 429],
+  ["red caída dos veces → reintento y aviso", ["red", "red"], 2, true, "sin-respuesta"],
+  ["401 (GoTrue rechaza el token) → SIN reintento y aviso", [401], 1, true, 401],
+]) {
+  test(`SECURITY-1B · cierre de la temporal: ${nombre}; la verificación sigue válida y en el log solo el id de sesión`, async () => {
+    const { e, llamar } = await montar(); const g = gotrueFalso({ cierre });
+    const r = await conGotrue(g, () => cambiarPin(llamar));
+    assert.equal(r.status, 200, "la contraseña ya quedó verificada");
+    assert.equal(g.cierres().length, llamadas); for (const c of g.cierres()) assert.match(c.url, /\/auth\/v1\/logout\?scope=local$/);
+    const avisos = e.logs.filter((l) => l.n === "warn" && l.a[0]?.evento === "pin-sesion-temporal-no-cerrada");
+    assert.equal(avisos.length, aviso ? 1 : 0);
+    if (aviso) assert.deepEqual(avisos[0].a[0], { evento: "pin-sesion-temporal-no-cerrada", sesion: SESION_TMP, estado });
+    volcadoSecretos(e);
+  });
+}
 
 /* ───────── CORS selectivo ───────── */
 const C = await import(await compilar("api-server/src/lib/cors-origenes.ts", { falsos: ["cors"], nombre: "cors" }));

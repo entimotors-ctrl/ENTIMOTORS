@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { logger } from "../lib/logger.js";
 import { crearServicioPin, configPin, type AccesoPin, type Solicitante } from "../lib/pin.js";
+import { crearVerificadorClaveCuenta } from "../lib/clave-cuenta.js";
 
 /* ============================================================================
  * PIN ADMINISTRATIVO (D-7). Ver lib/pin.ts para el diseño y taller-demo/supabase/sync/sync-3p-pin.sql para los límites.
@@ -34,23 +35,13 @@ function pepper(): string | null {
   return typeof p === "string" && p.length >= 32 ? p : null;
 }
 
-/** Contraseña de la cuenta (Supabase Auth). Se usa solo para re-autenticar al admin; nunca se guarda ni se registra. */
-async function verificarClaveCuenta(correo: string, clave: string): Promise<boolean> {
-  if (!ANON_KEY || !correo) return false;
-  const ctl = new AbortController();
-  const t = setTimeout(() => ctl.abort(), 8000);
-  try {
-    const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-      method: "POST",
-      headers: { apikey: ANON_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ email: correo, password: clave }),
-      signal: ctl.signal,
-    });
-    if (!r.ok) return false;
-    const j = (await r.json().catch(() => null)) as { access_token?: unknown } | null;
-    return typeof j?.access_token === "string" && j.access_token.length > 0;
-  } catch { return false; } finally { clearTimeout(t); }
-}
+/** Contraseña de la cuenta (Supabase Auth). Se usa solo para re-autenticar al admin; nunca se guarda ni se registra.
+    Comprueba que la cuenta verificada sea la del admin y cierra la sesión temporal que crea el login (SECURITY-1B): ver lib/clave-cuenta.ts.
+    `fetch` se lee en cada llamada (no se fija al cargar el módulo). */
+const verificarClaveCuenta = crearVerificadorClaveCuenta({
+  url: SUPABASE_URL, anon: ANON_KEY, log: logger,
+  fetch: ((...a: Parameters<typeof fetch>) => globalThis.fetch(...a)) as typeof fetch,
+});
 
 const acceso: AccesoPin = {
   async estado() {

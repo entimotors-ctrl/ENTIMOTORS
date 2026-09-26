@@ -30,8 +30,9 @@ const FALSOS = {
   logger: `export const logger = new Proxy({}, { get: (_, nivel) => (...a) => globalThis.__PIN.registrar(String(nivel), a) });\n`,
 };
 
-/** Bundle de una entrada TS. `falsos` decide qué dependencias se sustituyen. Devuelve la URL del .mjs generado. */
-export async function compilar(entrada, { falsos = ["express", "supabase", "ws", "logger", "cors"], nombre } = {}) {
+/** Bundle de una entrada TS. `falsos` decide qué dependencias se sustituyen. `mutar(rutaRelativa, texto)` altera un .ts EN MEMORIA
+    (nunca en disco) para las pruebas de mutación. Devuelve la URL del .mjs generado. */
+export async function compilar(entrada, { falsos = ["express", "supabase", "ws", "logger", "cors"], nombre, mutar = null } = {}) {
   const salida = path.join(tmp(), `${nombre ?? path.basename(entrada, ".ts")}-${Math.random().toString(36).slice(2, 8)}.mjs`);
   for (const [k, c] of Object.entries(FALSOS)) fs.writeFileSync(path.join(tmp(), `falso-${k}.mjs`), c);
   const plugin = {
@@ -43,6 +44,7 @@ export async function compilar(entrada, { falsos = ["express", "supabase", "ws",
       if (falsos.includes("cors")) b.onResolve({ filter: /^cors$/ }, () => ({ path: f("cors") }));
       if (falsos.includes("ws")) b.onResolve({ filter: /^ws$/ }, () => ({ path: f("ws") }));
       if (falsos.includes("logger")) b.onResolve({ filter: /lib\/logger(\.js)?$/ }, () => ({ path: f("logger") }));
+      if (mutar) b.onLoad({ filter: /\.ts$/ }, (a) => ({ contents: mutar(path.relative(RAIZ, a.path).split(path.sep).join("/"), fs.readFileSync(a.path, "utf8")), loader: "ts" }));
     },
   };
   await esbuild.build({ entryPoints: [path.join(RAIZ, entrada)], outfile: salida, bundle: true, platform: "node", format: "esm", packages: "external",

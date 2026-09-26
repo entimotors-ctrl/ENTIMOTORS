@@ -5,7 +5,7 @@
 import cors from "cors";
 import type { Request, Response, NextFunction } from "express";
 
-export const RUTAS_SENSIBLES = /^\/api\/(admin\/(pin|usuarios)|autorizaciones)(\/|$|\?)/;
+export const RUTAS_SENSIBLES = /^\/api\/(admin\/(pin|usuarios|clave)|autorizaciones)(\/|$|\?)/;
 
 /** Origins aprobados: los de las dos apps + los de CORS_ORIGINS_EXTRA (separados por comas). Solo https (http en localhost). */
 export function origenesAprobados(env: Record<string, string | undefined> = process.env): string[] {

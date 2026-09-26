@@ -7,7 +7,7 @@
 import test, { before, after, describe } from "node:test";
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-import { iniciarPila, PERFILES, CLAVE_CUENTA_PRUEBA } from "./lib/pila.mjs";
+import { iniciarPila, PERFILES, CLAVE_CUENTA_PRUEBA, CIERRES } from "./lib/pila.mjs";
 import { iniciarApi, llamar } from "./lib/api-local.mjs";
 
 const PIN = "482915";
@@ -55,10 +55,13 @@ describe("SYNC-7B · PIN real (api-server real + PostgREST real)", () => {
   });
 
   test("admin configura el PIN por la ruta real (re-autenticación por contraseña de cuenta); la clave mala se rechaza", async () => {
+    const antes = CIERRES.length;
     const mal = await llamar(pila, api, "PUT", "/api/admin/pin", { sub: PERFILES.admin, cuerpo: { pin_nuevo: PIN, clave_cuenta: "otra" } });
     assert.equal(mal.status, 401); assert.equal(mal.datos.codigo, "CLAVE_INCORRECTA");
+    assert.equal(CIERRES.length, antes, "SECURITY-1B: con la clave mala no hay sesión temporal que cerrar");
     const ok = await llamar(pila, api, "PUT", "/api/admin/pin", { sub: PERFILES.admin, cuerpo: { pin_nuevo: PIN, clave_cuenta: CLAVE_CUENTA_PRUEBA } });
     assert.equal(ok.status, 200, JSON.stringify(ok.datos));
+    assert.deepEqual(CIERRES.slice(antes), [{ scope: "local", sub: PERFILES.admin }], "SECURITY-1B: la sesión temporal se cierra una vez, con scope=local");
     assert.ok(!pila.sql(`select hash from public.admin_pin`).includes(PIN), "el PIN nunca se guarda en claro");
     assert.equal((await llamar(pila, api, "PUT", "/api/admin/pin", { sub: PERFILES.cajero, cuerpo: { pin_nuevo: "739164", clave_cuenta: CLAVE_CUENTA_PRUEBA } })).status, 403, "solo el admin");
   });

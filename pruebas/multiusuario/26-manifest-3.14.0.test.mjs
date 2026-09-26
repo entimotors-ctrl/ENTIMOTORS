@@ -1,17 +1,20 @@
-// MANIFESTS DE RELEASE 3.14.0 (árbol de trabajo): release-3.14.0-backend-manifest.json (api-server: fuente, pruebas y dist/ compilado)
+// MANIFESTS DE RELEASE 3.14.0 (sobre el commit PUBLICADO effbfa1): release-3.14.0-backend-manifest.json (api-server: fuente, pruebas y dist/ compilado)
 // y release-3.14.0-manifest.json (frontend: lo que se publica en el repo B y la base de Mi Trabajo, su documentación y sus pruebas).
 // Cada uno es una LISTA CERRADA con SHA-256 y tamaño: la publicación (SYNC-12 E) copia exactamente esos archivos y compara hashes.
-// Los de 3.13.0 siguen siendo evidencia inmutable (23-backend-manifest, sobre el tag v3.13.0).
+// Los de 3.13.0 siguen siendo evidencia inmutable (23-backend-manifest, sobre el tag v3.13.0). Desde 3.14.1 (UI-1B) el árbol de trabajo
+// cambia a propósito, así que 3.14.0 se comprueba igual: contra la instantánea de su commit (helpers/congelado-3.14.0.mjs), no contra el árbol.
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
-import { RAIZ } from "./helpers/entorno.mjs";
+import { RAIZ as RAIZ_REPO } from "./helpers/entorno.mjs";
+import { raiz3140, archivosDe3140 } from "./helpers/congelado-3.14.0.mjs";
 
-const VERIF = path.join(RAIZ, "pruebas/multiusuario/verificar-backend-manifest.mjs");
-const correr = (...a) => spawnSync(process.execPath, [VERIF, ...a], { encoding: "utf8" });
-const git = (...a) => spawnSync("git", ["-C", RAIZ, ...a], { encoding: "utf8" }).stdout.split("\n").filter(Boolean);
+const RAIZ = raiz3140();
+const VERIF = path.join(RAIZ_REPO, "pruebas/multiusuario/verificar-backend-manifest.mjs");
+const correr = (...a) => spawnSync(process.execPath, [VERIF, "--raiz", RAIZ, ...a], { encoding: "utf8" });
+const git = (_ls, prefijo) => archivosDe3140(prefijo);
 const leerJson = (rel) => JSON.parse(fs.readFileSync(path.join(RAIZ, rel), "utf8"));
 const B = "pruebas/multiusuario/release-3.14.0-backend-manifest.json", F = "pruebas/multiusuario/release-3.14.0-manifest.json";
 

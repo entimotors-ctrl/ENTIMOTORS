@@ -59,7 +59,10 @@ base_con() { # base_con <db> <fase...>  -> copia de la base de referencia con la
   local db="$1"; shift
   "$AQUI/entorno-local.sh" copia "$db" >/dev/null || return 1
   local f
-  for f in "$@"; do correr "$db" "$SQLDIR/sync-$f.sql" >/dev/null || { echo "  no se pudo aplicar sync-$f en $db"; return 1; }; done
+  for f in "$@"; do   # «sec-*» (3.14.1) es el nombre del archivo tal cual; el resto, sync-<fase>.sql
+    local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"
+    correr "$db" "$arch" >/dev/null || { echo "  no se pudo aplicar $(basename "$arch") en $db"; return 1; }
+  done
 }
 comparar() { # comparar <ref-db> <db> <mensaje-ok> <mensaje-mal>
   if node "$AQUI/baseline/verificar-fidelidad.mjs" "db:$1" --db "$2" >/dev/null; then ok "$3"; else mal "$4"; node "$AQUI/baseline/verificar-fidelidad.mjs" "db:$1" --db "$2" | tail -14; fi
@@ -256,7 +259,101 @@ fase10() {
   s=$(correr t_sync10_c "$SQLDIR/sync-10-importacion.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
   "$AQUI/entorno-local.sh" borra t_sync10_c >/dev/null; "$AQUI/entorno-local.sh" borra t_sync10_ref >/dev/null
 }
+fasesec1c() {
+  echo "== SECURITY-1C · límite persistente de intentos del cambio de contraseña del admin (SQL) =="
+  local s r t0 t1 ms
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion"
+  local A1=00000000-0000-4000-8000-000000000001 A2=00000000-0000-4000-8000-000000000007
+  base_con t_sec1c_ref $CADENA || { mal "no se pudo crear la referencia (cadena SYNC 1..10 = producción)"; return; }
+  base_con t_sec1c_a $CADENA || { mal "no se pudo crear la copia A"; return; }
+  ok "cadena SYNC 1 → 10 (estado de producción) aplica"
+  s=$(correr t_sec1c_a "$SQLDIR/sec-1c-clave-intentos.sql") && ok "sec-1c aplica" || { mal "sec-1c falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_sec1c_a "$SQLDIR/sec-1c-clave-intentos.sql") && ok "sec-1c re-aplica (idempotente)" || mal "sec-1c no es idempotente: $(tail -4 <<<"$s")"
+  pruebas t_sec1c_a "$AQUI/sql/sec1c-clave-intentos.test.sql"
+
+  # ── concurrencia REAL: sesiones psql en paralelo (copia C con un 2.º admin sembrado SOLO aquí, saltando el trigger de admin único) ──
+  base_con t_sec1c_c $CADENA sec-1c-clave-intentos || { mal "no se pudo crear la copia C"; return; }
+  cat "$AQUI/sql/00-prelude.sql" - <<SQL | "${PSQL[@]}" -U supabase_admin -d t_sec1c_c >/dev/null 2>&1
+SET session_replication_role = replica;
+INSERT INTO auth.users (id, email) VALUES ('$A2', 'u7@example.test') ON CONFLICT DO NOTHING;
+INSERT INTO public.perfiles (id, nombre, rol, activo) VALUES ('$A2', 'Admin 2 (solo prueba)', 'admin', true) ON CONFLICT (id) DO UPDATE SET rol = 'admin', activo = true;
+SQL
+  q() { "${PSQL[@]}" -U supabase_admin -d t_sec1c_c -At -c "$1"; }
+  for k in $(seq 1 20); do q "SELECT public.clave_reservar_intento('$A1',5,15,15,60)->>'motivo'" > "/tmp/sec1c-r-$k" 2>&1 & done; wait
+  r=$(q "SELECT count(*) FROM public.admin_clave_intentos WHERE perfil_id='$A1' AND resultado='reservado'")
+  local encurso; encurso=$(cat /tmp/sec1c-r-* | grep -c '^en_curso$'); rm -f /tmp/sec1c-r-*
+  [ "$r" = "1" ] && [ "$encurso" = "19" ] && ok "MISMO admin: 20 reservas simultáneas → 1 reservada y 19 «en_curso» (humo: la prueba que DISTINGUE el candado es la carrera determinista de abajo)" || mal "mismo perfil: $r reservadas, $encurso en_curso (esperaba 1 y 19)"
+  r=$(q "SELECT count(*) FROM pg_locks WHERE locktype='advisory'")
+  [ "$r" = "0" ] && ok "al terminar no queda NINGÚN candado advisory (es de transacción: se libera solo)" || mal "quedaron $r candados advisory"
+  r=$(q "SELECT public.clave_resolver_intento('$A1',(SELECT max(id) FROM public.admin_clave_intentos WHERE perfil_id='$A1' AND resultado='reservado'),'ok',5,15,15)->>'resultado'")
+  r=$(q "SELECT public.clave_reservar_intento('$A1',5,15,15,60)->>'permitido'")
+  [ "$r" = "true" ] && ok "resuelta la reserva, el siguiente cambio del mismo admin se permite al instante" || mal "tras resolver no se pudo reservar: $r"
+  q "SELECT public.clave_resolver_intento('$A1',(SELECT max(id) FROM public.admin_clave_intentos WHERE perfil_id='$A1' AND resultado='reservado'),'ok',5,15,15)" >/dev/null
+  for k in $(seq 1 10); do q "SELECT public.clave_reservar_intento('$A1',5,15,15,60)->>'permitido'" > "/tmp/sec1c-a-$k" 2>&1 & q "SELECT public.clave_reservar_intento('$A2',5,15,15,60)->>'permitido'" > "/tmp/sec1c-b-$k" 2>&1 & done; wait
+  local pa pb; pa=$(cat /tmp/sec1c-a-* | grep -c '^true$'); pb=$(cat /tmp/sec1c-b-* | grep -c '^true$'); rm -f /tmp/sec1c-a-* /tmp/sec1c-b-*
+  [ "$pa" = "1" ] && [ "$pb" = "1" ] && ok "DOS admins a la vez (10+10 simultáneas): exactamente 1 reserva cada uno — uno no bloquea al otro" || mal "perfiles distintos: A=$pa B=$pb (esperaba 1 y 1)"
+  # el candado es POR perfil: mientras otra sesión retiene el de A1 (2 s), A1 espera y A2 no
+  ( "${PSQL[@]}" -U supabase_admin -d t_sec1c_c -q -c "BEGIN; SELECT pg_advisory_xact_lock(hashtextextended('admin_clave:$A1', 0)); SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 & )
+  sleep 0.4
+  t0=$(date +%s%3N); q "SELECT public.clave_reservar_intento('$A2',5,15,15,60)" >/dev/null; t1=$(date +%s%3N); ms=$((t1-t0))
+  [ "$ms" -lt 1000 ] && ok "con el candado de A1 tomado, A2 NO espera (${ms} ms)" || mal "A2 esperó ${ms} ms por el candado de A1"
+  t0=$(date +%s%3N); q "SELECT public.clave_reservar_intento('$A1',5,15,15,60)" >/dev/null; t1=$(date +%s%3N); ms=$((t1-t0))
+  [ "$ms" -ge 1200 ] && ok "A1 SÍ espera a que se libere su candado (${ms} ms): la decisión está serializada" || mal "A1 no esperó al candado (${ms} ms)"
+  sleep 2
+  r=$(q "SELECT count(*) FROM pg_locks WHERE locktype='advisory'")
+  [ "$r" = "0" ] && ok "tras el COMMIT el candado se liberó" || mal "candado sin liberar: $r"
+  r=$(q "SELECT count(*) FROM public.admin_pin_intentos")
+  [ "$r" = "0" ] && ok "nada de esto toca el PIN (admin_pin_intentos vacío)" || mal "admin_pin_intentos tiene $r filas"
+  "$AQUI/entorno-local.sh" borra t_sec1c_c >/dev/null
+
+  # ── carrera DETERMINISTA (la de arriba no distingue: abrir cada psql tarda más que la función, así que se serializan solas).
+  #    A reserva DENTRO de una transacción abierta 2 s (su fila aún no es visible); B reserva mientras tanto.
+  #    Con candado: B espera a A y ve su reserva → «en_curso» (1 reserva). Sin candado (MUTANTE): B no ve nada → 2 reservas.
+  carrera() { # carrera <db> → "<reservas sin resolver de A1> <respuesta de B>"
+    local db="$1" mb
+    "${PSQL[@]}" -U supabase_admin -d "$db" -At -c "BEGIN; SELECT public.clave_reservar_intento('$A1',5,15,15,60)->>'permitido'; SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 &
+    sleep 0.5
+    mb=$("${PSQL[@]}" -U supabase_admin -d "$db" -At -c "SELECT coalesce(public.clave_reservar_intento('$A1',5,15,15,60)->>'motivo','permitido')")
+    wait
+    echo "$("${PSQL[@]}" -U supabase_admin -d "$db" -At -c "SELECT count(*) FROM public.admin_clave_intentos r WHERE r.perfil_id='$A1' AND r.resultado='reservado' AND NOT EXISTS (SELECT 1 FROM public.admin_clave_intentos x WHERE x.intento_id = r.id)") $mb"
+  }
+  base_con t_sec1c_d $CADENA sec-1c-clave-intentos || { mal "no se pudo crear la copia D"; return; }
+  "${PSQL[@]}" -U supabase_admin -d t_sec1c_d -f "$AQUI/sql/00-prelude.sql" >/dev/null 2>&1
+  r=$(carrera t_sec1c_d)
+  [ "$r" = "1 en_curso" ] && ok "carrera determinista: con el candado B espera a A y recibe «en_curso» (1 sola reserva)" || mal "carrera con candado: «$r» (esperaba «1 en_curso»)"
+  "$AQUI/entorno-local.sh" borra t_sec1c_d >/dev/null
+  local MUT; MUT=$(mktemp /tmp/sec1c-mutante-XXXX.sql); grep -v "PERFORM pg_advisory_xact_lock" "$SQLDIR/sec-1c-clave-intentos.sql" > "$MUT"
+  base_con t_sec1c_mut $CADENA || { mal "no se pudo crear la copia del mutante"; return; }
+  correr t_sec1c_mut "$MUT" >/dev/null; rm -f "$MUT"
+  "${PSQL[@]}" -U supabase_admin -d t_sec1c_mut -f "$AQUI/sql/00-prelude.sql" >/dev/null 2>&1
+  r=$(carrera t_sec1c_mut)
+  [ "$r" = "2 permitido" ] && ok "MUTANTE sin candado DETECTADO: la misma carrera deja 2 reservas simultáneas (por eso el candado es necesario)" || mal "el mutante sin candado no se detectó: «$r»"
+  "$AQUI/entorno-local.sh" borra t_sec1c_mut >/dev/null
+
+  # ── regresión del PIN con sec-1c aplicado ──
+  base_con t_sec1c_pin 1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin sec-1c-clave-intentos || { mal "no se pudo crear la copia PIN"; return; }
+  pruebas t_sec1c_pin "$AQUI/sql/04-pin.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sec1c_pin >/dev/null
+
+  # ── rollback: con evidencia se NIEGA; forzado restaura EXACTAMENTE el estado previo; y se puede volver a aplicar ──
+  s=$(correr t_sec1c_a "$SQLDIR/sec-1c-rollback.sql")
+  if grep -q "ROLLBACK STOP" <<<"$s"; then ok "rollback sin permiso se NIEGA si hay intentos registrados (evidencia)"; else mal "el rollback no se negó con datos"; fi
+  r=$("${PSQL[@]}" -U supabase_admin -d t_sec1c_a -At -c "SELECT (to_regclass('public.admin_clave_intentos') IS NOT NULL) AND (to_regprocedure('public.clave_reservar_intento(uuid,integer,integer,integer,integer)') IS NOT NULL)")
+  [ "$r" = "t" ] && ok "el rollback negado no cambió nada" || mal "el rollback negado dejó cambios"
+  s=$(PGOPTIONS="-c sec.forzar_rollback=si" correr t_sec1c_a "$SQLDIR/sec-1c-rollback.sql") && ok "rollback forzado aplica" || { mal "rollback forzado falló: $(tail -3 <<<"$s")"; return; }
+  comparar t_sec1c_ref t_sec1c_a "tras el rollback el esquema es IDÉNTICO al de producción (cadena SYNC 1..10)" "el rollback no restauró el estado previo"
+  s=$(correr t_sec1c_a "$SQLDIR/sec-1c-clave-intentos.sql") && ok "migración → pruebas → rollback → migración otra vez" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  pruebas t_sec1c_a "$AQUI/sql/sec1c-clave-intentos.test.sql"
+  "$AQUI/entorno-local.sh" borra t_sec1c_a >/dev/null
+  base_con t_sec1c_b $CADENA sec-1c-clave-intentos || { mal "no se pudo crear la copia B"; return; }
+  s=$(correr t_sec1c_b "$SQLDIR/sec-1c-rollback.sql") && ok "rollback LIMPIO (tabla vacía) aplica sin permiso especial" || mal "rollback limpio falló: $(tail -3 <<<"$s")"
+  comparar t_sec1c_ref t_sec1c_b "rollback limpio → esquema IDÉNTICO al de producción" "rollback limpio no restauró el estado previo"
+  s=$(correr t_sec1c_b "$SQLDIR/sec-1c-rollback.sql") && ok "rollback repetido no falla (idempotente)" || mal "rollback repetido falló"
+  s=$(correr t_sec1c_b "$SQLDIR/sec-1c-clave-intentos.sql") && ok "forward tras rollback limpio" || mal "forward tras rollback limpio falló"
+  "$AQUI/entorno-local.sh" borra t_sec1c_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sec1c_ref >/dev/null
+}
 case "${1:-}" in
+  sec1c) fasesec1c ;;
   10) fase10 ;;
   1) fase1 ;;
   9) fase9 ;;
@@ -264,7 +361,7 @@ case "${1:-}" in
   3p) fase3p ;;
   2) fase2 ;;
   3) fase3 ;;
-  *) echo "uso: $0 {1|2|3|3p|7b|9|10}" >&2; exit 2 ;;
+  *) echo "uso: $0 {1|2|3|3p|7b|9|10|sec1c}" >&2; exit 2 ;;
 esac
 echo "----"; echo "TOTAL: $PASS PASS, $FALLOS FAIL"
 [ "$FALLOS" -eq 0 ]

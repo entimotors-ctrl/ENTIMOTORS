@@ -7,6 +7,7 @@ import router from "./routes/index.js";
 import { logger } from "./lib/logger.js";
 import { saltosDeProxy } from "./lib/proxy.js";
 import { crearCorsSelectivo } from "./lib/cors-origenes.js";
+import { crearManejadorErrores } from "./lib/errores-http.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -50,5 +51,9 @@ app.use(express.static(path.resolve(__dirname, "../public")));
 
 /* Sin comodín que devuelva index.html: una ruta que no existe (página o API) responde 404. */
 app.use("/api", router);
+
+/* SECURITY-1B: último middleware. Un JSON mal formado (o cualquier error) ya no llega al manejador por defecto de Express, que imprimía
+   el mensaje —con trozos del cuerpo: contraseñas, PIN— en los logs. Respuesta genérica, no-store, sin mensaje ni cuerpo: ver lib/errores-http.ts. */
+app.use(crearManejadorErrores(logger));
 
 export default app;

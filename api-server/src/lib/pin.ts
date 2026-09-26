@@ -128,7 +128,7 @@ export interface Salida { status: number; cuerpo: Record<string, unknown>; cabec
 
 const err = (status: number, codigo: string, mensaje: string, extra: Record<string, unknown> = {}, cabeceras?: Record<string, string>): Salida => ({ status, cuerpo: { error: mensaje, codigo, ...extra }, cabeceras });
 
-export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?: ConfigPin; verificarClaveCuenta: (correo: string, clave: string) => Promise<boolean> }) {
+export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?: ConfigPin; verificarClaveCuenta: (admin: { id: string; correo: string }, clave: string) => Promise<boolean> }) {
   const { acceso, pepper } = dep;
   const cfg = dep.cfg ?? configPin();
 
@@ -189,7 +189,7 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
     /** Re-autenticación del admin para cambiar/quitar el PIN: el PIN actual (con límite de intentos) o la contraseña de su cuenta. */
     async reautenticar(admin: Solicitante, body: Record<string, unknown>, existe: boolean): Promise<Salida | null> {
       if (typeof body.clave_cuenta === "string" && body.clave_cuenta.length > 0 && body.clave_cuenta.length <= 200) {
-        return (await dep.verificarClaveCuenta(admin.correo, body.clave_cuenta)) ? null : err(401, "CLAVE_INCORRECTA", "La contraseña de la cuenta no es correcta.");
+        return (await dep.verificarClaveCuenta({ id: admin.id, correo: admin.correo }, body.clave_cuenta)) ? null : err(401, "CLAVE_INCORRECTA", "La contraseña de la cuenta no es correcta.");
       }
       if (existe && pinConFormato(body.pin_actual)) {
         const c = await comprobar(admin, body.pin_actual, null, "cambiar_pin", "admin_pin", null);
