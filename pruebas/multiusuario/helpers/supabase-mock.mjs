@@ -33,7 +33,7 @@ function respuesta(status, cuerpo, extra = {}) {
   const txt = cuerpo === undefined || cuerpo === "" ? "" : (typeof cuerpo === "string" ? cuerpo : JSON.stringify(cuerpo));
   return {
     ok: status >= 200 && status < 300, status, statusText: `HTTP ${status}`,
-    headers: { get: (n) => (String(n).toLowerCase() === "content-range" ? (extra.rango || null) : null) },
+    headers: { get: (n) => { const k = String(n).toLowerCase(); if (k === "content-range") return extra.rango || null; const c = extra.cabeceras || {}; for (const [h, v] of Object.entries(c)) if (h.toLowerCase() === k) return String(v); return null; } },
     text: async () => txt, json: async () => JSON.parse(txt),
   };
 }
@@ -89,7 +89,7 @@ export function crearServidor(cuentas = Object.values(CUENTAS)) {
   const limpiar = (c) => {
     if (!c || typeof c !== "object") return c;
     const o = { ...c };
-    for (const k of ["password", "clave", "token_hash", "refresh_token"]) if (k in o) o[k] = `«len:${String(o[k]).length}»`;
+    for (const k of ["password", "clave", "token_hash", "refresh_token", "clave_actual", "clave_nueva", "clave_confirmacion", "pin", "pin_nuevo", "pin_actual", "clave_cuenta"]) if (k in o) o[k] = `«len:${String(o[k]).length}»`;
     return o;
   };
 
@@ -112,7 +112,7 @@ export function crearServidor(cuentas = Object.values(CUENTAS)) {
     if (host === "api") {
       if (typeof s.api !== "function") return inesperada("api-server sin manejador");
       const r = await s.api(metodo, u.pathname, cuerpo, entrada.auth);
-      return respuesta(r.status, r.body);
+      return respuesta(r.status, r.body, { cabeceras: r.cabeceras });
     }
 
     // ── Supabase ──

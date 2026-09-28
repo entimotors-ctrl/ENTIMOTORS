@@ -47,8 +47,10 @@ const dentro = (base, destino) => { const r = path.relative(base, destino); retu
  *  mutar: { "app.js": (texto) => texto }  → SOLO para el origen de mutantes; nunca toca el disco,
  *  swActual: () => Buffer|null            → si existe, /sw.js se responde con esto (prueba de actualizacion).
  *  ctl: { sw(v) }                          → gancho para /__ctl/sw?v=… (cambia la fase de la prueba de actualizacion).
+ *  dirActual: () => ruta                   → si existe, la raiz servida en ESTE momento (3.14.1: el árbol COMPLETO de la release anterior
+ *                                            y después el nuevo, en el mismo origen, para probar la actualización 3.14.0 → 3.14.1).
  */
-export function crearOrigen({ nombre, dir, modo, prefijo = "", colector, mutar = {}, swActual = null, ctl = {} }) {
+export function crearOrigen({ nombre, dir, modo, prefijo = "", colector, mutar = {}, swActual = null, ctl = {}, dirActual = null }) {
   const estado = { desconectado: false, peticiones: [] };
   const servir = (res, codigo, cuerpo, tipo) => {
     res.writeHead(codigo, { "Content-Type": tipo || "text/plain; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" });
@@ -99,8 +101,9 @@ export function crearOrigen({ nombre, dir, modo, prefijo = "", colector, mutar =
       if (rel === "config-local.js") return servir(res, 404, "config-local.js no existe (es opcional y no se publica)");
     }
     if (rel === "sw.js" && swActual) { const b = swActual(); return b ? servir(res, 200, b, MIME[".js"]) : servir(res, 404, "sin sw"); }
-    const f = path.join(dir, rel);
-    const bruto = dentro(dir, f) ? leerSiExiste(f) : null;
+    const raiz = dirActual ? dirActual() : dir;
+    const f = path.join(raiz, rel);
+    const bruto = dentro(raiz, f) ? leerSiExiste(f) : null;
     if (!bruto) return servir(res, 404, "no existe");
     let cuerpo = bruto;
     if (modo === "app" && /^(index|panel-tecnico)\.html$/.test(rel)) cuerpo = transformarHtml(bruto.toString("utf8"), rel);

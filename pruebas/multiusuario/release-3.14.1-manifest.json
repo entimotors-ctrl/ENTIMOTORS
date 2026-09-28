@@ -1,0 +1,354 @@
+{
+  "format": "entimotors-release-freeze/1",
+  "version": "3.14.1",
+  "phase": "RELEASE-3.14.1-PREP",
+  "base_commit": "d0aaee3545fcd48ea7357ac9b923a342bbe510a4",
+  "branch": "feature/sync-3.14.0",
+  "scope": "frontend 3.14.1 (repo B / GitHub Pages y la base de Mi Trabajo: hacer-build-mecanicos.sh sobre esta misma lista). Sin cambios de backend (d0aaee3, ya publicado) ni de base de datos (sec-1c ya aplicada).",
+  "version_matrix": {
+    "VERSION_APP": "3.14.1",
+    "CACHE_NAME": "entimotors-v3.14.1",
+    "CACHE_NAME_MI_TRABAJO": "entimotors-mitrabajo-v3.14.1 (derivado por el build)",
+    "index_html_query_v": 16,
+    "sw_shell_query_v": 15,
+    "sw_shell_total": 20,
+    "panel_tecnico": "3.14.1",
+    "no_se_cambia": [
+      "app.js versionApp \"3.13.0\" (procedencia de los datos 3.13 del importador)",
+      "cabeceras históricas «(3.14.0 · SYNC-x)» de los módulos y comentarios de sw.js",
+      "archivos .sql de supabase/"
+    ]
+  },
+  "runtime_files": [
+    {
+      "path": "taller-demo/app.js",
+      "sha256": "e03a90d36680fda1f19a054b9a729e562cee9fd47bb63201d5dfac85a1e4f45c",
+      "bytes": 452589
+    },
+    {
+      "path": "taller-demo/auth.js",
+      "sha256": "a7c6914beb933fb4340cf6592db41a5e5691265de3b617ef8d06bc5a17f5ffe7",
+      "bytes": 13643
+    },
+    {
+      "path": "taller-demo/build-mecanicos/_headers",
+      "sha256": "ae57bedbe84d365de9aa67f0f23d24806f5132b21a2c87a45b77c7d6dcb3bb73",
+      "bytes": 798
+    },
+    {
+      "path": "taller-demo/build-mecanicos/build-target.js",
+      "sha256": "ee3640821f2483b19fda1315c6b0012dd954a397ffdb092d40f5f62712c4bd1f",
+      "bytes": 208
+    },
+    {
+      "path": "taller-demo/build-mecanicos/manifest.json",
+      "sha256": "c26ed7840ee0250d7f6552ce8369d831dd82ba995fcc47274a3b5772c8f1deeb",
+      "bytes": 715
+    },
+    {
+      "path": "taller-demo/build-target.js",
+      "sha256": "b943b38532811fa50be5c7c4f7754cf194bc8af638be9d8189628b6e2714cdce",
+      "bytes": 1581
+    },
+    {
+      "path": "taller-demo/config-local.example.js",
+      "sha256": "8d4d1f6e616bb40adaf12d4931486000816affb359c6289b1561bc683bb496b2",
+      "bytes": 1002
+    },
+    {
+      "path": "taller-demo/hacer-build-mecanicos.sh",
+      "sha256": "794232b693bf0fbb144fc6f2e6f7768e39e10d4397cca55d13cbb94582da7eeb",
+      "bytes": 4311
+    },
+    {
+      "path": "taller-demo/icons/icon-192-maskable.png",
+      "sha256": "80b3d171e3325a207705b9c25993b0a0004d24ce6556e4f2051b9f210ccd7dee",
+      "bytes": 15141
+    },
+    {
+      "path": "taller-demo/icons/icon-192.png",
+      "sha256": "a0ba3b2bb2da6e77be89d9a8327585766b3a7d0fc617e6a09cff2646e2712803",
+      "bytes": 20035
+    },
+    {
+      "path": "taller-demo/icons/icon-512-maskable.png",
+      "sha256": "19da11c8bf669d79bbad194d8b0c5b147af8a360904b77fb77745198aaffcde7",
+      "bytes": 69811
+    },
+    {
+      "path": "taller-demo/icons/icon-512.png",
+      "sha256": "028475e77655b240c4457f94e386b93029b120d153bcd2a4c3ccafa538204175",
+      "bytes": 94548
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark-doc.png",
+      "sha256": "f3d57e4c3f4b5f3dbd3d9eabd8f9af0dea634f326c226e457459e4caf72a38fe",
+      "bytes": 162214
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark.png",
+      "sha256": "4aa40f666fe981c280729b08b575d885ba1850861b01f5186752dcaaa3bc1733",
+      "bytes": 311256
+    },
+    {
+      "path": "taller-demo/import-313.js",
+      "sha256": "a7d215034cece8ba1c55a2a7fa92f029a20d6aec3d6fc8b79a234ba2932cef2f",
+      "bytes": 37787
+    },
+    {
+      "path": "taller-demo/index.html",
+      "sha256": "96914f98ecd0f00ea6c5f4cda82d552d9a161780de7370dad3407510f709b724",
+      "bytes": 283595
+    },
+    {
+      "path": "taller-demo/manifest.json",
+      "sha256": "0389761bd3de44a6c2fa3ca93623cd88b7348a397c691fe0334cbe2139c0ae75",
+      "bytes": 709
+    },
+    {
+      "path": "taller-demo/panel-tecnico.html",
+      "sha256": "eb11bd2003769b11fd8afb68f46faa1fa0c92479e0dc370bab22db5ce7c3527a",
+      "bytes": 11497
+    },
+    {
+      "path": "taller-demo/pin-ui.js",
+      "sha256": "3a4c858cfbfc7d7d4ed57e6081d85b9167db52c672dce6f1434dbde548265b85",
+      "bytes": 12110
+    },
+    {
+      "path": "taller-demo/recovery.js",
+      "sha256": "ea74ae97d4c282bebc9e0e3372c3c4d233db6ef06f12df43a2b7cb145218beef",
+      "bytes": 13716
+    },
+    {
+      "path": "taller-demo/supabase-client.js",
+      "sha256": "c028a34290c00c13af4a417a8fe93b42a9bc58af5055cbcfda6b5c5903f12114",
+      "bytes": 12393
+    },
+    {
+      "path": "taller-demo/supabase-config.js",
+      "sha256": "d325f87a17be2f155be42c7b20c2e817213c8210150192f31e5e41b14f052437",
+      "bytes": 1694
+    },
+    {
+      "path": "taller-demo/sw.js",
+      "sha256": "1b0b6cbe736e1e4ac4bf377f78f273581b83e9377ea830a721d7e4e641f5e404",
+      "bytes": 7509
+    },
+    {
+      "path": "taller-demo/sync-db.js",
+      "sha256": "f4ebc0e3c2898e00fd8fe653cac00a98d6fc71c83d7be4b0afb66950ab9a8eaa",
+      "bytes": 12728
+    },
+    {
+      "path": "taller-demo/sync-engine.js",
+      "sha256": "a711fcf2df963ebdeb4baec7aa9a9bc31b3c84aba7d75a71d55681f66a7bf9c6",
+      "bytes": 51450
+    },
+    {
+      "path": "taller-demo/sync-finanzas.js",
+      "sha256": "8425fa2c1b90bbab12864124a4936e3b24e88f7146c2b1d400c75b3eee1566fd",
+      "bytes": 16552
+    },
+    {
+      "path": "taller-demo/sync-fotos.js",
+      "sha256": "be12bfa015b9a7073c6f998b680f7bb4945a1633305e0693a5b70c0d6eb11929",
+      "bytes": 17836
+    },
+    {
+      "path": "taller-demo/sync-mappers.js",
+      "sha256": "de5bda0841e5502b59eaee380e60c3394b0c31616b7ce1ece317ee39d92050be",
+      "bytes": 29655
+    },
+    {
+      "path": "taller-demo/sync-rest.js",
+      "sha256": "b6f492351a4713df988b3a5f3b1ff9dec1f4735f51e8f3c54b92c2f79b34c587",
+      "bytes": 12152
+    },
+    {
+      "path": "taller-demo/usuarios.js",
+      "sha256": "c60286306ffe492452ce458be45086902a74523c7619789119069ec348ff5553",
+      "bytes": 22174
+    }
+  ],
+  "documentation_files": [
+    {
+      "path": "taller-demo/CHANGELOG.md",
+      "sha256": "8e34e406539cd8e47440961ebe447a20115f13519c857bd2052f449bd9f3db15",
+      "bytes": 18348
+    },
+    {
+      "path": "taller-demo/README.md",
+      "sha256": "2865cd55025a93648a74bb4e5cdaa7b58a443f603046da251d81e9c295b2106d",
+      "bytes": 18211
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.14.0.test.mjs",
+      "sha256": "c944c2c8a0692e3f41340d09059a40b62396ff327b3d42e1f9c0527c51f2cae1",
+      "bytes": 8778
+    },
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.14.1.test.mjs",
+      "sha256": "b1fc44d0eebb47babffb75fc446d1fdace32fd9017d027f717e7ddcd8fe65601",
+      "bytes": 8636
+    },
+    {
+      "path": "pruebas/multiusuario/02-build-target.test.mjs",
+      "sha256": "cc45b8773f6efbe079e997081b49209034d910ea1906d96451783f7e8b63db7a",
+      "bytes": 9533
+    },
+    {
+      "path": "pruebas/multiusuario/04-app-multiusuario.test.mjs",
+      "sha256": "32caed6baef38f73755ceb1e1fcb59be1f2f94ca17fd8de79686c1cf4d07c76e",
+      "bytes": 45752
+    },
+    {
+      "path": "pruebas/multiusuario/04b-app-mutantes.test.mjs",
+      "sha256": "1f26d98dee04ada77850645196412c671359b4edd3250990b5244487495b62c1",
+      "bytes": 21532
+    },
+    {
+      "path": "pruebas/multiusuario/08-build-mecanicos.test.mjs",
+      "sha256": "9d8d0841e681cc8a9a9d36219350045034244afe57145593ca18cfc47a5f935f",
+      "bytes": 20593
+    },
+    {
+      "path": "pruebas/multiusuario/16b-alcance-3.14.test.mjs",
+      "sha256": "7e62771aa8fed929e5b5bce3c3f63da8795c9e72c8a48bd4b771b91931a8229e",
+      "bytes": 5300
+    },
+    {
+      "path": "pruebas/multiusuario/16c-alcance-3.14.1.test.mjs",
+      "sha256": "01aaaccedaf41fd5d78b512b563d15f8c10ee7e6ae8eb4201bab5bb98598e8ab",
+      "bytes": 4346
+    },
+    {
+      "path": "pruebas/multiusuario/20-obs10-buscar-actualizacion.test.mjs",
+      "sha256": "2d4972f84978bcbe889c44141f7a0003ba8f9a4fd4ac11907ab379a298d1d7b6",
+      "bytes": 28432
+    },
+    {
+      "path": "pruebas/multiusuario/26b-manifest-3.14.1.test.mjs",
+      "sha256": "805feaa8471b0e849aeebf334dd34ae5ebe04377388eb4de42cff9fdb620c8ab",
+      "bytes": 4604
+    },
+    {
+      "path": "pruebas/multiusuario/27-ui1c-iconos.test.mjs",
+      "sha256": "bebe73fc3f82b3c21becad82881b151e39499275eaf887a08698da119d02624a",
+      "bytes": 15687
+    },
+    {
+      "path": "pruebas/multiusuario/29-sec1e-seguridad.test.mjs",
+      "sha256": "ccee6cdfadcf1c17c751dd6f6dd10ee7fee3ad4533712ce60d745c61a46a29b3",
+      "bytes": 30894
+    },
+    {
+      "path": "pruebas/multiusuario/browser/browser-runner.mjs",
+      "sha256": "d3812cde59502a9c648efd5395fe247de4685ef25594dcfaa19ddde0be7338d1",
+      "bytes": 18661
+    },
+    {
+      "path": "pruebas/multiusuario/browser/harness.js",
+      "sha256": "54eea6966e57463a2f8b7ac832a8358556c2b7ec6d5895a263dc0ba6e90b43a2",
+      "bytes": 2142
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/pagina.js",
+      "sha256": "9ace794d018b526ae4c67d73a8b7a9a1070de4607cc2f1c1bc5e5ea36ff19649",
+      "bytes": 9795
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-app.js",
+      "sha256": "79545d1d278529239bfbae05d92cd46216a9d9828eea818d9e8a8d98e01d2b86",
+      "bytes": 69914
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-pwa-3141.js",
+      "sha256": "d468815994d148ce1b1ab033e41f74523eb892da89ebcbe353cde5fea37d22f4",
+      "bytes": 9066
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-sec1e.js",
+      "sha256": "f691873bcae5a18e3912e37a812ac982fcf173b14965c044e022e7771389551d",
+      "bytes": 20196
+    },
+    {
+      "path": "pruebas/multiusuario/browser/server.mjs",
+      "sha256": "7f1f2722067f0c95d813ddc5eee348ca31221f270c9152816d89d72669125e3c",
+      "bytes": 9355
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/congelado-3.14.0.mjs",
+      "sha256": "52e7a3c7a572b6a1ea6e18376f9e477543556c0c83822e1c89bc561d45cd32b7",
+      "bytes": 2811
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/entorno.mjs",
+      "sha256": "e0688eda54666d39fb92ac5be239e4b6ac1ea4e14ff29a66c5355283aa4cf13a",
+      "bytes": 11549
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/pwa.mjs",
+      "sha256": "71c0d5185f1dfe17e08e54971da2631c12288181da2a0f8beabc248f5ee8bce2",
+      "bytes": 7848
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/supabase-mock.mjs",
+      "sha256": "7a11fdd76217f6baa06d04065e62b840d42f95567c26b0d45ee2cdcd21e1ba8a",
+      "bytes": 13176
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/usar-3140.mjs",
+      "sha256": "bf15af6a79b2a09cdc1b63b1fb5e6e6df50b425c84a871a58998416e63482249",
+      "bytes": 550
+    },
+    {
+      "path": "pruebas/sync/node/sync10.test.mjs",
+      "sha256": "566417ef42d8acf15d2714066ca380c00192b661cd821e35f558b7d08b1a52e2",
+      "bytes": 25091
+    }
+  ],
+  "publicacion": {
+    "repo_b": "clon limpio de entimotors-os en 2ba55e7 (= effbfa1): copiar SOLO repo_b_cambian desde el commit de la release, sha256 contra runtime_files, git add por nombre, push fast-forward por SSH; NUNCA rsync --delete ni git add -A",
+    "repo_b_lista": [
+      "app.js",
+      "auth.js",
+      "build-target.js",
+      "icons/icon-192-maskable.png",
+      "icons/icon-192.png",
+      "icons/icon-512-maskable.png",
+      "icons/icon-512.png",
+      "icons/logo-watermark-doc.png",
+      "icons/logo-watermark.png",
+      "import-313.js",
+      "index.html",
+      "manifest.json",
+      "pin-ui.js",
+      "recovery.js",
+      "supabase-client.js",
+      "supabase-config.js",
+      "sw.js",
+      "sync-db.js",
+      "sync-engine.js",
+      "sync-finanzas.js",
+      "sync-fotos.js",
+      "sync-mappers.js",
+      "sync-rest.js",
+      "usuarios.js"
+    ],
+    "repo_b_cambian": [
+      "app.js",
+      "index.html",
+      "sw.js"
+    ],
+    "mi_trabajo": "bash taller-demo/hacer-build-mecanicos.sh <destino> desde el commit de la release → subir la carpeta completa a Netlify (cambian app.js, index.html y sw.js)"
+  },
+  "no_ejecutado": [
+    "commit",
+    "publicacion_repo_b",
+    "netlify",
+    "produccion"
+  ]
+}

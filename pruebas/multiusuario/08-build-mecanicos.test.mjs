@@ -84,11 +84,11 @@ describe("el script sobre el runtime real", () => {
 });
 
 describe("contenido del build de «Mi Trabajo»", () => {
-  test("CACHE_NAME = entimotors-mitrabajo-v3.14.0 (una sola vez) y ninguna referencia a 3.12.x", () => {
+  test(`CACHE_NAME = entimotors-mitrabajo-v${V} (una sola vez) y ninguna referencia a 3.12.x`, () => {
     const sw = leerEn(destino, "sw.js"); assert.deepEqual([...sw.matchAll(/const CACHE_NAME = "([^"]+)"/g)].map((m) => m[1]), [`entimotors-mitrabajo-v${V}`]);
     for (const f of ["app.js", "sw.js", "index.html"]) assert.ok(!/3\.12\.[12](?![0-9])|entimotors-(mitrabajo-)?v3\.12\./.test(leerEn(destino, f)), f);
   });
-  test("los 15 <script ?v=> de index.html (los 16 del taller sin config-local.js) apuntan a 3.14.0 y el SHELL del service worker coincide", () => {
+  test(`los 15 <script ?v=> de index.html (los 16 del taller sin config-local.js) apuntan a ${V} y el SHELL del service worker coincide`, () => {
     const idx = leerEn(destino, "index.html"); assert.deepEqual([...idx.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`).sort(),
       ["app.js", "auth.js", "build-target.js", "import-313.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
        "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-rest.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
@@ -132,8 +132,8 @@ describe("contenido del build de «Mi Trabajo»", () => {
     for (const url of shell) { assert.ok(w.llamadas.fetch.some((f) => f.url === url && f.opciones?.cache === "no-store"), `no se precacheo ${url} con no-store`); if (url !== "./") assert.ok(fs.existsSync(path.join(destino, url.slice(2).split("?")[0])), `SHELL: ${url} no existe en el build`); }
   });
   test("al activarse, el service worker del build borra caches VIEJAS de Mi Trabajo, conserva la actual y llama clients.claim() sin skipWaiting", async () => {
-    const w = ejecutarServiceWorker({ sw: leerEn(destino, "sw.js"), cachesExistentes: ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0", `entimotors-mitrabajo-v${V}`] }); await w.activar();
-    assert.deepEqual(w.llamadas.borradas.sort(), ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0"]); assert.deepEqual([...w.almacenes.keys()], [`entimotors-mitrabajo-v${V}`]);
+    const w = ejecutarServiceWorker({ sw: leerEn(destino, "sw.js"), cachesExistentes: ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0", "entimotors-mitrabajo-v3.14.0", `entimotors-mitrabajo-v${V}`] }); await w.activar();
+    assert.deepEqual(w.llamadas.borradas.sort(), ["entimotors-mitrabajo-v3.12.1", "entimotors-mitrabajo-v3.12.2", "entimotors-mitrabajo-v3.13.0", "entimotors-mitrabajo-v3.14.0"]); assert.deepEqual([...w.almacenes.keys()], [`entimotors-mitrabajo-v${V}`]);
     assert.equal(w.llamadas.claim, 1); assert.equal(w.llamadas.skipWaiting, 0);
   });
 });

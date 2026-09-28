@@ -5,6 +5,7 @@
 import { crearBanco, esperarHasta, pausa, ok, igual, mismo } from "/__h/helpers/pagina.js";
 import { casosC7FixA } from "/__h/helpers/suite-c7fixa.js";
 import { casosC7FixB } from "/__h/helpers/suite-c7fixb.js";
+import { casosSec1E } from "/__h/helpers/suite-sec1e.js";
 
 export const AVISO_RED = "Sin conexión con el servidor. Inténtalo otra vez.";
 export const UUID = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, "0")}`;
@@ -456,6 +457,154 @@ export async function correr(ctx) {
     }
     return { vistos };
   }, { grupo: "OBS" });
+
+  // ══ UI-1B (3.14.1): los accesos rápidos de la página principal siguen a puedeVerVista, igual que el menú ══
+  const QA_TODOS = ["pos", "cotizaciones", "ordenes", "citas", "clientes", "inventario", "finanzas", "creditos", "web-cms", "ajustes"];
+  const accesosRapidos = (app) => {
+    const cs = (el) => app.win.getComputedStyle(el).display;
+    return {
+      botones: app.$$(".qa-btn[data-view]").filter((b) => cs(b) !== "none" && cs(b.closest(".qa-group")) !== "none").map((b) => b.dataset.view),
+      grupos: app.$$(".qa-group").map((g) => (cs(g) === "none" ? "oculto" : "visible")),
+      menu: app.$$(".nav-item[data-view]").filter((b) => cs(b) !== "none").map((b) => b.dataset.view),
+    };
+  };
+  if (taller) await caso("UI-1B · accesos rápidos del Dashboard = mismos permisos que el menú: admin ve los 10; cajero y mecánico local no ven Ajustes ni Gestor de la web y el grupo «Sitio web y sistema» desaparece; showView directo y el clic sobre el botón escondido siguen RECHAZADOS", async () => {
+    const vistos = {};
+    for (const [rol, opc, esperado, grupos] of [
+      ["admin", { cuenta: C.adminActivo }, QA_TODOS, ["visible", "visible"]],
+      ["cajero", { cuenta: C.cajeroActivo }, QA_TODOS.filter((v) => !["web-cms", "ajustes"].includes(v)), ["visible", "oculto"]],
+      ["mecanico local", { almacen: { enti_session: sesionLocal("mecanico") } }, QA_TODOS.filter((v) => !["finanzas", "web-cms", "ajustes"].includes(v)), ["visible", "oculto"]],
+    ]) {
+      const app = await B.abrirApp(opc); igual(await B.esperarArranque(app), "shell", `${rol}: la app debe arrancar`); await pausa(300);
+      ok(app.activo("view-dashboard"), `${rol}: abre en la página principal`);
+      const r = accesosRapidos(app);
+      mismo(r.botones, esperado, `${rol}: accesos rápidos visibles`);
+      mismo(r.grupos, grupos, `${rol}: grupos`);
+      for (const v of QA_TODOS) {
+        igual(r.botones.includes(v), r.menu.includes(v), `${rol}: «${v}» igual en el menú y en los accesos rápidos`);
+        igual(r.botones.includes(v), app.win.eval(`puedeVerVista(${JSON.stringify(v)})`), `${rol}: «${v}» sigue a puedeVerVista`);
+      }
+      if (rol === "cajero") {
+        for (const v of ["ajustes", "web-cms"]) {
+          const antes = app.$$("#toastWrap .toast").length;
+          igual(app.win.eval(`showView(${JSON.stringify(v)})`), false, `cajero: showView("${v}") directo`);
+          app.$(`.qa-btn[data-view="${v}"]`).click();   // el botón escondido, pulsado por código: la guarda sigue ahí
+          const avisos = app.$$("#toastWrap .toast").slice(antes).map((t) => t.textContent.trim());
+          mismo(avisos, ["No tienes acceso a esa sección", "No tienes acceso a esa sección"], `cajero: avisos de ${v}`);
+          ok(!app.activo(`view-${v}`), `cajero: la vista ${v} no se abre`);
+        }
+        ok(app.activo("view-dashboard"), "cajero: sigue en la página principal");
+      }
+      vistos[rol] = { visibles: r.botones.length, grupos: r.grupos.join("/") };
+      app.cerrar();
+    }
+    return { vistos };
+  }, { grupo: "UI-1B" });
+  if (!taller) await caso("UI-1B · Mi Trabajo: el mecánico con cuenta abre en su pantalla y no le aparece ningún acceso rápido ni grupo (no gana accesos)", async () => {
+    const app = await B.abrirApp({ cuenta: C.mecanicoActivo }); igual(await B.esperarArranque(app), "shell"); await pausa(300);
+    ok(app.activo("view-mi-trabajo"), "Mi Trabajo activa");
+    const r = accesosRapidos(app);
+    mismo(r.botones, [], "sin accesos rápidos"); mismo(r.grupos, ["oculto", "oculto"], "sin grupos"); mismo(r.menu, ["mi-trabajo"], "menú: solo Mi trabajo");
+    app.cerrar(); return { menu: r.menu };
+  }, { grupo: "UI-1B" });
+
+  // ══ UI-1C (3.14.1): iconos SVG del sprite en el motor REAL: referencias, tamaño, color, tema y 360/768/1280 ══
+  const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}\u{23F3}\u{2630}]/u;
+  const refsRotas = (app) => app.$$("use").map((u) => u.getAttribute("href")).filter((h) => { const s = h && h.startsWith("#") ? app.doc.getElementById(h.slice(1)) : null; return !(s && s.tagName.toLowerCase() === "symbol"); });
+  const caja = (el) => { const r = el.getBoundingClientRect(); return { x: r.left, y: r.top, w: r.width, h: r.height, r: r.right, b: r.bottom }; };
+  const dentro = (a, b) => a.x >= b.x - 0.5 && a.y >= b.y - 0.5 && a.r <= b.r + 0.5 && a.b <= b.b + 0.5;
+  const cuadrado = (c, min, max) => c.w >= min && c.w <= max && Math.abs(c.w - c.h) <= 0.5;
+  const colorDe = (app, el) => app.win.getComputedStyle(el).color;
+  const rojo = (app) => colorDe(app, app.$(".brand .name em"));            // var(--red) del tema activo
+  const acento = (app, el) => app.win.getComputedStyle(el).getPropertyValue("--ic-acento").trim().toLowerCase();
+  const rojoToken = (app) => app.win.getComputedStyle(app.doc.documentElement).getPropertyValue("--red").trim().toLowerCase();
+  const sinDesborde = (app) => app.doc.documentElement.scrollWidth <= app.doc.documentElement.clientWidth + 1;
+  /* Lo que se sale del ancho FUERA de la barra superior. La barra superior a ~768 px con ratón ya desbordaba en 3.14.0
+     (medido contra el release: admin 986/753, cajero 987/753, mecánico 1009/753) y se documenta aparte: aquí se exige
+     que ningún icono, tarjeta, menú ni contenido nuevo se salga, y se reporta la barra tal cual. */
+  const fueraDeLaBarra = (app) => { const cw = app.doc.documentElement.clientWidth, barra = app.$("#topbar"); return app.$$("body *").filter((e) => !barra.contains(e) && e.getBoundingClientRect().width > 0 && e.getBoundingClientRect().right > cw + 1 && app.win.getComputedStyle(e).position !== "fixed"); };
+  const desbordan = (app) => { const cw = app.doc.documentElement.clientWidth; return app.$$("body *").filter((e) => e.getBoundingClientRect().right > cw + 1 && e.getBoundingClientRect().width > 0).slice(0, 4).map((e) => `${e.tagName.toLowerCase()}${e.id ? "#" + e.id : ""}.${String(e.className?.baseVal ?? e.className).split(" ")[0]}→${Math.round(e.getBoundingClientRect().right)}`).join(", "); };
+  const visiblesQa = (app) => app.$$(".qa-btn[data-view]").filter((b) => b.getBoundingClientRect().width > 0);
+  async function revisarAnchos(app, rol, anchos) {
+    const medidas = {};
+    for (const w of anchos) {
+      app.iframe.style.width = `${w}px`; await pausa(250);
+      mismo(fueraDeLaBarra(app).map((e) => e.tagName), [], `${rol} @${w}: nada fuera de la barra superior se sale del ancho (${desbordan(app)})`);
+      const filas = {};
+      for (const b of visiblesQa(app)) {
+        const cb = caja(b), ci = caja(b.querySelector(".qa-ic svg.ic")), cl = caja(b.querySelector(".qa-lbl"));
+        ok(cuadrado(ci, 32, 38), `${rol} @${w} ${b.dataset.view}: icono cuadrado 32–38 px (UI-1C.1) (${ci.w}×${ci.h})`);
+        ok(caja(b.querySelector(".qa-top")).h <= 26.5, `${rol} @${w} ${b.dataset.view}: la fila del icono no agranda la tarjeta (${caja(b.querySelector(".qa-top")).h})`);
+        ok(dentro(ci, cb) && dentro(cl, cb), `${rol} @${w} ${b.dataset.view}: icono y etiqueta dentro de la tarjeta`);
+        (filas[Math.round(cb.y)] ||= []).push(cb.h);
+      }
+      for (const [y, hs] of Object.entries(filas)) ok(Math.max(...hs) - Math.min(...hs) <= 1, `${rol} @${w}: tarjetas de la fila y=${y} con la misma altura (${hs.join(", ")})`);
+      const menu = app.$("#btnMenuToggle"), sidebarFija = app.$("#sidebar").getBoundingClientRect().width > 0 && app.win.getComputedStyle(menu).display === "none";
+      if (!sidebarFija) ok(cuadrado(caja(menu.querySelector("svg.ic")), 14, 24), `${rol} @${w}: icono de menú visible`);
+      else for (const n of app.$$(".nav-item[data-view]").filter((x) => x.getBoundingClientRect().width > 0)) { const c = caja(n.querySelector("svg.ic")); ok(cuadrado(c, 15, 22) && dentro(c, caja(n)), `${rol} @${w}: icono del menú «${n.dataset.view}»`); }
+      medidas[w] = { tarjetas: visiblesQa(app).length, menu: sidebarFija ? "lateral" : "cajón", pagina: `${app.doc.documentElement.scrollWidth}/${app.doc.documentElement.clientWidth}`, barraHeredada: !sinDesborde(app) };
+      if (w !== 768) ok(sinDesborde(app), `${rol} @${w}: sin scroll horizontal (${desbordan(app)})`);
+    }
+    app.iframe.style.width = "1000px"; await pausa(150);
+    return medidas;
+  }
+  if (taller) await caso("UI-1C · iconos SVG en el Taller real: todas las referencias resuelven; accesos rápidos, menú, widgets y barra sin emoji; tamaño y color correctos en tema oscuro y claro; 360/768/1280 sin cortes ni desbordes; admin 10 y cajero 8 (UI-1B intacto)", async () => {
+    const vistos = {};
+    for (const [rol, opc, n] of [["admin", { cuenta: C.adminActivo }, 10], ["cajero", { cuenta: C.cajeroActivo }, 8]]) {
+      const app = await B.abrirApp(opc); igual(await B.esperarArranque(app), "shell", `${rol}: arranca`); await pausa(400);
+      mismo(refsRotas(app), [], `${rol}: <use> sin símbolo`);
+      igual(visiblesQa(app).length, n, `${rol}: accesos rápidos visibles`);
+      for (const b of visiblesQa(app)) {
+        const ic = b.querySelector(".qa-ic"); ok(!EMOJI_RE.test(ic.textContent), `${rol}: ${b.dataset.view} sin emoji`);
+        const svg = ic.querySelector("svg.ic"); igual(svg.getAttribute("aria-hidden"), "true"); igual(svg.getAttribute("focusable"), "false");
+      }
+      for (const nav of app.$$(".nav-item[data-view]")) ok(nav.querySelector("svg.ic use"), `${rol}: menú «${nav.dataset.view}» con icono`);
+      for (const id of ["btnMenuToggle", "btnBuscarGlobal", "btnNotificaciones", "btnCuenta", "fabHome"]) { const b = app.$(`#${id}`); ok(b.getAttribute("aria-label"), `${id}: aria-label`); ok(b.querySelector('svg.ic[aria-hidden="true"] use'), `${id}: icono`); ok(!EMOJI_RE.test(b.textContent), `${id}: sin emoji`); }
+      // widgets del Dashboard (los pinta app.js con icono())
+      const widgets = app.$$("#widgetRow .widget-mini");
+      igual(widgets.length, 6, `${rol}: 6 widgets`);
+      // herramientas decorativas (UI-1C.1): discretas y más pequeñas que los iconos protagonistas; la caja (y por tanto la caída) no cambia
+      const lluvia = app.$(".qa-falling-tools"), tools = app.$$(".qa-falling-tools svg.qa-tool");
+      if (lluvia && lluvia.getBoundingClientRect().width > 0) {
+        ok(Number(app.win.getComputedStyle(lluvia).opacity) <= 0.3 + 1e-6, "lluvia: opacidad ≤ 0.3");
+        const protagonista = visiblesQa(app).find((b) => b.dataset.view === "ajustes")?.querySelector(".qa-ic svg.ic");
+        for (const s of tools) { const cs = app.win.getComputedStyle(s), dibujo = parseFloat(cs.width) - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          ok(Math.abs(dibujo / parseFloat(cs.width) - 0.75) < 0.01, "lluvia: dibujo al 75 % de su caja"); if (protagonista) ok(dibujo < caja(protagonista).w * 0.6, "lluvia: más pequeña que Ajustes"); }
+      }
+      mismo(widgets.map((w) => w.querySelector("use")?.getAttribute("href")), ["#i-orden", "#i-cotizacion", "#i-cita", "#i-mantenimiento", "#i-stock-bajo", "#i-usuarios"], `${rol}: símbolos de los widgets`);
+      for (const w of widgets) { ok(!EMOJI_RE.test(w.querySelector(".ic").textContent), "widget sin emoji"); ok(cuadrado(caja(w.querySelector("svg.ic")), 18, 24), "widget: icono cuadrado"); }
+      // tema: el icono sigue al texto (currentColor); el acento es el rojo del tema; el activo del menú, rojo
+      const temas = {};
+      for (const tema of ["dark", "light"]) {
+        app.doc.documentElement.setAttribute("data-theme", tema); await pausa(120);
+        const b = visiblesQa(app)[0], svg = b.querySelector("svg.ic");
+        igual(colorDe(app, svg), colorDe(app, b.querySelector(".qa-lbl")), `${rol} ${tema}: icono del acceso rápido = color del texto`);
+        igual(acento(app, svg), rojoToken(app), `${rol} ${tema}: acento = --red del tema`);
+        igual(colorDe(app, app.$(".nav-item.active svg.ic")), rojo(app), `${rol} ${tema}: icono del menú activo en rojo`);
+        const inactivo = app.$$(".nav-item[data-view]:not(.active)").find((x) => x.getBoundingClientRect().width > 0);
+        if (inactivo) ok(colorDe(app, inactivo.querySelector("svg.ic")) !== rojo(app), `${rol} ${tema}: un icono inactivo NO va en rojo`);
+        temas[tema] = colorDe(app, svg);
+      }
+      ok(temas.dark !== temas.light, `${rol}: el icono cambia de color con el tema (${temas.dark} / ${temas.light})`);
+      app.doc.documentElement.removeAttribute("data-theme");
+      vistos[rol] = { anchos: await revisarAnchos(app, rol, [360, 768, 1280]), temas };
+      app.cerrar();
+    }
+    return { vistos };
+  }, { grupo: "UI-1C" });
+  if (!taller) await caso("UI-1C · Mi Trabajo: mismo sprite, referencias resueltas, «Mi trabajo» con su icono en rojo (activo), sin accesos nuevos y sin desbordes a 360/768/1280", async () => {
+    const app = await B.abrirApp({ cuenta: C.mecanicoActivo }); igual(await B.esperarArranque(app), "shell"); await pausa(400);
+    mismo(refsRotas(app), [], "<use> sin símbolo"); ok(app.activo("view-mi-trabajo"), "Mi Trabajo activa");
+    mismo(app.$$(".nav-item[data-view]").filter((b) => app.win.getComputedStyle(b).display !== "none").map((b) => b.dataset.view), ["mi-trabajo"], "menú: solo Mi trabajo");
+    const nav = app.$('.nav-item[data-view="mi-trabajo"] svg.ic'); igual(nav.querySelector("use").getAttribute("href"), "#i-mantenimiento");
+    igual(colorDe(app, nav), rojo(app), "icono activo en rojo"); igual(visiblesQa(app).length, 0, "sin accesos rápidos");
+    const anchos = {};
+    for (const w of [360, 768, 1280]) { app.iframe.style.width = `${w}px`; await pausa(250); mismo(fueraDeLaBarra(app).map((e) => e.tagName), [], `@${w}: nada fuera de la barra superior se sale (${desbordan(app)})`); if (w !== 768) ok(sinDesborde(app), `@${w}: sin scroll horizontal`); anchos[w] = `${app.doc.documentElement.scrollWidth}/${app.doc.documentElement.clientWidth}`; }
+    app.cerrar(); return { anchos };
+  }, { grupo: "UI-1C" });
+
+  // ══ SECURITY-1E (3.14.1): Ajustes → Seguridad → cambiar la contraseña del administrador (ver suite-sec1e.js) ══
+  await casosSec1E({ B, taller, C });
 
   // ══ M · USUARIOS ══
   if (taller) {

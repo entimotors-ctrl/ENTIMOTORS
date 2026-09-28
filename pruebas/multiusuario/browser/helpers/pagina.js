@@ -78,7 +78,15 @@ export function crearBanco({ enviar, muerto }) {
     }, { ms, desc: "arranque de la aplicacion" });
   }
 
-  const contar = (doc) => ({ img: doc.querySelectorAll("img").length, svg: doc.querySelectorAll("svg").length, script: doc.querySelectorAll("script").length,
+  /* UI-1C: los iconos del sprite son <svg> legítimos que la app pinta sola (p. ej. los widgets del Dashboard, en segundo plano).
+     No cuentan SOLO si tienen la forma EXACTA de icono(): class «ic…», aria-hidden, focusable=false, sin más atributos y un único
+     <use href="#i-…">; y el propio sprite. Cualquier otro <svg> —y todo manejador on*— sigue contando. */
+  const esIconoLegitimo = (s) => (s.id === "spriteIconos" && s.parentElement === s.ownerDocument.body && [...s.children].every((c) => c.tagName.toLowerCase() === "symbol"))
+    || (s.classList.contains("ic") && s.getAttribute("aria-hidden") === "true" && s.getAttribute("focusable") === "false"
+      && [...s.attributes].every((a) => ["class", "aria-hidden", "focusable"].includes(a.name))
+      && s.children.length === 1 && s.firstElementChild.tagName.toLowerCase() === "use" && /^#i-[a-z-]+$/.test(s.firstElementChild.getAttribute("href") || "")
+      && [...s.firstElementChild.attributes].every((a) => a.name === "href" || a.name === "id"));
+  const contar = (doc) => ({ img: doc.querySelectorAll("img").length, svg: [...doc.querySelectorAll("svg")].filter((s) => !esIconoLegitimo(s)).length, script: doc.querySelectorAll("script").length,
     iframe: doc.querySelectorAll("iframe").length, manejadores: doc.querySelectorAll("[onerror],[onload]").length });
 
   /** Busca el canario SIN imprimirlo: devuelve solo PRESENTE/AUSENTE por lugar. */

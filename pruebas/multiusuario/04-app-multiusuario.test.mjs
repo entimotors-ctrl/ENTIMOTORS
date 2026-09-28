@@ -3,7 +3,9 @@
 // caducidad de sesion y updateOrder para el mecanico. Se ejecuta el codigo real; solo IndexedDB se sustituye.
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
-import { sinLlamadasAjenas, sinFugas } from "./helpers/entorno.mjs";
+import fs from "node:fs";
+import path from "node:path";
+import { sinLlamadasAjenas, sinFugas, RAIZ_RUNTIME } from "./helpers/entorno.mjs";
 import { nuevoEntorno, enviarLogin, sesionAppDe, perfilDe, activo, toasts, como, dbFalsa, CUENTAS, crearServidor } from "./helpers/flujos.mjs";
 import { UUID } from "./helpers/supabase-mock.mjs";
 
@@ -160,6 +162,80 @@ describe("Vistas y permisos por rol (puedeVerVista / showView / aplicarPermisosP
       const ocultas = env.doc.querySelectorAll(".nav-item[data-view]").filter((b) => b.style.display === "none").map((b) => b.dataset.view);
       assert.deepEqual(VISTAS.filter((v) => !ocultas.includes(v)), esperado, nombre);
     }
+  });
+});
+
+// UI-1B (3.14.1): los accesos rápidos de la página principal siguen EXACTAMENTE a puedeVerVista, igual que el menú.
+// Se usa el marcado REAL de index.html (bloque .qa-wrap). El DOM sintético no anida: cada .qa-group se monta como un
+// elemento propio con su HTML real y document.querySelectorAll(".qa-group") los devuelve (en el navegador real lo cubre
+// el caso «UI-1B» de browser/helpers/suite-app.js).
+describe("UI-1B · accesos rápidos del Dashboard con los mismos permisos que el menú (aplicarPermisosPorRol → puedeVerVista)", () => {
+  const INDEX = fs.readFileSync(path.join(RAIZ_RUNTIME, "taller-demo/index.html"), "utf8");
+  const QA = INDEX.slice(INDEX.indexOf('<div class="qa-wrap">'), INDEX.indexOf('<div class="widget-row"'));
+  const GRUPOS = QA.split('<div class="qa-group').slice(1).map((t) => '<div class="qa-group' + t);
+  const QA_REALES = [...QA.matchAll(/class="qa-btn" data-view="([^"]+)"/g)].map((m) => m[1]);
+  const TALLER = ["pos", "cotizaciones", "ordenes", "citas", "clientes", "inventario", "finanzas", "creditos"];
+  const montar = (env) => {
+    env.doc.getElementById("sidebar").innerHTML = VISTAS.map((v) => `<button class="nav-item" data-view="${v}">${v}</button>`).join("");
+    const grupos = GRUPOS.map((html) => { const g = env.doc.createElement("div"); g.innerHTML = html; return g; });
+    const original = env.doc.querySelectorAll;
+    env.doc.querySelectorAll = (sel, dueno) => (sel === ".qa-group" && !dueno ? grupos : original.call(env.doc, sel, dueno));
+    return grupos;
+  };
+  const visibles = (env, sel) => env.doc.querySelectorAll(sel).filter((b) => b.style.display !== "none").map((b) => b.dataset.view);
+  const estadoGrupos = (grupos) => grupos.map((g) => (g.style.display === "none" ? "oculto" : "visible"));
+  const aplicar = (env, u) => { como(env, u); env.win.aplicarPermisosPorRol(); };
+
+  test("el marcado real tiene 10 accesos rápidos en 2 grupos: Taller (8) y «Sitio web y sistema» (Gestor de la web, Ajustes)", () => {
+    assert.deepEqual(QA_REALES, [...TALLER, "web-cms", "ajustes"]);
+    assert.equal(GRUPOS.length, 2);
+    assert.match(GRUPOS[1], /Sitio web y sistema/);
+    assert.deepEqual([...GRUPOS[1].matchAll(/data-view="([^"]+)"/g)].map((m) => m[1]), ["web-cms", "ajustes"]);
+  });
+
+  const CASOS_QA = [
+    ["admin (cuenta)", ADMIN_SB, QA_REALES, ["visible", "visible"]],
+    ["admin local", ADMIN_LOCAL, QA_REALES, ["visible", "visible"]],
+    ["cajero", CAJERO, TALLER, ["visible", "oculto"]],
+    ["mecanico LOCAL (TEAM)", MEC_LOCAL, TALLER.filter((v) => v !== "finanzas"), ["visible", "oculto"]],
+    ["mecanico con CUENTA", MEC_SB, [], ["oculto", "oculto"]],
+    ["desarrollador", DEV, [], ["oculto", "oculto"]],
+  ];
+  for (const [nombre, u, esperado, grupos] of CASOS_QA) {
+    test(`${nombre}: accesos rápidos visibles = ${esperado.length ? esperado.join(", ") : "ninguno"}; grupos ${grupos.join("/")}`, () => {
+      const env = nuevoEntorno(); const g = montar(env); aplicar(env, u);
+      assert.deepEqual(visibles(env, ".qa-btn[data-view]"), esperado);
+      assert.deepEqual(estadoGrupos(g), grupos);
+      // una sola fuente: cada acceso rápido se ve si y solo si puedeVerVista lo permite, y el menú dice lo mismo
+      for (const v of QA_REALES) {
+        assert.equal(visibles(env, ".qa-btn[data-view]").includes(v), env.win.puedeVerVista(v), `${nombre}: ${v} vs puedeVerVista`);
+        assert.equal(visibles(env, ".qa-btn[data-view]").includes(v), visibles(env, ".nav-item[data-view]").includes(v), `${nombre}: ${v} en menú y accesos rápidos`);
+      }
+    });
+  }
+
+  test("cajero: ocultar no sustituye la autorización — showView(\"ajustes\") y showView(\"web-cms\") siguen RECHAZADOS con aviso y sin cambiar de vista", () => {
+    const env = nuevoEntorno(); montar(env); aplicar(env, CAJERO);
+    for (const v of ["ajustes", "web-cms"]) {
+      assert.equal(env.win.showView(v), false, v);
+      assert.equal(env.doc.getElementById(`view-${v}`).classList.contains("active"), false, v);
+    }
+    assert.deepEqual(toasts(env), ["No tienes acceso a esa sección", "No tienes acceso a esa sección"]);
+    assert.equal(env.win.showView("finanzas"), true, "lo que sí le corresponde sigue abriendo");
+  });
+
+  test("mismo dispositivo, otro rol: cajero → admin vuelve a mostrar todo (y los grupos); admin → cajero vuelve a esconder", () => {
+    const env = nuevoEntorno(); const g = montar(env);
+    aplicar(env, CAJERO); assert.deepEqual(estadoGrupos(g), ["visible", "oculto"]);
+    aplicar(env, ADMIN_SB); assert.deepEqual(visibles(env, ".qa-btn[data-view]"), QA_REALES); assert.deepEqual(estadoGrupos(g), ["visible", "visible"]);
+    aplicar(env, CAJERO); assert.deepEqual(visibles(env, ".qa-btn[data-view]"), TALLER); assert.deepEqual(estadoGrupos(g), ["visible", "oculto"]);
+  });
+
+  test("un grupo sin ningún acceso rápido en su HTML no se esconde por error (solo se esconde si TODOS sus botones están ocultos)", () => {
+    const env = nuevoEntorno(); const vacio = env.doc.createElement("div"); vacio.innerHTML = '<div class="qa-group"><span class="qa-group-label">x</span></div>';
+    const original = env.doc.querySelectorAll;
+    env.doc.querySelectorAll = (sel, dueno) => (sel === ".qa-group" && !dueno ? [vacio] : original.call(env.doc, sel, dueno));
+    aplicar(env, CAJERO); assert.equal(vacio.style.display, "");
   });
 });
 

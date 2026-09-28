@@ -1,5 +1,28 @@
 # Registro de cambios · ENTIMOTORS OS
 
+## 3.14.1 — candidato (septiembre de 2026, aún sin publicar)
+
+> **Alcance: mantenimiento de los frontends.** Sin cambios de base de datos ni de backend en esta entrega:
+> usa `PUT /api/admin/clave` (backend ya publicado) y la tabla de intentos ya aplicada en la base.
+
+### Seguridad
+- **Ajustes → Seguridad** (solo administrador): cambiar la contraseña del administrador. Tres campos
+  (actual, nueva, confirmación) con `type=password`, mostrar/ocultar accesible, validación local mínima
+  (12 caracteres, 72 bytes, distinta de la actual) y el servidor como autoridad; un solo envío a la vez,
+  respeta `Retry-After`, mensajes propios para cada respuesta y nada se guarda en el navegador.
+- Los campos de contraseña fijan sus colores (texto, cursor, fondo, borde) con los del tema: legibles en
+  modo claro y oscuro.
+
+### Interfaz
+- Los accesos rápidos de la página principal siguen los mismos permisos que el menú; el cajero ya no ve
+  Ajustes ni el Gestor de la web y un grupo vacío se oculta.
+- Iconos SVG propios (sprite en `index.html`, lista cerrada en `app.js`) en lugar de emoji en el menú,
+  los accesos rápidos, los widgets y la barra superior.
+
+### PWA
+- Caché nueva **`entimotors-v3.14.1`** (Mi Trabajo: `entimotors-mitrabajo-v3.14.1`); la de 3.14.0 se borra
+  al activar la versión nueva. Sin activación automática: el aviso de versión sigue pidiendo respaldo.
+
 ## 3.14.0 — candidato (septiembre de 2026, aún sin publicar)
 
 > **Alcance: el taller en la nube.** Los datos del taller pasan a Supabase y se comparten entre

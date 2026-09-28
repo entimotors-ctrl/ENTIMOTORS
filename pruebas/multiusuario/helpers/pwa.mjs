@@ -2,15 +2,16 @@
 // `verificarPwa` es una funcion pura sobre textos: asi las pruebas pueden alimentarla con el runtime real
 // (debe pasar) y con MUTANTES en memoria (deben fallar por el id correcto). No escribe nada.
 import vm from "node:vm";
-import { leer, existe, ES_313 } from "./entorno.mjs";
+import { leer, existe, RELEASE_CONGELADA } from "./entorno.mjs";
 
 /* Contrato de versionado por release. 3.13.0: 8 etiquetas ?v=, 7 entradas versionadas del SHELL, 12 entradas en total.
    3.14.0: + sync-rest, sync-db, sync-engine, sync-mappers, sync-fotos, sync-finanzas, pin-ui, import-313 → 16 / 15 / 20. */
 export const CONTRATOS = {
   "3.13.0": { etiquetas: 8, shellV: 7, shell: 12 },
   "3.14.0": { etiquetas: 16, shellV: 15, shell: 20 },
+  "3.14.1": { etiquetas: 16, shellV: 15, shell: 20 },   // UI-1B, UI-1C, SECURITY-1E: sin scripts nuevos (todo en app.js e index.html)
 };
-export const VERSION_ESPERADA = ES_313 ? "3.13.0" : "3.14.0";
+export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.14.1";
 export const fuentesReales = () => ({ app: leer("app.js"), sw: leer("sw.js"), index: leer("index.html"), existe });
 
 function manejador(txt, evento) {

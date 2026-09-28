@@ -1,6 +1,9 @@
 // ALCANCE HONESTO · contrato de 3.14.0 (árbol de trabajo). El de 3.13.0 (16-alcance-honesto) sigue vigente sobre el tag v3.13.0.
 // Guardas de que el README y el CHANGELOG de 3.14.0 (1) dicen la versión y las cifras REALES del código, (2) declaran las
 // limitaciones conocidas de la migración y (3) no arrastran afirmaciones de 3.13.0 que en 3.14.0 serían falsas.
+// 3.14.1: contrato de la release 3.14.0 → se ejecuta, sin cambiar aserciones, sobre la instantánea del commit effbfa1
+// (helpers/usar-3140.mjs, PRIMER import). El de 3.14.1 está en 16c-alcance-3.14.1.
+import "./helpers/usar-3140.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";

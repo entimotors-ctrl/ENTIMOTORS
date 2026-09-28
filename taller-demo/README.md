@@ -4,7 +4,23 @@ Sistema de gestión para un taller de motocicletas. Recibe la moto, la sigue por
 seis etapas de reparación, cobra, controla el inventario, lleva la caja y los
 créditos, y le manda al cliente su factura por WhatsApp.
 
-**Versión actual:** 3.14.0 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+**Versión actual:** 3.14.1 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+
+---
+
+## Novedades de 3.14.1
+
+Versión de mantenimiento sobre 3.14.0 (misma base de datos y mismo backend; solo cambian el Taller y Mi Trabajo):
+
+- **Ajustes → Seguridad** (solo administrador): cambiar la contraseña con la que el administrador inicia sesión.
+  Pide la actual, la nueva y su confirmación; los campos se ven bien en modo claro y oscuro, se pueden mostrar u
+  ocultar, y se borran al terminar o al salir. Al cambiarla se cierran las demás sesiones de administrador.
+- **Accesos rápidos de la página principal** con los mismos permisos que el menú: el cajero ya no ve Ajustes ni
+  el Gestor de la web, y un grupo sin accesos visibles no deja su título suelto.
+- **Iconos vectoriales propios** (SVG) en el menú, los accesos rápidos, los widgets y la barra superior, en lugar
+  de emoji; se adaptan al tema claro/oscuro.
+- PWA con caché nueva `entimotors-v3.14.1` (Mi Trabajo: `entimotors-mitrabajo-v3.14.1`); la de 3.14.0 se borra al
+  activar la nueva.
 
 ---
 
@@ -24,7 +40,7 @@ Sigue funcionando sin señal: lo que se hace sin conexión queda en una cola y s
 - **Importador 3.13 → nube** (Ajustes o aviso en la página principal, solo administrador): vista previa,
   confirmación, importación atómica y verificación. El teléfono y el archivo **no se borran**.
 - Con sesión de nube **no hay datos de ejemplo** ni «Restaurar»/«Empezar de cero».
-- PWA con caché propia `entimotors-v3.14.0` y actualización controlada.
+- PWA con caché propia (`entimotors-v3.14.0`; desde 3.14.1, `entimotors-v3.14.1`) y actualización controlada.
 
 **No incluye** (limitaciones conocidas, ver más abajo)
 
@@ -70,8 +86,8 @@ auditoría y seis documentos imprimibles que se pueden enviar como imagen o PDF.
 
 | Producto | Quién entra | Caché | Base local |
 |---|---|---|---|
-| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.14.0` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
-| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.14.0` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
+| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.14.1` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
+| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.14.1` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
 
 Se publican en **dos orígenes distintos** (la política de mismo origen del navegador es la que
 separa sus datos). `build-target.js` declara qué producto es cada copia y **lo decide el build,
@@ -272,8 +288,8 @@ No se toca `versionApp: "3.13.0"` de `armarRespaldoLocal313` (app.js): identific
 datos de la 3.13, no la versión de la app.
 
 El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z`: no se edita a mano.
-`pruebas/multiusuario/01-pwa-3.14.0.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.13.0` la del
-release 3.13.0 sobre la instantánea inmutable del tag `v3.13.0`).
+`pruebas/multiusuario/01-pwa-3.14.1.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.14.0` y
+`01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: el commit `effbfa1` y el tag `v3.13.0`).
 
 ---
 
@@ -294,5 +310,8 @@ release 3.13.0 sobre la instantánea inmutable del tag `v3.13.0`).
 3.14.0 es el **release de la nube**: datos compartidos entre dispositivos, asignación real de trabajo y
 el importador para traer los datos de la 3.13. El orden de publicación es **base de datos → backend →
 frontends**; la 3.13 sigue funcionando contra la base nueva (rollback de código sin tocar la base).
+
+3.14.1 añade Ajustes → Seguridad (cambio de contraseña del administrador), los permisos de los accesos rápidos y
+los iconos vectoriales. Usa el backend y la base ya publicados; publicar o revertir 3.14.1 solo afecta a los frontends.
 
 Ver [`CHANGELOG.md`](CHANGELOG.md) para el detalle de cada versión.

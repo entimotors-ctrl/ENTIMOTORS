@@ -19,7 +19,10 @@ export const RAIZ = path.resolve(AQUI, "..", "..", "..");
    inmutable del tag v3.13.0 (helpers/usar-313.mjs, importado PRIMERO por esas pruebas → ENTIMOTORS_RUNTIME_RAIZ). El resto,
    contra el árbol de trabajo. Así las guardas de 3.13.0 siguen intactas y sin debilitar, y las de 3.14.0 van aparte. */
 export const RAIZ_RUNTIME = process.env.ENTIMOTORS_RUNTIME_RAIZ || RAIZ;
-export const ES_313 = RAIZ_RUNTIME !== RAIZ;
+/* 3.14.1: igual para el contrato de 3.14.0 (helpers/usar-3140.mjs → instantánea del commit effbfa1). La release congelada la declara
+   quien cambia la raíz (ENTIMOTORS_RUNTIME_RELEASE); sin declararla, una raíz ajena es la de 3.13.0 (como hasta ahora). */
+export const RELEASE_CONGELADA = RAIZ_RUNTIME === RAIZ ? null : (process.env.ENTIMOTORS_RUNTIME_RELEASE || "3.13.0");
+export const ES_313 = RELEASE_CONGELADA === "3.13.0";
 export const RUNTIME = path.join(RAIZ_RUNTIME, "taller-demo");
 export const leer = (rel) => fs.readFileSync(path.join(RUNTIME, rel), "utf8");
 export const existe = (rel) => fs.existsSync(path.join(RUNTIME, rel));

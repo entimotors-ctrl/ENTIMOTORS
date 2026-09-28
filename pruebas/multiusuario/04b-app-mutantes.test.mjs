@@ -6,11 +6,25 @@ import assert from "node:assert/strict";
 import { nuevoEntorno, enviarLogin, sesionAppDe, toasts, como, dbFalsa, CUENTAS } from "./helpers/flujos.mjs";
 import { UUID } from "./helpers/supabase-mock.mjs";
 import { idbFalsa } from "./helpers/idb-falsa.mjs";
+import fs from "node:fs";
+import path from "node:path";
+import { RAIZ_RUNTIME } from "./helpers/entorno.mjs";
 
 const MEC_SB = { rol: "mecanico", origen: "supabase", perfilId: UUID(3), nombre: "Mecanico Activo", activo: true };
 const ADMIN_SB = { rol: "admin", origen: "supabase", perfilId: UUID(1), nombre: "Admin Activo", activo: true };
 const MEC_LOCAL = { rol: "mecanico", origen: "local", nombre: "Mecánico 1" };
 const cambiar = (de, a) => (t) => t.replace(de, a);
+const CAJERO = { rol: "cajero", origen: "supabase", perfilId: UUID(5), nombre: "Cajero", activo: true };
+
+// UI-1B: los accesos rápidos REALES de index.html, cada .qa-group montado como elemento propio (el DOM sintético no anida).
+const INDEX_HTML = fs.readFileSync(path.join(RAIZ_RUNTIME, "taller-demo/index.html"), "utf8");
+const QA_HTML = INDEX_HTML.slice(INDEX_HTML.indexOf('<div class="qa-wrap">'), INDEX_HTML.indexOf('<div class="widget-row"'));
+function conAccesosRapidos(e) {
+  const grupos = QA_HTML.split('<div class="qa-group').slice(1).map((h) => { const g = e.doc.createElement("div"); g.innerHTML = '<div class="qa-group' + h; return g; });
+  const original = e.doc.querySelectorAll;
+  e.doc.querySelectorAll = (sel, dueno) => (sel === ".qa-group" && !dueno ? grupos : original.call(e.doc, sel, dueno));
+  return grupos;
+}
 
 // Cada propiedad devuelve true si la garantia de seguridad SE CUMPLE.
 const PROPIEDADES = {
@@ -99,6 +113,23 @@ const PROPIEDADES = {
     e.evaluar("const g = DB.getAll; DB.getAll = async (s) => { window.__leidas.push(s); return g(s); };"); await e.win.continuarArranque("blanco").catch(() => {}); await e.asentar();
     return e.doc.getElementById("view-mi-trabajo").classList.contains("active") && leidas.every((x) => ["clientes", "motos", "citas", "ordenes"].includes(x));
   },
+  "UI-1C: icono() solo pinta nombres de la lista cerrada": (m) => {
+    const w = nuevoEntorno({ mutar: m }).win;
+    return w.icono('x"><img src=x onerror=alert(1)>') === "" && w.icono("__proto__") === "" && w.icono(7) === "" && w.icono("tpv").includes('href="#i-tpv"');
+  },
+  "UI-1B: el cajero no ve Ajustes ni Gestor de la web en los accesos rápidos": (m) => {
+    const e = nuevoEntorno({ mutar: m }); conAccesosRapidos(e); como(e, CAJERO); e.win.aplicarPermisosPorRol();
+    const ocultos = e.doc.querySelectorAll(".qa-btn[data-view]").filter((b) => b.style.display === "none").map((b) => b.dataset.view);
+    return JSON.stringify(ocultos) === JSON.stringify(["web-cms", "ajustes"]);
+  },
+  "UI-1B: el grupo «Sitio web y sistema» se esconde cuando el cajero no ve ninguno de sus accesos": (m) => {
+    const e = nuevoEntorno({ mutar: m }); const g = conAccesosRapidos(e); como(e, CAJERO); e.win.aplicarPermisosPorRol();
+    return g[0].style.display === "" && g[1].style.display === "none";
+  },
+  "UI-1B: showView sigue rechazando Ajustes al cajero aunque se llame directo": (m) => {
+    const e = nuevoEntorno({ mutar: m }); conAccesosRapidos(e); como(e, CAJERO); e.win.aplicarPermisosPorRol();
+    return e.win.showView("ajustes") === false && e.win.showView("web-cms") === false && !e.doc.getElementById("view-ajustes").classList.contains("active");
+  },
   "el mecanico local no edita una cita (guarda del boton)": async (m) => {
     const e = nuevoEntorno({ mutar: m }); como(e, MEC_LOCAL); dbFalsa(e, { citas: [{ id: 1, clienteId: 1, fecha: "2000-01-01", hora: "10:00", motivo: "x" }], clientes: [{ id: 1, nombre: "C", telefono: "" }], motos: [], ordenes: [] });
     const llamadas = []; e.espiar("abrirModalEditarCita", async (id) => { llamadas.push(id); }); await e.win.renderCitasList(); await e.asentar();
@@ -139,6 +170,10 @@ const MUTANTES = [
   ["la produccion separa tocayos por uuid", "app", "agrupar solo por nombre", cambiar("const { id, nombre, clave } = identidadMecanico(o);", 'const { id, nombre } = identidadMecanico(o); const clave = nombre || "(sin asignar)";')],
   ["el arranque del mecanico muestra Mi Trabajo y no lee tablas de negocio", "app", "no distinguir al mecanico en continuarArranque", cambiar('  if (esMecanicoCuenta()) {\n    showView("mi-trabajo");', '  if (false) {\n    showView("mi-trabajo");')],
   ["el mecanico local no edita una cita (guarda del boton)", "app", "quitar la guarda del boton editar", cambiar('if (!exigeGestion("Solo el administrador o el cajero editan una cita")) return;', "")],
+  ["UI-1C: icono() solo pinta nombres de la lista cerrada", "app", "quitar la lista cerrada de icono()", cambiar('if (typeof nombre !== "string" || !ICONOS_VALIDOS.has(nombre)) return "";', "")],
+  ["UI-1B: el cajero no ve Ajustes ni Gestor de la web en los accesos rápidos", "app", "volver a filtrar SOLO el menú lateral", cambiar('for (const selector of [".nav-item[data-view]", ".qa-btn[data-view]"]) {', 'for (const selector of [".nav-item[data-view]"]) {')],
+  ["UI-1B: el grupo «Sitio web y sistema» se esconde cuando el cajero no ve ninguno de sus accesos", "app", "no esconder nunca el grupo", cambiar('grupo.style.display = botones.length > 0 && botones.every(b => b.style.display === "none") ? "none" : "";', 'grupo.style.display = "";')],
+  ["UI-1B: showView sigue rechazando Ajustes al cajero aunque se llame directo", "app", "quitar la guarda de showView (esconder botones no autoriza)", cambiar("if (!puedeVerVista(name)) {", "if (false) {")],
   ["el mecanico con cuenta no abre la ficha del cliente", "app", "quitar el bloqueo de la ficha", cambiar('if (esMecanicoCuenta()) { bloquear("La ficha del cliente es del administrador"); return; }', "")],
 ];
 

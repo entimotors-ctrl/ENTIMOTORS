@@ -20,10 +20,10 @@ const RAIZ = path.resolve(AQUI, "..", "..", "..");
 const TALLER = path.join(RAIZ, "taller-demo");
 const arg = (n, def) => { const a = process.argv.find((x) => x.startsWith(`--${n}=`)); return a ? a.slice(n.length + 3) : def; };
 const JSON_SALIDA = process.argv.includes("--json");
-const SUITES_TODAS = ["app", "mt", "mut", "pwa-taller", "pwa-mt", "pwa-upg"];
+const SUITES_TODAS = ["app", "mt", "mut", "pwa-taller", "pwa-mt", "pwa-upg", "upg-3141-taller", "upg-3141-mt"];
 const suites = arg("suite", SUITES_TODAS.join(",")).split(",").filter(Boolean);
 const quePedido = arg("navegador", "todos");
-const PLAZO_MS = { app: 240000, mt: 120000, mut: 150000, "pwa-taller": 90000, "pwa-mt": 90000, "pwa-upg": 120000 };
+const PLAZO_MS = { app: 240000, mt: 120000, mut: 150000, "pwa-taller": 90000, "pwa-mt": 90000, "pwa-upg": 120000, "upg-3141-taller": 150000, "upg-3141-mt": 150000 };
 
 // ── navegadores ya instalados ──
 const buscar = (nombres) => { for (const n of nombres) { const r = spawnSync("sh", ["-c", `command -v ${n}`], { encoding: "utf8" }); const p = r.stdout.trim(); if (p) return { nombre: n, ruta: p, real: fs.realpathSync(p) }; } return null; };
@@ -84,7 +84,7 @@ const FONDO_NAVEGADOR = /(^|\.)(google\.com|gstatic\.com|googleapis\.com|googleu
 function clasificarExterno(intento, suite) {
   const host = String(intento.destino);
   if (FONDO_NAVEGADOR.test(host)) return "BROWSER_BACKGROUND";
-  if (/^cdn\.jsdelivr\.net(:\d+)?$/i.test(host) && /^pwa-/.test(suite)) return "EXPECTED_SW_EXTRAS";
+  if (/^cdn\.jsdelivr\.net(:\d+)?$/i.test(host) && /^(pwa-|upg-)/.test(suite)) return "EXPECTED_SW_EXTRAS";
   return "UNEXPECTED_EXTERNAL_REQUEST";
 }
 const puertoLibre = () => new Promise((res, rej) => { const s = net.createServer(); s.once("error", rej); s.listen(0, "127.0.0.1", () => { const p = s.address().port; s.close(() => res(p)); }); });
@@ -100,7 +100,7 @@ try {
   // Build temporal de «Mi Trabajo» (solo si hace falta) y SW de PRE (3.12.2) leido del commit HEAD, sin tocar nada.
   const raizTmp = fs.mkdtempSync(path.join(os.tmpdir(), "entimotors-c3browser-build-")); limpiezas.push(() => fs.rmSync(raizTmp, { recursive: true, force: true }));
   const BUILD_MT = path.join(raizTmp, "mecanicos");
-  if (suites.some((s) => ["mt", "pwa-mt"].includes(s))) {
+  if (suites.some((s) => ["mt", "pwa-mt", "upg-3141-mt"].includes(s))) {
     const b = spawnSync("bash", [path.join(TALLER, "hacer-build-mecanicos.sh"), BUILD_MT], { encoding: "utf8", env: { PATH: process.env.PATH, LC_ALL: "C.UTF-8" } });
     if (b.status !== 0) throw new Error(`no se pudo generar el build de Mi Trabajo en /tmp: ${b.stderr || b.stdout}`);
   }
@@ -111,6 +111,19 @@ try {
     if (!SW_PRE || !/entimotors-v3\.12\.2/.test(SW_PRE.toString("utf8"))) throw new Error("el sw.js de HEAD no es el 3.12.2 esperado");
   }
   const SW_REAL = fs.readFileSync(path.join(TALLER, "sw.js"));
+  /* 3.14.1: la release ANTERIOR entera (commit effbfa1 = 3.14.0, publicada) como «antes» de la actualización: el Taller tal cual y su
+     «Mi Trabajo» generado con SU PROPIO hacer-build-mecanicos.sh. Solo lectura del repositorio (git archive a /tmp). */
+  let ANTES_TALLER = null, ANTES_MT = null;
+  if (suites.some((s) => /^upg-3141-/.test(s))) {
+    const d = path.join(raizTmp, "antes-3140"); fs.mkdirSync(d);
+    const a = spawnSync("sh", ["-c", `git -C "${RAIZ}" archive effbfa186d6f1e0db3bc8261e1c413f5f26077fc taller-demo | tar -x -C "${d}"`], { encoding: "utf8" });
+    if (a.status !== 0) throw new Error(`no se pudo extraer la release 3.14.0 (effbfa1): ${a.stderr}`);
+    ANTES_TALLER = path.join(d, "taller-demo");
+    if (!/const CACHE_NAME = "entimotors-v3\.14\.0";/.test(fs.readFileSync(path.join(ANTES_TALLER, "sw.js"), "utf8"))) throw new Error("effbfa1 no trae el sw.js 3.14.0");
+    ANTES_MT = path.join(raizTmp, "antes-3140-mt");
+    const b = spawnSync("bash", [path.join(ANTES_TALLER, "hacer-build-mecanicos.sh"), ANTES_MT], { encoding: "utf8", env: { PATH: process.env.PATH, LC_ALL: "C.UTF-8" } });
+    if (b.status !== 0) throw new Error(`no se pudo generar Mi Trabajo 3.14.0: ${b.stderr || b.stdout}`);
+  }
 
   const cambiar = (de, a) => (t) => { const r = t.split(de).join(a); if (r === t) throw new Error(`mutante sin efecto: ${de}`); return r; };
   const componer = (...fs) => (t) => fs.reduce((acc, f) => f(acc), t);
@@ -137,6 +150,8 @@ try {
     "pwa-taller": { nombre: "pwa-taller", dir: TALLER, modo: "raw", prefijo: "/taller" },
     "pwa-mt": { nombre: "pwa-mt", dir: BUILD_MT, modo: "raw", prefijo: "/mt" },
     "pwa-upg": { nombre: "pwa-upg", dir: TALLER, modo: "raw", prefijo: "/up", swActual: () => (fase.sw === "pre" ? SW_PRE : SW_REAL), ctl: { sw: (v) => { fase.sw = v; } } },
+    "upg-3141-taller": { nombre: "upg-3141-taller", dir: TALLER, modo: "raw", prefijo: "/u1", dirActual: () => (fase.sw === "pre" ? ANTES_TALLER : TALLER), ctl: { sw: (v) => { fase.sw = v; } } },
+    "upg-3141-mt": { nombre: "upg-3141-mt", dir: BUILD_MT, modo: "raw", prefijo: "/u2", dirActual: () => (fase.sw === "pre" ? ANTES_MT : BUILD_MT), ctl: { sw: (v) => { fase.sw = v; } } },
   };
   const origenes = {};
   for (const s of suites) { origenes[s] = await crearOrigen({ ...def[s], colector }); limpiezas.push(() => origenes[s].cerrar()); }
