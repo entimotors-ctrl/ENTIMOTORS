@@ -268,7 +268,7 @@ const router = Router();
 /* ───────────────────── GET /api/admin/usuarios ───────────────────── */
 router.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req: PeticionAdmin, res: Response) => {
   const { data: perfiles, error } = await comoElAdmin(req.quien!.token)
-    .from("perfiles").select("id, nombre, rol, telefono, activo, creado_en").order("nombre");
+    .from("perfiles").select("id, nombre, rol, telefono, activo, creado_en, eliminado_en").order("nombre");
 
   if (error) {
     logger.error({ err: error }, "no se pudieron listar los perfiles");
@@ -284,7 +284,7 @@ router.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req: Peti
   res.json({
     usuarios: (perfiles ?? []).map((p) => ({
       id: p.id, nombre: p.nombre, correo: correos.get(p.id) ?? "",
-      telefono: p.telefono ?? "", rol: p.rol, activo: p.activo,
+      telefono: p.telefono ?? "", rol: p.rol, activo: p.activo, eliminado: !!p.eliminado_en, eliminadoEn: p.eliminado_en ?? null,
       creadoEn: p.creado_en, esUsted: p.id === req.quien!.id,
     })),
   });
@@ -306,8 +306,23 @@ router.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req: Pet
   if (errAlta || !creado?.user) {
     const msg = errAlta?.message ?? "";
     logger.warn({ correo }, "alta de usuario rechazada");   // el correo sí, la clave nunca
-    res.status(/already|registered|exists/i.test(msg) ? 409 : 400)
-       .json({ error: /already|registered|exists/i.test(msg) ? "Ya existe una cuenta con ese correo." : "No se pudo crear la cuenta." });
+    const existe = /already|registered|exists/i.test(msg) || (errAlta as { code?: string } | null)?.code === "email_exists";
+    /* 3.15 (Bloque 4) · MISMO CORREO: una cuenta ELIMINADA conserva su identidad (historial y auditoría). Su correo no se reutiliza para
+       otra persona: la nueva cuenta necesita otro correo. Se dice claramente cuál es el caso. */
+    let eliminada = false;
+    if (existe) {
+      try {
+        const { data: lista } = await servidor.auth.admin.listUsers({ page: 1, perPage: 200 });
+        const previa = (lista?.users ?? []).find((u) => (u.email ?? "").toLowerCase() === correo.toLowerCase());
+        if (previa) { const { data: pf } = await servidor.from("perfiles").select("eliminado_en").eq("id", previa.id).maybeSingle(); eliminada = !!pf?.eliminado_en; }
+      } catch { /* sin detalle: el mensaje general basta */ }
+    }
+    res.status(existe ? 409 : 400).json({
+      error: !existe ? "No se pudo crear la cuenta." : eliminada
+        ? "Ese correo pertenece a un usuario ELIMINADO (se conserva por su historial). Usa otro correo para la cuenta nueva."
+        : "Ya existe una cuenta con ese correo.",
+      codigo: !existe ? "ALTA_RECHAZADA" : eliminada ? "CORREO_DE_USUARIO_ELIMINADO" : "CORREO_EXISTENTE",
+    });
     return;
   }
 
@@ -441,6 +456,7 @@ router.post("/admin/usuarios/:id/enlace", exigirConfiguracion, exigirAdmin, asyn
   });
 });
 
+
 /* ───────────────── PATCH /api/admin/usuarios/:id ───────────────── */
 router.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req: PeticionAdmin, res: Response) => {
   const id = String(req.params["id"] ?? "");
@@ -465,6 +481,8 @@ router.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req
   }
   if ("activo" in cuerpo) {
     if (typeof cuerpo["activo"] !== "boolean") { res.status(400).json({ error: "«activo» tiene que ser verdadero o falso." }); return; }
+    // 3.15 (Bloque 4): «Dar de baja» se sustituye por «Eliminar usuario» (PIN del propietario, sesiones revocadas, historial intacto)
+    if (cuerpo["activo"] === false) { res.status(400).json({ error: "Para quitarle el acceso a alguien usa «Eliminar usuario».", codigo: "USA_ELIMINAR_USUARIO" }); return; }
     cambios["activo"] = cuerpo["activo"];
   }
   if ("nombre" in cuerpo) {
@@ -480,8 +498,9 @@ router.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req
   if (Object.keys(cambios).length === 0) { res.status(400).json({ error: "No has pedido ningún cambio." }); return; }
 
   // que el objetivo exista, y que no sea el administrador
-  const { data: destino } = await servidor.from("perfiles").select("id, rol").eq("id", id).maybeSingle();
+  const { data: destino } = await servidor.from("perfiles").select("id, rol, eliminado_en").eq("id", id).maybeSingle();
   if (!destino) { res.status(404).json({ error: "Ese usuario no existe." }); return; }
+  if (destino.eliminado_en) { res.status(409).json({ error: "Ese usuario fue eliminado: su cuenta no se reactiva ni se modifica (se conserva por su historial).", codigo: "USUARIO_ELIMINADO" }); return; }
   if (destino.rol === "admin") { res.status(400).json({ error: "La cuenta del administrador no se modifica desde esta pantalla." }); return; }
 
   // la escritura va EN NOMBRE DEL ADMIN: RLS y el disparador deciden
@@ -496,6 +515,76 @@ router.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (req
   if (!actualizado) { res.status(403).json({ error: "La base no permitió el cambio." }); return; }
 
   res.json({ usuario: actualizado });
+});
+
+/* ───────────── GET /api/admin/usuarios/:id/impacto ─────────────
+   3.15 (Bloque 4). Lo que hay que saber ANTES de eliminar: trabajo activo (a resolver) e historial (se conserva). Lo calcula la base
+   (usuario_impacto) con el token del admin. */
+router.get("/admin/usuarios/:id/impacto", exigirConfiguracion, exigirAdmin, async (req: PeticionAdmin, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) { res.status(400).json({ error: "Identificador no válido." }); return; }
+  const { data, error } = await comoElAdmin(req.quien!.token).rpc("usuario_impacto", { p_perfil: id });
+  if (error) { res.status(/no existe/i.test(error.message) ? 404 : 400).json({ error: error.message }); return; }
+  res.json({ impacto: data });
+});
+
+/* ───────────── POST /api/admin/usuarios/:id/eliminar ─────────────
+   3.15 (Bloque 4) · ELIMINAR USUARIO ≠ BORRAR HISTORIAL. Orden (cada paso idempotente; un reintento con el MISMO op_id completa lo que falte):
+     1. eliminar_usuario (base, con el token del admin): consume la autorización del PIN del propietario (acción eliminar_usuario, ligada a
+        ESTA persona, a la sesión y al dispositivo), resuelve el trabajo activo (desasignar explícito o se niega con el conteo), marca el
+        perfil eliminado (RLS le corta el acceso a los datos al instante) y audita. Una cuenta ya eliminada responde «ya_eliminado».
+     2. Auth: baneo (login, refresh, /user y enlaces previos quedan rechazados por GoTrue).
+     3. revocar_sesiones_usuario: borra sus sesiones (todas: dos dispositivos = dos sesiones) y revoca sus refresh tokens.
+   Si 2/3 fallan (Auth caído), el acceso a los datos ya está cortado por el paso 1: se responde 502 con «reintenta», y el reintento repite
+   2 y 3 sin volver a pedir PIN (el paso 1 devuelve «repetida»). Nunca se borra la cuenta: su historia la necesita. */
+router.post("/admin/usuarios/:id/eliminar", exigirConfiguracion, exigirAdmin, async (req: PeticionAdmin, res: Response) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+  const cuerpo = (req.body ?? {}) as Record<string, unknown>;
+  const UUIDre = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUIDre.test(id)) { res.status(400).json({ error: "Identificador no válido." }); return; }
+  if (id === req.quien!.id) { res.status(400).json({ error: "No puedes eliminar tu propia cuenta.", codigo: "PROPIA_CUENTA" }); return; }
+  const op = cuerpo["op_id"], aut = cuerpo["autorizacion_id"], dev = cuerpo["device_id"];
+  if (typeof op !== "string" || !UUIDre.test(op)) { res.status(400).json({ error: "Falta el identificador de la operación.", codigo: "OP_INVALIDA" }); return; }
+  if (aut !== undefined && aut !== null && (typeof aut !== "string" || !UUIDre.test(aut))) { res.status(400).json({ error: "Autorización inválida.", codigo: "AUTORIZACION_INVALIDA" }); return; }
+  if (dev !== undefined && dev !== null && (typeof dev !== "string" || dev.length > 100)) { res.status(400).json({ error: "device_id inválido." }); return; }
+  const desasignar = cuerpo["desasignar"] === true;
+
+  const { data: r, error } = await comoElAdmin(req.quien!.token).rpc("eliminar_usuario", {
+    p_op: op, p_perfil: id, p_autorizacion: (aut as string | undefined) ?? null, p_device: (dev as string | undefined) ?? null, p_desasignar: desasignar,
+  });
+  if (error) {
+    const m = error.message ?? "";
+    const codigo = /TRABAJO_ACTIVO/.test(m) ? "TRABAJO_ACTIVO" : /AUTORIZACION_REQUERIDA/.test(m) ? "AUTORIZACION_REQUERIDA"
+      : /AUTORIZACION_INVALIDA/.test(m) ? "AUTORIZACION_INVALIDA" : /no existe/i.test(m) ? "NO_EXISTE" : /administrador|propia/i.test(m) ? "NO_PERMITIDO" : "RECHAZADO";
+    const st = codigo === "TRABAJO_ACTIVO" ? 409 : codigo === "NO_EXISTE" ? 404 : codigo === "AUTORIZACION_REQUERIDA" || codigo === "AUTORIZACION_INVALIDA" || codigo === "NO_PERMITIDO" ? 403 : 400;
+    logger.warn({ evento: "eliminar-usuario-rechazado", codigo, por: req.quien!.id, para: id }, "eliminar usuario rechazado");
+    res.status(st).json({ error: m.replace(/^[A-Z_]+: /, ""), codigo });
+    return;
+  }
+  const resultado = (r ?? {}) as Record<string, unknown>;
+
+  let accesoCerrado = true, sesiones = 0;
+  try {
+    const { error: eBan } = await servidor.auth.admin.updateUserById(id, { ban_duration: "876000h" });
+    if (eBan) throw new Error("ban: " + eBan.message);
+    const { data: n, error: eRev } = await servidor.rpc("revocar_sesiones_usuario", { p_perfil: id });
+    if (eRev) throw new Error("revocar: " + eRev.message);
+    sesiones = Number(n ?? 0);
+  } catch (e) {
+    accesoCerrado = false;
+    logger.error({ evento: "eliminar-usuario-auth", para: id, mensaje: e instanceof Error ? e.message : String(e) }, "no se pudo cerrar el acceso en Auth");
+  }
+  logger.info({ evento: "usuario-eliminado", por: req.quien!.id, para: id, accesoCerrado }, "usuario eliminado");
+  const cuerpoRes = {
+    ok: accesoCerrado, eliminado: true, ya_eliminado: resultado["ya_eliminado"] === true, repetida: resultado["repetida"] === true,
+    ordenes_desasignadas: resultado["ordenes_desasignadas"] ?? [], citas_desasignadas: resultado["citas_desasignadas"] ?? [],
+    sesiones_revocadas: sesiones, acceso_cerrado: accesoCerrado,
+    nota: accesoCerrado ? "Ya no puede entrar: sus sesiones se cerraron. Su historial se conserva."
+      : "Se eliminó en ENTIMOTORS (ya no ve ningún dato), pero no se pudo cerrar su acceso en el servidor de cuentas. Vuelve a intentarlo.",
+  };
+  res.status(accesoCerrado ? 200 : 502).json(cuerpoRes);
 });
 
 export default router;

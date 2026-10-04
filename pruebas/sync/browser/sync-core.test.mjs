@@ -1,7 +1,7 @@
 // SYNC-4 · NÚCLEO DEL CLIENTE DE SINCRONIZACIÓN en navegadores REALES (Chrome y Firefox) contra PostgREST + Postgres reales (local).
 //   node --test pruebas/sync/browser/sync-core.test.mjs          (requiere pruebas/sync/entorno-local.sh up y Docker)
 //   SYNC_NAVEGADORES=chromium node --test …                       (uno solo)
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { iniciarPila, PERFILES, PG, DB } from "./lib/pila.mjs";
@@ -38,6 +38,9 @@ for (const nav of NAVS) {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
     before(() => pila.limpiar());
+    // 3.15 (Bloque 6): cada prueba cierra SUS navegadores al terminar (mismo arreglo que sync5/6/7a/8/9-core en el Bloque 5: esta suite
+    // pasaba justa de memoria en 7,7 GB). Ninguna prueba usa dispositivos abiertos por otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("la base entimotors_sync tiene sus tablas, device_id estable y NO se crea entimotors_os_demo", async () => {

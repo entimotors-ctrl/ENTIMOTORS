@@ -4,7 +4,35 @@ Sistema de gestión para un taller de motocicletas. Recibe la moto, la sigue por
 seis etapas de reparación, cobra, controla el inventario, lleva la caja y los
 créditos, y le manda al cliente su factura por WhatsApp.
 
-**Versión actual:** 3.14.1 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+**Versión actual:** 3.15.0 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+
+---
+
+## Novedades de 3.15.0
+
+Versión mayor sobre 3.14.1: cambia la base de datos, el backend y los dos frontends. Orden de publicación obligatorio:
+**base de datos (sync-15a → 15g) → backend → frontends**.
+
+- **Cotizaciones y presupuestos con inventario**: los renglones recuerdan de qué repuesto salieron y el precio de esa
+  operación. Los repuestos del negocio salen del inventario **una sola vez, al aprobar** el presupuesto (o al aceptar la
+  cotización), aunque se repita el toque, se pierda la respuesta o aprueben dos dispositivos a la vez.
+- **Avisos en vivo y mensajes al equipo**: lo que se asigna a un mecánico aparece solo en Mi Trabajo, y el administrador
+  puede enviarle mensajes. Si los avisos no conectan, la app sigue revisando por su cuenta.
+- **Almacenamiento seguro**: si la base local del dispositivo no se puede abrir, la app lo dice y se detiene en vez de
+  guardar trabajo que nunca subiría. Trabajar sin conexión sigue igual.
+- **PIN del propietario** para las acciones destructivas y **«Eliminar usuario»** con su impacto a la vista (trabajo
+  asignado, sesiones abiertas) antes de confirmar.
+- **Finanzas y fechas** calculadas con la fecha del negocio; mismas cifras en el Taller y en el servidor.
+- **Rendimiento**: reabrir la app muestra lo guardado al instante y se pone al día en segundo plano; listas largas por
+  partes; fotos nuevas comprimidas.
+- **Datos de la versión 3.13**: el aviso y el importador siguen disponibles; nada de lo que quedó en un dispositivo se
+  borra ni se da por migrado automáticamente.
+- **Cambios que solo existen en un dispositivo**: si la nube rechazó un cambio y esa operación es lo único que lo
+  respalda, la orden conserva sus renglones al actualizarse y la entrada **no se puede quitar** de «⚠ Por revisar».
+  Es una **protección temporal**, no la solución definitiva: se retirará en una versión posterior, cuando esos datos
+  estén respaldados fuera del dispositivo (pendiente, ver «Estado»).
+- PWA con caché nueva `entimotors-v3.15.0` (Mi Trabajo: `entimotors-mitrabajo-v3.15.0`); la de 3.14.1 se borra al
+  activar la nueva. La actualización no es automática: la app avisa y la persona decide.
 
 ---
 
@@ -86,8 +114,8 @@ auditoría y seis documentos imprimibles que se pueden enviar como imagen o PDF.
 
 | Producto | Quién entra | Caché | Base local |
 |---|---|---|---|
-| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.14.1` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
-| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.14.1` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
+| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.15.0` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
+| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.15.0` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
 
 Se publican en **dos orígenes distintos** (la política de mismo origen del navegador es la que
 separa sus datos). `build-target.js` declara qué producto es cada copia y **lo decide el build,
@@ -278,18 +306,18 @@ Al cambiar el código hay que subir el número de versión en **todos** estos si
 se queda con la copia vieja:
 
 1. `app.js` → `const VERSION_APP`.
-2. `index.html` → las **16** etiquetas `<script src="…?v=X.Y.Z">` (`build-target`, `supabase-config`,
-   `supabase-client`, `auth`, `recovery`, `config-local`, `sync-rest`, `sync-db`, `sync-engine`,
-   `sync-mappers`, `sync-fotos`, `sync-finanzas`, `pin-ui`, `import-313`, `app` y `usuarios`).
-3. `sw.js` → `CACHE_NAME` y las **15** entradas versionadas de `SHELL` (todas menos `config-local`).
+2. `index.html` → las **19** etiquetas `<script src="…?v=X.Y.Z">` (`build-target`, `supabase-config`,
+   `supabase-client`, `auth`, `recovery`, `fecha-negocio`, `finanzas-calc`, `config-local`, `sync-rest`, `sync-db`,
+   `sync-engine`, `sync-realtime`, `sync-mappers`, `sync-fotos`, `sync-finanzas`, `pin-ui`, `import-313`, `app` y `usuarios`).
+3. `sw.js` → `CACHE_NAME` y las **18** entradas versionadas de `SHELL` (todas menos `config-local`).
 4. `panel-tecnico.html` → el literal visual de la versión (cosmético: no afecta a la caché).
 
 No se toca `versionApp: "3.13.0"` de `armarRespaldoLocal313` (app.js): identifica el formato de los
 datos de la 3.13, no la versión de la app.
 
 El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z`: no se edita a mano.
-`pruebas/multiusuario/01-pwa-3.14.1.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.14.0` y
-`01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: el commit `effbfa1` y el tag `v3.13.0`).
+`pruebas/multiusuario/01-pwa-3.15.0.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.14.1`, `01-pwa-3.14.0` y
+`01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: los commits `e807f65` y `effbfa1` y el tag `v3.13.0`).
 
 ---
 
@@ -313,5 +341,13 @@ frontends**; la 3.13 sigue funcionando contra la base nueva (rollback de código
 
 3.14.1 añade Ajustes → Seguridad (cambio de contraseña del administrador), los permisos de los accesos rápidos y
 los iconos vectoriales. Usa el backend y la base ya publicados; publicar o revertir 3.14.1 solo afecta a los frontends.
+
+3.15.0 cambia base de datos, backend y frontends (sync-15a → 15g → backend → Taller y Mi Trabajo). Cada migración trae su
+script de reversión; las que registran actividad de 3.15 se niegan a revertirse si ya hay actividad.
+
+**Pendiente conocido de 3.15.0 — rescate de datos de un dispositivo: DIFERIDO.** Un dispositivo conserva cambios que la
+nube no aceptó y que solo existen en él. Su respaldo fuera del dispositivo no se ha completado. Hasta entonces, 3.15.0
+los conserva en el dispositivo y no permite quitarlos de la lista de revisión (protección temporal). No borrar los datos
+del navegador ni desinstalar la app en ese dispositivo.
 
 Ver [`CHANGELOG.md`](CHANGELOG.md) para el detalle de cada versión.

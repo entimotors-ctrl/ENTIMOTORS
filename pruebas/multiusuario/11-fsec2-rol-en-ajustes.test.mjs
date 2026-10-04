@@ -26,7 +26,9 @@ const CARACTERES = `a<b>c&d"e'f`;
 const NOMBRE = "Persona Sintetica";
 const ROLES_NORMALES = [["admin", "administrador"], ["mecanico", "mecánico"], ["cajero", "cajero"], ["desarrollador", "desarrollador"]];
 // Plantilla EXACTA de #ajustesInfo con un rol normal, capturada ANTES del fix: el fix no debe cambiar ni un caracter.
-const DORADO = (etiqueta) => `\n    Usuario: <b>${NOMBRE}</b> (${etiqueta})<br>\n    Este dispositivo arrancó en blanco · 0 registros guardados en total.\n  `;
+// 3.15 (Bloque 6): en una sesión de NUBE el producto ya no dice «Este dispositivo arrancó en blanco» (texto de la época demo): dice de
+// dónde vienen los datos. Contrato visual actualizado a propósito; las comprobaciones de escape y de marcado no cambian.
+const DORADO = (etiqueta) => `\n    Usuario: <b>${NOMBRE}</b> (${etiqueta})<br>\n    Datos del taller en la nube · 0 registros guardados en este dispositivo.\n  `;
 const ETIQUETAS_PROPIAS = ["<b>", "</b>", "<br>"];
 
 const etiquetas = (html) => html.match(/<\/?[A-Za-z!?][^>]*>/g) || [];
@@ -41,7 +43,7 @@ async function ajustes(usuario, { mutar } = {}) {
   return env;
 }
 const infoHtml = (env) => env.doc.getElementById("ajustesInfo").innerHTML;
-const parteRol = (html) => (/<b>.*<\/b> \((.*)\)<br>\n\s*Este dispositivo/s.exec(html) || [])[1];
+const parteRol = (html) => (/<b>.*<\/b> \((.*)\)<br>\n\s*(?:Este dispositivo|Datos del taller)/s.exec(html) || [])[1];
 
 /** Violaciones de la propiedad para un rol concreto (lista vacia = propiedad cumplida). `rol` es lo que viaja en la sesion. */
 async function violaciones(rol, opciones) {
@@ -91,7 +93,7 @@ describe("no regresion visual: con roles normales la pantalla es EXACTAMENTE la 
   });
   test("rol vacio, null, ausente o falso → «(—)» sin romper la pantalla; sin sesion → «Usuario: — (—)»", async () => {
     for (const rol of ["", null, undefined, 0, false]) assert.equal(infoHtml(await ajustes({ rol })), DORADO("—"), String(rol));
-    const sin = await ajustes(null); assert.equal(infoHtml(sin), "\n    Usuario: <b>—</b> (—)<br>\n    Este dispositivo arrancó en blanco · 0 registros guardados en total.\n  ");
+    const sin = await ajustes(null); assert.equal(infoHtml(sin), "\n    Usuario: <b>—</b> (—)<br>\n    Este dispositivo arrancó en blanco · 0 registros guardados en este dispositivo.\n  ");   // sin sesión = no es nube
   });
   test("solo cambia lo que hay dentro del paréntesis: el resto de #ajustesInfo (nombre, modo, registros) queda igual", async () => {
     const env = await ajustes({ rol: "<img src=x onerror=alert(1)>" }); const html = infoHtml(env);

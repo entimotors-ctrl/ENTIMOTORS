@@ -38,8 +38,15 @@ test("22000 (ya anulada/ya finalizada) → HTTP 400 → validacion; 22023 (datos
   const ok = await c.rpc("registrar_venta_v2", venta(id(952), item(901, 1)));
   assert.equal(ok.ok, true);
   const v = ok.datos.venta_id;
-  assert.equal((await c.rpc("reversar_venta", { p_op: id(953), p_venta_id: v, p_motivo: "prueba http" })).ok, true);
-  const r = await c.rpc("reversar_venta", { p_op: id(954), p_venta_id: v, p_motivo: "otra vez" });
+  // 3.15 · Bloque 4: reversar_venta es DESTRUCTIVA → también el admin necesita una autorización del PIN (sin ella: 403 42501).
+  // Aquí no hay api-server: se emite con la RPC del backend (service_role) tras sembrar un PIN de prueba (hash sintético, sin PIN real).
+  const sinPin = await c.rpc("reversar_venta", { p_op: id(956), p_venta_id: v, p_motivo: "sin PIN" });
+  assert.deepEqual([sinPin.status, sinPin.codigo], [403, "42501"]);
+  pila.sql(`select public.pin_guardar('${PERFILES.admin}', 'scrypt$prueba-http', '${PERFILES.admin}', 'inicial')`);
+  const autorizar = () => JSON.parse(pila.sql(`select public.pin_emitir_autorizacion('${PERFILES.admin}', 'admin', '${PERFILES.admin}', 'reversar_venta', 'ventas',
+      '${v}', null, (select version from public.admin_pin where perfil_id = '${PERFILES.admin}'), null, 60)`)).autorizacion_id;
+  assert.equal((await c.rpc("reversar_venta", { p_op: id(953), p_venta_id: v, p_motivo: "prueba http", p_autorizacion: autorizar() })).ok, true);
+  const r = await c.rpc("reversar_venta", { p_op: id(954), p_venta_id: v, p_motivo: "otra vez", p_autorizacion: autorizar() });
   assert.deepEqual([r.status, r.codigo, r.clase], [400, "22000", "validacion"]);
   const r2 = await c.rpc("registrar_venta_v2", venta(id(955), []));
   assert.deepEqual([r2.status, r2.codigo, r2.clase], [400, "22023", "validacion"]);

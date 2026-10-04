@@ -13,6 +13,7 @@ const CODIGO_SW = fs.readFileSync(path.join(RAIZ, "taller-demo/sw.js"), "utf8");
 const ORIGEN = "https://taller.example.test";
 const SUPABASE = "https://proyecto-sintetico.supabase.co";
 const API = "https://api-sintetica.onrender.com";
+const V = (CODIGO_SW.match(/app\.js\?v=([\d.]+)/) || [])[1];   // la versión de los archivos del SHELL (3.15 B8: solo esos pasan por el caché)
 
 /** Carga sw.js. `red` = cómo responde la red (o lanza si no hay). Devuelve los manejadores y lo que el SW guardó/pidió. */
 function cargarSW({ red = async () => new Response("desde-la-red", { status: 200 }), previo = {} } = {}) {
@@ -39,7 +40,7 @@ async function pedir(sw, ruta, { metodo = "GET", cabeceras = {} } = {}) {
 
 test("GET normal del shell (mismo origen): se sirve y SE CACHEA", async () => {
   const sw = cargarSW();
-  for (const ruta of ["/", "/index.html", "/app.js?v=3.13.0", "/manifest.json", "/icons/icon-192.png"]) {
+  for (const ruta of ["/", "/index.html", `/app.js?v=${V}`, "/manifest.json", "/icons/icon-192.png"]) {
     const { interceptada, res } = await pedir(sw, ruta);
     assert.equal(interceptada, true, `${ruta} debe pasar por el SW`);
     assert.equal(await res.text(), "desde-la-red");

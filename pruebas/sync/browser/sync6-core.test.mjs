@@ -10,7 +10,7 @@
 // Storage (fotos online/offline/ajena) — esta pila local solo levanta PostgREST, no el servicio de Storage;
 // no hay endpoint /storage/v1/object real contra el que subir. Las políticas de Storage (taller_lee_media/
 // taller_sube_media, mecanico_asignado_a_orden) son de SYNC-2, sin cambios en SYNC-6.
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES, uid } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -60,6 +60,9 @@ for (const nav of NAVS) {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
     before(() => pila.limpiar());
+    // 3.15 (Bloque 5): cada prueba cierra SUS navegadores al terminar. Antes se cerraban todos al final del navegador y en Firefox llegaban a
+    // convivir ~20 instancias (≈250 MB c/u): la tanda de regresión agotó la memoria de la máquina. Ninguna prueba usa dispositivos de otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("mecánico A ve su orden; mecánico B (otro perfil real) no ve nada de ella", async () => {

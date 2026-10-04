@@ -1,0 +1,347 @@
+{
+  "format": "entimotors-backend-freeze/1",
+  "version": "3.15.0",
+  "phase": "RELEASE-3.15.0-CHECKPOINT-B3",
+  "base_commit": "e807f65502961497ed2866dbea8beaeb4bc1be3e",
+  "branch": "release/3.15.0",
+  "scope": "api-server 3.15.0: PIN del propietario (acciones destructivas, sesión y vía auditada), eliminar usuario con impacto y revocación de sesiones, y el dist/ regenerado. Respecto de 3.14.1 cambian src/lib/pin.ts, src/routes/pin.ts y src/routes/admin-usuarios.ts. Requiere sync-15d aplicada.",
+  "runtime_files": [
+    {
+      "path": "api-server/.env.example",
+      "sha256": "4ac99afcdba49e9622853c9e647c71304da19ae5d5084c097bb7de7724f2ef46",
+      "bytes": 4804
+    },
+    {
+      "path": "api-server/.gitignore",
+      "sha256": "0d74fb9ee14424e799b6856f4d44ecc118d4408780c8796cc8fe35cbf94868d4",
+      "bytes": 30
+    },
+    {
+      "path": "api-server/build.mjs",
+      "sha256": "a268757bc319f2ccaf2f2661d6616ea9cab3c8d8bc45b46b0ebfdb2bc6180267",
+      "bytes": 3455
+    },
+    {
+      "path": "api-server/package.json",
+      "sha256": "c96ef2412bd9c314aa2e6b0d0794c697d3c65fc8852b7c12d82af96c2736c6e2",
+      "bytes": 895
+    },
+    {
+      "path": "api-server/pnpm-lock.yaml",
+      "sha256": "12359dd3f72bf168f0b78aebdb2c57876fe47bbe52e05aece88d8e48ba4cb695",
+      "bytes": 44036
+    },
+    {
+      "path": "api-server/pnpm-workspace.yaml",
+      "sha256": "4c114032c79d06c2b5f280c94d893ab41e73b2d30d48b641fa24bde39cb086da",
+      "bytes": 1095
+    },
+    {
+      "path": "api-server/public/admin.html",
+      "sha256": "97850b17ae65caf57113d395ca91816de42f7297fde3deffee09c2ba23bbcbe5",
+      "bytes": 29535
+    },
+    {
+      "path": "api-server/public/catalogo.html",
+      "sha256": "41473ca09c900cf4c61a831984dac3f01ba75e5af3a4e8f9313ab4a7868aa0ea",
+      "bytes": 13993
+    },
+    {
+      "path": "api-server/public/img/logo2.webp",
+      "sha256": "6d0db088f7515dcfa041ac530ed9cddb7c128718a1802219bb7b60411bc1fdbc",
+      "bytes": 28748
+    },
+    {
+      "path": "api-server/public/img/logo_personal.webp",
+      "sha256": "b97cc3543ec0f4c996ad056ccf1b585c0e4b025876abbe840e512db9446bf8e7",
+      "bytes": 161976
+    },
+    {
+      "path": "api-server/public/index.html",
+      "sha256": "71e7555ab274b5eaf3d94e14fabc611175310185f4fff222ef242174960393ff",
+      "bytes": 16860
+    },
+    {
+      "path": "api-server/public/js/catalogo.js",
+      "sha256": "3ef95771f87848fc9d1314940f00d4c775f21d1147e8c31d3d6cfee524175fee",
+      "bytes": 4719
+    },
+    {
+      "path": "api-server/public/js/main.js",
+      "sha256": "68772965c490b9622cb81e8092adea799b3a220a8e25d21a7115b59a8d723682",
+      "bytes": 7395
+    },
+    {
+      "path": "api-server/public/js/seguro.js",
+      "sha256": "0e5a3cfe31eec35d47973c721aa6eeba5c0588bf1082a8d6efe3b9ed3b659e48",
+      "bytes": 5999
+    },
+    {
+      "path": "api-server/public/js/trabajos.js",
+      "sha256": "cc0ece773a11ff8402d492dd7624719e753cc1a56d1138725bb0185d14eb35a0",
+      "bytes": 6328
+    },
+    {
+      "path": "api-server/public/js/videos.js",
+      "sha256": "23270e29e121f3cc053fdc9ee4e0e13de1b26077b055bfe365622a74fff6b815",
+      "bytes": 4349
+    },
+    {
+      "path": "api-server/public/trabajos.html",
+      "sha256": "dcba39edd39d346805eeb8c347195c054b930bbf77309e20257a31cfc8932a84",
+      "bytes": 14444
+    },
+    {
+      "path": "api-server/public/videos.html",
+      "sha256": "40cb5171bf5be0ebfd9a863c48047b4142701a462359e64adfa77df8b17475d8",
+      "bytes": 12930
+    },
+    {
+      "path": "api-server/src/app.ts",
+      "sha256": "dbcb90439fce7b7389fe54213d34b7449f1f33a4bcda08d07d0add3b3ee98cc8",
+      "bytes": 2155
+    },
+    {
+      "path": "api-server/src/db/database.ts",
+      "sha256": "b9364842c19f5b7f77ce6504cb7b8c75d6a71458815abadafd7818b820b067d7",
+      "bytes": 168
+    },
+    {
+      "path": "api-server/src/index.ts",
+      "sha256": "9c1f296e0008006b40d766ee436697e43ef99cf907f2c7afe9a6cd2d6c118d3c",
+      "bytes": 511
+    },
+    {
+      "path": "api-server/src/lib/clave-admin.ts",
+      "sha256": "3bcc7b49421f3114d228419417a9ba143f7f638a6dd596ac9d397a095e916e00",
+      "bytes": 17939
+    },
+    {
+      "path": "api-server/src/lib/clave-cuenta.ts",
+      "sha256": "ee71bd696ae0285d9329f488a14fa42e8835f6eb514989fb0f6839ecd9b1c1e3",
+      "bytes": 6501
+    },
+    {
+      "path": "api-server/src/lib/cors-origenes.ts",
+      "sha256": "688f207c9ce5e2437d9770bec4a2b72e43919328d5a2468e02efdb24c5a49f52",
+      "bytes": 2665
+    },
+    {
+      "path": "api-server/src/lib/errores-http.ts",
+      "sha256": "c2c1e43fbe3a17cac4df1678c0c0e2aede7e5e2fe3d2e9b227d25a4cb132ae28",
+      "bytes": 4734
+    },
+    {
+      "path": "api-server/src/lib/logger.ts",
+      "sha256": "04ea48f254573e78dcac3583354f4e8d7a5e48b4534f360b982337448679194b",
+      "bytes": 1261
+    },
+    {
+      "path": "api-server/src/lib/pin.ts",
+      "sha256": "c58a64d1981e0795ac686ae6170674083bf45c0c9a0e3d2dd45ebb10cf700283",
+      "bytes": 18628
+    },
+    {
+      "path": "api-server/src/lib/proxy.ts",
+      "sha256": "5b06fcbdef210c5001ac4b31d242d72b52644f2cba925de2c2df876d16c13d57",
+      "bytes": 1387
+    },
+    {
+      "path": "api-server/src/lib/supabase.ts",
+      "sha256": "b2105c32f96d68c415964f0d0af943b1ad9e95923f2b737d1fb1b9edc22ee788",
+      "bytes": 475
+    },
+    {
+      "path": "api-server/src/lib/video-url.ts",
+      "sha256": "da22cdc950c8d1d4ecf865c64e8d34db5a51f261d9c68941ef353531f555b7cd",
+      "bytes": 7092
+    },
+    {
+      "path": "api-server/src/routes/admin-auth.ts",
+      "sha256": "cf329ad09b0b2b4dccde2e279bde761cbff3142265910eb0cfaebd696a5b1ed1",
+      "bytes": 8938
+    },
+    {
+      "path": "api-server/src/routes/admin-clave.ts",
+      "sha256": "89b27b4a91bb111d376d5ccf9cc457b6a7b9ae5e60a779988bb3293730aa39b0",
+      "bytes": 6327
+    },
+    {
+      "path": "api-server/src/routes/admin-usuarios.ts",
+      "sha256": "fd12904d1add07ce0429a364f50d9d71248903de4f0e17bd1961434dc7d5a09c",
+      "bytes": 33886
+    },
+    {
+      "path": "api-server/src/routes/health.ts",
+      "sha256": "c6bc3d5ec9506016f56b8edc8eb4ccfc75f5d1a71a55195e6c3a6d8dcec225df",
+      "bytes": 182
+    },
+    {
+      "path": "api-server/src/routes/index.ts",
+      "sha256": "0e59d0ce60c623145356b2827b947072f9203f36e863c176e4022d7812175628",
+      "bytes": 1037
+    },
+    {
+      "path": "api-server/src/routes/pin.ts",
+      "sha256": "ffbaded47a97f30238a38fb42544c84e2e80594feec99e5a2c3602439c23c5e1",
+      "bytes": 10587
+    },
+    {
+      "path": "api-server/src/routes/products.ts",
+      "sha256": "59b12cc1ce6cb19a86276dd8d1209e7c0263cc41ec37587bc99bc929edf785be",
+      "bytes": 2863
+    },
+    {
+      "path": "api-server/src/routes/projects.ts",
+      "sha256": "0d462e3cc5194f3928d0521ed0c6e28bfc06688ee57f6987b59c3524d9d8317b",
+      "bytes": 7457
+    },
+    {
+      "path": "api-server/src/routes/videos.ts",
+      "sha256": "f1e4ed8d954feb44865f4e533463eb81691bb58811042427e7e91197814f5bbf",
+      "bytes": 1892
+    },
+    {
+      "path": "api-server/tsconfig.json",
+      "sha256": "d0c83f11369bd09ad7b6767e0668184475b8fe89324713e4c6d6faf711532fee",
+      "bytes": 271
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/verificar-backend-manifest.mjs",
+      "sha256": "396b567f3b6c1c41d7f9709f0fd087d8b01cfdb8b482d8fdabe3cb59f2bbb2d3",
+      "bytes": 5177
+    },
+    {
+      "path": "pruebas/sync/browser/b4-owner-pin-app-real.test.mjs",
+      "sha256": "9b1bea544021a2c5b4de73d59e51faa24cb29a356cc1cdb89f0d70ba6de6745c",
+      "bytes": 19555
+    },
+    {
+      "path": "pruebas/sync/browser/lib/api-local.mjs",
+      "sha256": "dad6daa00115f6f2d033a4ab6174f755a7d8518a5032932dccedece088f0ac3f",
+      "bytes": 4327
+    },
+    {
+      "path": "pruebas/sync/gotrue/b4-eliminar-usuario.test.mjs",
+      "sha256": "fb41183ce876775c1c591db535659015265976187d6c0265bc03b3c68224e737",
+      "bytes": 20958
+    },
+    {
+      "path": "pruebas/sync/node/pin-lib.test.mjs",
+      "sha256": "bcd32b6ff6204bf4a8f65e593cd29610c81d539a7bb9e4f4394cb3e001d22861",
+      "bytes": 20802
+    },
+    {
+      "path": "pruebas/sync/node/pin-rutas.test.mjs",
+      "sha256": "e70cb733bf73f56137cedb10a30030813a37e20d7d7ce77d18234728c52a7453",
+      "bytes": 25856
+    },
+    {
+      "path": "pruebas/sync/node/pin-ui.test.mjs",
+      "sha256": "698b876df08c70d0989541b99497c8ee6885f491c1bc26a0c4b7eee392906d85",
+      "bytes": 12688
+    },
+    {
+      "path": "pruebas/sync/sql/15d-owner-pin.test.sql",
+      "sha256": "2d770cafac1f21445c074f6510f33f57766063802ea9de81638b6064138cc248",
+      "bytes": 21073
+    }
+  ],
+  "generated_build_artifacts": [
+    {
+      "path": "api-server/dist/index.mjs",
+      "sha256": "b17d070529a4b68c42758615a8c8fdbc2720fc19b1e1703304439becaea1121c",
+      "bytes": 2810074
+    },
+    {
+      "path": "api-server/dist/index.mjs.map",
+      "sha256": "ccc2d89f55f9fa9ab54c6560e3982e9339220cdc51077a167e58877e6e8baf2a",
+      "bytes": 4539958
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs",
+      "sha256": "aa2e3fa44e602c37c6fab7f49c584b937f3926395e1a9b2ac888d889f8d4dce6",
+      "bytes": 145147
+    },
+    {
+      "path": "api-server/dist/pino-file.mjs.map",
+      "sha256": "5024f09efb479db8f87302f7eb5b0fc1431a2296a43d40dc08c133d8b33db70c",
+      "bytes": 234404
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs",
+      "sha256": "cf71a8b7a8c0684fe283ebab253d95b2c5e795b15c26523d48149ce44121066f",
+      "bytes": 116870
+    },
+    {
+      "path": "api-server/dist/pino-pretty.mjs.map",
+      "sha256": "7e31e5fbff959c8ae7e58c3f7f90de1740a253bee942c374f02dc220ff4f9777",
+      "bytes": 208647
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs",
+      "sha256": "4c3013c0ee0c9a3127355b1e3ea72e2ab83b7b9083defadabe07cd5eacb76fc9",
+      "bytes": 156737
+    },
+    {
+      "path": "api-server/dist/pino-worker.mjs.map",
+      "sha256": "6771cc70633883dd1f73aea9dc3b39c9577d68b7276643d0b84693130ccdfa82",
+      "bytes": 262872
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs",
+      "sha256": "b490228463d2d47a57932bcbe6bb307af9c54d1b4f3953191e1077e791bb188d",
+      "bytes": 7459
+    },
+    {
+      "path": "api-server/dist/thread-stream-worker.mjs.map",
+      "sha256": "9db59f00b9b60ea947471e8a27d98934dac9419be8b6e6332df4ce868ee80cc9",
+      "bytes": 12296
+    }
+  ],
+  "how_to_reproduce": "desde la raíz: cd api-server && pnpm install --frozen-lockfile && node ./build.mjs. La ruta absoluta de compilación queda incrustada en 6 archivos de dist/ (no es un secreto). Render recompila en cada despliegue con su propio Build Command: lo que se ejecuta en producción es ESE build, no este dist/.",
+  "render": {
+    "verificado_por": "el usuario, en el panel de Render (última confirmación registrada: 2026-09-28, release 3.14.1); no re-verificado al preparar 3.15.0",
+    "branch": "main",
+    "root_directory": "",
+    "build_command": "npm install -g pnpm@12.3.4 && cd api-server && pnpm install && node ./build.mjs",
+    "start_command": "node api-server/dist/index.mjs",
+    "pre_deploy_command": "",
+    "auto_deploy": "On Commit",
+    "ojo": "un push a main puede desplegar producción: PUSH = ACCIÓN DE PRODUCCIÓN",
+    "variables_requeridas": [
+      "PORT (la pone Render)",
+      "NODE_ENV=production",
+      "SUPABASE_URL",
+      "SUPABASE_SERVICE_KEY (secreta)",
+      "SUPABASE_ANON_KEY",
+      "ADMIN_PASSWORD (secreta)",
+      "ADMIN_PIN_PEPPER (secreta, NUEVA, ≥32)",
+      "ENTIMOTORS_ADMIN_ORIGIN",
+      "ENTIMOTORS_MECHANIC_ORIGIN"
+    ],
+    "variables_opcionales": [
+      "CORS_ORIGINS_EXTRA",
+      "TRUST_PROXY_SALTOS",
+      "LOG_LEVEL",
+      "PIN_TTL_SEGUNDOS",
+      "PIN_MAX_FALLOS_SOLICITANTE",
+      "PIN_MAX_FALLOS_GLOBAL",
+      "PIN_VENTANA_MIN",
+      "PIN_BLOQUEO_MIN",
+      "PIN_MAX_BLOQUEOS_24H",
+      "RENDER (la pone Render)"
+    ]
+  },
+  "verificaciones": {
+    "build_local": "PASS (2 compilaciones idénticas; símbolos 3.15 presentes)",
+    "suites": "pin-lib, pin-rutas, pin-ui (Node); 15d (SQL); b4-gotrue; b4-owner-pin-app-real"
+  },
+  "no_ejecutado": [
+    "render",
+    "produccion",
+    "migraciones_produccion"
+  ]
+}

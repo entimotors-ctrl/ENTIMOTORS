@@ -138,7 +138,7 @@ describe("OBS-5 · supabase-client.js pedir(): el detalle es SIEMPRE una cadena 
 const U = (n, extra = {}) => ({ id: UUID(100 + n), nombre: `Persona ${n}`, correo: `persona${n}@example.test`, telefono: "", rol: "mecanico", activo: true, esUsted: false, ...extra });
 async function toastDeError(cuerpoDeError, { mutar } = {}) {
   const env = nuevoEntorno({ producto: "admin", cuenta: CUENTAS.adminActivo, apiUrl: URL_API, ...(mutar ? { mutar: { usuarios: mutar } } : {}) }); await env.asentar();
-  env.servidor.api = async (metodo) => (metodo === "GET" ? { status: 200, body: { usuarios: [U(1, { rol: "admin", esUsted: true }), U(3)] } } : { status: 500, body: cuerpoDeError });
+  env.servidor.api = async (metodo) => (metodo === "GET" ? { status: 200, body: { usuarios: [U(1, { rol: "admin", esUsted: true }), U(3, { activo: false })] } } : { status: 500, body: cuerpoDeError });
   await env.win.PantallaUsuarios.render(); await env.asentar(); await env.doc.querySelectorAll(".u-estado")[0].disparar("click"); await env.asentar();
   const t = env.doc.sumideros.filter((s) => /^<span class="dot off">/.test(s.html)).map((s) => s.html.replace(/^<span class="dot off"><\/span>/, ""));
   return t;

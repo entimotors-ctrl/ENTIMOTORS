@@ -29,13 +29,17 @@ mkdir -p "$DESTINO"
 cp -r "$ORIGEN"/. "$DESTINO"/
 
 # lo que no es parte de este producto
-rm -rf "$DESTINO/build-mecanicos" "$DESTINO/hacer-build-mecanicos.sh" \
+rm -rf "$DESTINO/build-mecanicos" "$DESTINO/hacer-build-mecanicos.sh" "$DESTINO/hacer-build-taller.sh" \
        "$DESTINO/config-local.js" "$DESTINO/config-local.example.js" \
        "$DESTINO/panel-tecnico.html" "$DESTINO/supabase" \
        "$DESTINO/README.md" "$DESTINO/CHANGELOG.md"
 
 # lo que sí lo distingue
 cp "$ORIGEN/build-mecanicos/build-target.js" "$DESTINO/build-target.js"
+# 3.15 (Bloque 6): ningún archivo técnico puede colarse aunque alguien lo agregue a la carpeta sin tocar la lista de arriba
+if find "$DESTINO" -type f \( -name '*.sh' -o -name '*.md' -o -name '*.sql' -o -name 'panel-tecnico.html' -o -name 'config-local*' \) | grep -q .; then
+  echo "build: se coló un archivo técnico:" >&2; find "$DESTINO" -type f \( -name '*.sh' -o -name '*.md' -o -name '*.sql' -o -name 'panel-tecnico.html' -o -name 'config-local*' \) >&2; exit 1
+fi
 cp "$ORIGEN/build-mecanicos/manifest.json"   "$DESTINO/manifest.json"
 cp "$ORIGEN/build-mecanicos/_headers"        "$DESTINO/_headers"
 
@@ -52,7 +56,9 @@ cp "$ORIGEN/build-mecanicos/_headers"        "$DESTINO/_headers"
 # delante la capa de Supabase entera.
 sed -i '/<!-- config-local\.js es opcional/,/Ver config-local\.example\.js\. -->/d' "$DESTINO/index.html"
 sed -i '/^<script src="config-local\.js/d' "$DESTINO/index.html"
-sed -i 's/<title>ENTIMOTORS OS — Demo local<\/title>/<title>ENTIMOTORS · Mi Trabajo<\/title>/' "$DESTINO/index.html"
+sed -i 's/<title>ENTIMOTORS OS<\/title>/<title>ENTIMOTORS · Mi Trabajo<\/title>/' "$DESTINO/index.html"
+# 3.15 (Bloque 6): un reemplazo que no encuentra su texto falla en silencio con sed; aquí se exige que haya quedado aplicado
+grep -q '<title>ENTIMOTORS · Mi Trabajo</title>' "$DESTINO/index.html" || { echo "build: no se pudo poner el título de Mi Trabajo" >&2; exit 1; }
 sed -i 's/<h1>Instala ENTIMOTORS OS<\/h1>/<h1>Instala ENTIMOTORS Mi Trabajo<\/h1>/' "$DESTINO/index.html"
 sed -i 's/Abre ENTIMOTORS OS desde su propio ícono/Abre Mi Trabajo desde su propio ícono/' "$DESTINO/index.html"
 

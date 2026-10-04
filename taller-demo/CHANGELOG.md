@@ -1,5 +1,68 @@
 # Registro de cambios · ENTIMOTORS OS
 
+## 3.15.0 — release (octubre de 2026)
+
+> **Alcance: base de datos, backend y frontends.** Orden de publicación obligatorio: base de datos
+> (sync-15a → 15b → 15c → 15d → 15e → 15f → 15g) → backend → frontends. Cada migración tiene su script de
+> reversión; 15b, 15c y 15d se niegan a revertirse si ya hay actividad de 3.15.
+
+### Cotizaciones, presupuestos e inventario
+- Los renglones de cotizaciones y órdenes guardan el repuesto de origen y el precio de esa operación; el precio
+  es editable por operación y queda congelado aunque el producto cambie después.
+- Aceptar una cotización crea su orden en una sola operación del servidor (`convertir_cotizacion`): repetirla o
+  hacerlo desde dos dispositivos da una sola orden.
+- Presupuesto `pendiente`, `aprobado` o `rechazado`, decidido por el servidor. Los repuestos del negocio salen del
+  inventario **una sola vez, al aprobar**; cambiar cantidades o productos después ajusta solo la diferencia. Lo que
+  ya se había descontado antes de 3.15 no se descuenta otra vez.
+
+### Tiempo real y mensajes
+- Avisos en vivo por canal privado (sin datos en el aviso): el registro afectado se vuelve a pedir con los permisos
+  de cada cuenta. Con avisos conectados la revisión periódica baja a cada 5 minutos; sin ellos sigue cada 30 segundos.
+- Mensajes del administrador al equipo, con lectura confirmada por el destinatario.
+
+### Seguridad y cuentas
+- **PIN del propietario** para acciones destructivas, verificado en el servidor y ligado a la sesión, la acción y
+  el dispositivo.
+- **Eliminar usuario** con impacto previo (trabajo asignado), baja de la cuenta y cierre de sus sesiones; un correo
+  eliminado no se reutiliza.
+- Cerrar sesión cierra solo ese dispositivo.
+
+### Almacenamiento y sin conexión
+- Si la base local no abre o el navegador la cierra, la app se bloquea con una explicación y no guarda «en modo
+  local» trabajo que nunca subiría. La cola pendiente no se borra.
+- Sin conexión, lo registrado queda pendiente y se envía una sola vez al volver la red.
+
+### Finanzas y fechas
+- Fecha del negocio (America/Tegucigalpa) en toda la app; las cifras de Finanzas coinciden con las del servidor.
+- Invariantes de dinero comprobables en la base (`finanzas_invariantes`).
+
+### Rendimiento
+- Lectura con permisos evaluados una vez por consulta (sync-15g; misma visibilidad por rol).
+- Reabrir muestra lo guardado y se pone al día en segundo plano; descarga por páginas con lecturas agrupadas;
+  listas largas por partes; fotos nuevas del Taller comprimidas.
+
+### Datos de la versión 3.13
+- El aviso de datos de 3.13 lo decide el servidor y muestra solo lo que falta; el importador y la recuperación
+  siguen disponibles. La base 3.13 del dispositivo no se borra ni se marca como migrada.
+
+### Operaciones rechazadas que respaldan datos locales
+- Al bajar una versión más nueva de una orden, se conservan los renglones que solo existen en el dispositivo y
+  cuya única representación es una operación `agregar_item_orden` rechazada por la nube; si una versión anterior
+  de la app ya los había quitado de la orden local, se reponen desde esa misma operación. No se reenvía nada.
+- La primera puesta al día de 3.15.0 sobre una caché descargada por una versión anterior la vuelve a leer una vez.
+- **Protección temporal:** una operación rechazada que es el único respaldo de datos locales (`agregar_item_orden`
+  de un renglón local, `registrar_credito` de un crédito que la nube aún no tiene) **no se puede quitar** de
+  «⚠ Por revisar», ni desde la pantalla ni por el motor. Las demás rechazadas se quitan como siempre.
+  No es la resolución definitiva: se retirará en una versión posterior.
+- **PHONE_RESCUE: DEFERRED.** El respaldo fuera del dispositivo de esos datos (los textos de los renglones y del
+  crédito afectados) no se ha completado al publicar 3.15.0; queda pendiente y condiciona el retiro de la
+  protección temporal y del legado 3.13.
+
+### PWA
+- Caché nueva **`entimotors-v3.15.0`** (Mi Trabajo: `entimotors-mitrabajo-v3.15.0`); la de 3.14.1 se borra al
+  activar la versión nueva. Sin activación automática: el aviso de versión sigue pidiendo respaldo.
+- Publicación por lista explícita de archivos (`hacer-build-taller.sh`, `hacer-build-mecanicos.sh`).
+
 ## 3.14.1 — candidato (septiembre de 2026, aún sin publicar)
 
 > **Alcance: mantenimiento de los frontends.** Sin cambios de base de datos ni de backend en esta entrega:

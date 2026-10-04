@@ -11,16 +11,31 @@ import { createHash, createHmac, randomBytes, scrypt, timingSafeEqual } from "no
 
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** Acciones que un cajero puede pedir con PIN. Ninguna es elevable para un mecánico ni para el desarrollador (Q-2). */
-export const ACCIONES_CON_PIN: Record<string, { entidad: string; roles: string[] }> = {
-  ajustar_stock: { entidad: "inventario", roles: ["cajero"] },
-  reversar_venta: { entidad: "ventas", roles: ["cajero"] },
-  registrar_devolucion: { entidad: "ventas", roles: ["cajero"] },
-  reversar_abono: { entidad: "abonos", roles: ["cajero"] },
-  reversar_credito: { entidad: "creditos", roles: ["cajero"] },
-  reversar_caja: { entidad: "caja_movimientos", roles: ["cajero"] },
-  anular_orden: { entidad: "ordenes", roles: ["cajero"] },
+/* OWNER-PIN-POLICY (3.15 · Bloque 4). Mismo catálogo que taller-demo/pin-ui.js y public.sync_accion_destructiva (sync-15d):
+     · DESTRUCTIVA: PIN del propietario para TODOS, también el administrador (anular/reversar lo cerrado, eliminar usuario).
+     · SENSIBLE: el cajero con PIN; el administrador con su propia sesión (ajustar stock, devolución parcial).
+   Ninguna es elevable para un mecánico ni para el desarrollador (Q-2). */
+export const ACCIONES_CON_PIN: Record<string, { entidad: string; roles: string[]; destructiva: boolean }> = {
+  ajustar_stock: { entidad: "inventario", roles: ["cajero"], destructiva: false },
+  registrar_devolucion: { entidad: "ventas", roles: ["cajero"], destructiva: false },
+  reversar_venta: { entidad: "ventas", roles: ["cajero", "admin"], destructiva: true },
+  reversar_abono: { entidad: "abonos", roles: ["cajero", "admin"], destructiva: true },
+  reversar_credito: { entidad: "creditos", roles: ["cajero", "admin"], destructiva: true },
+  reversar_caja: { entidad: "caja_movimientos", roles: ["cajero", "admin"], destructiva: true },
+  anular_orden: { entidad: "ordenes", roles: ["cajero", "admin"], destructiva: true },
+  eliminar_usuario: { entidad: "perfiles", roles: ["admin"], destructiva: true },
+  // 3.15 (Bloque 5): contrato de una FUTURA restauración en la nube (hoy no existe ningún endpoint que restaure). Reemplaza datos:
+  // destructiva, solo el administrador, con el PIN del propietario; registro = uuid derivado del SHA-256 del manifiesto del respaldo.
+  restaurar_respaldo: { entidad: "respaldos", roles: ["admin"], destructiva: true },
 };
+
+/** session_id del JWT (ya validado por Auth antes de llamar a esto). Solo se lee el claim; nunca se confía en él para identificar. */
+export function sesionDelToken(token: string): string | null {
+  try {
+    const p = JSON.parse(Buffer.from(String(token).split(".")[1] ?? "", "base64url").toString("utf8"));
+    return typeof p.session_id === "string" && UUID.test(p.session_id) ? p.session_id : null;
+  } catch { return null; }
+}
 
 export interface ConfigPin {
   ttlSegundos: number;
@@ -113,16 +128,19 @@ export function hashCritico(accion: string, registro: string, monto?: number | n
 }
 
 /* ───────────────────────── servicio ───────────────────────── */
-export interface Solicitante { id: string; rol: string; nombre: string; activo: boolean; correo: string }
+export interface Solicitante { id: string; rol: string; nombre: string; activo: boolean; correo: string; sesion?: string | null }
 export interface AccesoPin {
   estado(): Promise<{ configurado: boolean; version: number | null; actualizado_en: string | null; bloqueado_hasta: string | null; admin_id: string | null }>;
   leerHash(adminId: string): Promise<string | null>;
-  guardar(adminId: string, hash: string, actualizadoPor: string): Promise<number>;
+  guardar(adminId: string, hash: string, actualizadoPor: string, via: "inicial" | "pin" | "clave"): Promise<number>;
   borrar(adminId: string): Promise<void>;
   desbloquear(adminId: string): Promise<void>;
   reservar(sol: string, device: string | null, accion: string, entidad: string, registro: string | null, cfg: ConfigPin): Promise<Record<string, unknown>>;
   resultado(sol: string | null, device: string | null, accion: string | null, entidad: string | null, registro: string | null, res: string): Promise<void>;
   emitir(sol: Solicitante, admin: string, accion: string, entidad: string, registro: string, device: string | null, version: number, payloadHash: string | null, ttl: number): Promise<{ autorizacion_id: string; expira_en: string }>;
+  /** Límite de intentos de la CONTRASEÑA de la cuenta (SECURITY-1C, en la base). Opcional: sin él no se limita aquí. */
+  reservarClave?(adminId: string): Promise<{ permitido: boolean; intento_id?: number; reintentar_en_s?: number }>;
+  resolverClave?(adminId: string, intentoId: number, resultado: "ok" | "fallido" | "anulado"): Promise<void>;
 }
 export interface Salida { status: number; cuerpo: Record<string, unknown>; cabeceras?: Record<string, string> }
 
@@ -163,7 +181,8 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
       if (!pinConFormato(body.pin)) return err(400, "PIN_INVALIDO", "El PIN son 6 dígitos.");
       const device = typeof body.device_id === "string" ? body.device_id : null;
       const registro = body.registro_id.toLowerCase();
-      if (sol.rol === "admin") return err(400, "ADMIN_NO_NECESITA_PIN", "El administrador no necesita autorización.");
+      // el administrador solo pide autorización para lo DESTRUCTIVO (lo sensible lo hace con su sesión)
+      if (sol.rol === "admin" && !def.destructiva) return err(400, "ADMIN_NO_NECESITA_PIN", "El administrador no necesita autorización.");
       if (!def.roles.includes(sol.rol)) {
         await acceso.resultado(sol.id, device, accion, def.entidad, registro, "no_permitido");
         return err(403, "NO_PERMITIDO", "Tu rol no puede pedir esta autorización.");
@@ -175,7 +194,10 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
         const a = await acceso.emitir(sol, c.adminId as string, accion, def.entidad, registro, device, c.version as number, hash, cfg.ttlSegundos);
         return { status: 201, cuerpo: { autorizacion_id: a.autorizacion_id, expira_en: a.expira_en, ttl_segundos: cfg.ttlSegundos } };
       } catch (e) {
-        if (String((e as Error)?.message ?? "").includes("PIN_CAMBIADO")) return err(409, "PIN_CAMBIADO", "El PIN cambió mientras se verificaba. Inténtalo de nuevo.");
+        const m = String((e as Error)?.message ?? "");
+        if (m.includes("PIN_CAMBIADO")) return err(409, "PIN_CAMBIADO", "El PIN cambió mientras se verificaba. Inténtalo de nuevo.");
+        if (m.includes("SESION_INVALIDA")) return err(401, "SESION_INVALIDA", "Tu sesión ya no es válida. Inicia sesión de nuevo.");
+        if (m.includes("CUENTA_INACTIVA")) return err(403, "CUENTA_INACTIVA", "Tu cuenta no está activa.");
         throw e;
       }
     },
@@ -186,11 +208,26 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
       return { status: 200, cuerpo: { configurado: e.configurado, version: e.version, actualizado_en: e.actualizado_en, bloqueado, bloqueado_hasta: e.bloqueado_hasta } };
     },
 
-    /** Re-autenticación del admin para cambiar/quitar el PIN: el PIN actual (con límite de intentos) o la contraseña de su cuenta. */
-    async reautenticar(admin: Solicitante, body: Record<string, unknown>, existe: boolean): Promise<Salida | null> {
+    /** Re-autenticación del admin para cambiar/quitar/desbloquear el PIN: el PIN actual (con límite de intentos) o la contraseña de su
+        cuenta (RECUPERACIÓN: nunca se muestra ni se envía el PIN; se reemplaza. Con límite de intentos SECURITY-1C en la base). */
+    async reautenticar(admin: Solicitante, body: Record<string, unknown>, existe: boolean, soloClave = false): Promise<Salida | null> {
       if (typeof body.clave_cuenta === "string" && body.clave_cuenta.length > 0 && body.clave_cuenta.length <= 200) {
-        return (await dep.verificarClaveCuenta({ id: admin.id, correo: admin.correo }, body.clave_cuenta)) ? null : err(401, "CLAVE_INCORRECTA", "La contraseña de la cuenta no es correcta.");
+        let intento: number | undefined;
+        if (acceso.reservarClave) {
+          const r = await acceso.reservarClave(admin.id);
+          if (!r.permitido) {
+            const seg = Number(r.reintentar_en_s ?? 900);
+            return err(429, "CLAVE_BLOQUEADA", "Demasiados intentos con la contraseña. Espera unos minutos.", { reintentar_en_s: seg }, { "Retry-After": String(seg) });
+          }
+          intento = r.intento_id;
+        }
+        let bien = false;
+        try { bien = await dep.verificarClaveCuenta({ id: admin.id, correo: admin.correo }, body.clave_cuenta); }
+        catch (e) { if (acceso.resolverClave && intento !== undefined) await acceso.resolverClave(admin.id, intento, "anulado"); throw e; }
+        if (acceso.resolverClave && intento !== undefined) await acceso.resolverClave(admin.id, intento, bien ? "ok" : "fallido");
+        return bien ? null : err(401, "CLAVE_INCORRECTA", "La contraseña de la cuenta no es correcta.");
       }
+      if (soloClave) return err(400, "REAUTENTICACION_REQUERIDA", "Confirma con la contraseña de tu cuenta.");
       if (existe && pinConFormato(body.pin_actual)) {
         const c = await comprobar(admin, body.pin_actual, null, "cambiar_pin", "admin_pin", null);
         return c.salida;
@@ -201,12 +238,14 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
     async establecer(admin: Solicitante, body: Record<string, unknown>): Promise<Salida> {
       if (!pinConFormato(body.pin_nuevo)) return err(400, "PIN_INVALIDO", "El PIN son 6 dígitos.");
       if (pinDebil(body.pin_nuevo)) return err(400, "PIN_DEBIL", "Ese PIN es demasiado fácil de adivinar. Elige otro.");
+      if (body.pin_confirmacion !== undefined && body.pin_confirmacion !== body.pin_nuevo) return err(400, "PIN_NO_COINCIDE", "La confirmación no coincide con el PIN nuevo.");
       const e = await acceso.estado();
       const rechazo = await this.reautenticar(admin, body, e.configurado);
       if (rechazo) return rechazo;
       const hash = await hashearPin(body.pin_nuevo, pepper, cfg);
-      const version = await acceso.guardar(admin.id, hash, admin.id);
-      return { status: 200, cuerpo: { ok: true, version } };
+      const via = !e.configurado ? "inicial" : typeof body.clave_cuenta === "string" && body.clave_cuenta ? "clave" : "pin";
+      const version = await acceso.guardar(admin.id, hash, admin.id, via);
+      return { status: 200, cuerpo: { ok: true, version, via } };
     },
 
     async eliminar(admin: Solicitante, body: Record<string, unknown>): Promise<Salida> {
@@ -218,7 +257,11 @@ export function crearServicioPin(dep: { acceso: AccesoPin; pepper: string; cfg?:
       return { status: 200, cuerpo: { ok: true, configurado: false } };
     },
 
-    async desbloquear(admin: Solicitante): Promise<Salida> {
+    /** Desbloquear exige la CONTRASEÑA de la cuenta (con su propio límite): si bastara la sesión, quien la tuviera podría seguir
+        probando PIN sin fin (bloqueo → desbloqueo → bloqueo). */
+    async desbloquear(admin: Solicitante, body: Record<string, unknown> = {}): Promise<Salida> {
+      const rechazo = await this.reautenticar(admin, body, false, true);
+      if (rechazo) return rechazo;
       await acceso.desbloquear(admin.id);
       return { status: 200, cuerpo: { ok: true } };
     },

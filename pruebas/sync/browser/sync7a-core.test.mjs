@@ -8,7 +8,7 @@
 //
 // NO CUBIERTO AQUÍ (es de SYNC-7B, no de SYNC-7A — ver ENTIMOTORS-SYNC-3.14-STATE.md): ventas/créditos/órdenes
 // moviendo stock real, reversos de stock, requiere_revision por venta offline con stock negativo.
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES, uid } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -57,6 +57,9 @@ for (const nav of NAVS) {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
     before(() => pila.limpiar());
+    // 3.15 (Bloque 5): cada prueba cierra SUS navegadores al terminar. Antes se cerraban todos al final del navegador y en Firefox llegaban a
+    // convivir ~20 instancias (≈250 MB c/u): la tanda de regresión agotó la memoria de la máquina. Ninguna prueba usa dispositivos de otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("creación online: el maestro sube sin cantidad (nace en 0) y categoria_id resuelve por el mapa uid", async () => {

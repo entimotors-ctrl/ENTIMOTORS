@@ -8,6 +8,8 @@
     "security:sql": "node rcv34/guard-estatico-funciones.mjs --repo",
     "test:sync": "node rcv34/guard-estatico-cobertura-sync.test.mjs",
     "security:sync": "node rcv34/guard-estatico-cobertura-sync.mjs",
-    "verify:rcv34": "npm run test:guard && npm run security:sql && npm run test:sync && npm run security:sync"
+    "test:evolucion": "node rcv34/guard-evolucion-canonicas.test.mjs",
+    "security:evolucion": "node rcv34/guard-evolucion-canonicas.mjs",
+    "verify:rcv34": "npm run test:guard && npm run security:sql && npm run test:sync && npm run security:sync && npm run test:evolucion && npm run security:evolucion"
   }
 }

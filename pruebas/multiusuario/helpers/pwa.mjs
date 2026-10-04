@@ -10,8 +10,13 @@ export const CONTRATOS = {
   "3.13.0": { etiquetas: 8, shellV: 7, shell: 12 },
   "3.14.0": { etiquetas: 16, shellV: 15, shell: 20 },
   "3.14.1": { etiquetas: 16, shellV: 15, shell: 20 },   // UI-1B, UI-1C, SECURITY-1E: sin scripts nuevos (todo en app.js e index.html)
+  "3.15.0": { etiquetas: 19, shellV: 18, shell: 23 },   // + fecha-negocio.js y sync-realtime.js (Bloque 3) y finanzas-calc.js (Bloque 5)
 };
-export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.14.1";
+export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.15.0";
+/* RELEASE 3.15.0: el árbol de trabajo ES la release 3.15.0 (19 / 18 / 23). La release 3.14.1 PUBLICADA (instantánea e807f65,
+   RELEASE_CONGELADA) sigue con su contrato 16 / 15 / 20 de CONTRATOS. */
+export const CONTRATO_ARBOL = CONTRATOS["3.15.0"];
+export const CONTRATO_ACTUAL = RELEASE_CONGELADA ? CONTRATOS[RELEASE_CONGELADA] : CONTRATO_ARBOL;
 export const fuentesReales = () => ({ app: leer("app.js"), sw: leer("sw.js"), index: leer("index.html"), existe });
 
 function manejador(txt, evento) {
@@ -27,7 +32,7 @@ const sinComentarios = (s) => String(s || "").replace(/\/\/[^\n]*/g, "");
 export function verificarPwa({ app, sw, index, existe: hay }, version = VERSION_ESPERADA) {
   const R = [];
   // exigir una versión sin contrato (p. ej. 3.12.2, control negativo) usa las cifras del runtime: falla por la VERSIÓN, que es lo que se prueba
-  const K = CONTRATOS[version] || CONTRATOS[VERSION_ESPERADA];
+  const K = !RELEASE_CONGELADA && version === VERSION_ESPERADA ? CONTRATO_ARBOL : (CONTRATOS[version] || CONTRATOS[VERSION_ESPERADA]);
   const chk = (id, ok, detalle = "") => R.push({ id, ok: Boolean(ok), detalle: ok ? "" : detalle });
 
   const va = [...app.matchAll(/const VERSION_APP = "([^"]+)"/g)].map((m) => m[1]);
@@ -74,7 +79,7 @@ export function ejecutarServiceWorker({ cachesExistentes = [], sw = leer("sw.js"
   const almacenes = new Map(cachesExistentes.map((n) => [n, new Map()]));
   const respuesta = (u) => ({ url: u, ok: true, status: 200, clone() { return this; } });
   const caches = {
-    open: async (n) => { llamadas.abiertas.push(n); if (!almacenes.has(n)) almacenes.set(n, new Map()); const a = almacenes.get(n); return { put: async (k, v) => { llamadas.puestas.push(typeof k === "string" ? k : k.url); a.set(typeof k === "string" ? k : k.url, v); } }; },
+    open: async (n) => { llamadas.abiertas.push(n); if (!almacenes.has(n)) almacenes.set(n, new Map()); const a = almacenes.get(n); return { put: async (k, v) => { llamadas.puestas.push(typeof k === "string" ? k : k.url); a.set(typeof k === "string" ? k : k.url, v); }, match: async (k) => a.get(typeof k === "string" ? k : k.url) }; },   // 3.15 B8: el SW solo lee SU caché
     keys: async () => [...almacenes.keys()],
     delete: async (n) => { llamadas.borradas.push(n); return almacenes.delete(n); },
     match: async () => undefined,

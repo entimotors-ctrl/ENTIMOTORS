@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "proposito": "3.15.0 · Bloque 5 · Evoluciones DECLARADAS de funciones canónicas RCV-34. Cualquier otro CREATE/ALTER/DROP/GRANT/REVOKE sobre una de las 17 firmas canónicas fuera de las fuentes exentas es FAIL (guard-evolucion-canonicas.mjs). Cada entrada está fijada también en el código del guard.",
+  "exentos": [
+    "taller-demo/supabase/entimotors-rcv34-source-sync.sql",
+    "taller-demo/supabase/entimotors-fase4d-rls.sql",
+    "taller-demo/supabase/entimotors-usuarios.sql",
+    "taller-demo/supabase/entimotors-fase4d-rollback.sql",
+    "pruebas/rcv34/01-cierre-triggers-public.sql",
+    "pruebas/rcv34/02-rollback-cierre-triggers.sql",
+    "pruebas/rcv35/01-fix-rol-actual-activo.sql"
+  ],
+  "evoluciones": [
+    {
+      "archivo": "taller-demo/supabase/sync/sync-15e-finanzas.sql",
+      "motivo": "Panel técnico: ventas_hoy por el día empresarial de Honduras (antes current_date = día UTC del servidor). Las v1 sin op_id (registrar_venta, registrar_abono) dejan de ser ejecutables por authenticated: un reintento de un cliente viejo no puede duplicar dinero.",
+      "funciones": [
+        {
+          "firma": "estadisticas_tecnicas()",
+          "md5_canonico": "86948fdcaf03939a1d0929004cd9c730",
+          "md5_nuevo": "ba8ce62526487ba738fe21a924db2f46",
+          "reemplazos": [
+            {
+              "de": "    'ventas_hoy',        (select count(*) from public.ventas where creado_en::date = current_date),\n",
+              "a": "    'ventas_hoy',        (select count(*) from public.ventas where (creado_en at time zone 'America/Tegucigalpa')::date = (now() at time zone 'America/Tegucigalpa')::date),\n"
+            }
+          ]
+        }
+      ],
+      "acl": [
+        "revoke|estadisticas_tecnicas()|anon,public",
+        "grant|estadisticas_tecnicas()|authenticated,service_role",
+        "revoke|registrar_venta(uuid,text,text,numeric,jsonb,integer,text)|anon,authenticated,public",
+        "grant|registrar_venta(uuid,text,text,numeric,jsonb,integer,text)|service_role",
+        "revoke|registrar_abono(uuid,numeric,text,text)|anon,authenticated,public",
+        "grant|registrar_abono(uuid,numeric,text,text)|service_role"
+      ]
+    },
+    {
+      "archivo": "taller-demo/supabase/sync/sync-15e-rollback.sql",
+      "motivo": "Rollback de 15e: vuelve a la definición y ACL canónicas exactas.",
+      "funciones": [
+        {
+          "firma": "estadisticas_tecnicas()",
+          "md5_canonico": "86948fdcaf03939a1d0929004cd9c730",
+          "md5_nuevo": "86948fdcaf03939a1d0929004cd9c730",
+          "reemplazos": []
+        }
+      ],
+      "acl": [
+        "revoke|estadisticas_tecnicas()|anon,public",
+        "grant|estadisticas_tecnicas()|authenticated,service_role",
+        "revoke|registrar_venta(uuid,text,text,numeric,jsonb,integer,text)|anon,public",
+        "grant|registrar_venta(uuid,text,text,numeric,jsonb,integer,text)|authenticated,service_role",
+        "revoke|registrar_abono(uuid,numeric,text,text)|anon,public",
+        "grant|registrar_abono(uuid,numeric,text,text)|authenticated,service_role"
+      ]
+    }
+  ]
+}

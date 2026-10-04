@@ -176,7 +176,14 @@ export function crearEntorno(opts = {}) {
       if (producto === "ninguno") continue;
       if (typeof producto === "object") { win.ENTIMOTORS_BUILD = producto; continue; }
       cargarRel(producto === "mecanico" ? "build-mecanicos/build-target.js" : "build-target.js");
-    } else cargarRel(ARCHIVO[nombre], nombre);
+    } else {
+      // 3.15 (Bloque 3): index.html carga fecha-negocio.js justo antes de app.js (día empresarial de Honduras); las instantáneas
+      // congeladas (3.13/3.14.x) no lo tienen y siguen igual
+      if (nombre === "app" && existe("fecha-negocio.js") && !win.FechaNegocio) cargarRel("fecha-negocio.js");
+      // 3.15 (Bloque 5): y finanzas-calc.js (indicadores de efectivo sin red), también antes de app.js
+      if (nombre === "app" && existe("finanzas-calc.js") && !win.FinanzasCalc) cargarRel("finanzas-calc.js");
+      cargarRel(ARCHIVO[nombre], nombre);
+    }
   }
   return env;
 }

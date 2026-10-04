@@ -110,7 +110,9 @@ const PROPIEDADES = {
   },
   "el arranque del mecanico muestra Mi Trabajo y no lee tablas de negocio": async (m) => {
     const e = nuevoEntorno({ producto: "mecanico", mutar: m }); como(e, MEC_SB); dbFalsa(e, { clientes: [], motos: [], citas: [], ordenes: [] }); const leidas = []; e.win.__leidas = leidas;
-    e.evaluar("const g = DB.getAll; DB.getAll = async (s) => { window.__leidas.push(s); return g(s); };"); await e.win.continuarArranque("blanco").catch(() => {}); await e.asentar();
+    e.evaluar("const g = DB.getAll; DB.getAll = async (s) => { window.__leidas.push(s); return g(s); };"); // 3.15 (Bloque 7): el camino del Taller deja dibujar el Dashboard (rAF o ≤100 ms) antes de las demás pantallas; con el reloj FALSO del
+    // entorno ese temporizador solo corre si la prueba avanza el reloj (si no, el mutante quedaba esperando para siempre)
+    const arranque = e.win.continuarArranque("blanco").catch(() => {}); await e.asentar(); await e.avanzar(200); await arranque; await e.asentar();
     return e.doc.getElementById("view-mi-trabajo").classList.contains("active") && leidas.every((x) => ["clientes", "motos", "citas", "ordenes"].includes(x));
   },
   "UI-1C: icono() solo pinta nombres de la lista cerrada": (m) => {
@@ -145,7 +147,7 @@ const MUTANTES = [
   ["el portero de Mi Trabajo rechaza una sesion sin perfilId", "app", "no exigir perfilId", cambiar('typeof session.perfilId !== "string" || !session.perfilId', "false")],
   ["el portero de Mi Trabajo rechaza una sesion de origen local", "app", "aceptar origen local en Mi Trabajo", cambiar('if (session.origen !== "supabase")', "if (false)")],
   ["startApp repite el portero y no abre ninguna base para un mecanico en el taller", "app", "quitar el portero de startApp", cambiar("if (!admitida.ok) { await denegarSesion(admitida.motivo); return; }", "")],
-  ["arranque: un perfil dado de baja no arranca la app con la sesion guardada", "app", "no descartar la sesion ante cuenta-desactivada", cambiar('["cuenta-desactivada", "sin-perfil", "sin-permiso"].includes(r.motivo)', "false")],
+  ["arranque: un perfil dado de baja no arranca la app con la sesion guardada", "app", "no descartar la sesion ante cuenta-desactivada", cambiar('["cuenta-desactivada", "sin-perfil", "sin-permiso", "sesion-revocada"].includes(r.motivo)', "false")],
   ["login: una cuenta dada de baja no entra", "auth", "ignorar activo=false en Auth.cargarPerfil", cambiar("if (fila.activo === false) return mal(", "if (false) return mal(")],
   // dos capas (entrarConSesion y el portero): el mutante quita LAS DOS; quitar solo una ya no rompe la propiedad, y eso es lo deseado
   ["login: el desarrollador no abre el taller", "app", "quitar el corte del desarrollador en entrarConSesion Y en el portero", (t) => cambiar('if (typeof session.rol !== "string" || !ROLES_DEL_TALLER.includes(session.rol))', "if (false)")(cambiar('if (session.rol === "desarrollador")\n    return', "if (false)\n    return")(cambiar('if (!ES_APP_MECANICOS && session.rol === "desarrollador") {', "if (false) {")(t)))],
@@ -157,7 +159,7 @@ const MUTANTES = [
   ["updateOrder: el mecanico no entrega", "app", "quitar la regla del peldano (entrega)", cambiar("if (!paso?.siguiente || tentativa.estado !== paso.siguiente) {", "if (false) {")],
   ["el mecanico con cuenta solo ve su pantalla (no ve Clientes)", "app", "no ocultar vistas al mecanico", cambiar("if (esMecanicoCuenta()) return VISTAS_FUERA_DEL_MECANICO;", "")],
   ["el desarrollador no ve ninguna vista del taller", "app", "quitar el bloqueo del desarrollador", cambiar("if (VISTAS_OCULTAS_POR_ROL[currentUser.rol] === null) return false;", "")],
-  ["el cajero no ve Usuarios", "app", "vaciar las vistas del cajero", cambiar("return VISTAS_OCULTAS_POR_ROL[currentUser?.rol] ?? VISTAS_SOLO_ADMIN.concat(\"mi-trabajo\");", "return [];")],
+  ["el cajero no ve Usuarios", "app", "vaciar las vistas del cajero", cambiar("return VISTAS_OCULTAS_POR_ROL[currentUser?.rol] ?? VISTAS_SOLO_ADMIN.concat(\"mi-trabajo\", \"mensajes\");", "return [];")],
   ["exigeGestion bloquea al mecanico", "app", "exigeGestion siempre deja pasar", cambiar("if (puedeGestionarTaller()) return true;", "return true;")],
   ["solo el admin asigna mecanico", "app", "cualquiera asigna", cambiar("function puedeAsignarMecanico() { return esAdmin(); }", "function puedeAsignarMecanico() { return true; }")],
   ["esTrabajoPropio compara por UUID", "app", "toda orden es propia", cambiar("registro.mecanicoId === mio;", "true;")],

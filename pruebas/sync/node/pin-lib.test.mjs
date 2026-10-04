@@ -56,9 +56,33 @@ test("configuración: valores de Q-6 por defecto, ajustables y acotados", () => 
   assert.equal(M.configPin({ PIN_MAX_FALLOS_SOLICITANTE: "abc" }).maxFallosSolicitante, 5);
 });
 
-test("catálogo: solo el cajero pide PIN; el mecánico y el desarrollador no tienen ninguna acción elevable", () => {
-  for (const [accion, def] of Object.entries(M.ACCIONES_CON_PIN)) { assert.deepEqual(def.roles, ["cajero"], accion); assert.ok(def.entidad); }
-  assert.deepEqual(Object.keys(M.ACCIONES_CON_PIN).sort(), ["ajustar_stock", "anular_orden", "registrar_devolucion", "reversar_abono", "reversar_caja", "reversar_credito", "reversar_venta"]);
+// 3.15 (Bloque 4) · OWNER-PIN-POLICY: DESTRUCTIVAS → PIN para cajero Y admin (eliminar_usuario: solo admin); SENSIBLES → solo el cajero
+// (el admin con su sesión). Ninguna para mecánico ni desarrollador. (Contrato 3.14: «solo el cajero», reemplazado a propósito.)
+test("catálogo OWNER-PIN-POLICY: destructivas para admin y cajero, sensibles solo cajero; mecánico y desarrollador nunca", () => {
+  // 3.15 (Bloque 5): + restaurar_respaldo (contrato de la futura restauración en la nube: destructiva, solo admin)
+  const destructivas = ["anular_orden", "eliminar_usuario", "restaurar_respaldo", "reversar_abono", "reversar_caja", "reversar_credito", "reversar_venta"];
+  assert.deepEqual(Object.keys(M.ACCIONES_CON_PIN).sort(), ["ajustar_stock", "anular_orden", "eliminar_usuario", "registrar_devolucion", "restaurar_respaldo", "reversar_abono", "reversar_caja", "reversar_credito", "reversar_venta"]);
+  for (const [accion, def] of Object.entries(M.ACCIONES_CON_PIN)) {
+    assert.ok(def.entidad); assert.equal(def.destructiva, destructivas.includes(accion), accion);
+    assert.ok(!def.roles.includes("mecanico") && !def.roles.includes("desarrollador"), accion);
+    if (!def.destructiva) assert.deepEqual(def.roles, ["cajero"], accion);
+  }
+  assert.deepEqual(M.ACCIONES_CON_PIN.eliminar_usuario.roles, ["admin"]); assert.equal(M.ACCIONES_CON_PIN.eliminar_usuario.entidad, "perfiles");
+  assert.deepEqual(M.ACCIONES_CON_PIN.restaurar_respaldo, { entidad: "respaldos", roles: ["admin"], destructiva: true }, "B20: restaurar es destructiva y solo del admin");
+});
+
+test("admin: pide autorización SOLO para lo destructivo (PIN del propietario); lo sensible lo hace con su sesión", async () => {
+  const { svc, e } = await servicio();
+  assert.equal((await svc.autorizar(admin, cuerpo())).cuerpo.codigo, "ADMIN_NO_NECESITA_PIN", "ajustar_stock (sensible)");
+  const r = await svc.autorizar({ ...admin, sesion: "00000000-0000-4000-a000-000000000001" }, cuerpo({ accion: "eliminar_usuario", entidad: "perfiles" }));
+  assert.equal(r.status, 201); assert.equal(e.emitido.sol.sesion, "00000000-0000-4000-a000-000000000001", "la autorización va ligada a la sesión");
+  assert.equal((await svc.autorizar(cajero, cuerpo({ accion: "eliminar_usuario", entidad: "perfiles" }))).cuerpo.codigo, "NO_PERMITIDO", "el cajero no elimina usuarios");
+});
+
+test("sesionDelToken: lee session_id del JWT; basura → null", () => {
+  const b = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
+  assert.equal(M.sesionDelToken(`${b({})}.${b({ session_id: "00000000-0000-4000-a000-000000000009" })}.f`), "00000000-0000-4000-a000-000000000009");
+  for (const t of ["", "x.y.z", `${b({})}.${b({ session_id: "no-uuid" })}.f`, `${b({})}.${b({})}.f`]) assert.equal(M.sesionDelToken(t), null);
 });
 
 /* ───────── servicio con una «base» falsa ───────── */
@@ -67,7 +91,7 @@ function nuevoAcceso(over = {}) {
   const acceso = {
     async estado() { return { configurado: e.pin !== null, version: e.pin !== null ? e.version : null, actualizado_en: "2026-09-21T00:00:00Z", bloqueado_hasta: e.bloqueado ?? null, admin_id: uid(1) }; },
     async leerHash() { return e.pin; },
-    async guardar(admin, hash, por) { e.guardados.push({ admin, hash, por }); e.pin = hash; return ++e.version; },
+    async guardar(admin, hash, por, via) { e.guardados.push({ admin, hash, por, via }); e.pin = hash; return ++e.version; },
     async borrar(admin) { e.borrados.push(admin); e.pin = null; },
     async desbloquear(admin) { e.desbloqueos.push(admin); },
     async reservar(sol, device, accion, entidad, registro, cfg) { e.llamadas.push({ sol, device, accion, entidad, registro, cfg }); return e.reservar ? e.reservar() : { permitido: true, admin_id: uid(1), pin_version: e.version, hash: e.pin, intentos_restantes: 4 }; },
@@ -187,7 +211,9 @@ test("establecer PIN: exige 6 dígitos, rechaza los fáciles y pide re-autentica
   assert.equal((await svc.establecer(admin, { pin_nuevo: "739205", clave_cuenta: "otra" })).cuerpo.codigo, "CLAVE_INCORRECTA");
   assert.equal(e.guardados.length, 0);
   const r = await svc.establecer(admin, { pin_nuevo: "739205", clave_cuenta: "clave-correcta" });
-  assert.equal(r.status, 200); assert.deepEqual(r.cuerpo, { ok: true, version: 4 });
+  assert.equal(r.status, 200); assert.deepEqual(r.cuerpo, { ok: true, version: 4, via: "clave" });   // 3.15: la vía queda auditada
+  assert.equal(e.guardados[0].via, "clave");
+  assert.equal((await svc.establecer(admin, { pin_nuevo: "739206", pin_confirmacion: "739207", clave_cuenta: "clave-correcta" })).cuerpo.codigo, "PIN_NO_COINCIDE");
   assert.match(e.guardados[0].hash, /^scrypt\$/); assert.ok(!e.guardados[0].hash.includes("739205"));
   assert.equal(await M.verificarPin("739205", PEPPER, e.guardados[0].hash), true, "lo guardado verifica el PIN nuevo");
 });
@@ -210,5 +236,23 @@ test("eliminar PIN (fail-closed) y desbloquear", async () => {
   assert.equal((await svc.eliminar(admin, { clave_cuenta: "clave-correcta" })).status, 200);
   assert.deepEqual(e.borrados, [uid(1)]);
   assert.deepEqual((await svc.eliminar(admin, {})).cuerpo, { ok: true, configurado: false }, "sin PIN, eliminar es un no-op");
-  await svc.desbloquear(admin); assert.deepEqual(e.desbloqueos, [uid(1)]);
+  // 3.15 (Bloque 4): desbloquear exige la CONTRASEÑA de la cuenta (antes bastaba la sesión: bloqueo → desbloqueo → más intentos)
+  assert.equal((await svc.desbloquear(admin, {})).cuerpo.codigo, "REAUTENTICACION_REQUERIDA"); assert.deepEqual(e.desbloqueos, []);
+  assert.equal((await svc.desbloquear(admin, { pin_actual: "482913" })).cuerpo.codigo, "REAUTENTICACION_REQUERIDA", "con el PIN no: justo es lo bloqueado");
+  assert.equal((await svc.desbloquear(admin, { clave_cuenta: "otra" })).cuerpo.codigo, "CLAVE_INCORRECTA"); assert.deepEqual(e.desbloqueos, []);
+  assert.equal((await svc.desbloquear(admin, { clave_cuenta: "clave-correcta" })).status, 200); assert.deepEqual(e.desbloqueos, [uid(1)]);
+});
+
+test("recuperación con la contraseña: pasa por el límite de intentos de la cuenta (SECURITY-1C) y lo resuelve", async () => {
+  const { acceso, e } = nuevoAcceso(); e.pin = await M.hashearPin("482913", PEPPER, CFG);
+  const resoluciones = [];
+  acceso.reservarClave = async () => ({ permitido: true, intento_id: 7 });
+  acceso.resolverClave = async (a, i, r) => { resoluciones.push([a, i, r]); };
+  const svc = M.crearServicioPin({ acceso, pepper: PEPPER, cfg: CFG, verificarClaveCuenta: async (c, k) => k === "clave-correcta" });
+  assert.equal((await svc.establecer(admin, { pin_nuevo: "739205", clave_cuenta: "mala" })).cuerpo.codigo, "CLAVE_INCORRECTA");
+  assert.equal((await svc.establecer(admin, { pin_nuevo: "739205", clave_cuenta: "clave-correcta" })).status, 200);
+  assert.deepEqual(resoluciones, [[uid(1), 7, "fallido"], [uid(1), 7, "ok"]]);
+  acceso.reservarClave = async () => ({ permitido: false, reintentar_en_s: 600 });
+  const r = await svc.establecer(admin, { pin_nuevo: "739205", clave_cuenta: "clave-correcta" });
+  assert.equal(r.status, 429); assert.equal(r.cuerpo.codigo, "CLAVE_BLOQUEADA"); assert.equal(r.cabeceras["Retry-After"], "600");
 });

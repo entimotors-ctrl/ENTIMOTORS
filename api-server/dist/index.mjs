@@ -27980,7 +27980,7 @@ var require_pino = __commonJS({
     function pinoBundlerAbsolutePath(p) {
       try {
         const path4 = __require("path");
-        const outputDir = "/home/wilkin/Escritorio/Sistema-emos/ENTIMOTORS-integracion-4e/api-server/dist";
+        const outputDir = "/home/wilkin/Escritorio/Sistema-emos/ENTIMOTORS-3.15-release/fuente-release/api-server/dist";
         return path4.resolve(outputDir, p.replace(/^\.\//, ""));
       } catch (e) {
         const f = new Function("p", "return new URL(p, import.meta.url).pathname");
@@ -71714,7 +71714,7 @@ async function generarEnlaceDeRecuperacion(correo, rol) {
 }
 var router5 = (0, import_express6.Router)();
 router5.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res) => {
-  const { data: perfiles, error } = await comoElAdmin(req.quien.token).from("perfiles").select("id, nombre, rol, telefono, activo, creado_en").order("nombre");
+  const { data: perfiles, error } = await comoElAdmin(req.quien.token).from("perfiles").select("id, nombre, rol, telefono, activo, creado_en, eliminado_en").order("nombre");
   if (error) {
     logger.error({ err: error }, "no se pudieron listar los perfiles");
     res.status(500).json({ error: "No se pudo leer la lista del equipo." });
@@ -71731,6 +71731,8 @@ router5.get("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, res
       telefono: p.telefono ?? "",
       rol: p.rol,
       activo: p.activo,
+      eliminado: !!p.eliminado_en,
+      eliminadoEn: p.eliminado_en ?? null,
       creadoEn: p.creado_en,
       esUsted: p.id === req.quien.id
     }))
@@ -71753,7 +71755,23 @@ router5.post("/admin/usuarios", exigirConfiguracion, exigirAdmin, async (req, re
   if (errAlta || !creado?.user) {
     const msg = errAlta?.message ?? "";
     logger.warn({ correo }, "alta de usuario rechazada");
-    res.status(/already|registered|exists/i.test(msg) ? 409 : 400).json({ error: /already|registered|exists/i.test(msg) ? "Ya existe una cuenta con ese correo." : "No se pudo crear la cuenta." });
+    const existe = /already|registered|exists/i.test(msg) || errAlta?.code === "email_exists";
+    let eliminada = false;
+    if (existe) {
+      try {
+        const { data: lista } = await servidor.auth.admin.listUsers({ page: 1, perPage: 200 });
+        const previa = (lista?.users ?? []).find((u) => (u.email ?? "").toLowerCase() === correo.toLowerCase());
+        if (previa) {
+          const { data: pf } = await servidor.from("perfiles").select("eliminado_en").eq("id", previa.id).maybeSingle();
+          eliminada = !!pf?.eliminado_en;
+        }
+      } catch {
+      }
+    }
+    res.status(existe ? 409 : 400).json({
+      error: !existe ? "No se pudo crear la cuenta." : eliminada ? "Ese correo pertenece a un usuario ELIMINADO (se conserva por su historial). Usa otro correo para la cuenta nueva." : "Ya existe una cuenta con ese correo.",
+      codigo: !existe ? "ALTA_RECHAZADA" : eliminada ? "CORREO_DE_USUARIO_ELIMINADO" : "CORREO_EXISTENTE"
+    });
     return;
   }
   const nuevoId = creado.user.id;
@@ -71867,6 +71885,10 @@ router5.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (re
       res.status(400).json({ error: "\xABactivo\xBB tiene que ser verdadero o falso." });
       return;
     }
+    if (cuerpo["activo"] === false) {
+      res.status(400).json({ error: "Para quitarle el acceso a alguien usa \xABEliminar usuario\xBB.", codigo: "USA_ELIMINAR_USUARIO" });
+      return;
+    }
     cambios["activo"] = cuerpo["activo"];
   }
   if ("nombre" in cuerpo) {
@@ -71889,9 +71911,13 @@ router5.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (re
     res.status(400).json({ error: "No has pedido ning\xFAn cambio." });
     return;
   }
-  const { data: destino } = await servidor.from("perfiles").select("id, rol").eq("id", id).maybeSingle();
+  const { data: destino } = await servidor.from("perfiles").select("id, rol, eliminado_en").eq("id", id).maybeSingle();
   if (!destino) {
     res.status(404).json({ error: "Ese usuario no existe." });
+    return;
+  }
+  if (destino.eliminado_en) {
+    res.status(409).json({ error: "Ese usuario fue eliminado: su cuenta no se reactiva ni se modifica (se conserva por su historial).", codigo: "USUARIO_ELIMINADO" });
     return;
   }
   if (destino.rol === "admin") {
@@ -71910,6 +71936,88 @@ router5.patch("/admin/usuarios/:id", exigirConfiguracion, exigirAdmin, async (re
   }
   res.json({ usuario: actualizado });
 });
+router5.get("/admin/usuarios/:id/impacto", exigirConfiguracion, exigirAdmin, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+    res.status(400).json({ error: "Identificador no v\xE1lido." });
+    return;
+  }
+  const { data, error } = await comoElAdmin(req.quien.token).rpc("usuario_impacto", { p_perfil: id });
+  if (error) {
+    res.status(/no existe/i.test(error.message) ? 404 : 400).json({ error: error.message });
+    return;
+  }
+  res.json({ impacto: data });
+});
+router5.post("/admin/usuarios/:id/eliminar", exigirConfiguracion, exigirAdmin, async (req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  const id = String(req.params["id"] ?? "");
+  const cuerpo = req.body ?? {};
+  const UUIDre = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUIDre.test(id)) {
+    res.status(400).json({ error: "Identificador no v\xE1lido." });
+    return;
+  }
+  if (id === req.quien.id) {
+    res.status(400).json({ error: "No puedes eliminar tu propia cuenta.", codigo: "PROPIA_CUENTA" });
+    return;
+  }
+  const op = cuerpo["op_id"], aut = cuerpo["autorizacion_id"], dev = cuerpo["device_id"];
+  if (typeof op !== "string" || !UUIDre.test(op)) {
+    res.status(400).json({ error: "Falta el identificador de la operaci\xF3n.", codigo: "OP_INVALIDA" });
+    return;
+  }
+  if (aut !== void 0 && aut !== null && (typeof aut !== "string" || !UUIDre.test(aut))) {
+    res.status(400).json({ error: "Autorizaci\xF3n inv\xE1lida.", codigo: "AUTORIZACION_INVALIDA" });
+    return;
+  }
+  if (dev !== void 0 && dev !== null && (typeof dev !== "string" || dev.length > 100)) {
+    res.status(400).json({ error: "device_id inv\xE1lido." });
+    return;
+  }
+  const desasignar = cuerpo["desasignar"] === true;
+  const { data: r, error } = await comoElAdmin(req.quien.token).rpc("eliminar_usuario", {
+    p_op: op,
+    p_perfil: id,
+    p_autorizacion: aut ?? null,
+    p_device: dev ?? null,
+    p_desasignar: desasignar
+  });
+  if (error) {
+    const m = error.message ?? "";
+    const codigo = /TRABAJO_ACTIVO/.test(m) ? "TRABAJO_ACTIVO" : /AUTORIZACION_REQUERIDA/.test(m) ? "AUTORIZACION_REQUERIDA" : /AUTORIZACION_INVALIDA/.test(m) ? "AUTORIZACION_INVALIDA" : /no existe/i.test(m) ? "NO_EXISTE" : /administrador|propia/i.test(m) ? "NO_PERMITIDO" : "RECHAZADO";
+    const st = codigo === "TRABAJO_ACTIVO" ? 409 : codigo === "NO_EXISTE" ? 404 : codigo === "AUTORIZACION_REQUERIDA" || codigo === "AUTORIZACION_INVALIDA" || codigo === "NO_PERMITIDO" ? 403 : 400;
+    logger.warn({ evento: "eliminar-usuario-rechazado", codigo, por: req.quien.id, para: id }, "eliminar usuario rechazado");
+    res.status(st).json({ error: m.replace(/^[A-Z_]+: /, ""), codigo });
+    return;
+  }
+  const resultado = r ?? {};
+  let accesoCerrado = true, sesiones = 0;
+  try {
+    const { error: eBan } = await servidor.auth.admin.updateUserById(id, { ban_duration: "876000h" });
+    if (eBan) throw new Error("ban: " + eBan.message);
+    const { data: n, error: eRev } = await servidor.rpc("revocar_sesiones_usuario", { p_perfil: id });
+    if (eRev) throw new Error("revocar: " + eRev.message);
+    sesiones = Number(n ?? 0);
+  } catch (e) {
+    accesoCerrado = false;
+    logger.error({ evento: "eliminar-usuario-auth", para: id, mensaje: e instanceof Error ? e.message : String(e) }, "no se pudo cerrar el acceso en Auth");
+  }
+  logger.info({ evento: "usuario-eliminado", por: req.quien.id, para: id, accesoCerrado }, "usuario eliminado");
+  const cuerpoRes = {
+    ok: accesoCerrado,
+    eliminado: true,
+    ya_eliminado: resultado["ya_eliminado"] === true,
+    repetida: resultado["repetida"] === true,
+    ordenes_desasignadas: resultado["ordenes_desasignadas"] ?? [],
+    citas_desasignadas: resultado["citas_desasignadas"] ?? [],
+    sesiones_revocadas: sesiones,
+    acceso_cerrado: accesoCerrado,
+    nota: accesoCerrado ? "Ya no puede entrar: sus sesiones se cerraron. Su historial se conserva." : "Se elimin\xF3 en ENTIMOTORS (ya no ve ning\xFAn dato), pero no se pudo cerrar su acceso en el servidor de cuentas. Vuelve a intentarlo."
+  };
+  res.status(accesoCerrado ? 200 : 502).json(cuerpoRes);
+});
 var admin_usuarios_default = router5;
 
 // src/routes/pin.ts
@@ -71919,14 +72027,26 @@ var import_express7 = __toESM(require_express2(), 1);
 import { createHash as createHash2, createHmac, randomBytes as randomBytes2, scrypt, timingSafeEqual as timingSafeEqual2 } from "node:crypto";
 var UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 var ACCIONES_CON_PIN = {
-  ajustar_stock: { entidad: "inventario", roles: ["cajero"] },
-  reversar_venta: { entidad: "ventas", roles: ["cajero"] },
-  registrar_devolucion: { entidad: "ventas", roles: ["cajero"] },
-  reversar_abono: { entidad: "abonos", roles: ["cajero"] },
-  reversar_credito: { entidad: "creditos", roles: ["cajero"] },
-  reversar_caja: { entidad: "caja_movimientos", roles: ["cajero"] },
-  anular_orden: { entidad: "ordenes", roles: ["cajero"] }
+  ajustar_stock: { entidad: "inventario", roles: ["cajero"], destructiva: false },
+  registrar_devolucion: { entidad: "ventas", roles: ["cajero"], destructiva: false },
+  reversar_venta: { entidad: "ventas", roles: ["cajero", "admin"], destructiva: true },
+  reversar_abono: { entidad: "abonos", roles: ["cajero", "admin"], destructiva: true },
+  reversar_credito: { entidad: "creditos", roles: ["cajero", "admin"], destructiva: true },
+  reversar_caja: { entidad: "caja_movimientos", roles: ["cajero", "admin"], destructiva: true },
+  anular_orden: { entidad: "ordenes", roles: ["cajero", "admin"], destructiva: true },
+  eliminar_usuario: { entidad: "perfiles", roles: ["admin"], destructiva: true },
+  // 3.15 (Bloque 5): contrato de una FUTURA restauración en la nube (hoy no existe ningún endpoint que restaure). Reemplaza datos:
+  // destructiva, solo el administrador, con el PIN del propietario; registro = uuid derivado del SHA-256 del manifiesto del respaldo.
+  restaurar_respaldo: { entidad: "respaldos", roles: ["admin"], destructiva: true }
 };
+function sesionDelToken(token) {
+  try {
+    const p = JSON.parse(Buffer.from(String(token).split(".")[1] ?? "", "base64url").toString("utf8"));
+    return typeof p.session_id === "string" && UUID.test(p.session_id) ? p.session_id : null;
+  } catch {
+    return null;
+  }
+}
 function numero(env, nombre, defecto, min, max) {
   const v = Number(env[nombre]);
   return Number.isFinite(v) && v >= min && v <= max ? Math.floor(v) : defecto;
@@ -72023,7 +72143,7 @@ function crearServicioPin(dep) {
       if (!pinConFormato(body.pin)) return err(400, "PIN_INVALIDO", "El PIN son 6 d\xEDgitos.");
       const device = typeof body.device_id === "string" ? body.device_id : null;
       const registro = body.registro_id.toLowerCase();
-      if (sol.rol === "admin") return err(400, "ADMIN_NO_NECESITA_PIN", "El administrador no necesita autorizaci\xF3n.");
+      if (sol.rol === "admin" && !def.destructiva) return err(400, "ADMIN_NO_NECESITA_PIN", "El administrador no necesita autorizaci\xF3n.");
       if (!def.roles.includes(sol.rol)) {
         await acceso2.resultado(sol.id, device, accion, def.entidad, registro, "no_permitido");
         return err(403, "NO_PERMITIDO", "Tu rol no puede pedir esta autorizaci\xF3n.");
@@ -72035,7 +72155,10 @@ function crearServicioPin(dep) {
         const a = await acceso2.emitir(sol, c.adminId, accion, def.entidad, registro, device, c.version, hash, cfg2.ttlSegundos);
         return { status: 201, cuerpo: { autorizacion_id: a.autorizacion_id, expira_en: a.expira_en, ttl_segundos: cfg2.ttlSegundos } };
       } catch (e) {
-        if (String(e?.message ?? "").includes("PIN_CAMBIADO")) return err(409, "PIN_CAMBIADO", "El PIN cambi\xF3 mientras se verificaba. Int\xE9ntalo de nuevo.");
+        const m = String(e?.message ?? "");
+        if (m.includes("PIN_CAMBIADO")) return err(409, "PIN_CAMBIADO", "El PIN cambi\xF3 mientras se verificaba. Int\xE9ntalo de nuevo.");
+        if (m.includes("SESION_INVALIDA")) return err(401, "SESION_INVALIDA", "Tu sesi\xF3n ya no es v\xE1lida. Inicia sesi\xF3n de nuevo.");
+        if (m.includes("CUENTA_INACTIVA")) return err(403, "CUENTA_INACTIVA", "Tu cuenta no est\xE1 activa.");
         throw e;
       }
     },
@@ -72044,11 +72167,30 @@ function crearServicioPin(dep) {
       const bloqueado = e.bloqueado_hasta !== null && (e.bloqueado_hasta === "infinity" || new Date(e.bloqueado_hasta).getTime() > Date.now());
       return { status: 200, cuerpo: { configurado: e.configurado, version: e.version, actualizado_en: e.actualizado_en, bloqueado, bloqueado_hasta: e.bloqueado_hasta } };
     },
-    /** Re-autenticación del admin para cambiar/quitar el PIN: el PIN actual (con límite de intentos) o la contraseña de su cuenta. */
-    async reautenticar(admin, body, existe) {
+    /** Re-autenticación del admin para cambiar/quitar/desbloquear el PIN: el PIN actual (con límite de intentos) o la contraseña de su
+        cuenta (RECUPERACIÓN: nunca se muestra ni se envía el PIN; se reemplaza. Con límite de intentos SECURITY-1C en la base). */
+    async reautenticar(admin, body, existe, soloClave = false) {
       if (typeof body.clave_cuenta === "string" && body.clave_cuenta.length > 0 && body.clave_cuenta.length <= 200) {
-        return await dep.verificarClaveCuenta({ id: admin.id, correo: admin.correo }, body.clave_cuenta) ? null : err(401, "CLAVE_INCORRECTA", "La contrase\xF1a de la cuenta no es correcta.");
+        let intento;
+        if (acceso2.reservarClave) {
+          const r = await acceso2.reservarClave(admin.id);
+          if (!r.permitido) {
+            const seg = Number(r.reintentar_en_s ?? 900);
+            return err(429, "CLAVE_BLOQUEADA", "Demasiados intentos con la contrase\xF1a. Espera unos minutos.", { reintentar_en_s: seg }, { "Retry-After": String(seg) });
+          }
+          intento = r.intento_id;
+        }
+        let bien = false;
+        try {
+          bien = await dep.verificarClaveCuenta({ id: admin.id, correo: admin.correo }, body.clave_cuenta);
+        } catch (e) {
+          if (acceso2.resolverClave && intento !== void 0) await acceso2.resolverClave(admin.id, intento, "anulado");
+          throw e;
+        }
+        if (acceso2.resolverClave && intento !== void 0) await acceso2.resolverClave(admin.id, intento, bien ? "ok" : "fallido");
+        return bien ? null : err(401, "CLAVE_INCORRECTA", "La contrase\xF1a de la cuenta no es correcta.");
       }
+      if (soloClave) return err(400, "REAUTENTICACION_REQUERIDA", "Confirma con la contrase\xF1a de tu cuenta.");
       if (existe && pinConFormato(body.pin_actual)) {
         const c = await comprobar(admin, body.pin_actual, null, "cambiar_pin", "admin_pin", null);
         return c.salida;
@@ -72058,12 +72200,14 @@ function crearServicioPin(dep) {
     async establecer(admin, body) {
       if (!pinConFormato(body.pin_nuevo)) return err(400, "PIN_INVALIDO", "El PIN son 6 d\xEDgitos.");
       if (pinDebil(body.pin_nuevo)) return err(400, "PIN_DEBIL", "Ese PIN es demasiado f\xE1cil de adivinar. Elige otro.");
+      if (body.pin_confirmacion !== void 0 && body.pin_confirmacion !== body.pin_nuevo) return err(400, "PIN_NO_COINCIDE", "La confirmaci\xF3n no coincide con el PIN nuevo.");
       const e = await acceso2.estado();
       const rechazo = await this.reautenticar(admin, body, e.configurado);
       if (rechazo) return rechazo;
       const hash = await hashearPin(body.pin_nuevo, pepper2, cfg2);
-      const version3 = await acceso2.guardar(admin.id, hash, admin.id);
-      return { status: 200, cuerpo: { ok: true, version: version3 } };
+      const via = !e.configurado ? "inicial" : typeof body.clave_cuenta === "string" && body.clave_cuenta ? "clave" : "pin";
+      const version3 = await acceso2.guardar(admin.id, hash, admin.id, via);
+      return { status: 200, cuerpo: { ok: true, version: version3, via } };
     },
     async eliminar(admin, body) {
       const e = await acceso2.estado();
@@ -72073,7 +72217,11 @@ function crearServicioPin(dep) {
       await acceso2.borrar(admin.id);
       return { status: 200, cuerpo: { ok: true, configurado: false } };
     },
-    async desbloquear(admin) {
+    /** Desbloquear exige la CONTRASEÑA de la cuenta (con su propio límite): si bastara la sesión, quien la tuviera podría seguir
+        probando PIN sin fin (bloqueo → desbloqueo → bloqueo). */
+    async desbloquear(admin, body = {}) {
+      const rechazo = await this.reautenticar(admin, body, false, true);
+      if (rechazo) return rechazo;
       await acceso2.desbloquear(admin.id);
       return { status: 200, cuerpo: { ok: true } };
     }
@@ -72082,7 +72230,7 @@ function crearServicioPin(dep) {
 
 // src/lib/clave-cuenta.ts
 var RUTA_CIERRE_TEMPORAL = "/auth/v1/logout?scope=local";
-function sesionDelToken(token) {
+function sesionDelToken2(token) {
   try {
     const parte = token.split(".")[1];
     if (!parte) return null;
@@ -72119,7 +72267,7 @@ function crearVerificadorClaveCuenta(o) {
       }
       if (intento === 1) await new Promise((res) => setTimeout(res, ESPERA));
     }
-    o.log.warn({ evento: "pin-sesion-temporal-no-cerrada", sesion: sesionDelToken(token), estado }, "no se pudo cerrar la sesi\xF3n temporal de la verificaci\xF3n");
+    o.log.warn({ evento: "pin-sesion-temporal-no-cerrada", sesion: sesionDelToken2(token), estado }, "no se pudo cerrar la sesi\xF3n temporal de la verificaci\xF3n");
     return false;
   }
   async function comprobarClaveCuenta(admin, clave) {
@@ -72162,166 +72310,6 @@ function crearVerificadorClaveCuenta(o) {
   }
   return Object.assign(verificarClaveCuenta2, { comprobar: comprobarClaveCuenta });
 }
-
-// src/routes/pin.ts
-var SUPABASE_URL3 = process.env["SUPABASE_URL"];
-var SERVICE_KEY2 = process.env["SUPABASE_SERVICE_KEY"];
-var ANON_KEY2 = process.env["SUPABASE_ANON_KEY"];
-if (!SUPABASE_URL3 || !SERVICE_KEY2) throw new Error("Faltan SUPABASE_URL y SUPABASE_SERVICE_KEY");
-var servidor2 = createClient(SUPABASE_URL3, SERVICE_KEY2, {
-  auth: { autoRefreshToken: false, persistSession: false },
-  realtime: { transport: wrapper_default }
-});
-var router6 = (0, import_express7.Router)();
-function pepper() {
-  const p = process.env["ADMIN_PIN_PEPPER"];
-  return typeof p === "string" && p.length >= 32 ? p : null;
-}
-var verificarClaveCuenta = crearVerificadorClaveCuenta({
-  url: SUPABASE_URL3,
-  anon: ANON_KEY2,
-  log: logger,
-  fetch: ((...a) => globalThis.fetch(...a))
-});
-var acceso = {
-  async estado() {
-    const { data, error } = await servidor2.from("admin_pin").select("perfil_id, version, actualizado_en, bloqueado_hasta").order("actualizado_en", { ascending: false }).limit(1);
-    if (error) throw new Error("estado: " + error.message);
-    const f = data?.[0];
-    return { configurado: !!f, version: f?.version ?? null, actualizado_en: f?.actualizado_en ?? null, bloqueado_hasta: f?.bloqueado_hasta ?? null, admin_id: f?.perfil_id ?? null };
-  },
-  async leerHash(adminId) {
-    const { data, error } = await servidor2.from("admin_pin").select("hash").eq("perfil_id", adminId).maybeSingle();
-    if (error) throw new Error("leerHash: " + error.message);
-    return data?.hash ?? null;
-  },
-  async guardar(adminId, hash, por) {
-    const { data, error } = await servidor2.rpc("pin_guardar", { p_admin: adminId, p_hash: hash, p_por: por });
-    if (error) throw new Error("guardar: " + error.message);
-    return Number(data);
-  },
-  async borrar(adminId) {
-    const { error } = await servidor2.from("admin_pin").delete().eq("perfil_id", adminId);
-    if (error) throw new Error("borrar: " + error.message);
-  },
-  async desbloquear(adminId) {
-    const { error } = await servidor2.rpc("pin_desbloquear", { p_admin: adminId });
-    if (error) throw new Error("desbloquear: " + error.message);
-  },
-  async reservar(sol, device, accion, entidad, registro, cfg2) {
-    const { data, error } = await servidor2.rpc("pin_reservar_intento", {
-      p_solicitante: sol,
-      p_device: device,
-      p_accion: accion,
-      p_entidad: entidad,
-      p_registro: registro,
-      p_max_solicitante: cfg2.maxFallosSolicitante,
-      p_max_global: cfg2.maxFallosGlobal,
-      p_ventana_min: cfg2.ventanaMin,
-      p_bloqueo_min: cfg2.bloqueoMin,
-      p_max_bloqueos_24h: cfg2.maxBloqueos24h
-    });
-    if (error) throw new Error("reservar: " + error.message);
-    return data;
-  },
-  async resultado(sol, device, accion, entidad, registro, res) {
-    const { error } = await servidor2.from("admin_pin_intentos").insert({ solicitante_id: sol, device_id: device, accion, entidad, registro_id: registro, resultado: res });
-    if (error) throw new Error("resultado: " + error.message);
-  },
-  async emitir(sol, admin, accion, entidad, registro, device, version3, payloadHash, ttl) {
-    const { data, error } = await servidor2.rpc("pin_emitir_autorizacion", {
-      p_solicitante: sol.id,
-      p_rol: sol.rol,
-      p_admin: admin,
-      p_accion: accion,
-      p_entidad: entidad,
-      p_registro: registro,
-      p_device: device,
-      p_pin_version: version3,
-      p_payload_hash: payloadHash,
-      p_ttl_seg: ttl
-    });
-    if (error) throw new Error(error.message);
-    return data;
-  }
-};
-function cabecerasSeguras(_req, res, next) {
-  res.setHeader("Cache-Control", "no-store");
-  res.setHeader("Pragma", "no-cache");
-  next();
-}
-function exigirConfiguracion2(_req, res, next) {
-  if (!pepper()) {
-    logger.error("falta ADMIN_PIN_PEPPER (32+ caracteres): las autorizaciones con PIN quedan apagadas");
-    res.status(503).json({ error: "Las autorizaciones con PIN no est\xE1n configuradas en el servidor.", codigo: "PIN_NO_CONFIGURADO_EN_SERVIDOR" });
-    return;
-  }
-  next();
-}
-async function identificar(req, res, next) {
-  try {
-    const cab = req.headers.authorization ?? "";
-    const token = cab.startsWith("Bearer ") ? cab.slice(7).trim() : "";
-    if (!token) {
-      res.status(401).json({ error: "Hace falta iniciar sesi\xF3n.", codigo: "SIN_SESION" });
-      return;
-    }
-    const { data, error } = await servidor2.auth.getUser(token);
-    if (error || !data?.user) {
-      res.status(401).json({ error: "La sesi\xF3n no es v\xE1lida o ha caducado.", codigo: "SESION_INVALIDA" });
-      return;
-    }
-    const { data: perfil, error: errPerfil } = await servidor2.from("perfiles").select("id, nombre, rol, activo").eq("id", data.user.id).maybeSingle();
-    if (errPerfil) throw new Error("perfil: " + errPerfil.message);
-    if (!perfil || perfil.activo !== true) {
-      res.status(403).json({ error: "Tu cuenta no est\xE1 activa.", codigo: "CUENTA_INACTIVA" });
-      return;
-    }
-    req.quien = { id: perfil.id, rol: perfil.rol, nombre: perfil.nombre, activo: true, correo: data.user.email ?? "" };
-    next();
-  } catch (e) {
-    logger.error({ codigo: "pin-identificar", mensaje: e instanceof Error ? e.message : "error" }, "no se pudo identificar");
-    res.status(500).json({ error: "No se pudo comprobar la sesi\xF3n.", codigo: "ERROR_INTERNO" });
-  }
-}
-function exigirAdmin2(req, res, next) {
-  if (req.quien?.rol !== "admin") {
-    res.status(403).json({ error: "Solo el administrador.", codigo: "SOLO_ADMIN" });
-    return;
-  }
-  next();
-}
-function cuerpoRazonable(req, res, next) {
-  const b = req.body;
-  if (b !== void 0 && b !== null && (typeof b !== "object" || Array.isArray(b) || JSON.stringify(b).length > 4096)) {
-    res.status(400).json({ error: "Cuerpo inv\xE1lido.", codigo: "CUERPO_INVALIDO" });
-    return;
-  }
-  next();
-}
-function servir(caso) {
-  return async (req, res) => {
-    try {
-      const r = await caso(req.quien, req.body ?? {});
-      for (const [k, v] of Object.entries(r.cabeceras ?? {})) res.setHeader(k, v);
-      res.status(r.status).json(r.cuerpo);
-    } catch (e) {
-      logger.error({ codigo: "pin-error", mensaje: e instanceof Error ? e.message : "error" }, "fallo en una ruta del PIN");
-      res.status(500).json({ error: "No se pudo completar la operaci\xF3n.", codigo: "ERROR_INTERNO" });
-    }
-  };
-}
-var svc = () => crearServicioPin({ acceso, pepper: pepper(), cfg: configPin(), verificarClaveCuenta });
-var base = [cabecerasSeguras, exigirConfiguracion2, cuerpoRazonable, identificar];
-router6.get("/admin/pin/estado", ...base, exigirAdmin2, servir(() => svc().estado()));
-router6.put("/admin/pin", ...base, exigirAdmin2, servir((q, b) => svc().establecer(q, b)));
-router6.delete("/admin/pin", ...base, exigirAdmin2, servir((q, b) => svc().eliminar(q, b)));
-router6.post("/admin/pin/desbloquear", ...base, exigirAdmin2, servir((q) => svc().desbloquear(q)));
-router6.post("/autorizaciones", ...base, servir((q, b) => svc().autorizar(q, b)));
-var pin_default = router6;
-
-// src/routes/admin-clave.ts
-var import_express8 = __toESM(require_express2(), 1);
 
 // src/lib/clave-admin.ts
 function numero2(env, n, def, min, max) {
@@ -72545,7 +72533,178 @@ function crearServicioClaveAdmin(dep) {
   };
 }
 
+// src/routes/pin.ts
+var SUPABASE_URL3 = process.env["SUPABASE_URL"];
+var SERVICE_KEY2 = process.env["SUPABASE_SERVICE_KEY"];
+var ANON_KEY2 = process.env["SUPABASE_ANON_KEY"];
+if (!SUPABASE_URL3 || !SERVICE_KEY2) throw new Error("Faltan SUPABASE_URL y SUPABASE_SERVICE_KEY");
+var servidor2 = createClient(SUPABASE_URL3, SERVICE_KEY2, {
+  auth: { autoRefreshToken: false, persistSession: false },
+  realtime: { transport: wrapper_default }
+});
+var router6 = (0, import_express7.Router)();
+function pepper() {
+  const p = process.env["ADMIN_PIN_PEPPER"];
+  return typeof p === "string" && p.length >= 32 ? p : null;
+}
+var verificarClaveCuenta = crearVerificadorClaveCuenta({
+  url: SUPABASE_URL3,
+  anon: ANON_KEY2,
+  log: logger,
+  fetch: ((...a) => globalThis.fetch(...a))
+});
+var acceso = {
+  async estado() {
+    const { data, error } = await servidor2.from("admin_pin").select("perfil_id, version, actualizado_en, bloqueado_hasta").order("actualizado_en", { ascending: false }).limit(1);
+    if (error) throw new Error("estado: " + error.message);
+    const f = data?.[0];
+    return { configurado: !!f, version: f?.version ?? null, actualizado_en: f?.actualizado_en ?? null, bloqueado_hasta: f?.bloqueado_hasta ?? null, admin_id: f?.perfil_id ?? null };
+  },
+  async leerHash(adminId) {
+    const { data, error } = await servidor2.from("admin_pin").select("hash").eq("perfil_id", adminId).maybeSingle();
+    if (error) throw new Error("leerHash: " + error.message);
+    return data?.hash ?? null;
+  },
+  async guardar(adminId, hash, por, via) {
+    const { data, error } = await servidor2.rpc("pin_guardar", { p_admin: adminId, p_hash: hash, p_por: por, p_via: via });
+    if (error) throw new Error("guardar: " + error.message);
+    return Number(data);
+  },
+  async borrar(adminId) {
+    const { error } = await servidor2.rpc("pin_quitar", { p_admin: adminId, p_por: adminId });
+    if (error) throw new Error("borrar: " + error.message);
+  },
+  async desbloquear(adminId) {
+    const { error } = await servidor2.rpc("pin_desbloquear", { p_admin: adminId });
+    if (error) throw new Error("desbloquear: " + error.message);
+  },
+  async reservar(sol, device, accion, entidad, registro, cfg2) {
+    const { data, error } = await servidor2.rpc("pin_reservar_intento", {
+      p_solicitante: sol,
+      p_device: device,
+      p_accion: accion,
+      p_entidad: entidad,
+      p_registro: registro,
+      p_max_solicitante: cfg2.maxFallosSolicitante,
+      p_max_global: cfg2.maxFallosGlobal,
+      p_ventana_min: cfg2.ventanaMin,
+      p_bloqueo_min: cfg2.bloqueoMin,
+      p_max_bloqueos_24h: cfg2.maxBloqueos24h
+    });
+    if (error) throw new Error("reservar: " + error.message);
+    return data;
+  },
+  async resultado(sol, device, accion, entidad, registro, res) {
+    const { error } = await servidor2.from("admin_pin_intentos").insert({ solicitante_id: sol, device_id: device, accion, entidad, registro_id: registro, resultado: res });
+    if (error) throw new Error("resultado: " + error.message);
+  },
+  async emitir(sol, admin, accion, entidad, registro, device, version3, payloadHash, ttl) {
+    const { data, error } = await servidor2.rpc("pin_emitir_autorizacion", {
+      p_solicitante: sol.id,
+      p_rol: sol.rol,
+      p_admin: admin,
+      p_accion: accion,
+      p_entidad: entidad,
+      p_registro: registro,
+      p_device: device,
+      p_pin_version: version3,
+      p_payload_hash: payloadHash,
+      p_ttl_seg: ttl,
+      p_session: sol.sesion ?? null
+    });
+    if (error) throw new Error(error.message);
+    return data;
+  },
+  async reservarClave(adminId) {
+    const c = configClave();
+    const { data, error } = await servidor2.rpc("clave_reservar_intento", { p_perfil: adminId, p_max: c.max, p_ventana_min: c.ventanaMin, p_bloqueo_min: c.bloqueoMin, p_ttl_seg: c.ttlSeg });
+    if (error) throw new Error("reservar-clave");
+    const d = data ?? {};
+    return { permitido: d.permitido === true, intento_id: d.intento_id, reintentar_en_s: d.reintentar_en_s };
+  },
+  async resolverClave(adminId, intentoId, resultado) {
+    const c = configClave();
+    const { error } = await servidor2.rpc("clave_resolver_intento", { p_perfil: adminId, p_intento: intentoId, p_resultado: resultado, p_max: c.max, p_ventana_min: c.ventanaMin, p_bloqueo_min: c.bloqueoMin });
+    if (error) throw new Error("resolver-clave");
+  }
+};
+function cabecerasSeguras(_req, res, next) {
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Pragma", "no-cache");
+  next();
+}
+function exigirConfiguracion2(_req, res, next) {
+  if (!pepper()) {
+    logger.error("falta ADMIN_PIN_PEPPER (32+ caracteres): las autorizaciones con PIN quedan apagadas");
+    res.status(503).json({ error: "Las autorizaciones con PIN no est\xE1n configuradas en el servidor.", codigo: "PIN_NO_CONFIGURADO_EN_SERVIDOR" });
+    return;
+  }
+  next();
+}
+async function identificar(req, res, next) {
+  try {
+    const cab = req.headers.authorization ?? "";
+    const token = cab.startsWith("Bearer ") ? cab.slice(7).trim() : "";
+    if (!token) {
+      res.status(401).json({ error: "Hace falta iniciar sesi\xF3n.", codigo: "SIN_SESION" });
+      return;
+    }
+    const { data, error } = await servidor2.auth.getUser(token);
+    if (error || !data?.user) {
+      res.status(401).json({ error: "La sesi\xF3n no es v\xE1lida o ha caducado.", codigo: "SESION_INVALIDA" });
+      return;
+    }
+    const { data: perfil, error: errPerfil } = await servidor2.from("perfiles").select("id, nombre, rol, activo").eq("id", data.user.id).maybeSingle();
+    if (errPerfil) throw new Error("perfil: " + errPerfil.message);
+    if (!perfil || perfil.activo !== true) {
+      res.status(403).json({ error: "Tu cuenta no est\xE1 activa.", codigo: "CUENTA_INACTIVA" });
+      return;
+    }
+    req.quien = { id: perfil.id, rol: perfil.rol, nombre: perfil.nombre, activo: true, correo: data.user.email ?? "", sesion: sesionDelToken(token) };
+    next();
+  } catch (e) {
+    logger.error({ codigo: "pin-identificar", mensaje: e instanceof Error ? e.message : "error" }, "no se pudo identificar");
+    res.status(500).json({ error: "No se pudo comprobar la sesi\xF3n.", codigo: "ERROR_INTERNO" });
+  }
+}
+function exigirAdmin2(req, res, next) {
+  if (req.quien?.rol !== "admin") {
+    res.status(403).json({ error: "Solo el administrador.", codigo: "SOLO_ADMIN" });
+    return;
+  }
+  next();
+}
+function cuerpoRazonable(req, res, next) {
+  const b = req.body;
+  if (b !== void 0 && b !== null && (typeof b !== "object" || Array.isArray(b) || JSON.stringify(b).length > 4096)) {
+    res.status(400).json({ error: "Cuerpo inv\xE1lido.", codigo: "CUERPO_INVALIDO" });
+    return;
+  }
+  next();
+}
+function servir(caso) {
+  return async (req, res) => {
+    try {
+      const r = await caso(req.quien, req.body ?? {});
+      for (const [k, v] of Object.entries(r.cabeceras ?? {})) res.setHeader(k, v);
+      res.status(r.status).json(r.cuerpo);
+    } catch (e) {
+      logger.error({ codigo: "pin-error", mensaje: e instanceof Error ? e.message : "error" }, "fallo en una ruta del PIN");
+      res.status(500).json({ error: "No se pudo completar la operaci\xF3n.", codigo: "ERROR_INTERNO" });
+    }
+  };
+}
+var svc = () => crearServicioPin({ acceso, pepper: pepper(), cfg: configPin(), verificarClaveCuenta });
+var base = [cabecerasSeguras, exigirConfiguracion2, cuerpoRazonable, identificar];
+router6.get("/admin/pin/estado", ...base, exigirAdmin2, servir(() => svc().estado()));
+router6.put("/admin/pin", ...base, exigirAdmin2, servir((q, b) => svc().establecer(q, b)));
+router6.delete("/admin/pin", ...base, exigirAdmin2, servir((q, b) => svc().eliminar(q, b)));
+router6.post("/admin/pin/desbloquear", ...base, exigirAdmin2, servir((q, b) => svc().desbloquear(q, b)));
+router6.post("/autorizaciones", ...base, servir((q, b) => svc().autorizar(q, b)));
+var pin_default = router6;
+
 // src/routes/admin-clave.ts
+var import_express8 = __toESM(require_express2(), 1);
 var SUPABASE_URL4 = process.env["SUPABASE_URL"];
 var SERVICE_KEY3 = process.env["SUPABASE_SERVICE_KEY"];
 var ANON_KEY3 = process.env["SUPABASE_ANON_KEY"];

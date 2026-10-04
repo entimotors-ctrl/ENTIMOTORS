@@ -300,11 +300,27 @@ describe("Restaurar sesion al abrir la app", () => {
     const r = await A(env).restaurarSesion();
     assert.deepEqual([r.ok, r.motivo], [false, "sin-conexion"]); todosFalsos(env); assert.equal(A(env).perfilActual(), null);
   });
-  test("GAP (documentado): con el token CADUCADO restaurarSesion devuelve «sin-sesion» y NO intenta refrescar; borra el perfil de Auth", async () => {
+  /* 3.15 (Checkpoint 8A): el GAP «token CADUCADO → sin-sesion sin intentar refrescar» quedó CERRADO. Ahora se RENUEVA antes de decidir. */
+  test("token CADUCADO al abrir: se RENUEVA (una vez) y la sesión sigue, confirmada contra el servidor", async () => {
     const c = CUENTAS.adminActivo, env = entorno({ cuenta: c, expiraEnS: -100, perfil: perfilDe(c) });
+    const r = await A(env).restaurarSesion(); await env.asentar();
+    assert.equal(r.ok, true); assert.equal(A(env).esAdmin(), true); assert.equal(A(env).estado().conSesion, true);
+    assert.ok(rutas(env).includes("POST /auth/v1/token [ninguno]"), "se intentó renovar");
+  });
+  test("token CADUCADO al abrir y Auth RECHAZA la renovación (revocada): «sesion-revocada», sin perfil y sin credenciales guardadas", async () => {
+    const c = CUENTAS.adminActivo, env = entorno({ cuenta: c, expiraEnS: -100, perfil: perfilDe(c) }); env.servidor.refrescoFalla = true;
     const r = await A(env).restaurarSesion();
-    assert.deepEqual([r.ok, r.motivo], [false, "sin-sesion"]); todosFalsos(env); assert.equal(A(env).perfilActual(), null);
-    assert.equal(env.servidor.llamadas.length, 0, "no se intento refrescar ni consultar nada");
+    assert.deepEqual([r.ok, r.motivo], [false, "sesion-revocada"]); assert.equal(A(env).perfilActual(), null);
+    assert.equal(env.almacen.getItem("entimotors_sb_sesion"), null, "no se sigue con credenciales inválidas");
+  });
+  for (const red of ["caida", "timeout"]) test(`token CADUCADO al abrir y la renovación falla por RED (${red}): sigue con el perfil guardado SIN confirmar y reintenta`, async () => {
+    const c = CUENTAS.adminActivo, env = entorno({ cuenta: c, expiraEnS: -100, perfil: perfilDe(c) }); env.servidor.red = red;
+    const r = await A(env).restaurarSesion();
+    assert.equal(r.ok, true); assert.equal(r.sinConfirmar, true); assert.equal(A(env).perfilActual()?.rol, "admin");
+    assert.ok(!env.eventos.includes("SIGNED_OUT")); assert.ok(env.almacen.getItem("entimotors_sb_sesion"), "la sesión NO se borra por un corte");
+    assert.equal(A(env).estado().conSesion, false, "pero sin token válido nada sale a la nube"); assert.equal(env.timersPendientes() >= 1, true, "reintento programado");
+    env.servidor.red = "ok"; await env.avanzar(16000);
+    assert.equal(A(env).estado().conSesion, true, "al volver la red, el reintento renueva"); assert.ok(env.eventos.includes("TOKEN_REFRESHED"));
   });
   test("restaurarSesion no es reentrante: una segunda llamada simultanea devuelve «en-curso»", async () => {
     const env = entorno({ cuenta: CUENTAS.adminActivo });
@@ -322,14 +338,16 @@ describe("La sesion cambia mientras se trabaja", () => {
     assert.ok(env.eventos.includes("TOKEN_REFRESHED")); assert.equal(A(env).esAdmin(), true); assert.equal(env.timersPendientes(), 1);
     assert.ok(rutas(env).includes("POST /auth/v1/token [ninguno]"));
   });
-  test("renovacion RECHAZADA: SIGNED_OUT, el perfil se borra y ningun helper concede nada (el token guardado sigue hasta caducar: GAP)", async () => {
+  test("renovacion RECHAZADA: SIGNED_OUT, el perfil se borra, ningun helper concede nada y la sesión local se OLVIDA", async () => {
     const c = CUENTAS.adminActivo, env = entorno();
     await A(env).iniciarSesion(c.correo, c.clave);
     env.servidor.refrescoFalla = true;
     await env.avanzar(3500 * 1000);
     assert.ok(env.eventos.includes("SIGNED_OUT")); todosFalsos(env); assert.equal(A(env).perfilActual(), null);
     assert.equal(A(env).estado().rol, null); assert.equal(A(env).estado().origen, null);
-    assert.equal(A(env).estado().conSesion, true, "GAP: el token de acceso viejo sigue guardado hasta que caduque");
+    // 3.15 (Checkpoint 8A): GAP cerrado — un rechazo de Auth OLVIDA la sesión local (no se sigue con credenciales inválidas)
+    assert.equal(A(env).estado().conSesion, false); assert.equal(env.almacen.getItem("entimotors_sb_sesion"), null);
+    assert.equal(A(env).motivoSalida(), "sesion-revocada");
   });
   test("cerrarSesion: llama a /logout con el token, limpia sesion y perfil, emite SIGNED_OUT y cancela el temporizador", async () => {
     const c = CUENTAS.adminActivo, env = entorno();

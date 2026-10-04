@@ -2,6 +2,9 @@
 // (16) sobre el tag v3.13.0. Guardas de que README y CHANGELOG de 3.14.1 (1) dicen la versión y las cachés REALES del código,
 // (2) describen solo lo que entrega 3.14.1 (Seguridad, accesos rápidos, iconos) sin cambios de base ni de backend, y (3) conservan
 // la historia de 3.14.0 hacia atrás tal cual se publicó.
+// 3.15.0: contrato de la release 3.14.1 → se ejecuta sobre la instantánea del commit e807f65 (helpers/usar-3141.mjs, PRIMER import).
+// Única aserción ajustada: ya no corre sobre el árbol de trabajo sino sobre esa instantánea. El de 3.15.0 está en 16d-alcance-3.15.0.
+import "./helpers/usar-3141.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -14,8 +17,8 @@ const VERSION = (/const VERSION_APP = "([^"]+)"/.exec(APP) || [])[1];
 const CACHE = (/const CACHE_NAME = "([^"]+)"/.exec(SW) || [])[1];
 
 describe("README.md · 3.14.1", () => {
-  test("se ejecuta sobre el árbol de trabajo; versión 3.14.1 en el README, en app.js y en la caché", () => {
-    assert.equal(RELEASE_CONGELADA, null); assert.equal(VERSION, "3.14.1"); assert.equal(CACHE, "entimotors-v3.14.1");
+  test("se ejecuta sobre la instantánea del release 3.14.1 (e807f65); versión 3.14.1 en el README, en app.js y en la caché", () => {
+    assert.equal(RELEASE_CONGELADA, "3.14.1"); assert.equal(VERSION, "3.14.1"); assert.equal(CACHE, "entimotors-v3.14.1");
     assert.match(README, /\*\*Versión actual:\*\* 3\.14\.1 ·/);
   });
   test("«Novedades de 3.14.1»: Seguridad (solo admin), accesos rápidos, iconos y la caché nueva; sin base ni backend nuevos", () => {

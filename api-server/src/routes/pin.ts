@@ -2,8 +2,9 @@ import { Router, type Request, type Response, type NextFunction } from "express"
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import ws from "ws";
 import { logger } from "../lib/logger.js";
-import { crearServicioPin, configPin, type AccesoPin, type Solicitante } from "../lib/pin.js";
+import { crearServicioPin, configPin, sesionDelToken, type AccesoPin, type Solicitante } from "../lib/pin.js";
 import { crearVerificadorClaveCuenta } from "../lib/clave-cuenta.js";
+import { configClave } from "../lib/clave-admin.js";
 
 /* ============================================================================
  * PIN ADMINISTRATIVO (D-7). Ver lib/pin.ts para el diseño y taller-demo/supabase/sync/sync-3p-pin.sql para los límites.
@@ -11,8 +12,9 @@ import { crearVerificadorClaveCuenta } from "../lib/clave-cuenta.js";
  *   GET    /api/admin/pin/estado        admin   ¿hay PIN? versión, bloqueo. Nunca el hash.
  *   PUT    /api/admin/pin               admin   establecer/cambiar (re-autenticación con PIN actual o contraseña de la cuenta)
  *   DELETE /api/admin/pin               admin   desactivar (fail-closed: sin PIN ninguna acción con PIN es posible)
- *   POST   /api/admin/pin/desbloquear   admin   levantar un bloqueo y reiniciar contadores
- *   POST   /api/autorizaciones          cajero  el admin teclea el PIN; se emite una autorización de un solo uso
+ *   POST   /api/admin/pin/desbloquear   admin   levantar un bloqueo y reiniciar contadores (con la contraseña de la cuenta)
+ *   POST   /api/autorizaciones          cajero/admin  se teclea el PIN del propietario; autorización de un solo uso ligada a la SESIÓN
+ *                                       (el admin solo para lo DESTRUCTIVO: ver ACCIONES_CON_PIN en lib/pin.ts)
  *
  * Todas usan token Bearer (no cookies). Nada del cuerpo se registra en logs. Sin ADMIN_PIN_PEPPER responden 503.
  * ==========================================================================*/
@@ -55,13 +57,14 @@ const acceso: AccesoPin = {
     if (error) throw new Error("leerHash: " + error.message);
     return data?.hash ?? null;
   },
-  async guardar(adminId, hash, por) {
-    const { data, error } = await servidor.rpc("pin_guardar", { p_admin: adminId, p_hash: hash, p_por: por });
+  async guardar(adminId, hash, por, via) {
+    const { data, error } = await servidor.rpc("pin_guardar", { p_admin: adminId, p_hash: hash, p_por: por, p_via: via });
     if (error) throw new Error("guardar: " + error.message);
     return Number(data);
   },
   async borrar(adminId) {
-    const { error } = await servidor.from("admin_pin").delete().eq("perfil_id", adminId);
+    // por la RPC auditada (3.15): quitar el PIN deja bloqueado todo lo destructivo y queda registrado
+    const { error } = await servidor.rpc("pin_quitar", { p_admin: adminId, p_por: adminId });
     if (error) throw new Error("borrar: " + error.message);
   },
   async desbloquear(adminId) {
@@ -84,10 +87,22 @@ const acceso: AccesoPin = {
   async emitir(sol, admin, accion, entidad, registro, device, version, payloadHash, ttl) {
     const { data, error } = await servidor.rpc("pin_emitir_autorizacion", {
       p_solicitante: sol.id, p_rol: sol.rol, p_admin: admin, p_accion: accion, p_entidad: entidad, p_registro: registro,
-      p_device: device, p_pin_version: version, p_payload_hash: payloadHash, p_ttl_seg: ttl,
+      p_device: device, p_pin_version: version, p_payload_hash: payloadHash, p_ttl_seg: ttl, p_session: sol.sesion ?? null,
     });
     if (error) throw new Error(error.message);
     return data as { autorizacion_id: string; expira_en: string };
+  },
+  async reservarClave(adminId) {
+    const c = configClave();
+    const { data, error } = await servidor.rpc("clave_reservar_intento", { p_perfil: adminId, p_max: c.max, p_ventana_min: c.ventanaMin, p_bloqueo_min: c.bloqueoMin, p_ttl_seg: c.ttlSeg });
+    if (error) throw new Error("reservar-clave");
+    const d = (data ?? {}) as Record<string, unknown>;
+    return { permitido: d.permitido === true, intento_id: d.intento_id as number | undefined, reintentar_en_s: d.reintentar_en_s as number | undefined };
+  },
+  async resolverClave(adminId, intentoId, resultado) {
+    const c = configClave();
+    const { error } = await servidor.rpc("clave_resolver_intento", { p_perfil: adminId, p_intento: intentoId, p_resultado: resultado, p_max: c.max, p_ventana_min: c.ventanaMin, p_bloqueo_min: c.bloqueoMin });
+    if (error) throw new Error("resolver-clave");
   },
 };
 
@@ -119,7 +134,7 @@ async function identificar(req: PeticionPin, res: Response, next: NextFunction):
     const { data: perfil, error: errPerfil } = await servidor.from("perfiles").select("id, nombre, rol, activo").eq("id", data.user.id).maybeSingle();
     if (errPerfil) throw new Error("perfil: " + errPerfil.message);
     if (!perfil || perfil.activo !== true) { res.status(403).json({ error: "Tu cuenta no está activa.", codigo: "CUENTA_INACTIVA" }); return; }
-    req.quien = { id: perfil.id, rol: perfil.rol, nombre: perfil.nombre, activo: true, correo: data.user.email ?? "" };
+    req.quien = { id: perfil.id, rol: perfil.rol, nombre: perfil.nombre, activo: true, correo: data.user.email ?? "", sesion: sesionDelToken(token) };
     next();
   } catch (e) {
     logger.error({ codigo: "pin-identificar", mensaje: e instanceof Error ? e.message : "error" }, "no se pudo identificar");
@@ -161,7 +176,7 @@ const base = [cabecerasSeguras, exigirConfiguracion, cuerpoRazonable, identifica
 router.get("/admin/pin/estado", ...base, exigirAdmin, servir(() => svc().estado()));
 router.put("/admin/pin", ...base, exigirAdmin, servir((q, b) => svc().establecer(q, b)));
 router.delete("/admin/pin", ...base, exigirAdmin, servir((q, b) => svc().eliminar(q, b)));
-router.post("/admin/pin/desbloquear", ...base, exigirAdmin, servir((q) => svc().desbloquear(q)));
+router.post("/admin/pin/desbloquear", ...base, exigirAdmin, servir((q, b) => svc().desbloquear(q, b)));
 router.post("/autorizaciones", ...base, servir((q, b) => svc().autorizar(q, b)));
 
 export default router;

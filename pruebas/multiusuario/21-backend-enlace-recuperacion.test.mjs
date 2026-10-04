@@ -225,7 +225,9 @@ describe("OBS-9 backend · la ruta, leida en el codigo", () => {
   test("el modulo exporta destinoDeRecuperacion (ya lo usaban otras pruebas y la documentacion) y NO hay ninguna ruta publica nueva", async () => {
     const be = await crearBackend({}); assert.equal(typeof be.destino, "function");
     for (const r of be.rutas) assert.ok(r.handlers.length >= 3 && /^\/admin\/usuarios/.test(r.ruta), `ruta sin las puertas de administrador: ${r.metodo} ${r.ruta}`);
-    assert.deepEqual(be.rutas.map((r) => `${r.metodo} ${r.ruta}`), ["GET /admin/usuarios", "POST /admin/usuarios", "POST /admin/usuarios/:id/enlace", "PATCH /admin/usuarios/:id"]);
+    // 3.15 (Bloque 4): + impacto y eliminar (con las mismas puertas de administrador; ninguna pública)
+    assert.deepEqual(be.rutas.map((r) => `${r.metodo} ${r.ruta}`), ["GET /admin/usuarios", "POST /admin/usuarios", "POST /admin/usuarios/:id/enlace", "PATCH /admin/usuarios/:id",
+      "GET /admin/usuarios/:id/impacto", "POST /admin/usuarios/:id/eliminar"]);
   });
 });
 

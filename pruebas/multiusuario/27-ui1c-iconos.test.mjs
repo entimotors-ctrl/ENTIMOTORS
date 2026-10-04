@@ -96,7 +96,8 @@ describe("UI-1C · los 12 módulos principales ya no dependen de emoji", () => {
   }
   test("menú lateral: cada opción con data-view lleva su icono (y ya no el punto .sw); se conservan texto y data-view", () => {
     const esperado = { "mi-trabajo": "mantenimiento", dashboard: "dashboard", pos: "tpv", ordenes: "orden", cotizaciones: "cotizacion", citas: "cita", clientes: "cliente",
-      inventario: "inventario", finanzas: "finanzas", creditos: "credito", "web-cms": "web", usuarios: "usuarios", ajustes: "ajustes" };
+      inventario: "inventario", finanzas: "finanzas", creditos: "credito", "web-cms": "web", usuarios: "usuarios", ajustes: "ajustes",
+      mensajes: "usuarios" };   // 3.15 (Bloque 3): «Mensajes al equipo» (solo admin), con el icono de equipo
     const items = [...INDEX.matchAll(/<button class="nav-item(?: active)?" data-view="([^"]+)"><svg class="ic" aria-hidden="true" focusable="false"><use href="#i-([a-z-]+)"><\/use><\/svg>([^<]+)/g)];
     assert.deepEqual(Object.fromEntries(items.map((m) => [m[1], m[2]])), esperado);
     assert.doesNotMatch(INDEX, /class="sw"|\.nav-item \.sw/);
@@ -145,7 +146,7 @@ describe("UI-1C · accesibilidad", () => {
     assert.equal(b.length, 4);
   });
   test("la etiqueta visible de los accesos rápidos y del menú sigue siendo texto", () => {
-    for (const l of ["Venta rápida (TPV)", "Cotizaciones", "Órdenes de servicio", "Citas", "Clientes y motos", "Inventario", "Finanzas y caja", "Créditos", "Gestor de la web", "Ajustes"])
+    for (const l of ["Venta rápida (TPV)", "Cotizaciones", "Órdenes de servicio", "Citas", "Clientes y motos", "Inventario", "Finanzas y caja", "Créditos", "Gestor Web ↗", "Ajustes"])
       assert.ok(INDEX.includes(`<span class="qa-lbl">${l}</span>`), l);
   });
 });

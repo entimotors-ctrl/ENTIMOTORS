@@ -11,7 +11,9 @@ import { UUID, SERVICE_ROLE, ANON, URL_API } from "./helpers/supabase-mock.mjs";
 
 const XSS = ['<img src=x onerror=alert(1)>', "<script>alert(1)</script>", `"'><svg onload=alert(1)>`];
 const U = (n, extra = {}) => ({ id: UUID(100 + n), nombre: `Persona ${n}`, correo: `persona${n}@example.test`, telefono: `9999-000${n}`, rol: "mecanico", activo: true, esUsted: false, ...extra });
-const EQUIPO = () => [U(1, { rol: "admin", esUsted: true, nombre: "Admin Activo" }), U(2, { rol: "admin" }), U(3), U(4, { rol: "cajero" }), U(5, { activo: false }), U(6, { rol: "desarrollador" })];
+// 3.15 (Bloque 4): + U(7) eliminado (sin acciones). U(5) inactivo «de antes» (dado de baja en 3.14): conserva «Reactivar».
+const EQUIPO = () => [U(1, { rol: "admin", esUsted: true, nombre: "Admin Activo" }), U(2, { rol: "admin" }), U(3), U(4, { rol: "cajero" }), U(5, { activo: false }), U(6, { rol: "desarrollador" }),
+  U(7, { activo: false, eliminado: true })];
 
 /** Entorno con un admin (u otra cuenta) ya autenticado y un api-server sintetico programable. */
 async function pantalla({ cuenta = CUENTAS.adminActivo, producto = "admin", apiUrl = URL_API, usuarios = EQUIPO(), api, online = true, mutar, preparar } = {}) {
@@ -33,6 +35,56 @@ async function pantalla({ cuenta = CUENTAS.adminActivo, producto = "admin", apiU
   return env;
 }
 const llamadasApi = (env) => env.servidor.llamadas.filter((l) => l.host === "api");
+
+/* 3.15 (Bloque 4) · «Eliminar usuario»: impacto → confirmación explícita → PIN del propietario → UN envío con op_id. */
+describe("Eliminar usuario (3.15 · Bloque 4)", () => {
+  const AUT = "00000000-0000-4000-a000-00000000aaaa";
+  const IMPACTO = { ordenes_activas: [UUID(901), UUID(902), UUID(903)], citas_abiertas: [], historial: { ordenes: 4, ventas: 0, caja: 0, mensajes: 2, auditoria: 17 } };
+  async function flujo({ confirmar = true, pin = { ok: true, autorizacion_id: AUT }, eliminar = { status: 200, body: { ok: true, eliminado: true, sesiones_revocadas: 2, ordenes_desasignadas: [UUID(901), UUID(902), UUID(903)], citas_desasignadas: [] } }, online = true } = {}) {
+    const textos = [], pins = [];
+    const env = await pantalla({ online, api: async (m, ruta) => (m === "GET" && /impacto$/.test(ruta) ? { status: 200, body: { impacto: IMPACTO } } : m === "POST" && /eliminar$/.test(ruta) ? eliminar : null) });
+    await env.dibujar();
+    env.win.showConfirm = async (t, o) => { textos.push([t, o]); return confirmar; };
+    env.win.PinUI = { autorizarAccion: async (o) => { pins.push(o); return pin; } };
+    return { env, textos, pins };
+  }
+  test("muestra el impacto (3 órdenes activas, historial conservado), pide PIN y envía UNA vez con op_id, autorización y desasignar", async () => {
+    const { env, textos, pins } = await flujo();
+    await env.hijos(".u-eliminar").find((e) => e.dataset.id === UUID(103)).disparar("click"); await env.asentar();
+    assert.match(textos[0][0], /perderá el acceso/); assert.match(textos[0][0], /3 orden\(es\) abierta\(s\)/); assert.match(textos[0][0], /NO se borra/); assert.match(textos[0][0], /nadie las recibe automáticamente/);
+    assert.equal(textos[0][1].textoOk, "Desasignar 3 y eliminar");
+    assert.deepEqual(pins.map((x) => [x.accion, x.rol, x.registroId]), [["eliminar_usuario", "admin", UUID(103)]]);
+    const post = env.pedidos.filter((p) => p.metodo === "POST");
+    assert.equal(post.length, 1); assert.equal(post[0].ruta, `/api/admin/usuarios/${UUID(103)}/eliminar`);
+    assert.equal(post[0].cuerpo.autorizacion_id, AUT); assert.equal(post[0].cuerpo.desasignar, true); assert.match(post[0].cuerpo.op_id, /^[0-9a-f-]{36}$/);
+    assert.ok(toasts(env).some((t) => /ya no puede entrar/.test(t) && /historial se conserva/.test(t)));
+  });
+  test("cancelar la confirmación o el PIN: NO se elimina nada", async () => {
+    for (const o of [{ confirmar: false }, { pin: { ok: false, motivo: "cancelado" } }]) {
+      const { env } = await flujo(o); await env.hijos(".u-eliminar")[0].disparar("click"); await env.asentar();
+      assert.equal(env.pedidos.filter((p) => p.metodo === "POST").length, 0);
+    }
+  });
+  test("respuesta perdida: se reintenta UNA vez con el MISMO op_id (una sola operación en el servidor)", async () => {
+    let n = 0; const { env } = await flujo();
+    env.servidor.api = async (m, ruta, cuerpo) => { env.pedidos.push({ metodo: m, ruta, cuerpo }); if (/impacto$/.test(ruta)) return { status: 200, body: { impacto: { ...IMPACTO, ordenes_activas: [] } } };
+      if (/eliminar$/.test(ruta)) { n++; if (n === 1) throw new TypeError("Failed to fetch"); return { status: 200, body: { ok: true, eliminado: true, repetida: true } }; } return { status: 200, body: { usuarios: EQUIPO() } }; };
+    await env.hijos(".u-eliminar")[0].disparar("click"); await env.asentar();
+    const post = env.pedidos.filter((p) => p.metodo === "POST");
+    assert.ok(post.length >= 1 && post.length <= 2); assert.equal(new Set(post.map((p) => p.cuerpo.op_id)).size, 1, "mismo op_id");
+  });
+  test("doble clic: un solo flujo (una consulta de impacto)", async () => {
+    const { env } = await flujo(); const b = env.hijos(".u-eliminar")[0];
+    const p1 = b.disparar("click"), p2 = b.disparar("click"); await p1; await p2; await env.asentar();
+    assert.equal(env.pedidos.filter((p) => /impacto$/.test(p.ruta)).length, 1); assert.equal(env.pedidos.filter((p) => p.metodo === "POST").length, 1);
+  });
+  test("error del servidor (autorización inválida) se muestra escapado y no dice «ya no puede entrar»", async () => {
+    const { env } = await flujo({ eliminar: { status: 403, body: { error: "<img src=x onerror=alert(1)> la autorización no vale", codigo: "AUTORIZACION_INVALIDA" } } });
+    await env.hijos(".u-eliminar")[0].disparar("click"); await env.asentar();
+    assert.ok(!toasts(env).some((t) => /ya no puede entrar/.test(t)));
+    assert.ok(env.doc.sumideros.every((x) => !/<img/.test(x.html)), "nada de marcado del servidor en la pantalla");
+  });
+});
 
 describe("render — condiciones para que la pantalla tenga sentido", () => {
   test("un NO-admin (cajero) ve «solo para el administrador» y NO se hace ninguna llamada al servidor", async () => {
@@ -129,8 +181,9 @@ describe("traduccion de fallos (pedir + textoDeFallo)", () => {
 describe("la tabla del equipo", () => {
   test("pinta una fila por persona, con conteo, rol legible y estado", async () => {
     const env = await pantalla({}); await env.dibujar(); const h = env.cuerpo().innerHTML;
-    assert.match(h, /Equipo · 6/); for (const n of ["Administrador", "Mecánico", "Cajero", "Desarrollador"]) assert.ok(h.includes(`<td>${n}</td>`), n);
-    assert.equal((h.match(/<tr>/g) || []).length, 1 + 6, "cabecera + una fila por persona"); assert.ok(h.includes("Inactivo")); assert.ok(h.includes("(tú)"));
+    assert.match(h, /Equipo · 7/); for (const n of ["Administrador", "Mecánico", "Cajero", "Desarrollador"]) assert.ok(h.includes(`<td>${n}</td>`), n);
+    assert.equal((h.match(/<tr>/g) || []).length, 1 + 7, "cabecera + una fila por persona (también la eliminada: su nombre sigue en la historia)");
+    assert.ok(h.includes("Inactivo")); assert.ok(h.includes("Eliminado")); assert.ok(h.includes("(tú)"));
   });
   test("sin controles para uno mismo ni para otros admin (ni cambiar rol, ni baja, ni editar)", async () => {
     const env = await pantalla({}); await env.dibujar();
@@ -142,10 +195,16 @@ describe("la tabla del equipo", () => {
     const env = await pantalla({}); await env.dibujar(); const h = env.cuerpo().innerHTML;
     for (const sel of h.matchAll(/<select[^>]*>(.*?)<\/select>/g)) { const vals = [...sel[1].matchAll(/value="([^"]*)"/g)].map((m) => m[1]); assert.deepEqual(vals, ["mecanico", "cajero", "desarrollador"]); }
   });
-  test("el boton de estado depende de activo: «Dar de baja» / «Reactivar», con data-activo coherente", async () => {
-    const env = await pantalla({}); await env.dibujar();
-    const b = Object.fromEntries(env.hijos(".u-estado").map((e) => [e.dataset.id, e.dataset.activo])); assert.equal(b[UUID(103)], "1"); assert.equal(b[UUID(105)], "0");
-    assert.match(env.cuerpo().innerHTML, /data-activo="1">Dar de baja</); assert.match(env.cuerpo().innerHTML, /data-activo="0">Reactivar</);
+  // 3.15 (Bloque 4): «Dar de baja» ya no existe: activo → «Eliminar usuario»; dado de baja ANTES de 3.15 → «Reactivar» (+ Eliminar);
+  // ELIMINADO → sin acciones y estado «Eliminado». (Contrato 3.14 «Dar de baja/Reactivar» reemplazado a propósito.)
+  test("acciones por estado: activo «Eliminar usuario»; inactivo de antes «Reactivar»; eliminado sin acciones; nunca «Dar de baja»", async () => {
+    const env = await pantalla({}); await env.dibujar(); const h = env.cuerpo().innerHTML;
+    assert.ok(!/Dar de baja/.test(h), "el texto «Dar de baja» ya no aparece");
+    assert.deepEqual(env.hijos(".u-estado").map((e) => [e.dataset.id, e.dataset.activo]), [[UUID(105), "0"]], "«Reactivar» solo para el dado de baja de antes");
+    assert.deepEqual(env.hijos(".u-eliminar").map((e) => e.dataset.id).sort(), [UUID(103), UUID(104), UUID(105), UUID(106)].sort());
+    assert.ok(!env.hijos(".u-eliminar").some((e) => [UUID(101), UUID(102), UUID(107)].includes(e.dataset.id)), "ni yo, ni el admin, ni el ya eliminado");
+    assert.ok(!env.hijos(".u-rol").some((e) => e.dataset.id === UUID(107)) && !env.hijos(".u-editar").some((e) => e.dataset.id === UUID(107)), "el eliminado no cambia de rol ni se edita");
+    assert.match(h, /Usuario eliminado/); assert.match(h, />Eliminado</);
   });
   test("lista vacia / respuesta sin campo usuarios: no revienta y dice «Equipo · 0»", async () => {
     for (const body of [{ usuarios: [] }, {}, { usuarios: null }]) { const env = await pantalla({ api: async (m) => (m === "GET" ? { status: 200, body } : null) }); await env.dibujar(); assert.match(env.cuerpo().innerHTML, /Equipo · 0/); }
@@ -181,18 +240,15 @@ describe("acciones sobre una persona", () => {
     const sel = env.hijos(".u-rol")[0]; sel.value = "desarrollador"; await sel.disparar("change"); await env.asentar();
     assert.deepEqual(toasts(env).slice(-1), ["Solo el administrador puede gestionar usuarios."]); assert.equal(env.pedidos.filter((p) => p.metodo === "GET").length, 2);
   });
-  test("dar de baja: envia {activo:false} y avisa; reactivar: {activo:true}", async () => {
-    const env = await pantalla({}); await env.dibujar();
-    const baja = env.hijos(".u-estado").find((e) => e.dataset.id === UUID(103)); await baja.disparar("click"); await env.asentar();
-    assert.deepEqual(env.pedidos.find((p) => p.metodo === "PATCH").cuerpo, { activo: false }); assert.ok(toasts(env).includes("Usuario dado de baja"));
+  test("reactivar (cuenta dada de baja antes de 3.15): {activo:true}", async () => {
     const env2 = await pantalla({}); await env2.dibujar();
     const alta = env2.hijos(".u-estado").find((e) => e.dataset.id === UUID(105)); await alta.disparar("click"); await env2.asentar();
     assert.deepEqual(env2.pedidos.find((p) => p.metodo === "PATCH").cuerpo, { activo: true }); assert.ok(toasts(env2).includes("Usuario reactivado"));
   });
-  test("dar de baja rechazado (500): aviso y NO dice «dado de baja»; el boton se reactiva", async () => {
+  test("reactivar rechazado (500): aviso y NO dice «reactivado»; el boton se reactiva", async () => {
     const env = await pantalla({ api: async (m) => (m === "PATCH" ? { status: 500, body: { error: "Base no disponible" } } : null) }); await env.dibujar();
     const b = env.hijos(".u-estado")[0]; await b.disparar("click"); await env.asentar();
-    assert.ok(!toasts(env).includes("Usuario dado de baja")); assert.ok(toasts(env).includes("Base no disponible")); assert.equal(b.disabled, false);
+    assert.ok(!toasts(env).includes("Usuario reactivado")); assert.ok(toasts(env).includes("Base no disponible")); assert.equal(b.disabled, false);
   });
   test("editar: dos preguntas, valores recortados, PATCH {nombre,telefono}", async () => {
     const env = await pantalla({}); await env.dibujar(); const resp = ["  Nuevo Nombre  ", " 8888-1111 "], preguntas = [];
@@ -209,7 +265,7 @@ describe("acciones sobre una persona", () => {
   });
   test("mientras hay una operacion en curso se ignoran las demas (no hay doble envio)", async () => {
     let liberar; const espera = new Promise((r) => { liberar = r; });
-    const env = await pantalla({ api: async (m) => { if (m === "PATCH") await espera; return null; } }); await env.dibujar();
+    const env = await pantalla({ usuarios: [U(3, { activo: false }), U(5, { activo: false })], api: async (m) => { if (m === "PATCH") await espera; return null; } }); await env.dibujar();
     const [a, b] = env.hijos(".u-estado"); const p1 = a.disparar("click"); await env.asentar(); const p2 = b.disparar("click"); await env.asentar();
     assert.equal(env.pedidos.filter((p) => p.metodo === "PATCH").length, 1); liberar(); await p1; await p2; await env.asentar();
     assert.equal(env.pedidos.filter((p) => p.metodo === "PATCH").length, 1);
@@ -217,7 +273,7 @@ describe("acciones sobre una persona", () => {
   test("OBSERVACION (endurecimiento, no explotable desde entrada de usuario): el id NO se codifica en la ruta; un id con «../» devuelto por el servidor cambiaria de endpoint", async () => {
     // El id lo genera Postgres (UUID) y llega en la respuesta del PROPIO api-server; ningun campo que escriba un
     // usuario llega a esta ruta. Por eso es una observacion H-1 y no un hallazgo: haria falta un backend comprometido.
-    const env = await pantalla({ usuarios: [U(3, { id: "abc/../../otra" })] }); await env.dibujar();
+    const env = await pantalla({ usuarios: [U(3, { id: "abc/../../otra", activo: false })] }); await env.dibujar();
     await env.hijos(".u-estado")[0].disparar("click"); await env.asentar();
     assert.equal(env.pedidos.find((p) => p.metodo === "PATCH").ruta, "/api/admin/otra", "caracterizacion: el navegador normaliza los segmentos «..»");
   });
@@ -294,7 +350,7 @@ describe("mutantes de usuarios.js: cada garantia se ROMPE si se altera la linea 
     "el nombre se pinta escapado": async (m) => { const e = await pantalla({ usuarios: [U(3, { nombre: P })], mutar: m }); await e.dibujar(); return marcadoPeligroso(e.cuerpo().innerHTML).length === 0; },
     "el correo se pinta escapado": async (m) => { const e = await pantalla({ usuarios: [U(3, { correo: P })], mutar: m }); await e.dibujar(); return marcadoPeligroso(e.cuerpo().innerHTML).length === 0; },
     "data-nombre no se sale del atributo": async (m) => { const e = await pantalla({ usuarios: [U(3, { nombre: `"><img src=x onerror=alert(1)>` })], mutar: m }); await e.dibujar(); return marcadoPeligroso(e.cuerpo().innerHTML).length === 0; },
-    "dar de baja envia activo:false": async (m) => { const e = await pantalla({ mutar: m }); await e.dibujar(); await e.hijos(".u-estado").find((x) => x.dataset.id === UUID(103)).disparar("click"); await e.asentar(); return e.pedidos.find((p) => p.metodo === "PATCH")?.cuerpo?.activo === false; },
+    "reactivar envia activo:true": async (m) => { const e = await pantalla({ mutar: m }); await e.dibujar(); await e.hijos(".u-estado").find((x) => x.dataset.id === UUID(105)).disparar("click"); await e.asentar(); return e.pedidos.find((p) => p.metodo === "PATCH")?.cuerpo?.activo === true; },
     "el error al crear se muestra escapado": async (m) => {
       const e = await pantalla({ api: async (x) => (x === "POST" ? { status: 409, body: { error: P } } : null), mutar: m }); await e.dibujar();
       await e.doc.getElementById("btnCrearUsuario").disparar("click"); await e.asentar(); return marcadoPeligroso(e.doc.getElementById("nuResultado").innerHTML).length === 0;
@@ -317,7 +373,7 @@ describe("mutantes de usuarios.js: cada garantia se ROMPE si se altera la linea 
     ["el nombre se pinta escapado", "no escapar el nombre en la celda", cambiar('"<td>" + esc(u.nombre) + (u.esUsted', '"<td>" + u.nombre + (u.esUsted')],
     ["el correo se pinta escapado", "no escapar el correo", cambiar('"<td>" + esc(u.correo) + "</td>"', '"<td>" + u.correo + "</td>"')],
     ["data-nombre no se sale del atributo", "no escapar data-nombre", cambiar("'\" data-nombre=\"' + esc(u.nombre) +", "'\" data-nombre=\"' + u.nombre +")],
-    ["dar de baja envia activo:false", "invertir el valor de activo", cambiar('{ activo: b.dataset.activo !== "1" }', '{ activo: b.dataset.activo === "1" }')],
+    ["reactivar envia activo:true", "invertir el valor de activo", cambiar('{ activo: b.dataset.activo !== "1" }', '{ activo: b.dataset.activo === "1" }')],
     ["el error al crear se muestra escapado", "no escapar el mensaje del servidor", cambiar("return esc(r.mensaje || \"No se pudo completar la operación.\");", "return (r.mensaje || \"No se pudo completar la operación.\");")],
     ["el enlace se pinta escapado", "no escapar el enlace", cambiar("' + esc(enlace) + '", "' + enlace + '")],
     ["no se puede crear un administrador desde la pantalla", "ofrecer «admin» como rol", cambiar('{ valor: "cajero", texto: "Cajero" },', '{ valor: "cajero", texto: "Cajero" }, { valor: "admin", texto: "Administrador" },')],

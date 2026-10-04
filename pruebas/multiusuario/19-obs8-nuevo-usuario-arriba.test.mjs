@@ -87,11 +87,12 @@ describe("OBS-8 · orden de la pantalla real de Usuarios y equipo", () => {
     assert.deepEqual(verificarOrden(env.cuerpo().innerHTML).filter((x) => !x.ok), []);
     assert.equal(env.pedidos.filter((p) => p.metodo === "GET").length, 2, "vuelve a pedir la lista");
   });
-  test("no cambian los roles asignables, ni las acciones por fila (rol, baja, editar), ni el texto de la contraseña", async () => {
+  // 3.15 (Bloque 4): la acción de estado es «Eliminar usuario» (5 filas gestionables); «Reactivar» solo queda para la dada de baja antes
+  test("no cambian los roles asignables, ni las acciones por fila (rol, eliminar/reactivar, editar), ni el texto de la contraseña", async () => {
     const env = await pantalla(); const h = env.cuerpo().innerHTML;
     for (const rol of ["mecanico", "cajero", "desarrollador"]) assert.ok(h.includes(`<option value="${rol}">`), `rol ${rol}`);
     assert.ok(!h.includes('<option value="admin">'), "no se ofrece admin");
-    assert.equal((h.match(/class="u-rol"/g) || []).length, 5); assert.equal((h.match(/u-estado/g) || []).length, 5); assert.equal((h.match(/u-editar/g) || []).length, 5);
+    assert.equal((h.match(/class="u-rol"/g) || []).length, 5); assert.equal((h.match(/class="btn small ghost danger u-eliminar"/g) || []).length, 5); assert.equal((h.match(/u-estado/g) || []).length, 1); assert.equal((h.match(/u-editar/g) || []).length, 5);
     assert.match(h, /La contraseña no se pone aquí\. Al crear la cuenta se genera un enlace de un solo uso/);
     assert.match(h, /Equipo · 7/);
   });

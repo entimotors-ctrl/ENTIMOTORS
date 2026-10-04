@@ -259,6 +259,182 @@ fase10() {
   s=$(correr t_sync10_c "$SQLDIR/sync-10-importacion.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
   "$AQUI/entorno-local.sh" borra t_sync10_c >/dev/null; "$AQUI/entorno-local.sh" borra t_sync10_ref >/dev/null
 }
+fase15b() {
+  echo "== 3.15.0 · BLOQUE 2 · presupuestos + inventario + stock (tipos, aprobación exactamente una vez, ajustes, compatibilidad) =="
+  local s q r
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario"
+  base_con t_15b_ref $CADENA || { mal "no se pudo crear la referencia (cadena + 15a)"; return; }
+  base_con t_15b_a $CADENA || { mal "no se pudo crear la copia A"; return; }
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15b_a -At -c "$1"; }
+  s=$(correr t_15b_a "$SQLDIR/sync-15b-presupuestos-stock.sql") && ok "sync-15b aplica sobre la cadena + 15a" || { mal "sync-15b falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15b_a "$SQLDIR/sync-15b-presupuestos-stock.sql") && ok "sync-15b re-aplica (idempotente, el backfill no se repite)" || mal "sync-15b no es idempotente: $(tail -4 <<<"$s")"
+  [ "$(q "SELECT count(*) FROM pg_proc WHERE proname='agregar_item_orden' AND pronamespace='public'::regnamespace")" = "1" ] && ok "agregar_item_orden tiene UNA sola firma (sin sobrecarga ambigua)" || mal "agregar_item_orden quedó sobrecargada"
+  [ "$(q "SELECT has_function_privilege('authenticated','public.sync_reconciliar_renglon(uuid,numeric,uuid,uuid,text)','EXECUTE')")" = "f" ] && ok "el núcleo de reconciliación NO es invocable por authenticated" || mal "authenticated invoca sync_reconciliar_renglon"
+  [ "$(q "SELECT has_column_privilege('authenticated','public.ordenes','presupuesto_estado','UPDATE')")" = "f" ] && ok "el estado del presupuesto NO se escribe por el CRUD (solo por la RPC)" || mal "authenticated puede escribir presupuesto_estado"
+  pruebas t_15b_a "$AQUI/sql/15b-presupuestos.test.sql"
+  "$AQUI/entorno-local.sh" borra t_15b_a >/dev/null
+
+  echo "  -- compatibilidad 3.14.1 (fixtures creados con las funciones viejas, ANTES de la migración) --"
+  base_con t_15b_l $CADENA || { mal "no se pudo crear la copia L"; return; }
+  s=$(cat "$AQUI/sql/00-prelude.sql" "$AQUI/sql/15b-legado-antes.sql" | "${PSQL[@]}" -U supabase_admin -d t_15b_l -v ON_ERROR_STOP=1 2>&1) && ok "fixtures #4 #6 #9 #10 ab4277b6 creados con la 3.14.1" || { mal "fixtures: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_15b_l "$SQLDIR/sync-15b-presupuestos-stock.sql") && ok "sync-15b aplica sobre datos 3.14.1 (backfill)" || { mal "sync-15b sobre legado falló: $(tail -6 <<<"$s")"; return; }
+  pruebas t_15b_l "$AQUI/sql/15b-legado-despues.test.sql"
+  "$AQUI/entorno-local.sh" borra t_15b_l >/dev/null
+
+  echo "  -- concurrencia y caída (sesiones reales) --"
+  local INV=00000000-0000-4000-9000-000000002901 BD
+  q() { "${PSQL[@]}" -U supabase_admin -d "$BD" -At -c "$1"; }
+  preparar() { BD=$1; base_con "$BD" $CADENA 15b-presupuestos-stock || return 1; "${PSQL[@]}" -U supabase_admin -d "$BD" -q -f "$AQUI/sql/00-prelude.sql" >/dev/null 2>&1
+    q "INSERT INTO public.inventario (id, nombre, precio_venta, costo_compra) VALUES ('$INV','Pieza',10,5); INSERT INTO public.inventario_movimientos (inventario_id, tipo, cantidad) VALUES ('$INV','apertura',100);" >/dev/null; }
+  orden() { # orden <n>: orden pendiente con 2 del producto INV
+    q "INSERT INTO public.ordenes (id, estado, falla) VALUES ('00000000-0000-4000-9000-00000000291$1','presupuesto','c');" >/dev/null
+    sql_como "$BD" 2 "SELECT public.agregar_item_orden('00000000-0000-4000-9000-00000000292$1'::uuid, '00000000-0000-4000-9000-00000000291$1'::uuid, '$INV'::uuid, NULL, 2, 10, '00000000-0000-4000-9000-00000000293$1'::uuid, false, NULL, 'dev', 'repuesto_inventario')" >/dev/null; }
+  stock() { q "SELECT cantidad::int FROM public.inventario WHERE id='$INV'"; }
+  aprobar() { sql_como "$BD" "$1" "SELECT (public.decidir_presupuesto_orden('00000000-0000-4000-9000-0000000029$2'::uuid, '00000000-0000-4000-9000-00000000291$3'::uuid, 'aprobar'))->>'stock_movido'"; }
+  carrera() { # carrera <opA> <opB> <orden>: A aprueba y retiene 2 s; B (otro usuario, otro op) aprueba a la vez
+    ( "${PSQL[@]}" -U supabase_admin -d "$BD" -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.decidir_presupuesto_orden('00000000-0000-4000-9000-0000000029$1'::uuid, '00000000-0000-4000-9000-00000000291$3'::uuid, 'aprobar'); SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 & )
+    sleep 0.7; local rb; rb=$(aprobar 1 "$2" "$3"); sleep 2; echo "$rb"; }
+  preparar t_15b_c || { mal "no se pudo crear la copia C"; return; }
+  orden 1
+  for k in 1 2 3 4 5 6 7 8; do aprobar 2 41 1 >/dev/null & done; wait
+  [ "$(stock)" = "98" ] && ok "L/M · 8 aprobaciones simultáneas del MISMO op → se descuenta 2 una sola vez (100→98)" || mal "mismo op simultáneo: stock $(stock)"
+  orden 2
+  r=$(carrera 51 52 2)
+  { [ "$r" = "0" ] || [ "$r" = "0.00" ]; } && ok "N · el 2.º dispositivo/usuario (otro op) ESPERA y aprueba sin mover nada" || mal "N · el 2.º movió: $r"
+  [ "$(stock)" = "96" ] && ok "N · dos dispositivos simultáneos → 2 unidades una sola vez (98→96)" || mal "N · stock $(stock)"
+  # O · caída a mitad de la aprobación → nada; reintento (mismo op) → 1 vez
+  orden 3
+  "${PSQL[@]}" -U supabase_admin -d "$BD" -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.decidir_presupuesto_orden('00000000-0000-4000-9000-000000002971'::uuid, '00000000-0000-4000-9000-000000002913'::uuid, 'aprobar'); ROLLBACK;" >/dev/null 2>&1
+  [ "$(stock)" = "96" ] && [ "$(q "SELECT presupuesto_estado FROM public.ordenes WHERE id='00000000-0000-4000-9000-000000002913'")" = "pendiente" ] && ok "O · caída durante la aprobación → stock y presupuesto intactos" || mal "O · quedó estado parcial"
+  aprobar 2 71 3 >/dev/null; aprobar 2 71 3 >/dev/null
+  [ "$(stock)" = "94" ] && ok "O · reintento tras la caída (mismo op, dos veces) → descuenta 2 una sola vez (96→94)" || mal "O · stock $(stock)"
+  [ "$(q "SELECT public.verificar_invariantes()::text")" = "[]" ] && ok "invariantes [] tras las carreras" || mal "invariantes rotos tras las carreras"
+  "$AQUI/entorno-local.sh" borra t_15b_c >/dev/null
+
+  echo "  -- defensas y mutantes (copia aparte: los mutantes dejan datos inconsistentes a propósito) --"
+  preparar t_15b_m || { mal "no se pudo crear la copia M"; return; }
+  q "SELECT pg_get_functiondef('public.decidir_presupuesto_orden(uuid,uuid,text,text,text)'::regprocedure)" | sed 's/WHERE id = p_orden_id FOR UPDATE;/WHERE id = p_orden_id;/' > /tmp/entimotors-15b-sinlock1.sql
+  q "SELECT pg_get_functiondef('public.sync_reconciliar_renglon(uuid,numeric,uuid,uuid,text)'::regprocedure)" | sed 's/WHERE i.id = p_item FOR UPDATE;/WHERE i.id = p_item;/' > /tmp/entimotors-15b-sinlock2.sql
+  q "SELECT pg_get_functiondef('public.sync_verificar_existencias(uuid,text)'::regprocedure)" | sed 's/ORDER BY id FOR UPDATE;/ORDER BY id;/' > /tmp/entimotors-15b-sinlock3.sql
+  "${PSQL[@]}" -U supabase_admin -d "$BD" -q -f /tmp/entimotors-15b-sinlock1.sql -f /tmp/entimotors-15b-sinlock2.sql -f /tmp/entimotors-15b-sinlock3.sql >/dev/null 2>&1
+  orden 4
+  carrera 61 62 4 >/dev/null
+  [ "$(stock)" = "98" ] && ok "DEFENSA EN PROFUNDIDAD · aun SIN los candados explícitos (orden, renglón, producto), escribir la fila de la orden serializa: un solo descuento (100→98)" || mal "sin candados: stock $(stock)"
+  correr "$BD" "$SQLDIR/sync-15b-presupuestos-stock.sql" >/dev/null
+  # M1: reconciliar IGNORANDO lo ya aplicado → la 2.ª aprobación (otro op) descuenta otra vez: la prueba y las invariantes lo delatan
+  q "SELECT pg_get_functiondef('public.sync_reconciliar_renglon(uuid,numeric,uuid,uuid,text)'::regprocedure)" | sed 's/v_delta := COALESCE(p_objetivo, 0) - it.cantidad_aplicada;/v_delta := COALESCE(p_objetivo, 0);/' > /tmp/entimotors-15b-m1.sql
+  "${PSQL[@]}" -U supabase_admin -d "$BD" -q -f /tmp/entimotors-15b-m1.sql >/dev/null 2>&1
+  orden 5
+  aprobar 2 81 5 >/dev/null; r=$(aprobar 1 82 5)
+  { [ "$r" != "0" ] && [ "$r" != "0.00" ]; } && ok "MUTANTE M1 (ignora lo aplicado) → la 2.ª aprobación movió $r: la prueba N lo detecta" || mal "M1 no se detectó ($r)"
+  [ "$(q "SELECT public.verificar_invariantes()::text")" != "[]" ] && ok "MUTANTE M1 · verificar_invariantes delata el doble descuento" || mal "invariantes no delatan M1"
+  # M2: además reconciliar DOS veces en la MISMA operación → el índice único (op, renglón, producto) aborta la operación entera
+  q "SELECT pg_get_functiondef('public.decidir_presupuesto_orden(uuid,uuid,text,text,text)'::regprocedure)" | sed "s/  PERFORM public.sync_auditar('presupuesto-/  PERFORM public.sync_reconciliar_orden(p_orden_id, p_op, NULL, NULL);\n  PERFORM public.sync_auditar('presupuesto-/" > /tmp/entimotors-15b-m2.sql
+  "${PSQL[@]}" -U supabase_admin -d "$BD" -q -f /tmp/entimotors-15b-m2.sql >/dev/null 2>&1
+  orden 6
+  local antes; antes=$(stock)
+  r=$(aprobar 2 91 6)
+  grep -q "inventario_movimientos_op_renglon_uq" <<<"$r" && [ "$(stock)" = "$antes" ] && ok "MUTANTE M2 (doble aplicación en una operación) → el índice único la aborta entera: stock intacto" || mal "M2: el índice no frenó la doble aplicación: $(head -2 <<<"$r")"
+  "$AQUI/entorno-local.sh" borra t_15b_m >/dev/null
+
+  echo "  -- rollback --"
+  base_con t_15b_d $CADENA 15b-presupuestos-stock || { mal "no se pudo crear la copia D"; return; }
+  s=$(correr t_15b_d "$SQLDIR/sync-15b-rollback.sql") && ok "rollback sin actividad 3.15 aplica" || { mal "rollback falló: $(tail -4 <<<"$s")"; return; }
+  comparar t_15b_ref t_15b_d "tras el rollback el esquema es IDÉNTICO a la cadena + 15a" "el rollback de 15b no restauró el estado anterior"
+  s=$(correr t_15b_d "$SQLDIR/sync-15b-presupuestos-stock.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
+  "${PSQL[@]}" -U supabase_admin -d t_15b_d -q -f "$AQUI/sql/00-prelude.sql" >/dev/null 2>&1
+  "${PSQL[@]}" -U supabase_admin -d t_15b_d -q -c "INSERT INTO public.ordenes (id, estado, falla) VALUES ('00000000-0000-4000-9000-000000002981','presupuesto','x')" >/dev/null
+  sql_como t_15b_d 2 "SELECT public.agregar_item_orden('00000000-0000-4000-9000-000000002982'::uuid, '00000000-0000-4000-9000-000000002981'::uuid, NULL, 'Servicio', 1, 10, NULL, false, NULL, 'dev', 'mano_obra')" >/dev/null
+  s=$(correr t_15b_d "$SQLDIR/sync-15b-rollback.sql")
+  grep -q "ROLLBACK STOP" <<<"$s" && ok "con actividad 3.15 el rollback se NIEGA (no descuadra el stock)" || mal "el rollback no se negó con actividad 3.15: $(tail -2 <<<"$s")"
+  # forzado como en el pooler de Supabase (ignora PGOPTIONS): SET en la MISMA sesión y luego el archivo
+  s=$("${PSQL[@]}" -U supabase_admin -d t_15b_d -v ON_ERROR_STOP=1 -q -c "SET sync.forzar_rollback = 'si'" -f "$SQLDIR/sync-15b-rollback.sql" 2>&1) \
+    && [ -z "$("${PSQL[@]}" -U supabase_admin -d t_15b_d -At -c "SELECT 1 FROM information_schema.columns WHERE table_name='orden_items' AND column_name='cantidad_aplicada'")" ] \
+    && ok "forzado con SET de sesión (método del pooler) aplica el rollback" || mal "el forzado por SET de sesión no funcionó: $(tail -2 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_15b_d >/dev/null; "$AQUI/entorno-local.sh" borra t_15b_ref >/dev/null
+}
+fase15a() {
+  echo "== 3.15.0 · BLOQUE 1A · cotización ↔ inventario + conversión atómica e idempotente (sin stock) =="
+  local s q r
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos"
+  base_con t_15a_ref $CADENA || { mal "no se pudo crear la referencia (cadena 3.14.1)"; return; }
+  base_con t_15a_a $CADENA || { mal "no se pudo crear la copia A"; return; }
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15a_a -At -c "$1"; }
+  s=$(correr t_15a_a "$SQLDIR/sync-15a-cotizacion-inventario.sql") && ok "sync-15a aplica sobre la cadena 3.14.1" || { mal "sync-15a falló: $(tail -4 <<<"$s")"; return; }
+  s=$(correr t_15a_a "$SQLDIR/sync-15a-cotizacion-inventario.sql") && ok "sync-15a re-aplica (idempotente)" || mal "sync-15a no es idempotente: $(tail -4 <<<"$s")"
+  [ "$(q "SELECT has_function_privilege('anon','public.convertir_cotizacion(uuid,uuid,uuid,uuid,text)','EXECUTE')")" = "f" ] && ok "anon NO ejecuta convertir_cotizacion" || mal "anon ejecuta convertir_cotizacion"
+  [ "$(q "SELECT has_function_privilege('authenticated','public.cotizacion_aceptada_inmutable()','EXECUTE')")" = "f" ] && ok "la función de la guarda no es invocable por authenticated" || mal "authenticated invoca la guarda"
+  pruebas t_15a_a "$AQUI/sql/15a-cotizacion.test.sql"
+  "$AQUI/entorno-local.sh" borra t_15a_a >/dev/null
+
+  echo "  -- concurrencia y caída (sesiones reales) --"
+  base_con t_15a_c $CADENA 15a-cotizacion-inventario || { mal "no se pudo crear la copia C"; return; }
+  "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -f "$AQUI/sql/00-prelude.sql" >/dev/null 2>&1   # siembra las 6 cuentas de prueba (perfiles)
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15a_c -At -c "$1"; }
+  local COT=00000000-0000-4000-9000-000000001701
+  sembrar() { # sembrar <db> <n>: cotización pendiente <n> con 1 repuesto y 1 manual
+    "${PSQL[@]}" -U supabase_admin -d "$1" -q -c "INSERT INTO public.inventario (id, nombre, precio_venta, costo_compra) VALUES ('00000000-0000-4000-9000-000000001790','Pieza',10,5) ON CONFLICT DO NOTHING;
+      INSERT INTO public.cotizaciones (id, cliente_nombre, vence_en, estado) VALUES ('00000000-0000-4000-9000-00000000170$2','Carrera',now()+interval '9 days','pendiente');
+      INSERT INTO public.cotizacion_items (cotizacion_id, inventario_id, nombre, cantidad, precio) VALUES ('00000000-0000-4000-9000-00000000170$2','00000000-0000-4000-9000-000000001790','Pieza',1,10),('00000000-0000-4000-9000-00000000170$2',NULL,'Mano',1,5);" >/dev/null
+  }
+  sembrar t_15a_c 1
+  # 8 reintentos SIMULTÁNEOS de la MISMA operación (doble clic, reintentos por red) → 1 orden
+  for k in 1 2 3 4 5 6 7 8; do sql_como t_15a_c 2 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001711'::uuid, '$COT'::uuid, '00000000-0000-4000-9000-000000001712'::uuid)" >/dev/null & done; wait
+  r=$(q "SELECT count(*) FROM public.ordenes")
+  [ "$r" = "1" ] && ok "D/E · 8 envíos simultáneos del MISMO op → 1 orden" || mal "mismo op simultáneo: $r órdenes"
+  # dos dispositivos: OTRO op cada uno, a la vez, con carrera DETERMINISTA (A convierte y retiene la transacción 2 s)
+  sembrar t_15a_c 2
+  ( "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001721'::uuid, '00000000-0000-4000-9000-000000001702'::uuid, '00000000-0000-4000-9000-000000001722'::uuid); SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 & )
+  sleep 0.7
+  r=$(sql_como t_15a_c 1 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001723'::uuid, '00000000-0000-4000-9000-000000001702'::uuid, '00000000-0000-4000-9000-000000001724'::uuid)")
+  sleep 2
+  grep -q "COTIZACION_YA_ACEPTADA" <<<"$r" && ok "F · el 2.º dispositivo (otro op) ESPERA al 1.º y recibe COTIZACION_YA_ACEPTADA" || mal "F · el 2.º dispositivo no fue rechazado: $r"
+  r=$(q "SELECT count(*) FROM public.ordenes WHERE id IN ('00000000-0000-4000-9000-000000001722','00000000-0000-4000-9000-000000001724')")
+  [ "$r" = "1" ] && ok "F · dos dispositivos simultáneos → exactamente 1 orden" || mal "F · $r órdenes"
+  # MUTANTE: la misma función SIN el FOR UPDATE → la carrera debe crear 2 órdenes (prueba que el test detecta la falta del candado)
+  sembrar t_15a_c 3
+  q "SELECT pg_get_functiondef('public.convertir_cotizacion(uuid,uuid,uuid,uuid,text)'::regprocedure)" | sed 's/WHERE id = p_cotizacion_id FOR UPDATE/WHERE id = p_cotizacion_id/' > /tmp/entimotors-15a-mutante.sql
+  "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -f /tmp/entimotors-15a-mutante.sql >/dev/null 2>&1
+  ( "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001731'::uuid, '00000000-0000-4000-9000-000000001703'::uuid, '00000000-0000-4000-9000-000000001732'::uuid); SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 & )
+  sleep 0.7
+  sql_como t_15a_c 1 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001733'::uuid, '00000000-0000-4000-9000-000000001703'::uuid, '00000000-0000-4000-9000-000000001734'::uuid)" >/dev/null
+  sleep 2
+  r=$(q "SELECT count(*) FROM public.ordenes WHERE id IN ('00000000-0000-4000-9000-000000001732','00000000-0000-4000-9000-000000001734')")
+  [ "$r" = "1" ] && ok "DEFENSA DOBLE · sin FOR UPDATE pero con la guarda de aceptada, la carrera sigue dejando 1 orden (la guarda aborta al 2.º)" || mal "sin FOR UPDATE y con guarda: $r órdenes"
+  # MUTANTE completo: sin FOR UPDATE y SIN la guarda → la carrera debe crear 2 órdenes (la prueba F detecta que faltan ambas defensas)
+  sembrar t_15a_c 5
+  q "ALTER TABLE public.cotizaciones DISABLE TRIGGER cotizacion_aceptada_inmutable" >/dev/null
+  ( "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001751'::uuid, '00000000-0000-4000-9000-000000001705'::uuid, '00000000-0000-4000-9000-000000001752'::uuid); SELECT pg_sleep(2); COMMIT;" >/dev/null 2>&1 & )
+  sleep 0.7
+  sql_como t_15a_c 1 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001753'::uuid, '00000000-0000-4000-9000-000000001705'::uuid, '00000000-0000-4000-9000-000000001754'::uuid)" >/dev/null
+  sleep 2
+  r=$(q "SELECT count(*) FROM public.ordenes WHERE id IN ('00000000-0000-4000-9000-000000001752','00000000-0000-4000-9000-000000001754')")
+  [ "$r" = "2" ] && ok "MUTANTE sin FOR UPDATE y sin guarda → la carrera crea 2 órdenes: la prueba F SÍ detecta la falta de defensas" || mal "el mutante completo no se detectó ($r órdenes)"
+  q "ALTER TABLE public.cotizaciones ENABLE TRIGGER cotizacion_aceptada_inmutable" >/dev/null
+  q "DELETE FROM public.orden_items WHERE orden_id IN ('00000000-0000-4000-9000-000000001752','00000000-0000-4000-9000-000000001754')" >/dev/null 2>&1
+  correr t_15a_c "$SQLDIR/sync-15a-cotizacion-inventario.sql" >/dev/null && ok "función real restaurada tras el mutante" || mal "no se pudo restaurar la función real"
+  # G · caída a mitad: la transacción que convierte se corta (ROLLBACK = conexión muerta) → nada queda; el reintento con el MISMO op crea 1
+  sembrar t_15a_c 4
+  local cli0; cli0=$(q "SELECT count(*) FROM public.clientes")
+  "${PSQL[@]}" -U supabase_admin -d t_15a_c -q -c "BEGIN; SELECT set_config('request.jwt.claim.sub','00000000-0000-4000-8000-000000000002',true), set_config('role','authenticated',true); SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001741'::uuid, '00000000-0000-4000-9000-000000001704'::uuid, '00000000-0000-4000-9000-000000001742'::uuid); ROLLBACK;" >/dev/null 2>&1
+  r=$(q "SELECT (SELECT count(*) FROM public.ordenes WHERE id='00000000-0000-4000-9000-000000001742')||'|'||(SELECT count(*) FROM public.sync_ops WHERE op_id='00000000-0000-4000-9000-000000001741')||'|'||(SELECT estado FROM public.cotizaciones WHERE id='00000000-0000-4000-9000-000000001704')||'|'||((SELECT count(*) FROM public.clientes) - $cli0)")
+  [ "$r" = "0|0|pendiente|0" ] && ok "G · caída durante la conversión → sin orden, sin op guardado, cotización pendiente, sin cliente suelto" || mal "G · quedó estado parcial: $r"
+  sql_como t_15a_c 2 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001741'::uuid, '00000000-0000-4000-9000-000000001704'::uuid, '00000000-0000-4000-9000-000000001742'::uuid)" >/dev/null
+  sql_como t_15a_c 2 "SELECT public.convertir_cotizacion('00000000-0000-4000-9000-000000001741'::uuid, '00000000-0000-4000-9000-000000001704'::uuid, '00000000-0000-4000-9000-000000001742'::uuid)" >/dev/null
+  r=$(q "SELECT count(*) FROM public.ordenes WHERE id='00000000-0000-4000-9000-000000001742'")
+  [ "$r" = "1" ] && ok "G · reintento tras la caída (mismo op, dos veces) → exactamente 1 orden" || mal "G · $r órdenes tras el reintento"
+  r=$(q "SELECT count(*) FROM public.inventario_movimientos")
+  [ "$r" = "0" ] && ok "ninguna de las conversiones (ni el mutante) movió stock" || mal "hubo $r movimientos de stock"
+  [ "$(q "SELECT public.verificar_invariantes()::text")" = "[]" ] && ok "invariantes [] tras las carreras" || mal "invariantes rotos"
+  "$AQUI/entorno-local.sh" borra t_15a_c >/dev/null
+
+  # rollback: vuelve EXACTAMENTE al esquema de la cadena 3.14.1; forward → rollback → forward
+  base_con t_15a_d $CADENA 15a-cotizacion-inventario || { mal "no se pudo crear la copia D"; return; }
+  s=$(correr t_15a_d "$SQLDIR/sync-15a-rollback.sql") && ok "rollback aplica" || { mal "rollback falló: $(tail -4 <<<"$s")"; return; }
+  comparar t_15a_ref t_15a_d "tras el rollback el esquema es IDÉNTICO a la cadena 3.14.1" "el rollback de 15a no restauró el estado anterior"
+  s=$(correr t_15a_d "$SQLDIR/sync-15a-cotizacion-inventario.sql") && ok "forward → rollback → forward" || mal "no re-aplica tras rollback: $(tail -4 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_15a_d >/dev/null; "$AQUI/entorno-local.sh" borra t_15a_ref >/dev/null
+}
 fasesec1c() {
   echo "== SECURITY-1C · límite persistente de intentos del cambio de contraseña del admin (SQL) =="
   local s r t0 t1 ms
@@ -352,7 +528,205 @@ SQL
   s=$(correr t_sec1c_b "$SQLDIR/sec-1c-clave-intentos.sql") && ok "forward tras rollback limpio" || mal "forward tras rollback limpio falló"
   "$AQUI/entorno-local.sh" borra t_sec1c_b >/dev/null; "$AQUI/entorno-local.sh" borra t_sec1c_ref >/dev/null
 }
+# 3.15.0 · Bloque 3: mensajes + avisos en tiempo real. A = con Realtime (stub con el dueño de producción; 15c aplicada como postgres,
+# como en Supabase), B = base sin Realtime (los avisos se omiten, nada falla). Rollback: se niega con mensajes; forzado → idéntico.
+fase15c() {
+  echo "== 3.15 · Bloque 3 · mensajes + avisos en tiempo real (sync-15c) =="
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario 15b-presupuestos-stock"
+  local STUB="$AQUI/sql/15c-realtime-stub.sql" s r
+  base_con t_15c_ref $CADENA || { mal "no se pudo crear la referencia (cadena + 15b)"; return; }
+  correr t_15c_ref "$STUB" >/dev/null || { mal "stub de realtime (ref)"; return; }
+  base_con t_15c_a $CADENA || { mal "no se pudo crear la copia A"; return; }
+  correr t_15c_a "$STUB" >/dev/null || { mal "stub de realtime (A)"; return; }
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15c_a -At -c "$1"; }
+  # en producción migra `postgres` (dueño de public, miembro de supabase_realtime_admin); aquí el esquema de la copia es de supabase_admin,
+  # así que la migración corre como en las demás fases y el bloque de políticas de canal se prueba ADEMÁS como postgres.
+  local RTBLOQUE; RTBLOQUE=$(mktemp /tmp/entimotors-15c-rt-XXXX.sql)
+  { echo "BEGIN;"; sed -n '/^DO \$rt\$/,/^\$rt\$;/p' "$SQLDIR/sync-15c-mensajes-realtime.sql"; echo "ROLLBACK;"; } > "$RTBLOQUE"
+  s=$(correr t_15c_a "$RTBLOQUE" postgres) && ok "las políticas de canal se crean como postgres (sobre realtime.messages de supabase_realtime_admin)" || mal "postgres no crea las políticas de canal: $(tail -3 <<<"$s")"
+  rm -f "$RTBLOQUE"
+  s=$(correr t_15c_a "$SQLDIR/sync-15c-mensajes-realtime.sql") && ok "sync-15c aplica sobre la cadena + 15b" || { mal "sync-15c falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15c_a "$SQLDIR/sync-15c-mensajes-realtime.sql") && ok "sync-15c re-aplica (idempotente)" || mal "sync-15c no es idempotente: $(tail -4 <<<"$s")"
+  r=$(q "SELECT count(*) FROM pg_policies WHERE schemaname='realtime' AND tablename='messages' AND policyname LIKE 'entimotors_rt_%' AND cmd='SELECT'")
+  [ "$r" = "3" ] && ok "3 políticas de canal, todas de solo lectura" || mal "políticas de canal: $r"
+  r=$(q "SELECT count(*) FROM pg_trigger WHERE tgname='zz_rt_taller' AND NOT tgisinternal")
+  [ "$r" = "13" ] && ok "aviso «taller» por sentencia en 13 tablas" || mal "zz_rt_taller en $r tablas"
+  r=$(q "SELECT count(*) FROM pg_trigger WHERE tgname='zz_sync_sello' AND NOT tgisinternal")
+  [ "$r" = "12" ] && ok "zz_sync_sello sigue en 12 tablas (la poscondición de SYNC-1 no cambia)" || mal "zz_sync_sello en $r tablas"
+  pruebas t_15c_a "$AQUI/sql/15c-mensajes.test.sql"
+  s=$(correr t_15c_a "$SQLDIR/sync-15c-rollback.sql")
+  if grep -q "ROLLBACK STOP" <<<"$s"; then ok "rollback sin permiso se NIEGA si hay mensajes"; else mal "el rollback no se negó con mensajes"; fi
+  [ "$(q "SELECT count(*) FROM public.mensajes")" -gt 0 ] && ok "el rollback negado no borró nada" || mal "el rollback negado dejó cambios"
+  s=$(PGOPTIONS="-c sync.forzar_rollback=si" correr t_15c_a "$SQLDIR/sync-15c-rollback.sql") && ok "rollback forzado aplica" || { mal "rollback forzado falló: $(tail -3 <<<"$s")"; return; }
+  "${PSQL[@]}" -U supabase_admin -d t_15c_a -q -c "DELETE FROM realtime.messages" >/dev/null
+  comparar t_15c_ref t_15c_a "tras el rollback el esquema es IDÉNTICO a la cadena + 15b" "el rollback de 15c no restauró el estado anterior"
+  s=$(correr t_15c_a "$SQLDIR/sync-15c-mensajes-realtime.sql") && ok "migración → pruebas → rollback → migración otra vez" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  s=$(correr t_15c_a "$SQLDIR/sync-15c-rollback.sql") && ok "rollback LIMPIO (sin mensajes) aplica sin permiso especial" || mal "rollback limpio falló: $(tail -3 <<<"$s")"
+  comparar t_15c_ref t_15c_a "rollback limpio → esquema IDÉNTICO" "rollback limpio no restauró el estado"
+  "$AQUI/entorno-local.sh" borra t_15c_a >/dev/null; "$AQUI/entorno-local.sh" borra t_15c_ref >/dev/null
+
+  base_con t_15c_b $CADENA || { mal "no se pudo crear la copia B"; return; }
+  "${PSQL[@]}" -U supabase_admin -d t_15c_b -q -c "DROP SCHEMA IF EXISTS realtime CASCADE" >/dev/null 2>&1
+  s=$(correr t_15c_b "$SQLDIR/sync-15c-mensajes-realtime.sql") && ok "sin Realtime en la base: 15c aplica igual" || { mal "sin Realtime falló: $(tail -4 <<<"$s")"; return; }
+  grep -q "políticas de canal omitidas" <<<"$s" && ok "…y avisa que omitió las políticas de canal" || mal "no avisó de las políticas omitidas"
+  r=$("${PSQL[@]}" -U supabase_admin -d t_15c_b -At -f "$AQUI/sql/00-prelude.sql" -c "DO \$\$ BEGIN PERFORM pg_temp.como(1); PERFORM public.enviar_mensaje(gen_random_uuid(), gen_random_uuid(), pg_temp.uid(3), 'sin realtime'); PERFORM pg_temp.fin(); UPDATE public.ordenes SET falla = falla; END \$\$;" -c "SELECT count(*) FROM public.mensajes" 2>&1 | tail -1)
+  [ "$r" = "1" ] && ok "sin Realtime: enviar y editar órdenes funcionan (los avisos se omiten)" || mal "sin Realtime: $r"
+  "$AQUI/entorno-local.sh" borra t_15c_b >/dev/null
+}
+
+# 3.15.0 · Bloque 4: OWNER-PIN-GUARD + eliminar usuario. Con stub de auth.sessions y de realtime (la base de referencia no trae GoTrue ni Realtime).
+fase15d() {
+  echo "== 3.15 · Bloque 4 · OWNER-PIN-GUARD + eliminar usuario (sync-15d) =="
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario 15b-presupuestos-stock"
+  local s r
+  for d in t_15d_ref t_15d_a; do
+    "$AQUI/entorno-local.sh" copia $d >/dev/null || { mal "copia $d"; return; }
+    correr $d "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr $d "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+    for f in $CADENA 15c-mensajes-realtime; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr $d "$arch" >/dev/null || { mal "no se pudo aplicar $f en $d"; return; }; done
+  done
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15d_a -At -c "$1"; }
+  s=$(correr t_15d_a "$SQLDIR/sync-15d-owner-pin-usuarios.sql") && ok "sync-15d aplica sobre la cadena + 15c" || { mal "sync-15d falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15d_a "$SQLDIR/sync-15d-owner-pin-usuarios.sql") && ok "sync-15d re-aplica (idempotente)" || mal "sync-15d no es idempotente: $(tail -4 <<<"$s")"
+  pruebas t_15d_a "$AQUI/sql/15d-owner-pin.test.sql"
+  s=$(correr t_15d_a "$SQLDIR/sync-15d-rollback.sql")
+  if grep -q "ROLLBACK STOP" <<<"$s"; then ok "rollback sin permiso se NIEGA si hay usuarios eliminados"; else mal "el rollback no se negó con usuarios eliminados"; fi
+  s=$(PGOPTIONS="-c sync.forzar_rollback=si" correr t_15d_a "$SQLDIR/sync-15d-rollback.sql") && ok "rollback forzado aplica" || { mal "rollback forzado falló: $(tail -3 <<<"$s")"; return; }
+  "$AQUI/entorno-local.sh" borra t_15d_a >/dev/null
+  "$AQUI/entorno-local.sh" copia t_15d_b >/dev/null
+  correr t_15d_b "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr t_15d_b "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+  for f in $CADENA 15c-mensajes-realtime 15d-owner-pin-usuarios; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr t_15d_b "$arch" >/dev/null || { mal "no se pudo aplicar $f en B"; return; }; done
+  s=$(correr t_15d_b "$SQLDIR/sync-15d-rollback.sql") && ok "rollback LIMPIO (sin eliminados) aplica sin permiso" || mal "rollback limpio falló: $(tail -3 <<<"$s")"
+  comparar t_15d_ref t_15d_b "tras el rollback el esquema es IDÉNTICO a la cadena + 15c" "el rollback de 15d no restauró el estado anterior"
+  s=$(correr t_15d_b "$SQLDIR/sync-15d-owner-pin-usuarios.sql") && ok "forward otra vez tras el rollback" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_15d_b >/dev/null; "$AQUI/entorno-local.sh" borra t_15d_ref >/dev/null
+}
+
+# F09 con DOS sesiones de verdad al mismo tiempo (no secuencial): la primera cobra y espera 2 s antes de confirmar; la segunda llega
+# mientras tanto. Mismo op_id → espera el cerrojo y devuelve «repetida». Otro op_id (otro dispositivo) → espera la fila y se rechaza.
+concurrencia15e() {
+  local db="$1" r a b
+  local SES="SELECT set_config('request.jwt.claim.sub', '00000000-0000-4000-8000-000000000002', false), set_config('request.jwt.claims', '{\"sub\":\"00000000-0000-4000-8000-000000000002\",\"role\":\"authenticated\"}', false), set_config('role', 'authenticated', false);"
+  "${PSQL[@]}" -U supabase_admin -d "$db" -q -c "INSERT INTO public.ordenes (id, estado, falla) VALUES ('00000000-0000-4000-9000-000000098001', 'entregado', 'c1'), ('00000000-0000-4000-9000-000000098002', 'entregado', 'c2');
+    INSERT INTO public.orden_items (orden_id, nombre, cantidad, precio, tipo) VALUES ('00000000-0000-4000-9000-000000098001', 'MO', 1, 700, 'mano_obra'), ('00000000-0000-4000-9000-000000098002', 'MO', 1, 900, 'mano_obra');" >/dev/null
+  local CO1="SELECT public.finalizar_orden('00000000-0000-4000-9000-000000098101', '00000000-0000-4000-9000-000000098001', 'contado', 'efectivo')"
+  { echo "$SES"; echo "BEGIN; $CO1; SELECT pg_sleep(2); COMMIT;"; } | "${PSQL[@]}" -U supabase_admin -d "$db" -At > /tmp/entimotors-c15e-1.txt 2>&1 &
+  local p1=$!; sleep 0.6
+  { echo "$SES"; echo "$CO1;"; } | "${PSQL[@]}" -U supabase_admin -d "$db" -At > /tmp/entimotors-c15e-2.txt 2>&1
+  wait $p1
+  r=$("${PSQL[@]}" -U supabase_admin -d "$db" -At -c "SELECT count(*) FROM public.caja_movimientos WHERE orden_id = '00000000-0000-4000-9000-000000098001'")
+  if [ "$r" = "1" ] && grep -q '"repetida": true' /tmp/entimotors-c15e-2.txt; then ok "F09 concurrencia real, mismo op_id en dos sesiones: un solo ingreso y la segunda recibe «repetida»"; else mal "F09 mismo op_id concurrente: caja=$r $(tr '\n' ' ' < /tmp/entimotors-c15e-2.txt | cut -c1-200)"; fi
+  local CO2A="SELECT public.finalizar_orden('00000000-0000-4000-9000-000000098201', '00000000-0000-4000-9000-000000098002', 'contado', 'efectivo', 0, NULL, NULL, NULL, 'dev-A')"
+  local CO2B="SELECT public.finalizar_orden('00000000-0000-4000-9000-000000098202', '00000000-0000-4000-9000-000000098002', 'contado', 'efectivo', 0, NULL, NULL, NULL, 'dev-B')"
+  { echo "$SES"; echo "BEGIN; $CO2A; SELECT pg_sleep(2); COMMIT;"; } | "${PSQL[@]}" -U supabase_admin -d "$db" -At > /tmp/entimotors-c15e-3.txt 2>&1 &
+  p1=$!; sleep 0.6
+  { echo "$SES"; echo "$CO2B;"; } | "${PSQL[@]}" -U supabase_admin -d "$db" -At > /tmp/entimotors-c15e-4.txt 2>&1
+  wait $p1
+  r=$("${PSQL[@]}" -U supabase_admin -d "$db" -At -c "SELECT count(*) || '|' || sum(monto) FROM public.caja_movimientos WHERE orden_id = '00000000-0000-4000-9000-000000098002'")
+  if [ "$r" = "1|900.00" ] && grep -q "ya estaba finalizada" /tmp/entimotors-c15e-4.txt; then ok "F09 dos dispositivos cobran la MISMA orden a la vez (op_id distintos): exactamente un ingreso de 900; el segundo se rechaza"; else mal "F09 dos dispositivos: caja=$r $(tr '\n' ' ' < /tmp/entimotors-c15e-4.txt | cut -c1-200)"; fi
+  r=$("${PSQL[@]}" -U supabase_admin -d "$db" -At -c "SELECT public.finanzas_invariantes()")
+  [ "$r" = "[]" ] && ok "F09 invariantes financieras vacías tras la concurrencia" || mal "F09 invariantes: $r"
+  rm -f /tmp/entimotors-c15e-[1-4].txt
+}
+
+# 3.15.0 · Bloque 6: estado de migración 3.13 en el servidor (sync-15f, solo lectura).
+fase15f() {
+  echo "== 3.15 · Bloque 6 · estado de migración 3.13 en el servidor (sync-15f) =="
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario 15b-presupuestos-stock"
+  local s d
+  for d in t_15f_ref t_15f_a; do
+    "$AQUI/entorno-local.sh" copia $d >/dev/null || { mal "copia $d"; return; }
+    correr $d "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr $d "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+    for f in $CADENA 15c-mensajes-realtime 15d-owner-pin-usuarios 15e-finanzas; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr $d "$arch" >/dev/null || { mal "no se pudo aplicar $f en $d"; return; }; done
+  done
+  s=$(correr t_15f_a "$SQLDIR/sync-15f-legado-313.sql") && ok "sync-15f aplica sobre la cadena + 15e" || { mal "sync-15f falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15f_a "$SQLDIR/sync-15f-legado-313.sql") && ok "sync-15f re-aplica (idempotente)" || mal "sync-15f no es idempotente: $(tail -4 <<<"$s")"
+  pruebas t_15f_a "$AQUI/sql/15f-legado.test.sql"
+  s=$(correr t_15f_a "$SQLDIR/sync-15f-rollback.sql") && ok "rollback aplica" || { mal "rollback falló: $(tail -3 <<<"$s")"; return; }
+  "${PSQL[@]}" -U supabase_admin -d t_15f_a -q -c "SET session_replication_role = replica; DELETE FROM public.import_lotes; DELETE FROM public.clientes; DELETE FROM public.categorias_inv;" >/dev/null
+  comparar t_15f_ref t_15f_a "tras el rollback el esquema es IDÉNTICO a la cadena + 15e" "el rollback de 15f no restauró el estado anterior"
+  s=$(correr t_15f_a "$SQLDIR/sync-15f-legado-313.sql") && ok "forward otra vez tras el rollback" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_15f_a >/dev/null; "$AQUI/entorno-local.sh" borra t_15f_ref >/dev/null
+}
+
+# 3.15.0 · Bloque 5: FINANZAS CORRECTAS (sync-15e). Sin datos propios: el rollback es siempre seguro y devuelve el esquema idéntico.
+fase15e() {
+  echo "== 3.15 · Bloque 5 · finanzas: cobrado / por cobrar / costo histórico / no duplicar dinero (sync-15e) =="
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario 15b-presupuestos-stock"
+  local s r d
+  for d in t_15e_ref t_15e_a; do
+    "$AQUI/entorno-local.sh" copia $d >/dev/null || { mal "copia $d"; return; }
+    correr $d "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr $d "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+    for f in $CADENA 15c-mensajes-realtime 15d-owner-pin-usuarios; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr $d "$arch" >/dev/null || { mal "no se pudo aplicar $f en $d"; return; }; done
+  done
+  q() { "${PSQL[@]}" -U supabase_admin -d t_15e_a -At -c "$1"; }
+  s=$(correr t_15e_a "$SQLDIR/sync-15e-finanzas.sql") && ok "sync-15e aplica sobre la cadena + 15d" || { mal "sync-15e falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15e_a "$SQLDIR/sync-15e-finanzas.sql") && ok "sync-15e re-aplica (idempotente)" || mal "sync-15e no es idempotente: $(tail -4 <<<"$s")"
+  r=$(q "SELECT md5(prosrc) FROM pg_proc WHERE oid = 'public.estadisticas_tecnicas()'::regprocedure")
+  [ "$r" != "86948fdcaf03939a1d0929004cd9c730" ] && ok "estadisticas_tecnicas evolucionó (ya no es la canónica UTC)" || mal "estadisticas_tecnicas sigue canónica"
+  pruebas t_15e_a "$AQUI/sql/15e-finanzas.test.sql"
+  concurrencia15e t_15e_a
+  s=$(correr t_15e_a "$SQLDIR/sync-15e-rollback.sql") && ok "rollback aplica (15e no tiene datos propios)" || { mal "rollback falló: $(tail -3 <<<"$s")"; return; }
+  r=$(q "SELECT md5(prosrc) FROM pg_proc WHERE oid = 'public.estadisticas_tecnicas()'::regprocedure")
+  [ "$r" = "86948fdcaf03939a1d0929004cd9c730" ] && ok "rollback: estadisticas_tecnicas vuelve a la canónica RCV-34 byte a byte" || mal "rollback: estadisticas_tecnicas md5 $r"
+  "$AQUI/entorno-local.sh" borra t_15e_a >/dev/null
+  "$AQUI/entorno-local.sh" copia t_15e_b >/dev/null
+  correr t_15e_b "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr t_15e_b "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+  for f in $CADENA 15c-mensajes-realtime 15d-owner-pin-usuarios 15e-finanzas; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr t_15e_b "$arch" >/dev/null || { mal "no se pudo aplicar $f en B"; return; }; done
+  s=$(correr t_15e_b "$SQLDIR/sync-15e-rollback.sql") && ok "rollback sobre base recién migrada" || mal "rollback falló: $(tail -3 <<<"$s")"
+  comparar t_15e_ref t_15e_b "tras el rollback el esquema es IDÉNTICO a la cadena + 15d" "el rollback de 15e no restauró el estado anterior"
+  s=$(correr t_15e_b "$SQLDIR/sync-15e-finanzas.sql") && ok "forward otra vez tras el rollback" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  # con dinero DUPLICADO la migración se detiene (no crea índices a medias ni toca datos)
+  "${PSQL[@]}" -U supabase_admin -d t_15e_b -q -c "SELECT 1" >/dev/null
+  correr t_15e_b "$SQLDIR/sync-15e-rollback.sql" >/dev/null
+  "${PSQL[@]}" -U supabase_admin -d t_15e_b -q -c "INSERT INTO public.ordenes (id, estado, falla) VALUES ('00000000-0000-4000-9000-000000099001', 'entregado', 'dup');
+     INSERT INTO public.caja_movimientos (tipo, categoria, monto, orden_id) VALUES ('ingreso', 'Servicio taller', 10, '00000000-0000-4000-9000-000000099001'), ('ingreso', 'Servicio taller', 10, '00000000-0000-4000-9000-000000099001');" >/dev/null
+  s=$(correr t_15e_b "$SQLDIR/sync-15e-finanzas.sql")
+  if grep -q "SYNC-15E STOP: hay dinero duplicado" <<<"$s"; then ok "con un cobro duplicado en caja la migración se DETIENE y lo informa"; else mal "no se detuvo ante dinero duplicado: $(tail -2 <<<"$s")"; fi
+  r=$("${PSQL[@]}" -U supabase_admin -d t_15e_b -At -c "SELECT count(*) FROM pg_indexes WHERE indexname LIKE 'caja_un_%' OR indexname = 'idx_caja_momento'; SELECT count(*) FROM public.caja_movimientos WHERE orden_id = '00000000-0000-4000-9000-000000099001'")
+  [ "$r" = $'0\n2' ] && ok "…sin índices a medias y sin tocar los datos" || mal "tras la parada: $r"
+  "$AQUI/entorno-local.sh" borra t_15e_b >/dev/null; "$AQUI/entorno-local.sh" borra t_15e_ref >/dev/null
+}
+
+# 3.15.0 · Bloque 7: políticas de lectura con su función evaluada UNA vez por consulta (sync-15g). La visibilidad por rol (7 roles ×
+# 18 tablas: cuántas filas y CUÁLES) debe ser IDÉNTICA antes y después; el rollback deja el esquema idéntico a la cadena + 15f.
+fase15g() {
+  echo "== 3.15 · Bloque 7 · rendimiento de las políticas de lectura (sync-15g) =="
+  local CADENA="1-esquema 2-seguridad 3-rpc 3b-importacion 3p-pin 5-cotizacion-items 6-mecanicos-ordenes 7a-inventario 9-fotos 10-importacion sec-1c-clave-intentos 15a-cotizacion-inventario 15b-presupuestos-stock"
+  local s d antes despues
+  for d in t_15g_ref t_15g_a; do
+    "$AQUI/entorno-local.sh" copia $d >/dev/null || { mal "copia $d"; return; }
+    correr $d "$AQUI/sql/15c-realtime-stub.sql" >/dev/null; correr $d "$AQUI/sql/15d-auth-stub.sql" >/dev/null
+    for f in $CADENA 15c-mensajes-realtime 15d-owner-pin-usuarios 15e-finanzas 15f-legado-313; do local arch="$SQLDIR/sync-$f.sql"; [[ "$f" == sec-* ]] && arch="$SQLDIR/$f.sql"; correr $d "$arch" >/dev/null || { mal "no se pudo aplicar $f en $d"; return; }; done
+  done
+  antes=$(cat "$AQUI/sql/00-prelude.sql" "$AQUI/sql/15g-visibilidad.sql" | "${PSQL[@]}" -U supabase_admin -d t_15g_a 2>&1 | grep -o 'VIS|.*' | sort)
+  [ "$(wc -l <<<"$antes")" -eq 126 ] && ok "visibilidad ANTES: 7 roles × 18 tablas" || mal "visibilidad antes incompleta: $(wc -l <<<"$antes") líneas"
+  s=$(correr t_15g_a "$SQLDIR/sync-15g-rendimiento-rls.sql") && ok "sync-15g aplica sobre la cadena + 15f" || { mal "sync-15g falló: $(tail -6 <<<"$s")"; return; }
+  s=$(correr t_15g_a "$SQLDIR/sync-15g-rendimiento-rls.sql") && grep -q "0 política(s) de lectura optimizadas (18 ya lo estaban)" <<<"$s" && ok "sync-15g re-aplica (idempotente: 18 ya estaban)" || mal "sync-15g no es idempotente: $(tail -4 <<<"$s")"
+  despues=$(cat "$AQUI/sql/00-prelude.sql" "$AQUI/sql/15g-visibilidad.sql" | "${PSQL[@]}" -U supabase_admin -d t_15g_a 2>&1 | grep -o 'VIS|.*' | sort)
+  [ "$antes" == "$despues" ] && ok "visibilidad IDÉNTICA después (mismas filas por rol y tabla)" || { mal "la visibilidad CAMBIÓ con 15g"; diff <(echo "$antes") <(echo "$despues") | head -10; }
+  pruebas t_15g_a "$AQUI/sql/15g-rendimiento.test.sql"
+  # parada segura: si una política no tiene la expresión esperada, 15g se detiene y NO cambia ninguna
+  s=$(correr t_15g_ref "$SQLDIR/sync-15f-legado-313.sql" >/dev/null; "${PSQL[@]}" -U supabase_admin -d t_15g_ref -v ON_ERROR_STOP=1 -c "ALTER POLICY ventas_lee ON public.ventas USING (public.es_equipo())" 2>&1; correr t_15g_ref "$SQLDIR/sync-15g-rendimiento-rls.sql")
+  r=$("${PSQL[@]}" -U supabase_admin -d t_15g_ref -At -c "SELECT count(*) FROM pg_policies WHERE schemaname = 'public' AND qual ~ 'SELECT'")
+  grep -q "SYNC-15G STOP: ventas.ventas_lee" <<<"$s" && [ "$r" = "0" ] && ok "política distinta a la esperada → se DETIENE y no cambia ninguna" || mal "parada: $r · $(tail -3 <<<"$s")"
+  "${PSQL[@]}" -U supabase_admin -d t_15g_ref -q -c "ALTER POLICY ventas_lee ON public.ventas USING (public.ve_todo_el_taller())" >/dev/null
+  s=$(correr t_15g_a "$SQLDIR/sync-15g-rollback.sql") && ok "rollback aplica" || { mal "rollback falló: $(tail -3 <<<"$s")"; return; }
+  despues=$(cat "$AQUI/sql/00-prelude.sql" "$AQUI/sql/15g-visibilidad.sql" | "${PSQL[@]}" -U supabase_admin -d t_15g_a 2>&1 | grep -o 'VIS|.*' | sort)
+  [ "$antes" == "$despues" ] && ok "visibilidad idéntica tras el rollback" || mal "la visibilidad cambió tras el rollback"
+  "${PSQL[@]}" -U supabase_admin -d t_15g_a -q -c "SET session_replication_role = replica; TRUNCATE public.clientes, public.motos, public.citas, public.categorias_inv, public.cotizaciones, public.cotizacion_items, public.ordenes, public.orden_items, public.inventario, public.ventas, public.venta_items, public.creditos, public.credito_items, public.abonos, public.caja_movimientos, public.mensajes, public.web_cms CASCADE; DELETE FROM public.auditoria WHERE accion = 'b7';" >/dev/null
+  comparar t_15g_ref t_15g_a "tras el rollback el esquema es IDÉNTICO a la cadena + 15f" "el rollback de 15g no restauró el estado anterior"
+  s=$(correr t_15g_a "$SQLDIR/sync-15g-rendimiento-rls.sql") && ok "forward otra vez tras el rollback" || mal "no re-aplica tras rollback: $(tail -3 <<<"$s")"
+  "$AQUI/entorno-local.sh" borra t_15g_a >/dev/null; "$AQUI/entorno-local.sh" borra t_15g_ref >/dev/null
+}
+
 case "${1:-}" in
+  15g) fase15g ;;
+  15f) fase15f ;;
+  15e) fase15e ;;
+  15d) fase15d ;;
+  15c) fase15c ;;
+  15a) fase15a ;;
+  15b) fase15b ;;
   sec1c) fasesec1c ;;
   10) fase10 ;;
   1) fase1 ;;

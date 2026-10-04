@@ -9,13 +9,13 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { RUNTIME } from "./helpers/entorno.mjs";
-import { ejecutarServiceWorker, VERSION_ESPERADA, CONTRATOS } from "./helpers/pwa.mjs";
+import { ejecutarServiceWorker, VERSION_ESPERADA, CONTRATO_ACTUAL } from "./helpers/pwa.mjs";
 
 const SCRIPT = path.join(RUNTIME, "hacer-build-mecanicos.sh");
 const RAIZ_TMP = fs.mkdtempSync(path.join(os.tmpdir(), "entimotors-c3-build-"));
 const V = VERSION_ESPERADA;
 // cifras del contrato de la release (helpers/pwa.mjs): Mi Trabajo lleva las mismas etiquetas que el taller MENOS config-local.js
-const K = CONTRATOS[V], ETIQUETAS_MT = K.etiquetas - 1;
+const K = CONTRATO_ACTUAL, ETIQUETAS_MT = K.etiquetas - 1;   // 3.15 (Bloque 3): contrato del árbol de trabajo (18/17/22)
 let n = 0;
 const nuevoDir = (etiqueta) => path.join(RAIZ_TMP, `${etiqueta}-${++n}`);
 
@@ -88,16 +88,16 @@ describe("contenido del build de «Mi Trabajo»", () => {
     const sw = leerEn(destino, "sw.js"); assert.deepEqual([...sw.matchAll(/const CACHE_NAME = "([^"]+)"/g)].map((m) => m[1]), [`entimotors-mitrabajo-v${V}`]);
     for (const f of ["app.js", "sw.js", "index.html"]) assert.ok(!/3\.12\.[12](?![0-9])|entimotors-(mitrabajo-)?v3\.12\./.test(leerEn(destino, f)), f);
   });
-  test(`los 15 <script ?v=> de index.html (los 16 del taller sin config-local.js) apuntan a ${V} y el SHELL del service worker coincide`, () => {
+  test(`los 18 <script ?v=> de index.html (los 19 del taller sin config-local.js) apuntan a ${V} y el SHELL del service worker coincide`, () => {
     const idx = leerEn(destino, "index.html"); assert.deepEqual([...idx.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`).sort(),
-      ["app.js", "auth.js", "build-target.js", "import-313.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
-       "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-rest.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
-    assert.equal(ETIQUETAS_MT, 15);
+      ["app.js", "auth.js", "build-target.js", "fecha-negocio.js", "finanzas-calc.js", "import-313.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
+       "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-realtime.js", "sync-rest.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
+    assert.equal(ETIQUETAS_MT, 18);
   });
   test("index.html = el del taller SIN el bloque de config-local, con titulo y textos de «Mi Trabajo» (transformacion documentada del script)", () => {
     const src = leerEn(RUNTIME, "index.html");
     const esperado = src.replace(/<!-- config-local\.js es opcional[\s\S]*?Ver config-local\.example\.js\. -->\n?/, "").split("\n").filter((l) => !l.startsWith('<script src="config-local.js')).join("\n")
-      .replace("<title>ENTIMOTORS OS — Demo local</title>", "<title>ENTIMOTORS · Mi Trabajo</title>").replace("<h1>Instala ENTIMOTORS OS</h1>", "<h1>Instala ENTIMOTORS Mi Trabajo</h1>").replace("Abre ENTIMOTORS OS desde su propio ícono", "Abre Mi Trabajo desde su propio ícono");
+      .replace("<title>ENTIMOTORS OS</title>", "<title>ENTIMOTORS · Mi Trabajo</title>")   /* 3.15 (Bloque 6): el título ya no dice «Demo local» */.replace("<h1>Instala ENTIMOTORS OS</h1>", "<h1>Instala ENTIMOTORS Mi Trabajo</h1>").replace("Abre ENTIMOTORS OS desde su propio ícono", "Abre Mi Trabajo desde su propio ícono");
     assert.equal(leerEn(destino, "index.html"), esperado);
     assert.match(leerEn(destino, "index.html"), /<title>ENTIMOTORS · Mi Trabajo<\/title>/);
   });
@@ -114,7 +114,7 @@ describe("contenido del build de «Mi Trabajo»", () => {
   });
   test("quita exactamente lo que no es de este producto", () => {
     const out = arbol(destino); const quitados = [...fuente.keys()].filter((f) => !out.has(f));
-    assert.ok(quitados.every((f) => /^(build-mecanicos\/|hacer-build-mecanicos\.sh$|config-local(\.example)?\.js$|panel-tecnico\.html$|supabase\/|README\.md$|CHANGELOG\.md$)/.test(f)), `quitados inesperados: ${quitados.filter((f) => !/^(build-mecanicos\/|hacer-build-mecanicos\.sh$|config-local(\.example)?\.js$|panel-tecnico\.html$|supabase\/|README\.md$|CHANGELOG\.md$)/.test(f))}`);
+    assert.ok(quitados.every((f) => /^(build-mecanicos\/|hacer-build-mecanicos\.sh$|hacer-build-taller\.sh$|config-local(\.example)?\.js$|panel-tecnico\.html$|supabase\/|README\.md$|CHANGELOG\.md$)/.test(f)), `quitados inesperados: ${quitados.filter((f) => !/^(build-mecanicos\/|hacer-build-mecanicos\.sh$|hacer-build-taller\.sh$|config-local(\.example)?\.js$|panel-tecnico\.html$|supabase\/|README\.md$|CHANGELOG\.md$)/.test(f))}`);
     for (const f of ["hacer-build-mecanicos.sh", "panel-tecnico.html", "build-mecanicos/build-target.js"]) assert.ok(quitados.includes(f), f);
     for (const f of ["app.js", "auth.js", "recovery.js", "usuarios.js", "supabase-client.js", "supabase-config.js", "sw.js", "index.html"]) assert.ok(out.has(f), `debe conservar ${f}`);
   });
@@ -128,7 +128,7 @@ describe("contenido del build de «Mi Trabajo»", () => {
     const sw = leerEn(destino, "sw.js"); const w = ejecutarServiceWorker({ sw });
     assert.equal(w.nombreCache(), `entimotors-mitrabajo-v${V}`); await w.instalar();
     assert.deepEqual(w.llamadas.abiertas, [`entimotors-mitrabajo-v${V}`]); assert.equal(w.llamadas.skipWaiting, 0, "skipWaiting automatico en install");
-    const shell = w.shell(); assert.equal(shell.length, K.shell); assert.equal(K.shell, 20);
+    const shell = w.shell(); assert.equal(shell.length, K.shell); assert.equal(K.shell, 23);   // 3.15 (Bloque 5): + finanzas-calc.js
     for (const url of shell) { assert.ok(w.llamadas.fetch.some((f) => f.url === url && f.opciones?.cache === "no-store"), `no se precacheo ${url} con no-store`); if (url !== "./") assert.ok(fs.existsSync(path.join(destino, url.slice(2).split("?")[0])), `SHELL: ${url} no existe en el build`); }
   });
   test("al activarse, el service worker del build borra caches VIEJAS de Mi Trabajo, conserva la actual y llama clients.claim() sin skipWaiting", async () => {

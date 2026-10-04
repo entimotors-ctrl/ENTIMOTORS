@@ -11,7 +11,11 @@ import assert from "node:assert/strict";
 import { leer } from "./helpers/entorno.mjs";
 
 const INDEX = leer("index.html");
-const MEDIA_MOVIL = /@media \(max-width: 900px\) and \(pointer: coarse\), \(max-width: 640px\)\s*\{/;
+/* 3.15 (Bloque 7): el desplegable «Cuenta» (.account-panel/#btnCuenta, donde vive el chip en móvil) pasó del @media móvil a uno PROPIO de
+   ≤1100 px con cualquier puntero (arreglo del desborde de la barra a ~768 px con ratón). Ese bloque CUBRE todo el móvil (≤900 táctil y
+   ≤640), así que las garantías «móvil» M1–M5 se comprueban ahí; M6 exige además que el @media móvil del cajón siga existiendo. */
+const MEDIA_MOVIL = /@media \(max-width: 1100px\)\s*\{/;
+const MEDIA_CAJON = /@media \(max-width: 900px\) and \(pointer: coarse\), \(max-width: 640px\)\s*\{/;
 const MARCADO_CHIP = '<span class="chip user-chip"><span class="who"><span id="loggedUserName">—</span><small id="loggedUserRole"></small></span></span>';
 
 // ── lector de CSS minimo (las reglas de index.html no anidan mas de un @media) ──
@@ -59,7 +63,8 @@ function verificarChip(html) {
   chk("M4 móvil: se conserva `.account-panel .chip { white-space: normal; width: 100% }`", decl(de(movil, ".account-panel .chip"), "white-space") === "normal" && decl(de(movil, ".account-panel .chip"), "width") === "100%", "falta la regla heredada");
   chk("M5 la regla móvil GANA por especificidad a la de escritorio (si no, la elipsis seguiria activa en el móvil)",
     mayor(especificidad(".account-panel .user-chip"), especificidad(".user-chip")) && mayor(especificidad(".account-panel .user-chip .who > span"), especificidad(".user-chip .who > span")), "especificidad insuficiente");
-  chk("M6 el @media móvil sigue siendo el mismo (mismo umbral que .account-panel/#btnCuenta)", !!mv && /\.account-panel\.open\s*\{\s*display:\s*flex/.test(mv.dentro), "no se encontro el bloque móvil esperado");
+  chk("M6 el desplegable «Cuenta» vive en un @media que cubre TODO el móvil (≤1100 px ⊇ táctil ≤900 y ≤640) y el @media móvil del cajón sigue",
+    !!mv && /\.account-panel\.open\s*\{\s*display:\s*flex/.test(mv.dentro) && MEDIA_CAJON.test(css), "no se encontro el bloque esperado");
   chk("S1 el marcado del chip no cambia (una sola vez, mismos ids y anidacion)", html.split(MARCADO_CHIP).length === 2, "el marcado del chip cambio");
   return R;
 }
@@ -87,6 +92,7 @@ describe("OBS-7 · pruebas de MUTACION: cada garantia se rompe si se altera la l
     ["móvil: perder la regla heredada .account-panel .chip", () => mutar(".account-panel .chip { white-space: normal; width: 100%; }", ".account-panel .chip { width: 100%; }"), "M4"],
     ["móvil: bajar la especificidad de la regla que anula la elipsis", () => mutar(".account-panel .user-chip .who > span, .account-panel .user-chip .who small {", ".user-chip .who > span, .user-chip .who small {"), "M3"],
     ["alterar el marcado del chip", () => mutar(MARCADO_CHIP, MARCADO_CHIP.replace("chip user-chip", "user-chip")), "S1"],
+    ["el desplegable «Cuenta» deja de cubrir el móvil (umbral más chico)", () => mutar("@media (max-width: 1100px) {", "@media (max-width: 700px) {"), "M6"],
   ];
   for (const [nombre, crear, id] of casos) {
     test(`mutante «${nombre}» → falla ${id}`, () => { const f = fallos(verificarChip(crear())); assert.ok(f.includes(id), `el mutante NO fue detectado por ${id}; fallaron: ${JSON.stringify(f)}`); });

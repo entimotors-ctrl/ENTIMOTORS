@@ -6,7 +6,7 @@
 //      ligado → OTRO dispositivo lo ve; respuesta perdida; cierres; sesión caducada; dos dispositivos sin pisarse; dos
 //      pestañas; agregar_foto_orden con sus rechazos; límites del bucket. Todo se afirma en la NUBE.
 //   SYNC_NAVEGADORES=chromium node --test --test-concurrency=1 pruebas/sync/browser/sync9-core.test.mjs
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES, REST_URL } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -185,6 +185,9 @@ for (const nav of NAVS) {
   describe(`SYNC-9 · fotos con el cliente real (Storage real) · ${nav}`, () => {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
+    // 3.15 (Bloque 5): cada prueba cierra SUS navegadores al terminar. Antes se cerraban todos al final del navegador y en Firefox llegaban a
+    // convivir ~20 instancias (≈250 MB c/u): la tanda de regresión agotó la memoria de la máquina. Ninguna prueba usa dispositivos de otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("SIN RED → recarga → con red: UNA foto en Storage, ligada UNA vez, y OTRO dispositivo del mecánico la baja, firma y descarga idéntica", async () => {

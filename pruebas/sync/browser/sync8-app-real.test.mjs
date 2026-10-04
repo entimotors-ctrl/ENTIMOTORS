@@ -52,7 +52,7 @@ function entrar(d, rol, o = {}) {
     window.__token = a.token;
     window.SupabaseCliente.sesion = function () { return window.__token ? { access_token: window.__token } : null; };
     window.SupabaseCliente.estado = function () { return { activo: true, conSesion: true, usuario: a.rol + "@example.test" }; };
-    window.SupabaseCliente.refrescarSesion = async function () { return { ok: !!window.__token }; };
+    window.SupabaseCliente.refrescarSesion = async function () { return window.__token ? { ok: true } : { ok: false, motivo: "sin-sesion", clase: "rechazada" }; };   // como el cliente real (3.15 · 8A)
     const mec = a.rol === "mecanico" || a.rol === "mecanico2";
     currentUser = { uid: a.id, nombre: a.rol, rol: mec ? "mecanico" : a.rol, origen: "supabase", activo: true, perfilId: mec ? a.id : null, user: null };
     await prepararModoNube({ rol: currentUser.rol, origen: "supabase", activo: true, uid: a.id, perfilId: currentUser.perfilId });
@@ -188,7 +188,9 @@ for (const nav of NAVS) {
     test("ítems de orden A→B y reporte de producción por mecánico reconstruido en OTRO dispositivo; el stock no se descuenta dos veces", async () => {
       pila.limpiar(); sembrarRepuesto(10);
       const A = await paso("abrir A", () => abrirD("admin"));
-      const hoy = new Date().toISOString().slice(0, 10);
+      // 3.15 · Bloque 3: la producción se agrupa por el DÍA DEL NEGOCIO (Honduras), no por el día UTC. Con el día UTC la prueba
+      // fallaba entre las 18:00 y las 24:00 de Honduras (UTC ya es mañana). Se toma el mismo día que usa la app.
+      const hoy = await A.eval(() => FechaNegocio.hoy());
       const r = await paso("orden en A", () => A.eval(async (a) => {
         const rep = (await DB.getAll("inventario")).find((x) => x.uid === a.uid);
         const cli = await DB.save("clientes", { nombre: "Cliente A→B", telefono: "1" });

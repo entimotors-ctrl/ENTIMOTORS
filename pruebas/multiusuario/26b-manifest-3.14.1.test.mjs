@@ -10,6 +10,7 @@ import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { RAIZ } from "./helpers/entorno.mjs";
 import { raiz3140 } from "./helpers/congelado-3.14.0.mjs";
+import { raiz3141 } from "./helpers/congelado-3.14.1.mjs";
 
 const F = "pruebas/multiusuario/release-3.14.1-manifest.json";
 const VERIF = path.join(RAIZ, "pruebas/multiusuario/verificar-backend-manifest.mjs");
@@ -18,13 +19,15 @@ const sha = (p) => crypto.createHash("sha256").update(fs.readFileSync(p)).digest
 const git = (...a) => spawnSync("git", ["-C", RAIZ, ...a], { encoding: "utf8" }).stdout.split("\n").filter(Boolean);
 
 describe("release 3.14.1 · manifest cerrado del frontend", () => {
-  test("MATCH: cada archivo listado existe con su SHA-256 y su tamaño", () => {
-    const r = spawnSync(process.execPath, [VERIF, "--manifest", F], { encoding: "utf8" });
+  // 3.15 (Bloque 1A): el árbol de trabajo ya cambia a propósito; el freeze se comprueba contra el release PUBLICADO (e807f65, git archive).
+  test("MATCH: cada archivo listado existe con su SHA-256 y su tamaño (en el release publicado e807f65)", () => {
+    const r = spawnSync(process.execPath, [VERIF, "--raiz", raiz3141(), "--manifest", F], { encoding: "utf8" });
     assert.equal(r.status, 0, r.stdout); assert.match(r.stdout, /^MATCH \d+ archivos/m);
   });
   test("formato, versión y matriz de versiones = lo que dice el código", () => {
     assert.equal(M.format, "entimotors-release-freeze/1"); assert.equal(M.version, "3.14.1");
-    const app = fs.readFileSync(path.join(RAIZ, "taller-demo/app.js"), "utf8"), sw = fs.readFileSync(path.join(RAIZ, "taller-demo/sw.js"), "utf8"), idx = fs.readFileSync(path.join(RAIZ, "taller-demo/index.html"), "utf8");
+    // 3.15 (Bloque 3): el árbol de trabajo ya suma scripts: la matriz de 3.14.1 se comprueba contra el release PUBLICADO (e807f65)
+    const R = raiz3141(), app = fs.readFileSync(path.join(R, "taller-demo/app.js"), "utf8"), sw = fs.readFileSync(path.join(R, "taller-demo/sw.js"), "utf8"), idx = fs.readFileSync(path.join(R, "taller-demo/index.html"), "utf8");
     assert.equal(M.version_matrix.VERSION_APP, /const VERSION_APP = "([^"]+)"/.exec(app)[1]);
     assert.equal(M.version_matrix.CACHE_NAME, /const CACHE_NAME = "([^"]+)"/.exec(sw)[1]);
     assert.equal(M.version_matrix.index_html_query_v, (idx.match(/<script src="[^"?]+\?v=3\.14\.1"/g) || []).length);

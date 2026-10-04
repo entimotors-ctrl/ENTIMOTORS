@@ -3,7 +3,7 @@
 // prueba de SYNC-4: monta el motor con { usarMappersReales: true } (ver harness/montar.js).
 //   node --test pruebas/sync/browser/sync5-core.test.mjs          (requiere pruebas/sync/entorno-local.sh up y Docker)
 //   SYNC_NAVEGADORES=chromium node --test …                       (uno solo)
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES, uid } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -44,6 +44,9 @@ for (const nav of NAVS) {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
     before(() => pila.limpiar());
+    // 3.15 (Bloque 5): cada prueba cierra SUS navegadores al terminar. Antes se cerraban todos al final del navegador y en Firefox llegaban a
+    // convivir ~20 instancias (≈250 MB c/u): la tanda de regresión agotó la memoria de la máquina. Ninguna prueba usa dispositivos de otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("clientes: A crea → push → B pull; B edita el teléfono → A pull ve el cambio", async () => {

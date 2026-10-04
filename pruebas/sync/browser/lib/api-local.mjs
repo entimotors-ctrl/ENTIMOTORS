@@ -29,7 +29,7 @@ function compilar() {
 }
 
 /** pila: la de iniciarPila(). origen: el origin del navegador que llamará (CORS selectivo de las rutas sensibles). */
-export async function iniciarApi(pila, { origen = null, origenes = [] } = {}) {
+export async function iniciarApi(pila, { origen = null, origenes = [], entorno = {} } = {}) {
   const dir = compilar();
   const env = {
     PATH: process.env.PATH, NODE_ENV: "development", PORT: String(API_PUERTO), LOG_LEVEL: "warn",
@@ -41,6 +41,7 @@ export async function iniciarApi(pila, { origen = null, origenes = [] } = {}) {
   };
   if (origen) env.ENTIMOTORS_ADMIN_ORIGIN = origen;
   if (origenes.length) env.CORS_ORIGINS_EXTRA = origenes.join(",");
+  Object.assign(env, entorno);   // 3.15 (Bloque 4): p. ej. ENTIMOTORS_MECHANIC_ORIGIN para los enlaces de Mi Trabajo
   const proc = spawn(process.execPath, [path.join(dir, "index.mjs")], { env, stdio: ["ignore", "pipe", "pipe"] });
   let salida = "";
   proc.stdout.on("data", (d) => { salida += d; }); proc.stderr.on("data", (d) => { salida += d; });

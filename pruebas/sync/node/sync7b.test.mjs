@@ -244,6 +244,18 @@ describe("SYNC-7B · conAutorizacion() — PIN real del cajero, admin directo, m
     assert.equal(log.rpc[0].params.p_autorizacion, null);
   });
 
+  test("3.15 B4 · eliminar orden SIN dinero: el admin no pasa por el PIN (sinPinAdmin); el cajero con esa opción sí pasa por autorizar", async () => {
+    const ord = () => F().anularOrden({ ordenUid: "o-1", motivo: "orden duplicada", devolverStock: true, deviceId: "dev-A" });
+    const { motor, bd, log } = motorYBase({ respuestas: [{ ok: true, datos: {} }, { ok: true, datos: {} }] });
+    const pedidas = [];
+    const fin = ctx.SyncFinanzas.crear({ motor, bd, uuid: contador("op"), enLinea: () => true, autorizar: async (o) => { pedidas.push(o.rol); return { ok: true, autorizacion_id: "aut-c" }; } });
+    assert.equal((await fin.conAutorizacion(ord(), "admin", { sinPinAdmin: true })).ok, true);
+    assert.deepEqual(pedidas, [], "admin + sin dinero: no se pide PIN");
+    assert.equal(log.rpc[0].params.p_autorizacion, null);
+    assert.equal((await fin.conAutorizacion(ord(), "cajero", { sinPinAdmin: true })).ok, true);
+    assert.deepEqual(pedidas, ["cajero"], "la opción no salta nada para el cajero (el servidor además lo niega)");
+  });
+
   test("PIN offline: denegado ANTES de pedir el PIN, con el mensaje exacto, sin red y sin cola", async () => {
     const { motor, bd, log, cola } = motorYBase();
     let pedido = false;

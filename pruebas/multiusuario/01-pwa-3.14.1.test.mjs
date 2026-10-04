@@ -2,6 +2,9 @@
 // Mismas comprobaciones que 01-pwa-3.14.0 (que sigue vigilando la release 3.14.0 sobre el commit effbfa1), con el contrato de 3.14.1:
 // las mismas 16 etiquetas ?v=, 15 entradas versionadas del SHELL (20 en total; 3.14.1 no añade scripts) y la release anterior
 // (3.14.0) como «versión vieja»: su caché se borra al activar la nueva.
+// 3.15.0: este es el CONTRATO de la release 3.14.1 → se ejecuta, sin cambiar una sola aserción, contra la instantánea inmutable
+// del commit e807f65 (helpers/usar-3141.mjs, PRIMER import). El contrato vigente de 3.15.0 está en 01-pwa-3.15.0.
+import "./helpers/usar-3141.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import { leer } from "./helpers/entorno.mjs";

@@ -43,14 +43,31 @@ function base(o) {
   }, o);
 }
 
-test("admin nunca llama al servidor: se resuelve localmente, sin fetch ni pedirPin", async () => {
+// 3.15 (Bloque 4): el admin pasa sin PIN solo en lo SENSIBLE; lo DESTRUCTIVO le pide el PIN del propietario (contrato 3.14 reemplazado).
+test("admin en una acción SENSIBLE: se resuelve localmente, sin fetch ni pedirPin", async () => {
   let pedirPinLlamado = false;
   const pin = PinUI.crear(base({ fetch: fetchFalso([{ status: 201, cuerpo: { autorizacion_id: "x" } }]), pedirPin: async () => { pedirPinLlamado = true; return "123456"; } }));
-  const r = await pin.pedirAutorizacion({ rol: "admin", accion: "reversar_venta", registroId: "11111111-1111-1111-1111-111111111111" });
-  assert.equal(r.ok, true);
-  assert.equal(r.admin, true);
-  assert.equal(r.autorizacion_id, null);
-  assert.equal(pedirPinLlamado, false, "el admin no necesita PIN: nunca se le pide");
+  const r = await pin.pedirAutorizacion({ rol: "admin", accion: "ajustar_stock", registroId: "11111111-1111-1111-1111-111111111111" });
+  assert.equal(r.ok, true); assert.equal(r.admin, true); assert.equal(r.autorizacion_id, null);
+  assert.equal(pedirPinLlamado, false);
+});
+test("admin en una acción DESTRUCTIVA: se le pide el PIN del propietario (con la acción descrita) y va al servidor", async () => {
+  let info = null;
+  const f = fetchFalso([{ status: 201, cuerpo: { autorizacion_id: "aut-admin" } }]);
+  const pin = PinUI.crear(base({ fetch: f, pedirPin: async (i) => { info = i; return "739205"; } }));
+  for (const accion of ["reversar_venta", "reversar_caja", "anular_orden", "eliminar_usuario", "restaurar_respaldo"]) {
+    const r = await pin.pedirAutorizacion({ rol: "admin", accion, registroId: "11111111-1111-1111-1111-111111111111" });
+    assert.equal(r.ok, true, accion); assert.equal(r.autorizacion_id, "aut-admin"); assert.equal(info.destructiva, true); assert.ok(info.descripcion.length > 5);
+  }
+  const caj = await PinUI.crear(base({ fetch: fetchFalso([]), pedirPin: async () => "739205" })).pedirAutorizacion({ rol: "cajero", accion: "eliminar_usuario", registroId: "11111111-1111-1111-1111-111111111111" });
+  assert.equal(caj.ok, false); assert.equal(caj.motivo, "sin-permiso", "el cajero no elimina usuarios (ni se le pide el PIN)");
+  assert.equal(PinUI.esDestructiva("ajustar_stock"), false); assert.equal(PinUI.esDestructiva("eliminar_usuario"), true);
+  // B20 (3.15 · Bloque 5): restaurar un respaldo en la nube = DESTRUCTIVA: PIN también para el admin, nunca el cajero, nunca sin red
+  assert.equal(PinUI.esDestructiva("restaurar_respaldo"), true);
+  const cajR = await PinUI.crear(base({ fetch: fetchFalso([]), pedirPin: async () => "739205" })).pedirAutorizacion({ rol: "cajero", accion: "restaurar_respaldo", registroId: "11111111-1111-1111-1111-111111111111" });
+  assert.equal(cajR.motivo, "sin-permiso", "el cajero no restaura respaldos");
+  const off = await PinUI.crear(base({ fetch: fetchFalso([]), enLinea: () => false, pedirPin: async () => { throw new Error("no debe pedir PIN sin red"); } })).pedirAutorizacion({ rol: "admin", accion: "restaurar_respaldo", registroId: "11111111-1111-1111-1111-111111111111" });
+  assert.equal(off.motivo, "sin-conexion", "sin red no se intenta ni se pide el PIN");
 });
 
 test("mecánico (o cualquier rol que no sea cajero/admin) se rechaza localmente, sin red", async () => {
@@ -69,7 +86,7 @@ test("acción PIN offline: se deniega ANTES de pedir el PIN y sin ninguna llamad
   const r = await pin.pedirAutorizacion({ rol: "cajero", accion: "reversar_caja", registroId: "id" });
   assert.equal(r.ok, false);
   assert.equal(r.motivo, "sin-conexion");
-  assert.match(r.mensaje, /requiere conexión/);
+  assert.match(r.mensaje, /necesita conexión/); assert.match(r.mensaje, /No se hizo nada/);
   assert.equal(pedirPinLlamado, false, "sin conexión no se debe ni mostrar el modal de PIN");
   assert.equal(f.llamadas.length, 0);
 });
@@ -128,7 +145,8 @@ test("PIN nunca sobrevive en el resultado ni en el cuerpo enviado más allá del
 
 test("clasificación de códigos de error del servidor (SIN_PIN, CUENTA_INACTIVA, BLOQUEADO_ADMIN, BLOQUEADO_*, PIN_CAMBIADO)", async () => {
   const casos = [
-    [{ status: 409, cuerpo: { codigo: "SIN_PIN" } }, "SIN_PIN", /todavía no configuró/],
+    [{ status: 409, cuerpo: { codigo: "SIN_PIN" } }, "SIN_PIN", /Todavía no hay PIN del propietario/],
+    [{ status: 401, cuerpo: { codigo: "SESION_INVALIDA" } }, "SESION_INVALIDA", /Inicia sesión de nuevo/],
     [{ status: 403, cuerpo: { codigo: "CUENTA_INACTIVA" } }, "CUENTA_INACTIVA", /no está activa/],
     [{ status: 423, cuerpo: { codigo: "BLOQUEADO_ADMIN" } }, "BLOQUEADO_ADMIN", /debe desbloquearlas/],
     [{ status: 429, cuerpo: { codigo: "BLOQUEADO_SOLICITANTE", reintentar_en_s: 900 } }, "BLOQUEADO_SOLICITANTE", /15 minutos/],
@@ -181,8 +199,9 @@ test("mensajeParaCodigo es pura y cubre el catálogo completo de códigos del ba
 
 test("ACCIONES_CON_PIN coincide exactamente con el catálogo del backend (api-server/src/lib/pin.ts)", () => {
   assert.deepEqual(Object.keys(PinUI.ACCIONES_CON_PIN).sort(), [
-    "ajustar_stock", "anular_orden", "registrar_devolucion", "reversar_abono", "reversar_caja", "reversar_credito", "reversar_venta",
+    "ajustar_stock", "anular_orden", "eliminar_usuario", "registrar_devolucion", "restaurar_respaldo", "reversar_abono", "reversar_caja", "reversar_credito", "reversar_venta",
   ]);
+  assert.equal(PinUI.ACCIONES_CON_PIN.eliminar_usuario, "perfiles");
   assert.equal(PinUI.ACCIONES_CON_PIN.reversar_venta, "ventas");
   assert.equal(PinUI.ACCIONES_CON_PIN.ajustar_stock, "inventario");
   assert.equal(PinUI.ACCIONES_CON_PIN.anular_orden, "ordenes");

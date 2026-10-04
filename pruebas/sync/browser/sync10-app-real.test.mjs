@@ -68,7 +68,7 @@ async function arrancar(d, rol, o = {}) {
       window.__token = a.token;
       window.SupabaseCliente.sesion = function () { return window.__token ? { access_token: window.__token } : null; };
       window.SupabaseCliente.estado = function () { return { activo: true, conSesion: true, usuario: a.rol + "@example.test" }; };
-      window.SupabaseCliente.refrescarSesion = async function () { return { ok: !!window.__token }; };
+      window.SupabaseCliente.refrescarSesion = async function () { return window.__token ? { ok: true } : { ok: false, motivo: "sin-sesion", clase: "rechazada" }; };   // como el cliente real (3.15 · 8A)
     }
     await startApp(sesion);
     await new Promise((r) => setTimeout(r, 400));
@@ -193,12 +193,18 @@ for (const nav of NAVS) {
       assert.equal(filasNube(), 1); assert.equal(demoEnNube(), 0);
     });
 
-    test("B2 · modo demo LOCAL legítimo (sesión local, sin nube): «Ver un ejemplo» sigue funcionando SOLO en el teléfono", async () => {
+    // 3.15 (Bloque 6): «Ver un ejemplo» es una herramienta de DESARROLLO: solo existe con config-local.js (ENTIMOTORS_LOCAL), que nunca se
+    // publica. Sin él, ni en una sesión local se ofrece; con él, sigue funcionando SOLO en el teléfono y nada llega a la nube.
+    test("B2 · modo demo LOCAL (sesión local, sin nube): sin config-local NO se ofrece; con config-local (desarrollo) funciona SOLO en el teléfono", async () => {
       pila.limpiar();
       const d = await abrirD();
       const a = await arrancar(d, "admin", { local: true });
       assert.equal(a.gate, true);
+      const sinConfig = await d.eval(() => { prepararGateModo(); return document.getElementById("btnModoDemo").style.display; });
+      assert.equal(sinConfig, "none", "producto publicado (sin config-local): no se ofrece el ejemplo");
       const r = await d.eval(async () => {
+        window.ENTIMOTORS_LOCAL = { teamPasswords: { prueba: "solo-desarrollo" } };   // lo que carga config-local.js en desarrollo
+        prepararGateModo();
         const vis = document.getElementById("btnModoDemo").style.display !== "none";
         document.getElementById("btnModoDemo").click();
         for (let i = 0; i < 100 && !(await idbGetAll("clientes")).length; i++) await new Promise((ok) => setTimeout(ok, 100));

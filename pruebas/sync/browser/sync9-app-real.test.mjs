@@ -48,7 +48,7 @@ function entrar(d, rol, o = {}) {
     window.__token = a.token;
     window.SupabaseCliente.sesion = function () { return window.__token ? { access_token: window.__token } : null; };
     window.SupabaseCliente.estado = function () { return { activo: true, conSesion: true, usuario: a.rol + "@example.test" }; };
-    window.SupabaseCliente.refrescarSesion = async function () { return { ok: !!window.__token }; };
+    window.SupabaseCliente.refrescarSesion = async function () { return window.__token ? { ok: true } : { ok: false, motivo: "sin-sesion", clase: "rechazada" }; };   // como el cliente real (3.15 · 8A)
     currentUser = { uid: a.id, nombre: a.rol, rol: "mecanico", origen: "supabase", activo: true, perfilId: a.id, user: null };
     await prepararModoNube({ rol: "mecanico", origen: "supabase", activo: true, uid: a.id, perfilId: a.id });
     window.__elegirFoto = async (ordenUid, contenido) => {   // el <input type=file> REAL de la app, con una foto hecha en canvas

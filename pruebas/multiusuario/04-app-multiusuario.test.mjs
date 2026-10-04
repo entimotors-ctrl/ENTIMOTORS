@@ -113,15 +113,18 @@ describe("entrarConSesion / denegarSesion / startApp — nada se abre sin permis
   });
   test("startApp: el mecanico con cuenta abre SU base (por perfilId) — nunca la del taller", async () => {
     const env = nuevoEntorno({ producto: "mecanico", espiarStartApp: false }); await env.asentar();
-    await assert.rejects(env.win.startApp(MEC_SB), /indexedDB deshabilitado/);
+    // 3.15 (Bloque 3): si la base no abre, ya no revienta a medias: se BLOQUEA con la pantalla de almacenamiento (fail closed)
+    await env.win.startApp(MEC_SB);
     assert.deepEqual(env.idbAbiertas.map((b) => b.nombre), [`entimotors_os_demo_mec_${MEC_SB.perfilId}`]);
+    assert.equal(activo(env, "gateAlmacen"), true); assert.equal(activo(env, "shell"), false);
     const env2 = nuevoEntorno({ producto: "admin", espiarStartApp: false }); await env2.asentar();
-    await assert.rejects(env2.win.startApp(ADMIN_SB), /indexedDB deshabilitado/);
+    await env2.win.startApp(ADMIN_SB);
     assert.deepEqual(env2.idbAbiertas.map((b) => b.nombre), ["entimotors_os_demo"]);
+    assert.equal(activo(env2, "gateAlmacen"), true);
   });
   test("startApp: el rol se muestra como TEXTO en la barra (textContent, no innerHTML)", async () => {
     const env = nuevoEntorno({ producto: "admin", espiarStartApp: false }); await env.asentar();
-    await assert.rejects(env.win.startApp({ ...ADMIN_SB, nombre: "<b>x</b>" }));
+    await env.win.startApp({ ...ADMIN_SB, nombre: "<b>x</b>" });   // la base falla → pantalla de almacenamiento (3.15), el nombre ya se pintó
     assert.equal(env.doc.getElementById("loggedUserName").textContent, "<b>x</b>");
     assert.ok(!env.doc.sumideros.some((s) => s.id === "loggedUserName"), "no debe pasar por innerHTML");
   });
@@ -485,9 +488,16 @@ describe("Arranque con sesion guardada (arrancarConSesion) — que pasa con cada
     const e = await arrancar({ sesionGuardada: guardada() });
     assert.equal(e.startApp.length, 1); assert.equal(e.startApp[0][0].rol, "admin"); assert.equal(e.servidor.llamadas.length, 0);
   });
-  test("GAP: con el token de acceso CADUCADO tampoco se intenta refrescar ni confirmar: arranca con la sesion guardada", async () => {
+  // 3.15 (Checkpoint 8A): GAP cerrado — con el token CADUCADO se RENUEVA antes de decidir, y luego se confirma el perfil
+  test("token de acceso CADUCADO: se renueva y se confirma el perfil; arranca con la sesión del servidor", async () => {
     const e = await arrancar({ cuenta, expiraEnS: -100, sesionGuardada: guardada() });
-    assert.equal(e.startApp.length, 1); assert.equal(e.servidor.llamadas.length, 0);
+    assert.equal(e.startApp.length, 1); assert.ok(e.servidor.llamadas.some((l) => /grant_type=refresh_token/.test(l.ruta)), "se intentó renovar");
+    assert.equal(e.win.Auth.estado().conSesion, true);
+  });
+  test("token CADUCADO y Auth RECHAZA la renovación: login con «Tu sesión terminó» y sin la sesión guardada", async () => {
+    const e = await arrancar({ cuenta, expiraEnS: -100, sesionGuardada: guardada(), preparar: (env) => { env.servidor.refrescoFalla = true; } });
+    assert.equal(e.startApp.length, 0); assert.equal(activo(e, "gateLogin"), true);
+    assert.equal(e.doc.getElementById("loginError").textContent, "Tu sesión terminó. Vuelve a entrar."); assert.equal(e.almacen.getItem("enti_session"), null);
   });
   test("GAP: en TALLER una sesion guardada con activo:false tambien arranca si no hay servidor que la contradiga", async () => {
     const e = await arrancar({ sesionGuardada: guardada({ activo: false }) });

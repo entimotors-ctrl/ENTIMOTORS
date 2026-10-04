@@ -35,6 +35,9 @@ async function montar({ pepper = PEPPER, entorno = {}, e: extra = {} } = {}) {
       if (nombre === "pin_reservar_intento") return { data: e.reservar ? e.reservar() : { permitido: true, admin_id: uid(1), pin_version: e.version, hash: e.hash, intentos_restantes: 4 }, error: null };
       if (nombre === "pin_emitir_autorizacion") return { data: { autorizacion_id: "aut-9", expira_en: "2026-09-21T00:01:30Z" }, error: null };
       if (nombre === "pin_guardar") return { data: ++e.version, error: null };
+      // 3.15 (Bloque 4): límite de intentos de la contraseña (SECURITY-1C) al recuperar/desbloquear el PIN
+      if (nombre === "clave_reservar_intento") return { data: e.claveBloqueada ? { permitido: false, reintentar_en_s: 900 } : { permitido: true, intento_id: 11 }, error: null };
+      if (nombre === "clave_resolver_intento") return { data: { resultado: args.p_resultado }, error: null };
       return { data: null, error: null };
     },
   });
@@ -172,23 +175,37 @@ test("establecer PIN: la contraseña de la cuenta se verifica contra Auth (sin g
     const mala = await llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: "clave-mala" } });
     assert.equal(mala.status, 401); assert.equal(mala.cuerpo.codigo, "CLAVE_INCORRECTA");
     const buena = await llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: "clave-buena" } });
-    assert.equal(buena.status, 200); assert.deepEqual(buena.cuerpo, { ok: true, version: 4 });
+    assert.equal(buena.status, 200); assert.deepEqual(buena.cuerpo, { ok: true, version: 4, via: "clave" });
   });
   assert.match(peticiones[0].url, /\/auth\/v1\/token\?grant_type=password$/);
   assert.equal(JSON.parse(peticiones[0].cuerpo).email, "admin@example.test", "usa el correo de la cuenta del token, no uno enviado por el cliente");
   const g = e.rpc.find((r) => r.nombre === "pin_guardar").args;
-  assert.match(g.p_hash, /^scrypt\$/); assert.equal(g.p_admin, uid(1)); assert.equal(g.p_por, uid(1));
+  assert.match(g.p_hash, /^scrypt\$/); assert.equal(g.p_admin, uid(1)); assert.equal(g.p_por, uid(1)); assert.equal(g.p_via, "clave");
+  assert.deepEqual(e.rpc.filter((r) => r.nombre === "clave_resolver_intento").map((r) => r.args.p_resultado), ["fallido", "ok"], "cada intento con la contraseña se reserva y se resuelve");
   assert.ok(!volcado(e).includes("739205") && !volcado(e).includes("clave-buena") && !volcado(e).includes("clave-mala"), "ni el PIN nuevo ni las contraseñas llegan a la base o a los logs");
 });
 
-test("desbloquear y eliminar PIN llegan a la base solo con un admin", async () => {
+// 3.15 (Bloque 4): desbloquear exige la contraseña de la cuenta; quitar el PIN va por la RPC auditada pin_quitar (no DELETE directo)
+test("desbloquear (con la contraseña) y quitar el PIN (RPC auditada) llegan a la base solo con un admin", async () => {
   const { e, llamar } = await montar();
-  assert.equal((await llamar("POST", "/admin/pin/desbloquear", { token: "tk-admin" })).status, 200);
+  const sinClave = await llamar("POST", "/admin/pin/desbloquear", { token: "tk-admin" });
+  assert.equal(sinClave.status, 400); assert.equal(sinClave.cuerpo.codigo, "REAUTENTICACION_REQUERIDA");
+  assert.ok(!e.rpc.some((r) => r.nombre === "pin_desbloquear"), "sin contraseña no se desbloquea");
+  const g0 = gotrueFalso({ clave: "x" });
+  await conGotrue(g0, async () => { assert.equal((await llamar("POST", "/admin/pin/desbloquear", { token: "tk-admin", body: { clave_cuenta: "x" } })).status, 200); });
   assert.equal(e.rpc.at(-1).nombre, "pin_desbloquear"); assert.equal(e.rpc.at(-1).args.p_admin, uid(1));
   const g = gotrueFalso({ clave: "x" });
   await conGotrue(g, async () => { assert.equal((await llamar("DELETE", "/admin/pin", { token: "tk-admin", body: { clave_cuenta: "x" } })).status, 200); });
   assert.equal(g.cierres().length, 1, "también al quitar el PIN se cierra la sesión temporal");
-  assert.deepEqual(e.deletes, [{ tabla: "admin_pin", c: "perfil_id", v: uid(1) }]);
+  assert.deepEqual(e.deletes ?? [], [], "ya no se borra la fila directamente");
+  const q = e.rpc.find((r) => r.nombre === "pin_quitar"); assert.deepEqual(q.args, { p_admin: uid(1), p_por: uid(1) });
+});
+
+test("contraseña bloqueada por intentos (SECURITY-1C): 429 CLAVE_BLOQUEADA con Retry-After y sin llamar a Auth", async () => {
+  const { e, llamar } = await montar({ e: { claveBloqueada: true } }); const g = gotrueFalso();
+  const r = await conGotrue(g, () => llamar("PUT", "/admin/pin", { token: "tk-admin", body: { pin_nuevo: "739205", clave_cuenta: "clave-buena" } }));
+  assert.equal(r.status, 429); assert.equal(r.cuerpo.codigo, "CLAVE_BLOQUEADA"); assert.equal(g.llamadas.length, 0);
+  assert.equal(e.rpc.filter((x) => x.nombre === "pin_guardar").length, 0);
 });
 
 /* ───────── SECURITY-1B: sesión temporal de la verificación con la contraseña de la cuenta ───────── */

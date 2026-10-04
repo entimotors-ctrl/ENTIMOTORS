@@ -27,7 +27,8 @@ const U = (n, extra = {}) => ({ id: UUID(100 + n), nombre: `Persona ${n}`, corre
 /** Pantalla «Usuarios y equipo» de un admin. `respuestaError` = { status, body } que devuelve el api-server a cualquier PATCH/POST. */
 async function pantalla(respuestaError, { mutar, apiUrl = URL_API } = {}) {
   const env = nuevoEntorno({ producto: "admin", cuenta: CUENTAS.adminActivo, apiUrl, ...(mutar ? { mutar } : {}) }); await env.asentar();
-  env.servidor.api = async (metodo) => (metodo === "GET" ? { status: 200, body: { usuarios: [U(1, { rol: "admin", esUsted: true }), U(3)] } } : respuestaError);
+  // 3.15: U(3) dada de baja «de antes» → botón «Reactivar» (vehículo del botón de estado) y «Eliminar usuario» (cuyo 1.er paso, el impacto, también puede fallar)
+  env.servidor.api = async (metodo, ruta) => (metodo === "GET" && !/impacto$/.test(ruta || "") ? { status: 200, body: { usuarios: [U(1, { rol: "admin", esUsted: true }), U(3, { activo: false })] } } : respuestaError);
   await env.win.PantallaUsuarios.render(); await env.asentar();
   return env;
 }
@@ -36,8 +37,9 @@ const error = (mensaje, status = 500) => ({ status, body: { error: mensaje } });
 // Los tres caminos que llegan a aviso(): cada uno provoca un PATCH rechazado por el servidor.
 const CAMINOS = [
   ["cambiar el rol", async (env) => { const s = env.doc.querySelectorAll(".u-rol")[0]; s.value = "cajero"; await s.disparar("change"); }],
-  ["dar de baja / reactivar", async (env) => { await env.doc.querySelectorAll(".u-estado")[0].disparar("click"); }],
+  ["reactivar", async (env) => { await env.doc.querySelectorAll(".u-estado")[0].disparar("click"); }],
   ["editar nombre y telefono", async (env) => { env.win.showPrompt = async () => "x"; await env.doc.querySelectorAll(".u-editar")[0].disparar("click"); }],
+  ["eliminar usuario (el impacto falla)", async (env) => { await env.doc.querySelectorAll(".u-eliminar")[0].disparar("click"); }],
 ];
 async function provocar(camino, respuesta, opciones) { const env = await pantalla(respuesta, opciones); await camino(env); await env.asentar(); return env; }
 
@@ -129,8 +131,8 @@ describe("no regresion de mensajes: el usuario sigue leyendo texto comprensible"
     const a = await pantalla(resp); await CAMINOS[0][1](a); await a.asentar(); const b = await pantalla(resp); await b.doc.getElementById("btnCrearUsuario").disparar("click"); await b.asentar();
     assert.equal(textoVisible(a, toastsHtml(a)[0]), textoVisible(b, b.doc.getElementById("nuResultado").innerHTML));
   });
-  test("los avisos de EXITO siguen siendo texto fijo: «Rol actualizado», «Usuario dado de baja», «Datos actualizados»", async () => {
-    for (const [i, esperado] of [[0, "Rol actualizado"], [1, "Usuario dado de baja"], [2, "Datos actualizados"]]) {
+  test("los avisos de EXITO siguen siendo texto fijo: «Rol actualizado», «Usuario reactivado», «Datos actualizados»", async () => {
+    for (const [i, esperado] of [[0, "Rol actualizado"], [1, "Usuario reactivado"], [2, "Datos actualizados"]]) {
       const env = await pantalla({ status: 200, body: {} }); await CAMINOS[i][1](env); await env.asentar();
       assert.ok(toastsHtml(env).some((h) => h === `<span class="dot on"></span>${esperado}`), esperado);
     }

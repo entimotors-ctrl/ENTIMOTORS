@@ -3,7 +3,7 @@
 // navegador (harness/red-falsa.js): corte, respuesta perdida tras aplicar, 5xx/4xx sintéticos, peticiones colgadas.
 // Todo lo que importa se afirma EN LA NUBE (SQL) y las invariantes financieras se revisan tras cada prueba de dinero.
 //   SYNC_NAVEGADORES=chromium node --test --test-concurrency=1 pruebas/sync/browser/sync8-core.test.mjs
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -66,6 +66,9 @@ for (const nav of NAVS) {
     const abiertos = [];
     const abrir = async (...a) => { const d = await dispositivo(nav, ...a); abiertos.push(d); return d; };
     before(() => pila.limpiar());
+    // 3.15 (Bloque 5): cada prueba cierra SUS navegadores al terminar. Antes se cerraban todos al final del navegador y en Firefox llegaban a
+    // convivir ~20 instancias (≈250 MB c/u): la tanda de regresión agotó la memoria de la máquina. Ninguna prueba usa dispositivos de otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
 
     test("venta: respuesta perdida tras aplicarse, cierre DURANTE el envío (syncing) + recarga real, cierre ANTES de enviar → UNA venta cada una", async () => {
@@ -303,6 +306,10 @@ for (const nav of NAVS) {
       await flush(A);
       const item = crypto.randomUUID();
       await encolar(A, "agregar_item_orden", { p_orden_id: or.uid, p_inventario_id: INV, p_nombre: "Aceite", p_cantidad: 2, p_precio: 150, p_item_id: item, p_offline: false, p_occurred_at: new Date().toISOString(), p_device: null }, { entidad: "ordenes", uid: or.uid });
+      assert.equal((await flush(A)).enviadas, 1);
+      // 3.15 (Bloque 2): presupuesto pendiente → agregar NO descuenta; aprobar descuenta una sola vez
+      assert.equal(stock(), 4, "presupuesto pendiente: el ítem no toca el inventario");
+      await encolar(A, "decidir_presupuesto_orden", { p_orden_id: or.uid, p_decision: "aprobar", p_via: "local", p_device: null }, { entidad: "ordenes", uid: or.uid });
       assert.equal((await flush(A)).enviadas, 1);
       assert.equal(stock(), 2);
       await pullTodo(B); await pullTodo(B);

@@ -117,7 +117,12 @@ test("un 401 se refresca UNA vez y se reintenta; sin refresco posible → clase 
   const c3 = cliente(servidor(() => ({ status: 401 })), { refrescar: async () => false });
   assert.equal((await c3.seleccionar("clientes")).clase, "auth");
   const c4 = cliente(servidor(() => ({ status: 401 })), { refrescar: async () => { throw new Error("boom"); } });
-  assert.equal((await c4.seleccionar("clientes")).clase, "auth", "un refresco que revienta no rompe la cola");
+  // 3.15 (Checkpoint 8A): un refresco que revienta NO es una sesión rechazada: es temporal (clase «red», la cola reintenta)
+  assert.equal((await c4.seleccionar("clientes")).clase, "red", "un refresco que revienta no rompe la cola ni cierra la sesión");
+  const c5 = cliente(servidor(() => ({ status: 401 })), { refrescar: async () => "temporal" });
+  assert.deepEqual([(await c5.seleccionar("clientes")).clase, (await c5.seleccionar("clientes")).codigo], ["red", "RENOVACION_PENDIENTE"], "renovación pendiente por red = red");
+  const c6 = cliente(servidor(() => ({ status: 401 })), { refrescar: async () => "cuenta-desactivada" });
+  assert.deepEqual([(await c6.seleccionar("clientes")).clase, (await c6.seleccionar("clientes")).codigo], ["auth", "CUENTA_DESACTIVADA"]);
 });
 
 test("los fallos de red y los tiempos agotados son clase «red» y NUNCA lanzan; un getToken que revienta tampoco", async () => {
@@ -238,7 +243,8 @@ test("rpcInmediato: motor apagado (sin ENTIMOTORS_SYNC.enabled) no llama a la re
 });
 
 test("guardas estáticas de los tres módulos: sin claves de servidor, sin almacenamiento del navegador para credenciales, sin registrar tokens", () => {
-  for (const f of ["sync-rest.js", "sync-db.js", "sync-engine.js"]) {
+  // 3.15 (Bloque 3): sync-realtime.js (el token viaja en el canal) cumple las mismas guardas
+  for (const f of ["sync-rest.js", "sync-db.js", "sync-engine.js", "sync-realtime.js"]) {
     const t = leer(f);
     assert.ok(!/service_role|sb_secret_|SERVICE_KEY/i.test(t), `${f}: nada de claves de servidor`);
     assert.ok(!/localStorage|sessionStorage|document\.cookie/.test(t), `${f}: no toca localStorage/sessionStorage/cookies`);

@@ -107,7 +107,9 @@ describe("SYNC-7B · PIN real (api-server real + PostgREST real)", () => {
     assert.equal(pila.sql(`select count(*) from public.reversos where registro_id = '${v.venta}' and tipo = 'devolucion'`), "1", "una sola devolución entró");
   });
 
-  test("usuario inactivo, mecánico y admin: nunca obtienen elevación por PIN", async () => {
+  // 3.15 · Bloque 4 (contrato nuevo): reversar_venta es DESTRUCTIVA → también el admin necesita el PIN (201); lo SENSIBLE
+  // (ajustar_stock) el admin lo sigue haciendo con su sesión → ADMIN_NO_NECESITA_PIN.
+  test("usuario inactivo y mecánico nunca obtienen elevación por PIN; el admin la necesita solo para lo destructivo", async () => {
     const v = await venta(5);
     const cuerpo = { accion: "reversar_venta", entidad: "ventas", registro_id: v.venta, monto: v.total };
     pila.sql(`update public.perfiles set activo = false where id = '${PERFILES.cajero}'`);
@@ -118,13 +120,15 @@ describe("SYNC-7B · PIN real (api-server real + PostgREST real)", () => {
     const m = await pedir(PERFILES.mecanico, cuerpo);
     assert.equal(m.status, 403); assert.equal(m.datos.codigo, "NO_PERMITIDO");
     const ad = await pedir(PERFILES.admin, cuerpo);
-    assert.equal(ad.datos.codigo, "ADMIN_NO_NECESITA_PIN");
+    assert.equal(ad.status, 201, "destructiva: el admin también pasa por el PIN");
+    const as = await pedir(PERFILES.admin, { accion: "ajustar_stock", entidad: "inventario", registro_id: crypto.randomUUID() });
+    assert.equal(as.datos.codigo, "ADMIN_NO_NECESITA_PIN");
     const x = await rpc(PERFILES.mecanico, "reversar_venta", { p_op: crypto.randomUUID(), p_venta_id: v.venta, p_motivo: "intento", p_autorizacion: null });
     assert.equal(x.status, 403);
   });
 
   test("RATE LIMIT solicitante: 5 fallos → 6º bloqueado 15 min (aun con el PIN correcto); otro cajero sigue pudiendo", async () => {
-    await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin });   // contadores a cero para esta prueba
+    await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin, cuerpo: { clave_cuenta: CLAVE_CUENTA_PRUEBA } });   // contadores a cero (3.15 B4: desbloquear exige la contraseña)
     const v = await venta(6);
     const c = { accion: "reversar_venta", entidad: "ventas", registro_id: v.venta, monto: v.total };
     for (let i = 0; i < 5; i++) {
@@ -142,7 +146,7 @@ describe("SYNC-7B · PIN real (api-server real + PostgREST real)", () => {
   });
 
   test("RATE LIMIT global: 10 fallos entre varios cajeros en 15 min → bloqueo global; 3er bloqueo en 24 h → solo el admin desbloquea", async () => {
-    await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin });
+    await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin, cuerpo: { clave_cuenta: CLAVE_CUENTA_PRUEBA } });
     const v = await venta(7);
     const c = { accion: "reversar_venta", entidad: "ventas", registro_id: v.venta, monto: v.total };
     const fallar = async (sub, n) => { for (let i = 0; i < n; i++) assert.equal((await pedir(sub, { ...c, pin: "907315" })).datos.codigo, "PIN_INCORRECTO"); };
@@ -159,8 +163,8 @@ describe("SYNC-7B · PIN real (api-server real + PostgREST real)", () => {
     desplazarReloj(60);
     const sigue = await pedir(CAJ.c4, c);
     assert.equal(sigue.datos.codigo, "BLOQUEADO_ADMIN", "no caduca solo: requiere al administrador");
-    assert.equal((await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.cajero })).status, 403, "el cajero no se desbloquea a sí mismo");
-    assert.equal((await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin })).status, 200);
+    assert.equal((await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.cajero, cuerpo: { clave_cuenta: CLAVE_CUENTA_PRUEBA } })).status, 403, "el cajero no se desbloquea a sí mismo");
+    assert.equal((await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin, cuerpo: { clave_cuenta: CLAVE_CUENTA_PRUEBA } })).status, 200);
     assert.equal((await pedir(CAJ.c4, c)).status, 201, "tras el desbloqueo del admin, vuelve a funcionar");
   });
 

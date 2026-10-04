@@ -1,0 +1,430 @@
+{
+  "format": "entimotors-release-freeze/1",
+  "version": "3.15.0",
+  "phase": "RELEASE-3.15.0-CHECKPOINT-B3",
+  "base_commit": "e807f65502961497ed2866dbea8beaeb4bc1be3e",
+  "branch": "release/3.15.0",
+  "scope": "release 3.15.0 completa: base de datos (sync-15a → 15g, grupo database_files), backend (release-3.15.0-backend-manifest.json) y frontends (Taller: hacer-build-taller.sh; Mi Trabajo: hacer-build-mecanicos.sh sobre esta misma fuente).",
+  "version_matrix": {
+    "VERSION_APP": "3.15.0",
+    "CACHE_NAME": "entimotors-v3.15.0",
+    "CACHE_NAME_MI_TRABAJO": "entimotors-mitrabajo-v3.15.0 (derivado por el build)",
+    "index_html_query_v": 19,
+    "sw_shell_query_v": 18,
+    "sw_shell_total": 23,
+    "panel_tecnico": "3.15.0",
+    "no_se_cambia": [
+      "app.js versionApp \"3.13.0\" (procedencia de los datos 3.13 del importador)",
+      "cabeceras históricas «(3.14.0 · SYNC-x)» de los módulos y comentarios de sw.js"
+    ]
+  },
+  "runtime_files": [
+    {
+      "path": "taller-demo/app.js",
+      "sha256": "89471211d3d06f4b77864c2b9a2a08253ba1451736158e668b4ec1c3f4955960",
+      "bytes": 554664
+    },
+    {
+      "path": "taller-demo/auth.js",
+      "sha256": "56fcc9ccaded1535bda475bedad8dfa906d893bcd4725b64fcd27a68354d7950",
+      "bytes": 17412
+    },
+    {
+      "path": "taller-demo/build-mecanicos/_headers",
+      "sha256": "ae57bedbe84d365de9aa67f0f23d24806f5132b21a2c87a45b77c7d6dcb3bb73",
+      "bytes": 798
+    },
+    {
+      "path": "taller-demo/build-mecanicos/build-target.js",
+      "sha256": "ee3640821f2483b19fda1315c6b0012dd954a397ffdb092d40f5f62712c4bd1f",
+      "bytes": 208
+    },
+    {
+      "path": "taller-demo/build-mecanicos/manifest.json",
+      "sha256": "c26ed7840ee0250d7f6552ce8369d831dd82ba995fcc47274a3b5772c8f1deeb",
+      "bytes": 715
+    },
+    {
+      "path": "taller-demo/build-target.js",
+      "sha256": "b943b38532811fa50be5c7c4f7754cf194bc8af638be9d8189628b6e2714cdce",
+      "bytes": 1581
+    },
+    {
+      "path": "taller-demo/config-local.example.js",
+      "sha256": "8d4d1f6e616bb40adaf12d4931486000816affb359c6289b1561bc683bb496b2",
+      "bytes": 1002
+    },
+    {
+      "path": "taller-demo/fecha-negocio.js",
+      "sha256": "4122fbbd50d4b29528630b3111c2f16876d24ad6e38eb6ae03bd30698805756d",
+      "bytes": 9763
+    },
+    {
+      "path": "taller-demo/finanzas-calc.js",
+      "sha256": "8edfe3241fa74e813fb0ce2a19ffac328fd45d7fcc0c6a45a42e73547f84c65a",
+      "bytes": 5234
+    },
+    {
+      "path": "taller-demo/hacer-build-mecanicos.sh",
+      "sha256": "f7f8962c3ece8f1bf36c305ceb65a47d32eb9195a847b9ecb2b906c7570a5467",
+      "bytes": 5078
+    },
+    {
+      "path": "taller-demo/hacer-build-taller.sh",
+      "sha256": "71e94a74021c18111d6c3b239718bbc28688da1e14d93659100b1bd4ed60482b",
+      "bytes": 3261
+    },
+    {
+      "path": "taller-demo/icons/icon-192-maskable.png",
+      "sha256": "80b3d171e3325a207705b9c25993b0a0004d24ce6556e4f2051b9f210ccd7dee",
+      "bytes": 15141
+    },
+    {
+      "path": "taller-demo/icons/icon-192.png",
+      "sha256": "a0ba3b2bb2da6e77be89d9a8327585766b3a7d0fc617e6a09cff2646e2712803",
+      "bytes": 20035
+    },
+    {
+      "path": "taller-demo/icons/icon-512-maskable.png",
+      "sha256": "19da11c8bf669d79bbad194d8b0c5b147af8a360904b77fb77745198aaffcde7",
+      "bytes": 69811
+    },
+    {
+      "path": "taller-demo/icons/icon-512.png",
+      "sha256": "028475e77655b240c4457f94e386b93029b120d153bcd2a4c3ccafa538204175",
+      "bytes": 94548
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark-doc.png",
+      "sha256": "f3d57e4c3f4b5f3dbd3d9eabd8f9af0dea634f326c226e457459e4caf72a38fe",
+      "bytes": 162214
+    },
+    {
+      "path": "taller-demo/icons/logo-watermark.png",
+      "sha256": "4aa40f666fe981c280729b08b575d885ba1850861b01f5186752dcaaa3bc1733",
+      "bytes": 311256
+    },
+    {
+      "path": "taller-demo/import-313.js",
+      "sha256": "24bcd03ead8594f7d5ae26e0304739a99aa84a5d3d64b3fe2e20dd78cc317047",
+      "bytes": 44804
+    },
+    {
+      "path": "taller-demo/index.html",
+      "sha256": "87aa4364e42e196bee9a6e647bb90c4c7060f798fc5d0714ff50f70ef2c0e33f",
+      "bytes": 296091
+    },
+    {
+      "path": "taller-demo/manifest.json",
+      "sha256": "0389761bd3de44a6c2fa3ca93623cd88b7348a397c691fe0334cbe2139c0ae75",
+      "bytes": 709
+    },
+    {
+      "path": "taller-demo/panel-tecnico.html",
+      "sha256": "2755a0cece9959c28465b590e94fb11c2303a2e197b6256cf22e4a300996320d",
+      "bytes": 11497
+    },
+    {
+      "path": "taller-demo/pin-ui.js",
+      "sha256": "d000a815447d2bb626793a72dabeef951d536488e4156048d64399fd49dd9c63",
+      "bytes": 14756
+    },
+    {
+      "path": "taller-demo/recovery.js",
+      "sha256": "ea74ae97d4c282bebc9e0e3372c3c4d233db6ef06f12df43a2b7cb145218beef",
+      "bytes": 13716
+    },
+    {
+      "path": "taller-demo/supabase-client.js",
+      "sha256": "fab8f1573c0f1c8fe4cb8f9b8f0d4e301087d60985eb3a539207adc9204a7daf",
+      "bytes": 16569
+    },
+    {
+      "path": "taller-demo/supabase-config.js",
+      "sha256": "0d8e18a9d927b6eebf68762be669c03a94342c2ea881bb00fecf5aef5d091354",
+      "bytes": 2075
+    },
+    {
+      "path": "taller-demo/sw.js",
+      "sha256": "a06b43268ea2fc077c13f4d01b6e2b103c9fc0d961d23dcf1ec9328d97ad8299",
+      "bytes": 12191
+    },
+    {
+      "path": "taller-demo/sync-db.js",
+      "sha256": "7025b88104a2acebcbdee6c13cb88b24ccc102f6c6145ae77a66ab19848947d1",
+      "bytes": 17369
+    },
+    {
+      "path": "taller-demo/sync-engine.js",
+      "sha256": "8c561f9a81a573790c33af4cdc59036a52fe0888a339f75b8b624e216c04a5d2",
+      "bytes": 62647
+    },
+    {
+      "path": "taller-demo/sync-finanzas.js",
+      "sha256": "6aac8e3585a6a968d8914f015b3bbbaa890a308f02ba9cbb71d4d353846a7aba",
+      "bytes": 20011
+    },
+    {
+      "path": "taller-demo/sync-fotos.js",
+      "sha256": "6b03691f3f2fcb0db6af8fb4a169e415de9eb718fd989805f307728fef12163d",
+      "bytes": 18426
+    },
+    {
+      "path": "taller-demo/sync-mappers.js",
+      "sha256": "599f2f0f430d6572f0f7242ff23fd209e98eaefc8de615a67f15e744ff5a72d8",
+      "bytes": 38396
+    },
+    {
+      "path": "taller-demo/sync-realtime.js",
+      "sha256": "2fb1ff75277925724bd2fa91f847d3bb894e092d5f26ff1bfb7918dc01721141",
+      "bytes": 12945
+    },
+    {
+      "path": "taller-demo/sync-rest.js",
+      "sha256": "08ea46a4a7a2215383d8558900fde5d66c9d313a22118769385b7b9d9abddbd6",
+      "bytes": 12929
+    },
+    {
+      "path": "taller-demo/usuarios.js",
+      "sha256": "fd18b3143763faa18e4ffaeb5e0152ec7dde056801d9659ee74c99672baf7723",
+      "bytes": 29178
+    }
+  ],
+  "documentation_files": [
+    {
+      "path": "taller-demo/CHANGELOG.md",
+      "sha256": "d4cc3f81b68f6c3db9df45f41bd5da8b8e435191fb97b7ff25beafe12513bc8c",
+      "bytes": 22655
+    },
+    {
+      "path": "taller-demo/README.md",
+      "sha256": "9cc650d4ee3cbecbb6855df5aa1012b9ea47c5862c41b8e2575b5820d74f6252",
+      "bytes": 21152
+    }
+  ],
+  "test_files": [
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.14.1.test.mjs",
+      "sha256": "59b05366a8eadefa77eeedb8a60268cfff19e8a3a16fc6318a0488378f543197",
+      "bytes": 8919
+    },
+    {
+      "path": "pruebas/multiusuario/01-pwa-3.15.0.test.mjs",
+      "sha256": "86d9d308fcb8cd758fb8691b25bc027b4963a4a18fd1f78fafc6b1808ff796c8",
+      "bytes": 8932
+    },
+    {
+      "path": "pruebas/multiusuario/02-build-target.test.mjs",
+      "sha256": "69255ba43bbaba5112175342380ebeb009fa4ae0e00d119237edc29a02bf5e3c",
+      "bytes": 9533
+    },
+    {
+      "path": "pruebas/multiusuario/07-panel-tecnico.test.mjs",
+      "sha256": "545eaaf0866737cc65598a29f54f2bc2ad6524fcb82cdc1149f46df34c012131",
+      "bytes": 16911
+    },
+    {
+      "path": "pruebas/multiusuario/08-build-mecanicos.test.mjs",
+      "sha256": "395a2e93a509b6b632684b9b7ec5ccfffc8430b6ad74551873697ad3085295c1",
+      "bytes": 20862
+    },
+    {
+      "path": "pruebas/multiusuario/16c-alcance-3.14.1.test.mjs",
+      "sha256": "4a4e015e8b9f2e80564a3fd6d3ba2d3cf4e31ff3b28cf148b303020f5db43624",
+      "bytes": 4685
+    },
+    {
+      "path": "pruebas/multiusuario/16d-alcance-3.15.0.test.mjs",
+      "sha256": "6217878ab14e3de0bed10851c7b2c457da4adac72ed558cd1e1f9fd3939ca44f",
+      "bytes": 6876
+    },
+    {
+      "path": "pruebas/multiusuario/17b-copy-sincronizacion-3.14.lista.json",
+      "sha256": "7e0875f7036d8013870c2fa1ed7a1af75dc9340f4156284e86ebd2ce7c39a1fd",
+      "bytes": 3272
+    },
+    {
+      "path": "pruebas/multiusuario/17b-copy-sincronizacion-3.14.test.mjs",
+      "sha256": "b403272e7ee4509ef87407271cc81aef6877691ea9c1d26991356185fdc0427f",
+      "bytes": 5026
+    },
+    {
+      "path": "pruebas/multiusuario/20-obs10-buscar-actualizacion.test.mjs",
+      "sha256": "bac450c2e63cd02756135eb855079750bc77d09f34b11d839d4a61f914be3a7b",
+      "bytes": 28432
+    },
+    {
+      "path": "pruebas/multiusuario/26b-manifest-3.14.1.test.mjs",
+      "sha256": "666065cc9b6c25b2c8cc2a46b45c7dd87e685e260e1ee9b67988dd1bef18d0c9",
+      "bytes": 5002
+    },
+    {
+      "path": "pruebas/multiusuario/26c-manifest-3.15.0.test.mjs",
+      "sha256": "0c90e435ea3683c3659a33bb257b17e5d609dc10edea5cb2679a955f91cb06ec",
+      "bytes": 9450
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/congelado-3.14.1.mjs",
+      "sha256": "27cb66dca0b31343b459a88176a530209eea8e9376ac2fb1b243a31bf2e8b839",
+      "bytes": 2838
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/entorno.mjs",
+      "sha256": "336185921521c1bd2f65af44fdf3a6888d134b40984543dc9a88cc9e2b142755",
+      "bytes": 12082
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/pwa.mjs",
+      "sha256": "e131c0b9fd11c8b1e5a928aeb634236d715ed47be9f9b8759eb49378dcdc656e",
+      "bytes": 8510
+    },
+    {
+      "path": "pruebas/multiusuario/helpers/usar-3141.mjs",
+      "sha256": "45d132a5dbaac61b43bac8fad8941a8ee5b87b826ea14b99ebf187a5b3dabf06",
+      "bytes": 550
+    },
+    {
+      "path": "pruebas/sync/browser/b8-pwa-actualizacion.test.mjs",
+      "sha256": "90b92f16751024eaea490cbdcdebf6280e3a4c875171f04915aeb9051dc34163",
+      "bytes": 19696
+    },
+    {
+      "path": "pruebas/sync/browser/b8-ventana-migracion.test.mjs",
+      "sha256": "0d80f3fc9bc2dddaba156678f0be34a2748a461637b1be3d9a1533a0604c15da",
+      "bytes": 19954
+    },
+    {
+      "path": "pruebas/sync/node/b6-artefacto-publico.test.mjs",
+      "sha256": "a72c17ae553a85bda65d9e551eee370360c4764da2badc23ee3a7d4b7ee32c2f",
+      "bytes": 8077
+    },
+    {
+      "path": "pruebas/sync/node/f1-rechazadas-orden.test.mjs",
+      "sha256": "bb31e189357d99502254710a4455db9e3b3359e7f1413af42f1141fdfdfb921a",
+      "bytes": 36071
+    },
+    {
+      "path": "pruebas/sync/node/sync10.test.mjs",
+      "sha256": "612577a7bc23a95efdac376059f08d3ae41974fe48e74040e1a12b18aca362ad",
+      "bytes": 25091
+    }
+  ],
+  "database_files": [
+    {
+      "path": "taller-demo/supabase/sync/sync-15a-cotizacion-inventario.sql",
+      "sha256": "ed5f26efeb8f45954253c2f0d4a76c98ffee6cd6d5fa1f6aa5f162dc1e027f04",
+      "bytes": 12740
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15a-rollback.sql",
+      "sha256": "093ad5fc6e4087772b207a6c01d104c714852377fd225195e5938d3af2018eb8",
+      "bytes": 7886
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15b-presupuestos-stock.sql",
+      "sha256": "8dfad54e771bc8ebf53c2576b7f6fe1266e8285a8adfc528f2551efdd0474fb8",
+      "bytes": 53192
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15b-rollback.sql",
+      "sha256": "6ea2ba0118cd1a587442e5c9bb89575b223b27b102ae0736110eb41307903a14",
+      "bytes": 28366
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15c-mensajes-realtime.sql",
+      "sha256": "5803bdcf87e4e54057b3c2268cc60478c7062d86f6d5cb1b0ef007183b7d117b",
+      "bytes": 26629
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15c-rollback.sql",
+      "sha256": "b42d58b52d65baa93b9f67568ce72997e5b49b533eedc58b3c2f46c6b368037c",
+      "bytes": 3099
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15d-owner-pin-usuarios.sql",
+      "sha256": "214adb54bcc34560cadc0483251c47de118a81bb9ca37f09d2898d77c003a6b9",
+      "bytes": 28332
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15d-rollback.sql",
+      "sha256": "9736264d181807c17645bdd30f982fcac13b46d1aed48089656d760a1eda83d5",
+      "bytes": 9136
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15e-finanzas.sql",
+      "sha256": "4634d9211864151f892d10de3cb44d130173c1671f2f9549944a3c116bf18516",
+      "bytes": 25506
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15e-rollback.sql",
+      "sha256": "ebbdf1ef252222ae0bb133ef02e2794ee5720bd9c04deffe3ba24af6f223e9e4",
+      "bytes": 4570
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15f-legado-313.sql",
+      "sha256": "40c1c4c282b2c2a5c35bf4c5900a2a924be503d5f8cef9acfc1eb3ff4bd40d6b",
+      "bytes": 4984
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15f-rollback.sql",
+      "sha256": "889f71e80dd476863fdd88c9eee22730300b411a7fde94ffb1714e2cd283bcd2",
+      "bytes": 462
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15g-rendimiento-rls.sql",
+      "sha256": "1089bb60d6a9e1e04307ab7aa171d5d2693dbe78fa65ab3759579857b255e707",
+      "bytes": 6265
+    },
+    {
+      "path": "taller-demo/supabase/sync/sync-15g-rollback.sql",
+      "sha256": "4711882ca7bb20f10310b44f343097964704f0c6a1dc77057cb92d81c9be7a79",
+      "bytes": 1916
+    }
+  ],
+  "publicacion": {
+    "orden": "base de datos (sync-15a → 15b → 15c → 15d → 15e → 15f → 15g) → backend (push a main) → Taller → Mi Trabajo",
+    "taller": "bash taller-demo/hacer-build-taller.sh <destino> desde el commit de la release → clon limpio de entimotors-os: copiar SOLO taller_lista, sha256 contra el build, git add por nombre, push fast-forward por SSH; NUNCA rsync --delete ni git add -A",
+    "taller_lista": [
+      "app.js",
+      "auth.js",
+      "build-target.js",
+      "fecha-negocio.js",
+      "finanzas-calc.js",
+      "icons/icon-192-maskable.png",
+      "icons/icon-192.png",
+      "icons/icon-512-maskable.png",
+      "icons/icon-512.png",
+      "icons/logo-watermark-doc.png",
+      "icons/logo-watermark.png",
+      "import-313.js",
+      "index.html",
+      "manifest.json",
+      "pin-ui.js",
+      "recovery.js",
+      "supabase-client.js",
+      "supabase-config.js",
+      "sw.js",
+      "sync-db.js",
+      "sync-engine.js",
+      "sync-finanzas.js",
+      "sync-fotos.js",
+      "sync-mappers.js",
+      "sync-realtime.js",
+      "sync-rest.js",
+      "usuarios.js"
+    ],
+    "mi_trabajo": "bash taller-demo/hacer-build-mecanicos.sh <destino> desde el commit de la release → subir la carpeta completa (taller_lista + _headers) a Netlify"
+  },
+  "pendiente_conocido": [
+    "PHONE_RESCUE: DEFERRED (respaldo fuera del dispositivo de los datos que solo existen en un teléfono: no completado)",
+    "protección TEMPORAL de las operaciones rechazadas que respaldan datos locales: se retira en una versión posterior"
+  ],
+  "no_ejecutado": [
+    "commit",
+    "migraciones_produccion",
+    "push_main",
+    "publicacion_taller",
+    "netlify",
+    "tag"
+  ]
+}

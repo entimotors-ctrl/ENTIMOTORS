@@ -289,12 +289,12 @@ describe("SYNC-10 · guardas estáticas (B2, restaurar/borrar en nube, P0002, SW
     }
   });
   // SYNC-10 no subía versión; desde SYNC-12A (release 3.14.0) el importador viaja con ?v=3.14.0 y la caché entimotors-v3.14.0
-  // 3.14.1: la versión del release vigente (3.14.0 la conserva su commit effbfa1, que es donde se publicó el importador)
-  test("SW / index: import-313.js en el SHELL y cargado ANTES de app.js, con la versión del release (3.14.1)", () => {
-    assert.match(sw, /"\.\/import-313\.js\?v=3\.14\.1"/);
-    assert.match(sw, /const CACHE_NAME = "entimotors-v3\.14\.1";/);
-    assert.ok(html.indexOf('src="import-313.js?v=3.14.1"') > 0 && html.indexOf('src="import-313.js') < html.indexOf('src="app.js'));
-    assert.match(app, /const VERSION_APP = "3\.14\.1";/);
+  // 3.15.0: la versión del release vigente (3.14.0 la conserva su commit effbfa1, que es donde se publicó el importador)
+  test("SW / index: import-313.js en el SHELL y cargado ANTES de app.js, con la versión del release (3.15.0)", () => {
+    assert.match(sw, /"\.\/import-313\.js\?v=3\.15\.0"/);
+    assert.match(sw, /const CACHE_NAME = "entimotors-v3\.15\.0";/);
+    assert.ok(html.indexOf('src="import-313.js?v=3.15.0"') > 0 && html.indexOf('src="import-313.js') < html.indexOf('src="app.js'));
+    assert.match(app, /const VERSION_APP = "3\.15\.0";/);
   });
   test("fixtures: ningún secreto (JWT, service role, contraseñas) ni user-agent real", () => {
     for (const f of ["respaldo-313-realista.json", "respaldo-313-demo.json", "generar-respaldo-313.mjs"]) {

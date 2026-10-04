@@ -496,7 +496,8 @@ describe("SYNC-8 · conflictos, ítems de orden y campos del servidor (mappers r
 
   test("ítems de orden: bajan embebidos con precio/costo y repuesto resuelto; un PATCH sin embebido NO los borra; lo local sin uid se conserva", () => {
     const M = ctxReal().ENTIMOTORS_SYNC_MAPPERS.ordenes;
-    assert.match(M.select, /orden_items\(id,inventario_id,nombre,cantidad,precio,costo_unitario,costo_estimado,creado_en\)/);
+    // 3.15 (Bloque 2): + tipo, cantidad_aplicada y aplicada_legado (solo lectura)
+    assert.match(M.select, /orden_items\(id,inventario_id,tipo,nombre,cantidad,precio,costo_unitario,costo_estimado,cantidad_aplicada,aplicada_legado,creado_en\)/);
     const c = M.aLocal({ estado: "reparacion", finalizada: true, finalizado_en: "2026-09-22T10:00:00Z", entregado_en: null,
       orden_items: [{ id: "i2", nombre: "B", cantidad: 1, precio: 5, costo_unitario: 3, inventario_id: null, creado_en: "2026-09-22T10:00:02Z" },
         { id: "i1", nombre: "A", cantidad: "2", precio: "10", costo_unitario: "4", inventario_id: "inv-1", creado_en: "2026-09-22T10:00:01Z" }] });
@@ -505,7 +506,9 @@ describe("SYNC-8 · conflictos, ítems de orden y campos del servidor (mappers r
     assert.ok(!("items" in M.aLocal({ estado: "x" })), "sin embebido (respuesta de un PATCH) no toca los ítems");
     const f = M.fusionarLocal({ items: [{ uid: "i1" }, { nombre: "solo local", cantidad: 1, precio: 1 }] }, c);
     assert.deepEqual(J(f.items.map((x) => x.uid || x.nombre)), ["i1", "i2", "solo local"]);
-    assert.deepEqual(J(M.soloServidor), ["finalizada", "anulada", "finalizadoEn", "entregadoEn"]);
+    // 3.15 (Bloque 8 · F): + fotosNube — las fotos del mecánico se BAJAN para mostrarlas en el Taller y jamás suben por el CRUD
+    assert.deepEqual(J(M.soloServidor), ["finalizada", "anulada", "finalizadoEn", "entregadoEn", "presupuestoEstado", "aprobadoEn", "rechazadoEn", "aprobacionVia", "fotosNube"]);
+    assert.ok(!M.columnas.includes("fotosNube") && !M.columnas.includes("fotos"), "las fotos de la nube no suben por el CRUD del Taller");
     assert.ok(!M.columnas.includes("items") && !M.columnas.some((x) => /precio|costo|finaliz/.test(x)), "nada de ítems ni dinero sube por el CRUD");
     // mecánico: nunca precio ni costo
     const mec = cargar({ mecanico: true }).ENTIMOTORS_SYNC_MAPPERS.ordenes;

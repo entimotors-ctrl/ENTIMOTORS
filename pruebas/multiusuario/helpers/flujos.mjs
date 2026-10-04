@@ -50,6 +50,7 @@ export function dbFalsa(env, datos = {}) {
   env.win.__datos = datos; env.win.__guardados = [];
   env.evaluar(`DB.getAll = async (s) => (window.__datos[s] || []).map(x => x);
                DB.get = async (s, id) => { const a = (window.__datos[s] || []).find(x => x.id === id); return a ? { ...a } : undefined; };
+               DB.count = async (s) => (window.__datos[s] || []).length;   // 3.15 (Bloque 7): DB.count (contar sin leer), mismo almacén en memoria
                DB.save = async (s, v) => { window.__guardados.push([s, JSON.parse(JSON.stringify(v))]); const l = (window.__datos[s] ||= []); const i = l.findIndex(x => x.id === v.id); if (i >= 0) l[i] = v; else l.push(v); return v.id; };`);
   return { guardados: () => env.win.__guardados };
 }

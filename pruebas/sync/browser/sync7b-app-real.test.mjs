@@ -4,7 +4,7 @@
 // finalizarOrdenNube…) y las acciones sensibles por la UI real: botón de la tabla de caja → modal de motivo → modal
 // PIN. La verdad se comprueba en la NUBE (SQL) y en la caché que ve la UI (DB.getAll), también tras recargar la página.
 //   SYNC_NAVEGADORES=chromium node --test --test-concurrency=1 pruebas/sync/browser/sync7b-app-real.test.mjs
-import test, { describe, before, after } from "node:test";
+import test, { describe, before, after, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { iniciarPila, PERFILES, CLAVE_CUENTA_PRUEBA } from "./lib/pila.mjs";
 import { abrirDispositivo, NAVEGADORES } from "./lib/dispositivo.mjs";
@@ -104,11 +104,14 @@ for (const nav of NAVS) {
       const r = await llamar(pila, api, "PUT", "/api/admin/pin", { sub: PERFILES.admin, cuerpo: { pin_nuevo: PIN, clave_cuenta: CLAVE_CUENTA_PRUEBA } });
       assert.equal(r.status, 200, JSON.stringify(r.datos));
     });
+    // 3.15 (Bloque 6): cada prueba cierra SUS navegadores al terminar (mismo arreglo que sync5/6/7a/8/9-core en el Bloque 5: esta suite
+    // pasaba justa de memoria en 7,7 GB). Ninguna prueba usa dispositivos abiertos por otra.
+    afterEach(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); });
     after(async () => { for (const d of abiertos.splice(0)) await d.cerrar(); await api?.detener(); });
     // el CORS selectivo del backend real exige el origen exacto de cada dispositivo: se reinicia con ese origen
     async function apiPara(d) {
       await api.detener(); api = await iniciarApi(pila, { origenes: [d.origen] });
-      await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin });
+      await llamar(pila, api, "POST", "/api/admin/pin/desbloquear", { sub: PERFILES.admin, cuerpo: { clave_cuenta: CLAVE_CUENTA_PRUEBA } });   // 3.15 B4: con reautenticación
     }
 
     test("CAJERO: venta → RPC → stock y caja cambian en la nube y en la caché; recargar la página conserva todo", async () => {
@@ -270,21 +273,29 @@ for (const nav of NAVS) {
       await recargar(d, "cajero");
       assert.equal(await d.eval(async () => (await DB.getAll("ventas_rapidas"))[0].anulada), true, "tras recargar sigue anulada");
       // el admin ve la auditoría (RLS auditoria_admin_lee) y el cajero no
-      const leer = async (quien) => (await fetch(`${pila.REST_URL}/rest/v1/auditoria?accion=eq.anular-venta&select=accion,autorizado_por`, { headers: { apikey: "a", Authorization: "Bearer " + pila.jwt(PERFILES[quien]) } })).json();
+      // 3.15 (Bloque 5): solo la auditoría de ESTA venta. auditoria es de solo-agregar y pila.limpiar() no la vacía: la anulación de la
+      // pasada de Chromium seguía ahí cuando corría Firefox (el FAIL «2 filas» del Bloque 4 y del 5 era esa contaminación, no un doble reverso)
+      const ventaId = uno(`select id from public.ventas`).trim();
+      const leer = async (quien) => (await fetch(`${pila.REST_URL}/rest/v1/auditoria?accion=eq.anular-venta&entidad_id=eq.${ventaId}&select=accion,autorizado_por`, { headers: { apikey: "a", Authorization: "Bearer " + pila.jwt(PERFILES[quien]) } })).json();
       assert.deepEqual(await leer("admin"), [{ accion: "anular-venta", autorizado_por: PERFILES.admin }]);
       assert.deepEqual(await leer("cajero"), []);
       assert.equal(invariantesServidor(), "[]");
     });
 
-    test("UI real de reversos (admin, sin PIN): devolución 'renglón:cantidad' validada, revertir abono, anular crédito, revertir movimiento de caja — originales conservados", async () => {
+    // 3.15 · Bloque 4 (contrato nuevo): la devolución es SENSIBLE (admin con su sesión, sin PIN); revertir abono, anular crédito y
+    // revertir caja son DESTRUCTIVAS → también el admin escribe el PIN del propietario en el modal real.
+    test("UI real de reversos (admin): devolución 'renglón:cantidad' validada sin PIN; revertir abono, anular crédito y revertir caja CON PIN — originales conservados", async () => {
       sembrarRepuesto(10);
       const d = await abrirD("admin");
-      const r = await d.eval(async (uid) => {
+      await apiPara(d);   // 3.15 B4: el admin ahora también pide la autorización al backend del PIN (CORS con su origen)
+      const r = await d.eval(async ({ uid, pinProp }) => {
         const rep = (await DB.getAll("inventario")).find((x) => x.uid === uid);
         await registrarVentaRapida({ items: [{ inventarioId: rep.id, nombre: rep.nombre, cantidad: 3, precio: 100 }], metodoPago: "efectivo", efectivoRecibido: 300 });
         const esperarToast = async (re) => { for (let i = 0; i < 80; i++) { if (window.__toasts.some((t) => re.test(t))) return true; await new Promise((r) => setTimeout(r, 100)); } return false; };
         const prompt = async (valor) => { for (let i = 0; i < 80 && !document.getElementById("modalPrompt").classList.contains("active"); i++) await new Promise((r) => setTimeout(r, 100));
           document.getElementById("promptInput").value = valor; document.getElementById("btnPromptAceptar").click(); await new Promise((r) => setTimeout(r, 150)); };
+        const pin = async () => { for (let i = 0; i < 80 && !document.getElementById("modalPinAutorizar").classList.contains("active"); i++) await new Promise((r) => setTimeout(r, 100));
+          document.getElementById("pinAutorizarInput").value = pinProp; document.getElementById("btnPinAutorizarOk").click(); await new Promise((r) => setTimeout(r, 150)); };
         const out = {};
         // devolución inválida (más de lo vendido) → no llega a la red
         window.__toasts = []; await renderFinanzas(); document.querySelector("[data-devolver-venta]").click(); await prompt("1:9");
@@ -297,19 +308,19 @@ for (const nav of NAVS) {
         await registrarAbonoCredito(c.id, 20, "efectivo");
         await renderCreditos();
         const clave = Object.keys(creditosPorCliente)[0]; abrirCreditoDetalle(clave);
-        window.__toasts = []; document.querySelector('#credDetLista [data-act="revertir-abono"][data-abono="1"]').click(); await prompt("abono duplicado");
+        window.__toasts = []; document.querySelector('#credDetLista [data-act="revertir-abono"][data-abono="1"]').click(); await prompt("abono duplicado"); await pin();
         out.abono = await esperarToast(/Abono revertido/);
-        window.__toasts = []; abrirCreditoDetalle(Object.keys(creditosPorCliente)[0]); document.querySelector('#credDetLista [data-act="eliminar"]').click(); await prompt("crédito mal hecho");
+        window.__toasts = []; abrirCreditoDetalle(Object.keys(creditosPorCliente)[0]); document.querySelector('#credDetLista [data-act="eliminar"]').click(); await prompt("crédito mal hecho"); await pin();
         out.credito = await esperarToast(/Crédito anulado/);
         // movimiento manual de caja y su reverso
         document.getElementById("moviTipo").value = "egreso"; document.getElementById("moviMonto").value = "75"; document.getElementById("moviDescripcion").value = "compra";
         await registrarMovimientoCajaNube({ tipo: "egreso", categoria: "Compra de repuestos", monto: 75, metodoPago: "efectivo", descripcion: "compra" });
-        window.__toasts = []; await renderFinanzas(); document.querySelector("[data-revertir-movi]").click(); await prompt("egreso duplicado");
+        window.__toasts = []; await renderFinanzas(); document.querySelector("[data-revertir-movi]").click(); await prompt("egreso duplicado"); await pin();
         out.caja = await esperarToast(/Movimiento revertido/);
         await renderCreditos();
         out.creditosVisibles = Object.keys(creditosPorCliente).length;
         return out;
-      }, INV);
+      }, { uid: INV, pinProp: PIN });
       assert.deepEqual(r, { invalida: true, devolucion: true, abono: true, credito: true, caja: true, creditosVisibles: 0 });
       assert.equal(uno(`select count(*) from public.reversos`), "4", "devolución + abono + crédito + caja");
       assert.equal(uno(`select count(*) from public.ventas`) + "/" + uno(`select anulada from public.ventas`), "1/f", "la venta se conserva (devolución parcial)");
