@@ -26,6 +26,9 @@ export const P_ROL = [
 const LISTA = [
   { id: UUID(1), nombre: "Admin Activo", correo: "admin-activo@example.test", telefono: "", rol: "admin", activo: true, esUsted: true },
   { id: UUID(103), nombre: "Persona 3", correo: "persona3@example.test", telefono: "", rol: "mecanico", activo: true, esUsted: false },
+  // 3.15 (Bloque 4): «Dar de baja» se sustituyó por «Eliminar usuario»; el botón de estado («Reactivar») solo existe para cuentas dadas de
+  // baja ANTES de 3.15 → la lista lleva una (mismo contrato que 10-fsec1 en node: U(3) inactiva)
+  { id: UUID(105), nombre: "Persona 5", correo: "persona5@example.test", telefono: "", rol: "cajero", activo: false, esUsted: false },
 ];
 
 // ───────────────────────── utilidades de flujo ─────────────────────────
@@ -275,7 +278,9 @@ export async function correr(ctx) {
       for (const [rol, etiqueta, opc, nombre] of NORMALES) {
         const o = opc.inyectar ? await observarAjustesInyectando(B, rol) : await observarAjustes(B, opc.sesion || null, { cuenta: opc.cuenta || null });
         igual(o.est, "shell", `${rol}: arranque`); igual(o.xss, 0, `${rol}: canario`); mismo(o.hijos, ["B", "BR"], `${rol}: hijos`);
-        ok(new RegExp(`^\\s*Usuario: <b>${nombre}</b> \\(${etiqueta}\\)<br>\\s*Este dispositivo arrancó en blanco · \\d+ registros guardados en total\\.\\s*$`).test(o.html), `${rol}: HTML distinto del de antes: ${o.html.replace(/\s+/g, " ")}`);
+        // 3.15 (Bloque 6): la segunda línea dice de dónde vienen los datos (nube o este dispositivo) y cuenta lo guardado EN ESTE DISPOSITIVO
+        // (mismo contrato que 11-fsec2 en node); la estructura <b>, <br> y el escape del nombre/rol no cambian
+        ok(new RegExp(`^\\s*Usuario: <b>${nombre}</b> \\(${etiqueta}\\)<br>\\s*(?:Datos del taller en la nube|Este dispositivo arrancó en blanco) · \\d+ registros guardados en este dispositivo\\.\\s*$`).test(o.html), `${rol}: HTML distinto del de antes: ${o.html.replace(/\s+/g, " ")}`);
         vistos[rol] = o.texto;
         if (rol === "admin") {   // navegacion REAL a Ajustes con el menu: la vista se abre y vuelve a pintar lo mismo
           o.app.$('.nav-item[data-view="ajustes"]').click(); await pausa(500);
@@ -426,8 +431,8 @@ export async function correr(ctx) {
       const visibles = app.$$(".nav-item[data-view]").filter((b) => b.style.display !== "none").map((b) => b.dataset.view);
       mismo(visibles, ["mi-trabajo"], "solo Mi Trabajo en el menu");
       igual(app.win.showView("finanzas"), false, "showView('finanzas') debe negarse");
-      // 4E-C4-FIX: la limitacion es VISIBLE dentro de la app y nada promete trabajo asignado
-      const NOTA = "La asignación y sincronización de trabajos entre dispositivos estará disponible en una versión posterior.";
+      // 4E-C4-FIX: el alcance es VISIBLE dentro de la app. 3.14.0 (asignación real) cambió la nota: ya dice lo que hace (contrato de 17b en node)
+      const NOTA = "Aquí aparecen los trabajos que el administrador te asigna. Lo que avances se guarda aunque no haya señal y se envía solo al volver la red.";
       const nota = app.$("#miTrabajoAlcance"); ok(nota && nota.textContent.trim() === NOTA, `nota de alcance: «${nota && nota.textContent.trim()}»`);
       ok(app.win.getComputedStyle(nota).display !== "none" && nota.getClientRects().length > 0, "la nota debe estar VISIBLE (dentro de la vista activa)");
       igual(app.$("#miTrabajoSub").textContent, `${C.mecanicoActivo.perfil.nombre} · acceso para mecánicos.`);
@@ -610,20 +615,23 @@ export async function correr(ctx) {
   if (taller) {
     await caso("USUARIOS · admin: abre la superficie desde el menú, ve la lista y las acciones reales (rol, baja, editar, nuevo)", async () => {
       const { app } = await abrirUsuarios(B);
-      ok(app.activo("view-usuarios"), "la vista debe estar activa"); igual(app.$$("#usuariosCuerpo tbody tr").length, 2, "filas");
+      ok(app.activo("view-usuarios"), "la vista debe estar activa"); igual(app.$$("#usuariosCuerpo tbody tr").length, 3, "filas");
       const desc = app.$("#view-usuarios .view-head p").textContent; ok(!/Los permisos los aplica el servidor/.test(desc), "el texto no debe sobreafirmar"); ok(/Las cuentas las protege el servidor/.test(desc) && /datos de este dispositivo/.test(desc) && /aplicación/.test(desc), `texto de la pantalla: «${desc}»`);
-      igual(app.$$(".u-rol").length, 1); igual(app.$$(".u-estado").length, 1); igual(app.$$(".u-editar").length, 1); ok(app.$("#btnNuevoUsuario"), "boton nuevo");
-      return { filas: 2 };
+      // 3.15: rol, editar y «Eliminar usuario» en las 2 personas gestionables; «Reactivar» solo en la dada de baja antes de 3.15
+      igual(app.$$(".u-rol").length, 2); igual(app.$$(".u-estado").length, 1); igual(app.$$(".u-editar").length, 2); igual(app.$$(".u-eliminar").length, 2); ok(app.$("#btnNuevoUsuario"), "boton nuevo");
+      igual(app.$(".u-estado").textContent, "Reactivar"); igual(app.$(".u-estado").dataset.id, UUID(105));
+      return { filas: 3 };
     }, { grupo: "USUARIOS" });
-    await caso("USUARIOS · acciones con éxito (cambiar rol, dar de baja, editar): aviso «on», y el api-server recibe PATCH /api/admin/usuarios/<id> con el cuerpo y la sesión correctos", async () => {
+    await caso("USUARIOS · acciones con éxito (cambiar rol, reactivar, editar): aviso «on», y el api-server recibe PATCH /api/admin/usuarios/<id> con el cuerpo y la sesión correctos", async () => {
       const { app, estado } = await abrirUsuarios(B); const vistos = {};
-      for (const [camino, texto, cuerpo] of [["rol", "Rol actualizado", { rol: "cajero" }], ["baja", "Usuario dado de baja", { activo: false }], ["editar", "Datos actualizados", { nombre: "x", telefono: "y" }]]) {
+      // 3.15: el botón de estado es «Reactivar» de la cuenta dada de baja (UUID 105); rol y editar actúan sobre la primera fila gestionable (103)
+      for (const [camino, texto, cuerpo, id] of [["rol", "Rol actualizado", { rol: "cajero" }, UUID(103)], ["baja", "Usuario reactivado", { activo: true }, UUID(105)], ["editar", "Datos actualizados", { nombre: "x", telefono: "y" }, UUID(103)]]) {
         estado.resp = { status: 200, body: {} }; const n = app.$$("#toastWrap .toast").length; const l0 = B.H.servidor.llamadas.length;
         await dispararCamino(app, camino);
         const t = await esperarHasta(() => { const x = app.$$("#toastWrap .toast"); return x.length > n ? x[x.length - 1] : null; }, { desc: `aviso de ${camino}` });
         igual(t.textContent, texto); ok(t.querySelector(".dot.on"), "el aviso de exito debe ser «on»");
         const p = B.H.servidor.llamadas.slice(l0).find((l) => l.host === "api" && l.metodo === "PATCH"); ok(p, "debe haber un PATCH");
-        igual(p.ruta, `/api/admin/usuarios/${UUID(103)}`); mismo(p.cuerpo, cuerpo, "cuerpo del PATCH"); igual(p.auth, "sesion", "debe ir con la sesion del admin");
+        igual(p.ruta, `/api/admin/usuarios/${id}`); mismo(p.cuerpo, cuerpo, "cuerpo del PATCH"); igual(p.auth, "sesion", "debe ir con la sesion del admin");
         vistos[camino] = { aviso: t.textContent, ruta: p.ruta };
         await esperarHasta(() => tablaLista(app), { desc: "tabla tras la accion" });
       }
@@ -692,20 +700,28 @@ export async function correr(ctx) {
   // ══ V · COPY SIN SINCRONIZACION (4E-C5.1): la interfaz no afirma sincronizacion operativa; el simulador de conexion usa los textos nuevos ══
   const cuentaProducto = taller ? C.adminActivo : C.mecanicoActivo;
   const NOTA_MT = "La asignación y sincronización de trabajos entre dispositivos estará disponible en una versión posterior.";
-  await caso("COPY · el HTML servido trae el chip «En línea · datos locales» y, con la app arrancada, NINGÚN texto ni atributo visible dice «sincroniz…» salvo la nota honesta de Mi Trabajo", async () => {
+  /* 3.14+ · con una cuenta de NUBE arranca el motor de sincronización y el chip pasa a ser el de la nube (contrato de 17b en node). Este
+     harness no sirve las tablas de datos (el mock falla cerrado), así que ese chip diría, con razón, «Descarga inicial incompleta». El
+     contrato de COPY de 4E-C5.1 es el de una sesión SIN motor de sincronización (17 en node: hayServidor=false): en el Taller se prueba con
+     una sesión LOCAL; Mi Trabajo solo admite cuentas de nube y sigue con la suya. */
+  const arranqueCopy = taller ? { almacen: { enti_session: sesionLocal("cajero") } } : { cuenta: cuentaProducto };
+  // el chip que corresponde: sin motor, «Solo en este dispositivo»; Mi Trabajo (nube) contra un mock SIN tablas de datos, el chip honesto de la
+  // nube «Descarga inicial incompleta · reintentando». En ambos el punto queda apagado y nada dice «sincronizado».
+  const CHIP_COPY = taller ? "Solo en este dispositivo · respalda seguido" : "Descarga inicial incompleta · reintentando";
+  await caso("COPY · el HTML servido trae el chip «En línea · datos locales» y, con la app arrancada, NINGÚN texto ni atributo visible dice «sincroniz…» (sin la nota vieja de Mi Trabajo, retirada en 3.14.0)", async () => {
     const servido = new DOMParser().parseFromString(await (await fetch("/index.html")).text(), "text/html");
     igual(servido.getElementById("syncLabel").textContent, "En línea · datos locales", "chip inicial del HTML servido");
-    const app = await B.abrirApp({ cuenta: cuentaProducto }); igual(await B.esperarArranque(app), "shell"); await pausa(300);
-    igual(app.$("#syncLabel").textContent, "Solo en este dispositivo · respalda seguido", "chip tras el arranque"); igual(app.$("#syncDot").className, "dot off");
+    const app = await B.abrirApp(arranqueCopy); igual(await B.esperarArranque(app), "shell"); await pausa(300);
+    igual(app.$("#syncLabel").textContent, CHIP_COPY, "chip tras el arranque"); igual(app.$("#syncDot").className, "dot off");
     const copia = app.doc.body.cloneNode(true); for (const n of copia.querySelectorAll("script,style")) n.remove();
     const texto = copia.textContent, atributos = [...copia.querySelectorAll("[title],[aria-label],[placeholder],[alt]")].flatMap((e) => ["title", "aria-label", "placeholder", "alt"].map((a) => e.getAttribute(a) || ""));
     const menciones = (texto.match(/sincroniz/gi) || []).length;
-    igual(menciones, 1, "una sola mencion de «sincroniz…» en todo el texto de la app"); ok(texto.includes(NOTA_MT), "y es la nota honesta de Mi Trabajo");
-    ok(!/sincroniz/i.test(texto.replace(NOTA_MT, "")), "ningun otro texto dice «sincroniz…»"); ok(!atributos.some((a) => /sincroniz/i.test(a)), "ningun atributo visible dice «sincroniz…»");
+    // 3.14.0 retiró la nota de Mi Trabajo («…estará disponible en una versión posterior»): ya no queda NINGUNA mención (contrato de 17b en node)
+    igual(menciones, 0, "ninguna mencion de «sincroniz…» en el texto de la app"); ok(!texto.includes(NOTA_MT), "la nota vieja de Mi Trabajo ya no existe"); ok(!atributos.some((a) => /sincroniz/i.test(a)), "ningun atributo visible dice «sincroniz…»");
     return { chipServido: servido.getElementById("syncLabel").textContent, chipArrancada: app.$("#syncLabel").textContent, mencionesEnLaApp: menciones, producto: taller ? "taller" : "mi-trabajo" };
   }, { grupo: "COPY" });
   await caso("COPY · «Simular sin conexión» en el navegador real: «Modo sin conexión activado» → «Conexión restaurada — procesando cambios locales…» → «Cambios guardados localmente» (nada de «sincroniz…»)", async () => {
-    const app = await B.abrirApp({ cuenta: cuentaProducto }); igual(await B.esperarArranque(app), "shell"); await pausa(300);
+    const app = await B.abrirApp(arranqueCopy); igual(await B.esperarArranque(app), "shell"); await pausa(300);
     const boton = app.$("#offlineToggle"), vistos = [], ver = () => { for (const t of app.$$("#toastWrap .toast").map((x) => x.textContent)) if (!vistos.includes(t)) vistos.push(t); return vistos; };
     boton.click(); await esperarHasta(() => ver().includes("Modo sin conexión activado"), { desc: "aviso de modo sin conexión" });
     igual(boton.textContent, "Volver a estar en línea"); app.win.markDirty(); ok(app.win.eval("pending") >= 1, "sin conexion queda al menos un cambio pendiente");
@@ -713,7 +729,7 @@ export async function correr(ctx) {
     await esperarHasta(() => ver().includes("Cambios guardados localmente"), { ms: 4000, desc: "aviso final (1200 ms despues)" });
     igual(app.win.eval("pending"), 0, "los pendientes vuelven a 0"); igual(boton.textContent, "Simular sin conexión");
     ok(!vistos.some((t) => /sincroniz/i.test(t)), `ningun aviso debe decir «sincroniz…»: ${JSON.stringify(vistos)}`);
-    igual(app.$("#syncLabel").textContent, "Solo en este dispositivo · respalda seguido", "el chip sigue diciendo la verdad"); igual(app.$("#syncDot").className, "dot off");
+    igual(app.$("#syncLabel").textContent, CHIP_COPY, "el chip sigue diciendo la verdad"); igual(app.$("#syncDot").className, "dot off");
     return { avisos: vistos, chipFinal: app.$("#syncLabel").textContent, producto: taller ? "taller" : "mi-trabajo" };
   }, { grupo: "COPY" });
   // ══ C7-FIX-A · OBS-7 (chip del usuario), OBS-8 («Nuevo usuario» a la vista) y OBS-10 («Buscar actualización ahora» no destructivo) ══

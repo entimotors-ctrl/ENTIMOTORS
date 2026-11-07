@@ -254,14 +254,49 @@
       "bytes": 6649
     },
     {
+      "path": "pruebas/multiusuario/browser/README.md",
+      "sha256": "6e840dc2ba172158ead56bb57685bc94092caecaabbfb88a15afbb56a0e6fa7e",
+      "bytes": 9188
+    },
+    {
       "path": "pruebas/multiusuario/browser/browser-runner.mjs",
-      "sha256": "e28000734a5de5df68b5b0dccfc991bffb3145c6ebc4640d6011daa33891bbb3",
-      "bytes": 18715
+      "sha256": "e299776cc0cbe25d12db6791f8253320b4a0eed43707f701acd77fd55cb63395",
+      "bytes": 18569
+    },
+    {
+      "path": "pruebas/multiusuario/browser/harness.js",
+      "sha256": "2bfd24fea759be310ba66eb817a10e833871a2e5eb4073a6a925ce9958345b9c",
+      "bytes": 2092
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/prelude.js",
+      "sha256": "2f0798117add18f7ae374189ec342f5bfa89b16ae2b16e18c8288eab21411546",
+      "bytes": 7213
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-app.js",
+      "sha256": "4f38ca901e9383f9d3dc51c4e8f78be5b9494f67373dec443872baedd357f8ba",
+      "bytes": 72132
     },
     {
       "path": "pruebas/multiusuario/browser/helpers/suite-mutantes.js",
       "sha256": "6e45684e66636ad6d591bc52766e17fdb733c8aaced16e8be174ca4e4925e804",
       "bytes": 6278
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-pwa-actualizacion.js",
+      "sha256": "05fa48363a0d30f3a4eb3934b5307b950c64d79205795d97229adffec4d9465e",
+      "bytes": 10122
+    },
+    {
+      "path": "pruebas/multiusuario/browser/helpers/suite-pwa.js",
+      "sha256": "0a65cc7a71e9d65b10295459d8f2765e5702ba86296e9d3944a8590344b74a75",
+      "bytes": 7381
+    },
+    {
+      "path": "pruebas/multiusuario/browser/server.mjs",
+      "sha256": "a8335c420e202f67b1c684027b31c138291006c5b75387b9e99bedf9498608c5",
+      "bytes": 9593
     },
     {
       "path": "pruebas/multiusuario/helpers/congelado-3.15.0.mjs",

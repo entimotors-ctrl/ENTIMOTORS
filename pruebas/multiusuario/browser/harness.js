@@ -12,9 +12,8 @@ const SUITES = {
   "mut": { modulo: "suite-mutantes.js", modo: "taller" },
   "pwa-taller": { modulo: "suite-pwa.js", modo: "taller" },
   "pwa-mt": { modulo: "suite-pwa.js", modo: "mitrabajo" },
-  "pwa-upg": { modulo: "suite-pwa.js", modo: "upgrade" },
-  "upg-3141-taller": { modulo: "suite-pwa-3141.js", modo: "taller" },
-  "upg-3141-mt": { modulo: "suite-pwa-3141.js", modo: "mitrabajo" },
+  "upg-taller": { modulo: "suite-pwa-actualizacion.js", modo: "taller" },
+  "upg-mt": { modulo: "suite-pwa-actualizacion.js", modo: "mitrabajo" },
 };
 
 window.addEventListener("error", (e) => enviar({ tipo: "log", nivel: "harness-error", texto: String(e.message) }));

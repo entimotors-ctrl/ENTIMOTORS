@@ -30,8 +30,9 @@ window.ENTIMOTORS_SUPABASE = { url: ${JSON.stringify(URL_SB)}, anonKey: ${JSON.s
 /** Cambios EN MEMORIA al HTML de la aplicacion. Falla cerrado si quedara algun recurso externo. */
 export function transformarHtml(texto, nombre) {
   let t = String(texto);
-  const chart = /<script src="https:\/\/cdn\.jsdelivr\.net\/npm\/chart\.js"><\/script>/;
-  if (chart.test(t)) t = t.replace(chart, '<script src="/__h/vacio.js"></script>');
+  // 3.15.0 añadió atributos a la etiqueta (`id="libChart" … async`): se aceptan los que haya y se conserva el id (app.js lo busca)
+  const chart = /<script((?:\s+[\w-]+(?:="[^"]*")?)*?)\s+src="https:\/\/cdn\.jsdelivr\.net\/npm\/chart\.js"((?:\s+[\w-]+(?:="[^"]*")?)*)><\/script>/;
+  if (chart.test(t)) t = t.replace(chart, (_, antes, despues) => `<script${antes} src="/__h/vacio.js"${despues}></script>`);
   const externos = [...t.matchAll(/<(?:script|link|img|iframe|source|video|audio)\b[^>]*\b(?:src|href)\s*=\s*["'](https?:\/\/[^"']+)/gi)].map((m) => m[1]);
   if (externos.length) throw new Error(`${nombre}: quedan recursos externos que el harness no sustituye: ${externos.join(", ")}`);
   if (!/<head[^>]*>/i.test(t)) throw new Error(`${nombre}: no se encontro <head> para inyectar el prelude`);

@@ -53,10 +53,32 @@
     if (HOSTS_SINTETICOS[u.host]) { externo("xhr-sintetico-no-soportado", url); throw new DOMException("el harness no atiende XHR sintetico", "NetworkError"); }
     return xhrOpen.apply(this, arguments);
   };
+  /* 3.15.0 (Bloque 3) · sync-realtime.js abre un WebSocket (Phoenix) contra el host SINTETICO de Supabase. El harness no simula Realtime:
+     ese socket se queda CONECTANDO para siempre (un Realtime que no contesta), sin red real, sin reconexiones en bucle y sin inventar
+     mensajes. La app sigue funcionando sin avisos en vivo, igual que en las pruebas de node (allí no existe WebSocket). Se anota en
+     H.realtime para quien quiera comprobarlo; cualquier OTRO destino sigue siendo UNEXPECTED_EXTERNAL_REQUEST. */
+  function SocketSinRespuesta(url) {
+    this.url = String(url); this.readyState = 0; this.protocol = ""; this.extensions = ""; this.binaryType = "blob"; this.bufferedAmount = 0;
+    this.onopen = this.onmessage = this.onerror = this.onclose = null;
+    (H.realtime = H.realtime || []).push(this.url.split("?")[0]);
+  }
+  SocketSinRespuesta.CONNECTING = 0; SocketSinRespuesta.OPEN = 1; SocketSinRespuesta.CLOSING = 2; SocketSinRespuesta.CLOSED = 3;
+  SocketSinRespuesta.prototype.send = function () { throw new DOMException("el socket sigue conectando", "InvalidStateError"); };
+  SocketSinRespuesta.prototype.close = function () {
+    if (this.readyState === 3) return; var s = this; s.readyState = 3;
+    setTimeout(function () { if (typeof s.onclose === "function") s.onclose({ code: 1000, reason: "", wasClean: true }); }, 0);
+  };
+  SocketSinRespuesta.prototype.addEventListener = SocketSinRespuesta.prototype.removeEventListener = function () {};
   ["WebSocket", "EventSource"].forEach(function (nombre) {
     var Nativo = W[nombre]; if (!Nativo) return;
-    W[nombre] = function (url) { var u = resolver(url); if (!u || (u.hostname !== "127.0.0.1")) { externo(nombre, url); throw new DOMException("UNEXPECTED_EXTERNAL_REQUEST bloqueado por el harness", "SecurityError"); } return new Nativo(url, arguments[1]); };
+    W[nombre] = function (url) {
+      var u = resolver(url);
+      if (nombre === "WebSocket" && u && HOSTS_SINTETICOS[u.host]) return new SocketSinRespuesta(u.href);
+      if (!u || (u.hostname !== "127.0.0.1")) { externo(nombre, url); throw new DOMException("UNEXPECTED_EXTERNAL_REQUEST bloqueado por el harness", "SecurityError"); }
+      return new Nativo(url, arguments[1]);
+    };
     W[nombre].prototype = Nativo.prototype;
+    if (nombre === "WebSocket") { W.WebSocket.CONNECTING = 0; W.WebSocket.OPEN = 1; W.WebSocket.CLOSING = 2; W.WebSocket.CLOSED = 3; }
   });
   if (navigator.sendBeacon) navigator.sendBeacon = function (url) { externo("sendBeacon", url); return false; };
 

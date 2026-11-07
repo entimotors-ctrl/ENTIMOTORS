@@ -7,7 +7,7 @@ Service Worker + `CacheStorage` reales. **Solo la red es sintética.** Local, si
 ```bash
 # desde la raiz del repositorio (Node >= 20). Usa los navegadores YA instalados (google-chrome/chromium y firefox)
 node pruebas/multiusuario/browser/browser-runner.mjs                       # todo: 6 suites × cada navegador (≈ 5 min)
-node pruebas/multiusuario/browser/browser-runner.mjs --navegador=firefox --suite=app,pwa-upg
+node pruebas/multiusuario/browser/browser-runner.mjs --navegador=firefox --suite=app,upg-taller
 node pruebas/multiusuario/browser/browser-runner.mjs --json                # informe completo por stdout (no escribe nada en disco)
 ```
 
@@ -19,7 +19,7 @@ Este directorio **no** entra en `node --test pruebas/multiusuario/*.test.mjs` (n
 
 | Pieza | Qué hace |
 |---|---|
-| `browser-runner.mjs` | Localiza los navegadores (sin instalar nada), genera **en `/tmp`** el build de «Mi Trabajo» con `hacer-build-mecanicos.sh`, lee el `sw.js` de `HEAD` (3.12.2) con `git show`, arranca los servidores, lanza cada suite con un **perfil temporal nuevo** y un **proxy-sumidero**, espera el resultado, mata el navegador y borra perfiles y build. |
+| `browser-runner.mjs` | Localiza los navegadores (sin instalar nada), genera **en `/tmp`** el build de «Mi Trabajo» con `hacer-build-mecanicos.sh`, extrae con `git archive` la release ANTERIOR publicada (`RELEASE_ANTERIOR`, hoy 3.15.0 = `f2a6598`) y genera su Mi Trabajo con su propio script, arranca los servidores, lanza cada suite con un **perfil temporal nuevo** y un **proxy-sumidero**, espera el resultado, mata el navegador y borra perfiles y build. |
 | `server.mjs` | Servidores HTTP en `127.0.0.1` (puerto dinámico; **un origen por suite** = almacenamiento/CacheStorage aislados). Sirve el runtime **sin modificarlo en disco**. Incluye el proxy-sumidero. |
 | `collector.mjs` | Recibe en `/__test_result` los casos que la página envía; solo en memoria. |
 | `harness.html` / `harness.js` | Página autoejecutable que carga la suite y reporta cada caso. |
@@ -28,7 +28,8 @@ Este directorio **no** entra en `node --test pruebas/multiusuario/*.test.mjs` (n
 | `helpers/pagina.js` | Banco de casos, apertura de la app en un iframe, esperas, canario de contraseña, clasificación de errores. |
 | `helpers/suite-app.js` | Aplicación real: F-SEC-1, F-SEC-2, F-FUNC-1, OBS-3/4/5, rol desconocido, auth/activo, usuarios, panel técnico, IndexedDB, copy de Mi Trabajo, copy sin sincronización (chip y avisos de «Simular sin conexión» en el DOM real), controles. Variante «Mi Trabajo». |
 | `helpers/suite-mutantes.js` | Sirve el runtime con **siete correcciones revertidas en memoria** (F-SEC-1, F-SEC-2, F-FUNC-1, OBS-3, OBS-4, OBS-5 y la lista blanca de roles) y exige que cada defecto se **detecte** (la suite puede fallar). |
-| `helpers/suite-pwa.js` | Service Worker y cachés reales: taller, Mi Trabajo y actualización 3.12.2 → 3.13.0. |
+| `helpers/suite-pwa.js` | Service Worker y cachés reales del Taller y de Mi Trabajo (la versión se lee del `sw.js` servido). |
+| `helpers/suite-pwa-actualizacion.js` | Actualización real «release anterior → versión en curso» (`upg-taller`, `upg-mt`): detecta, espera sin `skipWaiting`, «activar-ya» borra la caché vieja, sin red solo la nueva. Versiones leídas de los `sw.js` servidos. Desde 3.15.1 sustituye a `pwa-upg` (3.12.2 → 3.13.0) y `upg-3141-*` (3.14.0 → 3.14.1); `suite-pwa-3141.js` se conserva sin cambios como evidencia del release 3.14.1 (su manifest la exige), pero ya no se ejecuta. |
 | `helpers/suite-c7fixb.js` | 4E-C7-FIX-B (lo invoca `suite-app.js` al final): **OBS-9 plan B**. Taller: Usuarios → «Generar enlace» (solo personas activas que no son admin), confirmación, caja de resultado **a la vista** en 1024×640, «Copiar enlace» exacto (API y `execCommand`), vida del enlace (reemplazo, «Cerrar», salir de la vista, cerrar sesión) y que **no queda** en localStorage, sessionStorage ni IndexedDB (contenido real), consola ni bitácora; errores/XSS como texto; recorrido completo de un **cajero** (enlace → abrirlo → contraseña nueva → entra al Taller). Mi Trabajo: recorrido de un **mecánico** (entra a Mi Trabajo). Ambos: ayuda del login en escritorio y móvil, y texto de recovery vs invite. |
 | `helpers/suite-c7fixa.js` | 4E-C7-FIX-A (lo invoca `suite-app.js` al final): **OBS-7** (chip del usuario MEDIDO en el motor real, escritorio 1280 y móvil 390, nombre normal y de 56 letras), **OBS-8** («+ Nuevo usuario» deja el formulario y el enlace generado a la vista en 1280×900, 1024×640 y 390×844, y antes de la lista) y **OBS-10** («Buscar actualización ahora» contra un Service Worker FALSO y controlable: ACTIVE, WAITING, INSTALLING, OFFLINE, sin SW, «Ahora no», «Solo crear copia» y «Crear copia y actualizar» con la copia real de IndexedDB). El SW REAL de este flujo se prueba aparte, en el entorno PWA. |
 
@@ -46,7 +47,7 @@ Este directorio **no** entra en `node --test pruebas/multiusuario/*.test.mjs` (n
 
 ### Red cerrada (tres capas)
 
-1. **En la página** (`prelude.js`): `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` y `sendBeacon` solo admiten los dos hosts sintéticos
+1. **En la página** (`prelude.js`): `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource` y `sendBeacon` solo admiten los dos hosts sintéticos (desde 3.15.1, el WebSocket de Realtime hacia el host sintético se queda «conectando» sin red: el harness no simula Realtime)
    (`synthetic-test.supabase.co`, `api.synthetic.test`, atendidos por el mock) y `127.0.0.1`. Cualquier otro destino se rechaza y se anota como
    `UNEXPECTED_EXTERNAL_REQUEST` → el caso **falla**. Además se audita `PerformanceResourceTiming` (imágenes, scripts, hojas de estilo…).
 2. **En el navegador:** proxy-sumidero (`--proxy-server` en Chrome; `network.proxy.*` en Firefox; `127.0.0.1` exento). Todo lo demás llega a un
