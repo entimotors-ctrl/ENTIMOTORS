@@ -14,6 +14,19 @@
 - Pruebas: `32-toast-xss-nombres` (payloads, nombres normales, guardas estáticas y mutantes); `10-fsec1-mensajes-error`
   actualizada al nuevo lugar del escape (mismas propiedades, mutantes sobre `toast()`).
 
+### Inicio de sesión
+- **LOGIN-ESTADO:** el aviso decía «Conectado al servidor» con solo `navigator.onLine` y, sin señal, ofrecía «acceso local»
+  también en el producto publicado, donde no existe (solo con `config-local.js`). Ahora: «Con internet — entra con tu
+  correo.» / «Sin señal — para entrar hace falta internet.» (o «solo acceso local» en desarrollo); si el intento de entrar
+  no recibe respuesta, el aviso pasa a «El servidor no responde ahora…» y el error ya no sugiere el usuario local cuando no
+  existe. No se añade ninguna llamada al servidor sin sesión (se descartó consultar `/auth/v1/health` al abrir: rompía esa
+  garantía). Pruebas: `04` y `04c` actualizadas (producto, desarrollo y Mi Trabajo).
+
+### Pruebas en navegador real
+- El arnés de `pruebas/multiusuario/browser` vuelve a correr (no lo hacía desde 3.15.0): Realtime, `chart.js`, contratos de
+  3.14/3.15 y una prueba de actualización genérica «release anterior → versión en curso» (`upg-taller`, `upg-mt`; hoy
+  3.15.0 → 3.15.1). 316/316 en Chrome y Firefox.
+
 ### Versión
 - PWA: caché `entimotors-v3.15.1` (Mi Trabajo: `entimotors-mitrabajo-v3.15.1`), las 19 etiquetas `?v=` y las 18 entradas
   versionadas del `SHELL`. Los contratos de 3.15.0 se comprueban ahora sobre la instantánea del tag `v3.15.0` (`f2a6598`).

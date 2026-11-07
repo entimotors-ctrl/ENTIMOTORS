@@ -395,7 +395,8 @@ describe("Login por formulario con Supabase (Auth real + app.js real)", () => {
     ["clave incorrecta", () => [CUENTAS.adminActivo.correo, "mala"], undefined, "Correo o contraseña incorrectos."],
     ["cuenta dada de baja", () => [CUENTAS.adminInactivo.correo, CUENTAS.adminInactivo.clave], undefined, "Esta cuenta está dada de baja. Habla con el administrador."],
     ["cuenta sin perfil", () => [CUENTAS.sinPerfil.correo, CUENTAS.sinPerfil.clave], undefined, "La cuenta existe pero no tiene perfil asignado."],
-    ["sin conexion", () => [CUENTAS.adminActivo.correo, CUENTAS.adminActivo.clave], (s) => { s.red = "caida"; }, "Sin conexión con el servidor. Entra con tu usuario local."],
+    // 3.15.1 (LOGIN-ESTADO): el producto publicado no tiene acceso local → no lo ofrece (con config-local.js sí: ver 04c)
+    ["sin conexion", () => [CUENTAS.adminActivo.correo, CUENTAS.adminActivo.clave], (s) => { s.red = "caida"; }, "Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo."],
     ["error 500 al leer el perfil", () => [CUENTAS.adminActivo.correo, CUENTAS.adminActivo.clave], (s) => { s.perfilesHttp = 500; }, "No se pudo entrar. Inténtalo de nuevo."],
     ["perfil malformado", () => [CUENTAS.adminActivo.correo, CUENTAS.adminActivo.clave], (s) => { s.perfilesCuerpo = { oops: 1 }; }, "La cuenta existe pero no tiene perfil asignado."],
   ];
@@ -405,6 +406,8 @@ describe("Login por formulario con Supabase (Auth real + app.js real)", () => {
     const r = await enviarLogin(e, u, p);
     assert.equal(r.error, mensaje); assert.equal(e.startApp.length, 0); assert.equal(e.almacen.getItem("enti_session"), null); assert.deepEqual(e.idbAbiertas, []);
     if (!/conexión/.test(mensaje)) sinLlamadasAjenas(e);
+    // 3.15.1: con internet pero sin respuesta del servidor, el aviso de arriba deja de decir «con internet — entra»
+    if (/conexión/.test(mensaje)) assert.equal(e.doc.getElementById("loginModo").textContent, "El servidor no responde ahora. Revisa la conexión y vuelve a intentarlo en un momento.");
   });
   test("TALLER + desarrollador: Auth lo autentica, pero la app NO abre el taller (mensaje tecnico + signOut)", async () => {
     const { e } = await ok(CUENTAS.desarrollador);

@@ -50,12 +50,33 @@ describe("release 3.15.1 · manifest cerrado de la fuente (frontend, documentaci
     const api = () => spawnSync("git", ["-C", RAIZ, "diff", "--quiet", "f2a659870d1a485551cedc601b07490e804faed4", "--", "api-server"]).status;
     assert.equal(api(), 0, "3.15.1 no toca api-server/");
   });
-  test("lo que cambia en app.js respecto de 3.15.0 es SOLO toast() (escape) y VERSION_APP", () => {
+  /* app.js respecto de 3.15.0: lista EXACTA de líneas que se quitan y de líneas de código que se añaden (los comentarios aparte). Cada
+     arreglo que entra en 3.15.1 se declara aquí; un cambio no declarado hace fallar esta prueba. */
+  const APP_QUITA = [
+    '  el.innerHTML = `<span class="dot ${kind}"></span>${msg}`;',                                                  // TOAST-XSS
+    "  el.textContent = hay",                                                                                       // LOGIN-ESTADO
+    '    ? (navigator.onLine ? "Conectado al servidor — entra con tu correo." : "Sin señal — solo acceso local.")', // LOGIN-ESTADO
+    '          r.motivo === "sin-conexion"           ? "Sin conexión con el servidor. Entra con tu usuario local." :', // LOGIN-ESTADO
+    'const VERSION_APP = "3.15.0";',
+  ];
+  const APP_PONE = [
+    '  el.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`;',
+    "const loginLocalDisponible = () => PERMITE_LOGIN_LOCAL && modoDesarrollo();",
+    'const AVISO_SERVIDOR_NO_RESPONDE = "El servidor no responde ahora. Revisa la conexión y vuelve a intentarlo en un momento.";',
+    '  el.textContent = !hay ? ""',
+    '    : navigator.onLine ? "Con internet — entra con tu correo."',
+    '    : loginLocalDisponible() ? "Sin señal — solo acceso local." : "Sin señal — para entrar hace falta internet.";',
+    '          r.motivo === "sin-conexion"           ? (loginLocalDisponible() ? "Sin conexión con el servidor. Entra con tu usuario local."',
+    '                                                                          : "Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo.") :',
+    '        if (r.motivo === "sin-conexion" && navigator.onLine) { const m = document.getElementById("loginModo"); if (m) m.textContent = AVISO_SERVIDOR_NO_RESPONDE; }',
+    'const VERSION_APP = "3.15.1";',
+  ];
+  test("app.js respecto de 3.15.0: cambian EXACTAMENTE las líneas declaradas (TOAST-XSS, LOGIN-ESTADO y VERSION_APP)", () => {
     const antes = fs.readFileSync(path.join(raiz3150(), "taller-demo/app.js"), "utf8").split("\n"), ahora = fs.readFileSync(path.join(RAIZ, "taller-demo/app.js"), "utf8").split("\n");
-    const quitadas = antes.filter((l) => !ahora.includes(l)), puestas = ahora.filter((l) => !antes.includes(l));
-    assert.deepEqual(quitadas, ['  el.innerHTML = `<span class="dot ${kind}"></span>${msg}`;', 'const VERSION_APP = "3.15.0";']);
-    assert.ok(puestas.includes('  el.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`;')); assert.ok(puestas.includes('const VERSION_APP = "3.15.1";'));
-    assert.ok(puestas.every((l) => l.startsWith("/* 3.15.1") || l.startsWith("   ") || /esc\(msg\)|VERSION_APP/.test(l)), JSON.stringify(puestas));
+    const sa = new Set(antes), sb = new Set(ahora);
+    assert.deepEqual(antes.filter((l) => !sb.has(l)), APP_QUITA);
+    const comentario = (l) => /^\s*(\/\*|\/\/|\*)/.test(l) || /^\s{3}\S/.test(l) && !/[;{}]\s*$/.test(l);
+    assert.deepEqual(ahora.filter((l) => !sa.has(l) && !comentario(l)), APP_PONE);
   });
   test("la lista del Taller es la del build y no publica nada técnico", () => {
     const build = fs.readFileSync(path.join(RAIZ, "taller-demo/hacer-build-taller.sh"), "utf8");

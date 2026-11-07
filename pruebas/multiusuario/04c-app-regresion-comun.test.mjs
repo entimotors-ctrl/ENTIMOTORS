@@ -61,9 +61,17 @@ describe("funciones pequenas nuevas", () => {
   test("dos mecanicos distintos abren bases distintas", () => {
     const t = nuevoEntorno().win; assert.notEqual(t.nombreBaseParaSesion(MEC_SB), t.nombreBaseParaSesion({ ...MEC_SB, perfilId: UUID(4) }));
   });
-  test("pintarModoLogin: sin Supabase configurado no muestra nada; con Supabase distingue conectado / sin señal", async () => {
-    const con = nuevoEntorno({}); await con.asentar(); assert.match(con.doc.getElementById("loginModo").textContent, /Conectado al servidor/);
-    con.setOnline(false); con.win.pintarModoLogin(); assert.match(con.doc.getElementById("loginModo").textContent, /Sin señal — solo acceso local/);
+  // 3.15.1 (LOGIN-ESTADO): dice solo lo que sabe (hay internet o no), nunca «Conectado al servidor» sin haberle hablado; y «acceso local»
+  // solo donde existe (taller con config-local.js), no en el producto publicado ni en Mi Trabajo
+  test("pintarModoLogin: sin Supabase configurado no muestra nada; con Supabase dice si hay internet, sin afirmar nada del servidor ni ofrecer un acceso local que no existe", async () => {
+    const con = nuevoEntorno({}); await con.asentar(); const modo = () => con.doc.getElementById("loginModo").textContent;
+    assert.equal(modo(), "Con internet — entra con tu correo."); assert.doesNotMatch(modo(), /Conectado al servidor/);
+    assert.equal(con.servidor.llamadas.length, 0, "pintar el aviso no llama al servidor");
+    con.setOnline(false); con.win.pintarModoLogin(); assert.equal(modo(), "Sin señal — para entrar hace falta internet.");
+    const dev = nuevoEntorno({ local: { teamPasswords: { prueba: "clave-local-sintetica" } } }); await dev.asentar();
+    dev.setOnline(false); dev.win.pintarModoLogin(); assert.equal(dev.doc.getElementById("loginModo").textContent, "Sin señal — solo acceso local.");
+    const mt = nuevoEntorno({ producto: "mecanico", local: { teamPasswords: { mecanico1: "x-sintetica" } } }); await mt.asentar();
+    mt.setOnline(false); mt.win.pintarModoLogin(); assert.equal(mt.doc.getElementById("loginModo").textContent, "Sin señal — para entrar hace falta internet.", "Mi Trabajo nunca tiene acceso local");
     const sin = nuevoEntorno({ scripts: ["build-target", "app"] }); sin.win.ENTIMOTORS_SUPABASE = undefined; sin.win.pintarModoLogin(); assert.equal(sin.doc.getElementById("loginModo").textContent, "");
   });
 });
@@ -86,8 +94,10 @@ describe("login LOCAL (lista TEAM) — solo existe en el taller", () => {
   test("TALLER sin config-local.js (sin claves locales): el login local queda DESHABILITADO aunque el usuario exista y la clave sea vacia o «undefined»", async () => {
     for (const p of ["", "undefined", "null"]) { const e = nuevoEntorno(); await e.asentar(); const r = await enviarLogin(e, "prueba", p); assert.equal(r.error, "Usuario o contraseña incorrectos.", p); assert.equal(e.startApp.length, 0); }
   });
-  test("TALLER, correo SIN conexion y Supabase disponible: intenta el camino de Supabase, que falla sin salir a la red, y sugiere el usuario local", async () => {
-    const e = nuevoEntorno({ online: false }); await e.asentar(); const r = await enviarLogin(e, "persona@example.test", "x"); assert.equal(r.error, "Sin conexión con el servidor. Entra con tu usuario local."); assert.equal(e.servidor.llamadas.length, 0); assert.equal(e.startApp.length, 0);
+  test("TALLER, correo SIN conexion y Supabase disponible: intenta el camino de Supabase, que falla sin salir a la red; sugiere el usuario local SOLO si existe (config-local.js)", async () => {
+    const e = nuevoEntorno({ online: false }); await e.asentar(); const r = await enviarLogin(e, "persona@example.test", "x"); assert.equal(r.error, "Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo."); assert.equal(e.servidor.llamadas.length, 0); assert.equal(e.startApp.length, 0);
+    assert.equal(e.doc.getElementById("loginModo").textContent, "Sin señal — para entrar hace falta internet.", "sin internet el aviso ya lo decía: no se cambia por «el servidor no responde»");
+    const d = conLocal({ online: false }); await d.asentar(); const rd = await enviarLogin(d, "persona@example.test", "x"); assert.equal(rd.error, "Sin conexión con el servidor. Entra con tu usuario local."); assert.equal(d.startApp.length, 0);
   });
   test("TALLER, correo, SIN conexion y Supabase NO disponible: cae al camino local con el mensaje «para entrar con correo hace falta señal»", async () => {
     const e = nuevoEntorno({ online: false }); await e.asentar(); e.win.Auth.disponible = () => false; const r = await enviarLogin(e, "persona@example.test", "x");

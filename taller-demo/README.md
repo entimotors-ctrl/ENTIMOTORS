@@ -15,6 +15,10 @@ créditos, y le manda al cliente su factura por WhatsApp.
   como si fuera código de página. Un nombre con marcado (escrito a mano, importado por CSV o llegado de otro
   dispositivo por la sincronización) podía ejecutarse en la sesión de quien viera el aviso. Desde 3.15.1 el aviso
   muestra siempre el texto tal cual: los nombres normales («Tom & Jerry», «Filtro <K&N>») se leen igual que antes.
+- **El aviso del inicio de sesión dice la verdad.** Decía «Conectado al servidor» solo porque el aparato tenía internet,
+  aunque el servidor no contestara, y sin señal ofrecía un «acceso local» que la app publicada no tiene. Ahora dice
+  «Con internet — entra con tu correo.» o «Sin señal — para entrar hace falta internet.»; si al entrar el servidor no
+  responde, lo dice. Abrir la app sigue sin hablar con el servidor mientras nadie ha iniciado sesión.
 - Solo cambia el frontend (`app.js` y `usuarios.js`): la base de datos y el backend de 3.15.0 no se tocan, y revertir
   3.15.1 solo afecta a los frontends.
 - PWA con caché nueva `entimotors-v3.15.1` (Mi Trabajo: `entimotors-mitrabajo-v3.15.1`); la de 3.15.0 se borra al

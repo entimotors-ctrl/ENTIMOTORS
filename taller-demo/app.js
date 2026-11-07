@@ -2674,13 +2674,19 @@ function sesionDesdePerfil(perfil, correo) {
            activo: perfil.activo !== false };
 }
 
+/* 3.15.1 (LOGIN-ESTADO): antes decía «Conectado al servidor» solo porque el aparato tenía internet (navigator.onLine), aunque el
+   servidor no contestara; y sin señal ofrecía «acceso local», que en el producto publicado no existe (solo con config-local.js).
+   Ahora dice solo lo que sabe: si hay internet o no. Lo del servidor lo dice el intento de entrar (ver el submit), sin llamar al
+   servidor solo por abrir la app: sin sesión no se le habla. */
+const loginLocalDisponible = () => PERMITE_LOGIN_LOCAL && modoDesarrollo();
+const AVISO_SERVIDOR_NO_RESPONDE = "El servidor no responde ahora. Revisa la conexión y vuelve a intentarlo en un momento.";
 function pintarModoLogin() {
   const el = document.getElementById("loginModo");
   if (!el) return;
   const hay = window.Auth && Auth.disponible();
-  el.textContent = hay
-    ? (navigator.onLine ? "Conectado al servidor — entra con tu correo." : "Sin señal — solo acceso local.")
-    : "";
+  el.textContent = !hay ? ""
+    : navigator.onLine ? "Con internet — entra con tu correo."
+    : loginLocalDisponible() ? "Sin señal — solo acceso local." : "Sin señal — para entrar hace falta internet.";
 }
 
 let loginGateCableado = false;
@@ -2713,8 +2719,11 @@ function wireLoginGate() {
           r.motivo === "credenciales-invalidas" ? "Correo o contraseña incorrectos." :
           r.motivo === "cuenta-desactivada"     ? "Esta cuenta está dada de baja. Habla con el administrador." :
           r.motivo === "sin-perfil"             ? "La cuenta existe pero no tiene perfil asignado." :
-          r.motivo === "sin-conexion"           ? "Sin conexión con el servidor. Entra con tu usuario local." :
+          r.motivo === "sin-conexion"           ? (loginLocalDisponible() ? "Sin conexión con el servidor. Entra con tu usuario local."
+                                                                          : "Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo.") :
                                                   "No se pudo entrar. Inténtalo de nuevo.";
+        // con internet pero sin respuesta: el aviso de arriba lo dice (sin internet ya lo decía «Sin señal»)
+        if (r.motivo === "sin-conexion" && navigator.onLine) { const m = document.getElementById("loginModo"); if (m) m.textContent = AVISO_SERVIDOR_NO_RESPONDE; }
         return;
       }
       entrarConSesion(sesionDesdePerfil(r.datos, entrada.toLowerCase()));

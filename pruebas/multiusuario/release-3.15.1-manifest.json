@@ -21,8 +21,8 @@
   "runtime_files": [
     {
       "path": "taller-demo/app.js",
-      "sha256": "1d9fc632a7623922266f78832b478e122e4569cf1b3e6db126207e1b064b5280",
-      "bytes": 555046
+      "sha256": "a7b7ec516db8d675799f7c9412b1462585376b9877d9715e1d53e91e7a956246",
+      "bytes": 556235
     },
     {
       "path": "taller-demo/auth.js",
@@ -193,13 +193,13 @@
   "documentation_files": [
     {
       "path": "taller-demo/CHANGELOG.md",
-      "sha256": "dfb360d6a692c08c8b36b021d6e6c7861153203ad877a797f297a6879146679a",
-      "bytes": 23902
+      "sha256": "ac899260d0f8078b2657cbfe14b5629d7d73d9ff71a16c12a40b55d3fa3119af",
+      "bytes": 24983
     },
     {
       "path": "taller-demo/README.md",
-      "sha256": "123fbca9532cec1774870bd2f13be3479ab11228c3b7506e56cd12efd0f26227",
-      "bytes": 22372
+      "sha256": "90a4734430c6f1108b5f4c6ef1bafcd3f509dd03908959423841d1a821576767",
+      "bytes": 22848
     }
   ],
   "test_files": [
@@ -217,6 +217,16 @@
       "path": "pruebas/multiusuario/02-build-target.test.mjs",
       "sha256": "cab03d7b29f1320e2163fe28e3ece6ddfa34bcae26685e32ee79c53cffab40f9",
       "bytes": 9522
+    },
+    {
+      "path": "pruebas/multiusuario/04-app-multiusuario.test.mjs",
+      "sha256": "b2e2de67d649f4d032c611154eb559931cf409ad70132e6f9e77530aacb2fa5f",
+      "bytes": 47212
+    },
+    {
+      "path": "pruebas/multiusuario/04c-app-regresion-comun.test.mjs",
+      "sha256": "d85afcd439b3e27e309d713eadf4648ba4d27073684907d20a0dd8089724f19e",
+      "bytes": 38686
     },
     {
       "path": "pruebas/multiusuario/10-fsec1-mensajes-error.test.mjs",
@@ -245,8 +255,8 @@
     },
     {
       "path": "pruebas/multiusuario/26d-manifest-3.15.1.test.mjs",
-      "sha256": "3cdf5d05f7d76367fe9c3304df343d1fae34d4cfeae1a1db1d52aed47cb9d832",
-      "bytes": 7321
+      "sha256": "3778583a6756d5722f6b0b96008afcffff9e301b7fd7ad13a6112fa786846a71",
+      "bytes": 9004
     },
     {
       "path": "pruebas/multiusuario/32-toast-xss-nombres.test.mjs",
