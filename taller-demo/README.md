@@ -19,6 +19,10 @@ créditos, y le manda al cliente su factura por WhatsApp.
   aunque el servidor no contestara, y sin señal ofrecía un «acceso local» que la app publicada no tiene. Ahora dice
   «Con internet — entra con tu correo.» o «Sin señal — para entrar hace falta internet.»; si al entrar el servidor no
   responde, lo dice. Abrir la app sigue sin hablar con el servidor mientras nadie ha iniciado sesión.
+- **Las etapas y los selectores del detalle de una orden ya no guardan al primer toque.** Cambiar la etapa, el mecánico
+  o el origen del trabajo pregunta antes («¿Pasar la orden #N a «Reparación»?»); si se cancela, no se guarda nada y el
+  selector vuelve a lo que estaba. Tocar la etapa en la que ya está la orden no hace nada. En un teléfono era fácil
+  cambiarlos sin querer al desplazar, y cada toque quedaba guardado en la nube.
 - Solo cambia el frontend (`app.js` y `usuarios.js`): la base de datos y el backend de 3.15.0 no se tocan, y revertir
   3.15.1 solo afecta a los frontends.
 - PWA con caché nueva `entimotors-v3.15.1` (Mi Trabajo: `entimotors-mitrabajo-v3.15.1`); la de 3.15.0 se borra al

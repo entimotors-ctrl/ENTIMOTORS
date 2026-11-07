@@ -50,33 +50,54 @@ describe("release 3.15.1 · manifest cerrado de la fuente (frontend, documentaci
     const api = () => spawnSync("git", ["-C", RAIZ, "diff", "--quiet", "f2a659870d1a485551cedc601b07490e804faed4", "--", "api-server"]).status;
     assert.equal(api(), 0, "3.15.1 no toca api-server/");
   });
-  /* app.js respecto de 3.15.0: lista EXACTA de líneas que se quitan y de líneas de código que se añaden (los comentarios aparte). Cada
-     arreglo que entra en 3.15.1 se declara aquí; un cambio no declarado hace fallar esta prueba. */
+  /* app.js respecto de 3.15.0: lista EXACTA de líneas de CÓDIGO (sin comentarios) que se quitan y que se añaden. Cada arreglo que entra en
+     3.15.1 se declara aquí; un cambio no declarado hace fallar esta prueba. Arreglos: TOAST-XSS (toast escapa), LOGIN-ESTADO (aviso del
+     login), OBS-E1a (etapas y selectores del detalle confirman) y VERSION_APP. */
   const APP_QUITA = [
-    '  el.innerHTML = `<span class="dot ${kind}"></span>${msg}`;',                                                  // TOAST-XSS
-    "  el.textContent = hay",                                                                                       // LOGIN-ESTADO
-    '    ? (navigator.onLine ? "Conectado al servidor — entra con tu correo." : "Sin señal — solo acceso local.")', // LOGIN-ESTADO
-    '          r.motivo === "sin-conexion"           ? "Sin conexión con el servidor. Entra con tu usuario local." :', // LOGIN-ESTADO
-    'const VERSION_APP = "3.15.0";',
+    "  el.innerHTML = `<span class=\"dot ${kind}\"></span>${msg}`;",
+    "  el.textContent = hay",
+    "    ? (navigator.onLine ? \"Conectado al servidor — entra con tu correo.\" : \"Sin señal — solo acceso local.\")",
+    "          r.motivo === \"sin-conexion\"           ? \"Sin conexión con el servidor. Entra con tu usuario local.\" :",
+    "  document.getElementById(\"detalleOrigenSel\").value = origenTrabajoDe(o);",
+    "  document.getElementById(\"detalleMecanicoSel\").addEventListener(\"change\", async (e) => {",
+    "  document.getElementById(\"detalleOrigenSel\").addEventListener(\"change\", async (e) => {",
+    "    await updateOrder(o.id, ord => { ord.origenTrabajo = e.target.value === \"negocio\" ? \"negocio\" : \"taller\"; });",
+    "const VERSION_APP = \"3.15.0\";",
   ];
   const APP_PONE = [
-    '  el.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`;',
+    "  el.innerHTML = `<span class=\"dot ${kind}\"></span>${esc(msg)}`;",
     "const loginLocalDisponible = () => PERMITE_LOGIN_LOCAL && modoDesarrollo();",
-    'const AVISO_SERVIDOR_NO_RESPONDE = "El servidor no responde ahora. Revisa la conexión y vuelve a intentarlo en un momento.";',
-    '  el.textContent = !hay ? ""',
-    '    : navigator.onLine ? "Con internet — entra con tu correo."',
-    '    : loginLocalDisponible() ? "Sin señal — solo acceso local." : "Sin señal — para entrar hace falta internet.";',
-    '          r.motivo === "sin-conexion"           ? (loginLocalDisponible() ? "Sin conexión con el servidor. Entra con tu usuario local."',
-    '                                                                          : "Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo.") :',
-    '        if (r.motivo === "sin-conexion" && navigator.onLine) { const m = document.getElementById("loginModo"); if (m) m.textContent = AVISO_SERVIDOR_NO_RESPONDE; }',
-    'const VERSION_APP = "3.15.1";',
+    "const AVISO_SERVIDOR_NO_RESPONDE = \"El servidor no responde ahora. Revisa la conexión y vuelve a intentarlo en un momento.\";",
+    "  el.textContent = !hay ? \"\"",
+    "    : navigator.onLine ? \"Con internet — entra con tu correo.\"",
+    "    : loginLocalDisponible() ? \"Sin señal — solo acceso local.\" : \"Sin señal — para entrar hace falta internet.\";",
+    "          r.motivo === \"sin-conexion\"           ? (loginLocalDisponible() ? \"Sin conexión con el servidor. Entra con tu usuario local.\"",
+    "                                                                          : \"Sin conexión con el servidor. Revisa tu internet y vuelve a intentarlo.\") :",
+    "        if (r.motivo === \"sin-conexion\" && navigator.onLine) { const m = document.getElementById(\"loginModo\"); if (m) m.textContent = AVISO_SERVIDOR_NO_RESPONDE; }",
+    "  const selMec = document.getElementById(\"detalleMecanicoSel\"), selOrigen = document.getElementById(\"detalleOrigenSel\");",
+    "  selOrigen.value = origenTrabajoDe(o);",
+    "  let mecGuardado = selMec.value, origenGuardado = selOrigen.value;",
+    "  selMec.addEventListener(\"change\", async () => {",
+    "    const nombre = selMec.selectedOptions?.[0]?.textContent?.trim() || \"sin asignar\";",
+    "    if (!(await showConfirm(`¿Asignar la orden #${o.id} a «${nombre}»?`, { titulo: \"Cambiar mecánico\", textoOk: \"Sí, asignar\" }))) {",
+    "      selMec.value = mecGuardado; return;",
+    "    mecGuardado = selMec.value;",
+    "  selOrigen.addEventListener(\"change\", async (e) => {",
+    "    const origen = e.target.value === \"negocio\" ? \"negocio\" : \"taller\";",
+    "    if (!(await showConfirm(`¿Marcar la orden #${o.id} como trabajo del ${origen === \"negocio\" ? \"negocio\" : \"taller\"}?`, { titulo: \"Origen del trabajo\", textoOk: \"Sí, cambiar\" }))) {",
+    "      selOrigen.value = origenGuardado; return;",
+    "    await updateOrder(o.id, ord => { ord.origenTrabajo = origen; });",
+    "    origenGuardado = origen;",
+    "      if (i === idx) return;",
+    "      if (!(await showConfirm(`¿Pasar la orden #${currentOrderId} a «${STAGES[i].label}»?`, { titulo: \"Cambiar etapa\", textoOk: \"Sí, cambiar\" }))) return;",
+    "const VERSION_APP = \"3.15.1\";",
   ];
-  test("app.js respecto de 3.15.0: cambian EXACTAMENTE las líneas declaradas (TOAST-XSS, LOGIN-ESTADO y VERSION_APP)", () => {
-    const antes = fs.readFileSync(path.join(raiz3150(), "taller-demo/app.js"), "utf8").split("\n"), ahora = fs.readFileSync(path.join(RAIZ, "taller-demo/app.js"), "utf8").split("\n");
+  const codigo = (t) => t.replace(/\/\*[\s\S]*?\*\//g, "").split("\n").filter((l) => l.trim() && !l.trim().startsWith("//"));
+  test("app.js respecto de 3.15.0: cambian EXACTAMENTE las líneas de código declaradas (TOAST-XSS, LOGIN-ESTADO, OBS-E1a y VERSION_APP)", () => {
+    const antes = codigo(fs.readFileSync(path.join(raiz3150(), "taller-demo/app.js"), "utf8")), ahora = codigo(fs.readFileSync(path.join(RAIZ, "taller-demo/app.js"), "utf8"));
     const sa = new Set(antes), sb = new Set(ahora);
     assert.deepEqual(antes.filter((l) => !sb.has(l)), APP_QUITA);
-    const comentario = (l) => /^\s*(\/\*|\/\/|\*)/.test(l) || /^\s{3}\S/.test(l) && !/[;{}]\s*$/.test(l);
-    assert.deepEqual(ahora.filter((l) => !sa.has(l) && !comentario(l)), APP_PONE);
+    assert.deepEqual(ahora.filter((l) => !sa.has(l)), APP_PONE);
   });
   test("la lista del Taller es la del build y no publica nada técnico", () => {
     const build = fs.readFileSync(path.join(RAIZ, "taller-demo/hacer-build-taller.sh"), "utf8");

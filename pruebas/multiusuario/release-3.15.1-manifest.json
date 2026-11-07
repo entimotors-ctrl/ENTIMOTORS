@@ -21,8 +21,8 @@
   "runtime_files": [
     {
       "path": "taller-demo/app.js",
-      "sha256": "a7b7ec516db8d675799f7c9412b1462585376b9877d9715e1d53e91e7a956246",
-      "bytes": 556235
+      "sha256": "ff8490db4e6c6f46803bbb362ef918714142a6a9ec2d4c66308625b7cc77601e",
+      "bytes": 557677
     },
     {
       "path": "taller-demo/auth.js",
@@ -193,13 +193,13 @@
   "documentation_files": [
     {
       "path": "taller-demo/CHANGELOG.md",
-      "sha256": "ac899260d0f8078b2657cbfe14b5629d7d73d9ff71a16c12a40b55d3fa3119af",
-      "bytes": 24983
+      "sha256": "e88da076e3bb95fa772a571930e1c1945addc88741f5bf1270fced61a709bd7b",
+      "bytes": 25603
     },
     {
       "path": "taller-demo/README.md",
-      "sha256": "90a4734430c6f1108b5f4c6ef1bafcd3f509dd03908959423841d1a821576767",
-      "bytes": 22848
+      "sha256": "3c11c20336c930c6596e07a128cc09abf352438ba9bb4f21c89e25f886ab5bdd",
+      "bytes": 23293
     }
   ],
   "test_files": [
@@ -255,13 +255,18 @@
     },
     {
       "path": "pruebas/multiusuario/26d-manifest-3.15.1.test.mjs",
-      "sha256": "3778583a6756d5722f6b0b96008afcffff9e301b7fd7ad13a6112fa786846a71",
-      "bytes": 9004
+      "sha256": "82c3cfbff53aa8c8948b4094a34ad8e199d4b0644647bc5d71fde0f2aedc7545",
+      "bytes": 10759
     },
     {
       "path": "pruebas/multiusuario/32-toast-xss-nombres.test.mjs",
       "sha256": "803b6354eaf601ab31cfd8bb1be8116aa6f60a4048b5e44e7a71594cd6b3b7f6",
       "bytes": 6649
+    },
+    {
+      "path": "pruebas/multiusuario/33-detalle-confirma.test.mjs",
+      "sha256": "b2270d93c428df7b95eb4c032c41fc8c57bc79e0732ab28b57a903c77db5e0b4",
+      "bytes": 8326
     },
     {
       "path": "pruebas/multiusuario/browser/README.md",

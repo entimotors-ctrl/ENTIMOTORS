@@ -3559,18 +3559,32 @@ async function renderDetalleMecanico(o) {
         <option value="taller">Taller</option><option value="negocio">Negocio</option>
       </select>`;
   await poblarSelectMecanico("detalleMecanicoSel", o.mecanico, o.mecanicoId);
-  document.getElementById("detalleOrigenSel").value = origenTrabajoDe(o);
-  document.getElementById("detalleMecanicoSel").addEventListener("change", async (e) => {
+  const selMec = document.getElementById("detalleMecanicoSel"), selOrigen = document.getElementById("detalleOrigenSel");
+  selOrigen.value = origenTrabajoDe(o);
+  /* 3.15.1 (OBS-E1a): cada cambio de estos selectores es una escritura en la nube (+1 revisión de la orden). En un teléfono es fácil
+     cambiarlos sin querer al desplazar, así que se confirma antes de guardar; si se cancela, el selector vuelve a lo guardado. */
+  let mecGuardado = selMec.value, origenGuardado = selOrigen.value;
+  selMec.addEventListener("change", async () => {
     if (!puedeAsignarMecanico()) { bloquear("Solo el administrador asigna trabajo"); return; }
+    const nombre = selMec.selectedOptions?.[0]?.textContent?.trim() || "sin asignar";
+    if (!(await showConfirm(`¿Asignar la orden #${o.id} a «${nombre}»?`, { titulo: "Cambiar mecánico", textoOk: "Sí, asignar" }))) {
+      selMec.value = mecGuardado; return;
+    }
     await updateOrder(o.id, ord => {
       const a = asignacionDesdeSelect("detalleMecanicoSel");
       ord.mecanico = a.mecanico; ord.mecanicoId = a.mecanicoId;
     });
+    mecGuardado = selMec.value;
     toast("Mecánico actualizado");
     renderOrdersList();
   });
-  document.getElementById("detalleOrigenSel").addEventListener("change", async (e) => {
-    await updateOrder(o.id, ord => { ord.origenTrabajo = e.target.value === "negocio" ? "negocio" : "taller"; });
+  selOrigen.addEventListener("change", async (e) => {
+    const origen = e.target.value === "negocio" ? "negocio" : "taller";
+    if (!(await showConfirm(`¿Marcar la orden #${o.id} como trabajo del ${origen === "negocio" ? "negocio" : "taller"}?`, { titulo: "Origen del trabajo", textoOk: "Sí, cambiar" }))) {
+      selOrigen.value = origenGuardado; return;
+    }
+    await updateOrder(o.id, ord => { ord.origenTrabajo = origen; });
+    origenGuardado = origen;
     toast("Origen del trabajo actualizado");
   });
 }
@@ -3650,6 +3664,11 @@ function renderStageTracker(estado, finalizada) {
     btn.addEventListener("click", async () => {
       if (finalizada) { toast("Este trabajo ya está finalizado", "off"); return; }
       const i = Number(btn.dataset.i);
+      /* 3.15.1 (OBS-E1a): un toque en la barra era una escritura en la nube sin preguntar (fácil al desplazar en un teléfono), y tocar
+         la etapa en la que ya estaba la orden también guardaba (+1 revisión sin cambio). Ahora la etapa actual no hace nada y las demás
+         se confirman. */
+      if (i === idx) return;
+      if (!(await showConfirm(`¿Pasar la orden #${currentOrderId} a «${STAGES[i].label}»?`, { titulo: "Cambiar etapa", textoOk: "Sí, cambiar" }))) return;
       const o = await updateOrder(currentOrderId, ord => setStage(ord, STAGES[i].key));
       toast(`Etapa: ${STAGES[i].label}`);
       openOrder(o.id);

@@ -22,6 +22,13 @@
   existe. No se añade ninguna llamada al servidor sin sesión (se descartó consultar `/auth/v1/health` al abrir: rompía esa
   garantía). Pruebas: `04` y `04c` actualizadas (producto, desarrollo y Mi Trabajo).
 
+### Detalle de la orden
+- **OBS-E1a** (observación del cierre de 3.15.0): la barra de etapas y los selectores «mecánico» y «origen del trabajo»
+  guardaban en la nube al primer toque (+1 revisión por toque; tocar la etapa actual también guardaba sin cambio). Ahora la
+  etapa actual no hace nada y todo cambio pide confirmación (`showConfirm`); al cancelar no se guarda y el selector vuelve a
+  lo guardado. El permiso se comprueba antes de preguntar. El flujo del mecánico (avanzar una etapa) no cambia.
+  Prueba: `33-detalle-confirma` (aceptar, cancelar, etapa actual, cajero, orden finalizada y mutantes).
+
 ### Pruebas en navegador real
 - El arnés de `pruebas/multiusuario/browser` vuelve a correr (no lo hacía desde 3.15.0): Realtime, `chart.js`, contratos de
   3.14/3.15 y una prueba de actualización genérica «release anterior → versión en curso» (`upg-taller`, `upg-mt`; hoy
