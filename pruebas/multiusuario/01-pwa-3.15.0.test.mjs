@@ -2,6 +2,9 @@
 // Mismas comprobaciones que 01-pwa-3.14.1 (que sigue vigilando la release 3.14.1 sobre el commit e807f65), con el contrato de 3.15.0:
 // 19 etiquetas ?v=, 18 entradas versionadas del SHELL (23 en total: + fecha-negocio.js, sync-realtime.js y finanzas-calc.js) y la release
 // anterior (3.14.1) como «versión vieja»: su caché se borra al activar la nueva.
+// 3.15.1: este es el CONTRATO de la release 3.15.0 → se ejecuta, sin cambiar una sola aserción, contra la instantánea inmutable
+// del commit f2a6598 (tag v3.15.0; helpers/usar-3150.mjs, PRIMER import). El contrato vigente de 3.15.1 está en 01-pwa-3.15.1.
+import "./helpers/usar-3150.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import { leer } from "./helpers/entorno.mjs";

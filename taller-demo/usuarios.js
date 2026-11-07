@@ -38,10 +38,10 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  /* Recibe TEXTO PLANO. toast() pinta su argumento como HTML, así que se escapa
-     aquí, una sola vez, justo antes de entregárselo: lo que dijo el servidor
-     nunca se convierte en marcado. */
-  function aviso(msg) { if (typeof toast === "function") toast(esc(msg), "off"); }
+  /* Recibe TEXTO PLANO y lo entrega tal cual: desde 3.15.1 toast() (app.js) escapa
+     su argumento una sola vez, así que escapar también aquí lo haría DOS veces
+     («&amp;lt;»). Lo que dijo el servidor nunca se convierte en marcado. */
+  function aviso(msg) { if (typeof toast === "function") toast(msg, "off"); }
   function bien(msg) { if (typeof toast === "function") toast(msg); }
 
   /* Primera CADENA no vacía de la lista; un objeto anidado no se convierte a

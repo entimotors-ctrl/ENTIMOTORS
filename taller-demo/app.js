@@ -2118,11 +2118,14 @@ function alHacerClicUnaVez(btn, handler) {
 }
 
 /* ---------------- toasts ---------------- */
+/* 3.15.1 (TOAST-XSS): `msg` es TEXTO PLANO y se escapa aquí, una sola vez, para TODAS las llamadas. Antes se pintaba como HTML
+   y varias llamadas metían nombres escritos por usuarios (cliente, repuesto, CSV importado, sincronizados de otro dispositivo):
+   un nombre con marcado ejecutaba código en la sesión de quien viera el aviso. Nadie le pasa HTML a propósito. */
 function toast(msg, kind = "on") {
   const wrap = document.getElementById("toastWrap");
   const el = document.createElement("div");
   el.className = "toast";
-  el.innerHTML = `<span class="dot ${kind}"></span>${msg}`;
+  el.innerHTML = `<span class="dot ${kind}"></span>${esc(msg)}`;
   wrap.appendChild(el);
   setTimeout(() => el.remove(), 3400);
 }
@@ -8368,7 +8371,7 @@ alHacerClicUnaVez(document.getElementById("btnForzarActualizacion"), buscarActua
    fecha e identificador, para que al restaurarlo se sepa exactamente de dónde
    salió y si el esquema es compatible. */
 
-const VERSION_APP = "3.15.0";
+const VERSION_APP = "3.15.1";
 const VERSION_RESPALDO = 2; // formato del archivo, no de la app
 
 async function armarRespaldo() {

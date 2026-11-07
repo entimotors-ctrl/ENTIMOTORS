@@ -3,6 +3,9 @@
 // y las cachés REALES del código, (2) describen el estado real del release —la protección de las operaciones rechazadas es TEMPORAL y el
 // rescate de los datos del dispositivo está DIFERIDO, no completado—, (3) no llevan textos privados ni identificadores del dispositivo
 // y (4) conservan la historia de 3.14.1 hacia atrás tal cual se publicó.
+// 3.15.1: contrato de la release 3.15.0 → se ejecuta sobre la instantánea del commit f2a6598 (tag v3.15.0; helpers/usar-3150.mjs, PRIMER
+// import). Única aserción ajustada: ya no corre sobre el árbol de trabajo sino sobre esa instantánea. El de 3.15.1 está en 16e-alcance-3.15.1.
+import "./helpers/usar-3150.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -18,8 +21,8 @@ const SHELL_V = [...((/const SHELL = \[(.*?)\];/s.exec(SW) || [, ""])[1]).matchA
 const PRIVADO = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|L\s?2[.,]?280|\b2280\b|\b5[.,]?920\b|ADMIN_PASSWORD|service_role|JWT/i;
 
 describe("README.md · 3.15.0", () => {
-  test("se ejecuta sobre el árbol de trabajo; versión 3.15.0 en el README, en app.js, en la caché y en el panel técnico", () => {
-    assert.equal(RELEASE_CONGELADA, null); assert.equal(VERSION, "3.15.0"); assert.equal(CACHE, "entimotors-v3.15.0");
+  test("se ejecuta sobre la instantánea del release 3.15.0 (f2a6598); versión 3.15.0 en el README, en app.js, en la caché y en el panel técnico", () => {
+    assert.equal(RELEASE_CONGELADA, "3.15.0"); assert.equal(VERSION, "3.15.0"); assert.equal(CACHE, "entimotors-v3.15.0");
     assert.match(README, /\*\*Versión actual:\*\* 3\.15\.0 ·/);
     assert.equal((/<span class="version" id="version">([^<]*)<\/span>/.exec(PANEL) || [])[1], "3.15.0");
   });

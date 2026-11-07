@@ -139,40 +139,51 @@ describe("no regresion de mensajes: el usuario sigue leyendo texto comprensible"
   });
 });
 
-/** Guarda estatica sobre el TEXTO de usuarios.js. Devuelve la lista de violaciones (vacia = cumple). */
+/** Guarda estatica sobre el TEXTO de usuarios.js. Devuelve la lista de violaciones (vacia = cumple).
+    3.15.1 (TOAST-XSS): el escape se mudo de aviso() a toast() (app.js), que ahora escapa SIEMPRE; aviso() entrega texto plano tal cual. */
 function guardaEstatica(s) {
   const v = [];
   if (/quitarHtml/.test(s)) v.push("quitarHtml presente");
   if (/\.innerHTML\s*=\s*\w+\s*;\s*return\s+\w+\.(textContent|innerText)/.test(s)) v.push("patron de des-escape por DOM (innerHTML=…; return …textContent)");
   const aviso = /function aviso\(msg\)\s*\{([^}]*)\}/.exec(s);
-  if (!aviso) v.push("no se encontro aviso()"); else if (!/toast\(esc\(msg\),\s*"off"\)/.test(aviso[1])) v.push("aviso() no escapa antes de entregar al toast");
+  if (!aviso) v.push("no se encontro aviso()"); else if (!/toast\(msg,\s*"off"\)/.test(aviso[1])) v.push("aviso() no entrega texto plano al toast (que ya escapa)");
   const llamadas = [...new Set([...s.matchAll(/(?<!function\s)(?<![\w.])aviso\(([^;]*?)\);/g)].map((m) => m[1]))];  // llamadas, no la definicion
   if (llamadas.length !== 1 || llamadas[0] !== "textoPlanoDeFallo(r)") v.push(`aviso() recibe algo distinto de texto plano: ${JSON.stringify(llamadas)}`);
   return v;
 }
+/** Guarda estatica sobre toast() de app.js: el mensaje se escapa con esc() dentro del sumidero. */
+function guardaToast(s) {
+  const t = /function toast\(msg, kind = "on"\) \{([\s\S]*?)\n\}/.exec(s);
+  if (!t) return ["no se encontro toast()"];
+  return /innerHTML = `<span class="dot \$\{kind\}"><\/span>\$\{esc\(msg\)\}`;/.test(t[1]) ? [] : ["toast() no escapa su mensaje"];
+}
 describe("guarda estatica de usuarios.js: no vuelve el patron «escapar → des-escapar → innerHTML»", () => {
-  test("usuarios.js real cumple la guarda: sin quitarHtml, sin des-escape por DOM, aviso() escapa y solo recibe texto PLANO", () => assert.deepEqual(guardaEstatica(leer("usuarios.js")), []));
+  test("usuarios.js real cumple la guarda: sin quitarHtml, sin des-escape por DOM, aviso() entrega texto PLANO y solo recibe texto PLANO", () => assert.deepEqual(guardaEstatica(leer("usuarios.js")), []));
+  test("app.js real: toast() escapa su mensaje dentro del sumidero (3.15.1)", () => assert.deepEqual(guardaToast(leer("app.js")), []));
 });
 
 describe("mutantes: si se reintroduce el des-escape o se entrega marcado sin escape, la prueba VUELVE A FALLAR (en memoria; ningun archivo real se toca)", () => {
   const cambiar = (de, a) => (t) => { const r = t.split(de).join(a); if (r === t) throw new Error(`mutante sin efecto: ${de}`); return r; };
   const QUITAR_HTML = 'function quitarHtml(s) { var d = document.createElement("div"); d.innerHTML = s; return d.textContent; }\n  global.PantallaUsuarios =';
   const componer = (...f) => (t) => f.reduce((acc, fn) => fn(acc), t);
+  // 3.15.1: el escape vive en toast() de app.js → los mutantes de «sin escape» se aplican a app.js; los de doble escape, a usuarios.js.
+  const TOAST_ESCAPA = "${esc(msg)}`;", TOAST_CRUDO = "${msg}`;";
   const MUTANTES = [
-    ["aviso() entrega el mensaje SIN escapar", cambiar('toast(esc(msg), "off")', 'toast(msg, "off")')],
-    ["vuelve el flujo ORIGINAL de F-SEC-1: quitarHtml(textoDeFallo(r)) + aviso sin escape", componer(cambiar("aviso(textoPlanoDeFallo(r))", "aviso(quitarHtml(textoDeFallo(r)))"), cambiar('toast(esc(msg), "off")', 'toast(msg, "off")'), cambiar("global.PantallaUsuarios =", QUITAR_HTML))],
-    ["el mensaje se escapa DOS veces (entidades duplicadas ilegibles)", cambiar('toast(esc(msg), "off")', 'toast(esc(esc(msg)), "off")')],
-    ["el texto plano se entrega como HTML de textoDeFallo (escapado y luego tratado como texto → «&lt;…»)", cambiar("aviso(textoPlanoDeFallo(r))", "aviso(textoDeFallo(r))")],
+    ["toast() de app.js vuelve a pintar el mensaje SIN escapar (el defecto de 3.15.0)", { app: cambiar(TOAST_ESCAPA, TOAST_CRUDO) }],
+    ["vuelve el flujo ORIGINAL de F-SEC-1: quitarHtml(textoDeFallo(r)) + toast sin escape", { app: cambiar(TOAST_ESCAPA, TOAST_CRUDO), usuarios: componer(cambiar("aviso(textoPlanoDeFallo(r))", "aviso(quitarHtml(textoDeFallo(r)))"), cambiar("global.PantallaUsuarios =", QUITAR_HTML)) }],
+    ["el mensaje se escapa DOS veces: aviso() vuelve a escapar ademas de toast() (entidades duplicadas ilegibles)", { usuarios: cambiar('toast(msg, "off")', 'toast(esc(msg), "off")') }],
+    ["el texto plano se entrega como HTML de textoDeFallo (escapado y luego tratado como texto → «&lt;…»)", { usuarios: cambiar("aviso(textoPlanoDeFallo(r))", "aviso(textoDeFallo(r))") }],
   ];
-  const propiedad = async (mutar) => (await violacionesTodas([...PAYLOADS, ...NORMALES, CARACTERES], mutar ? { mutar: { usuarios: mutar } } : undefined)).length === 0;
+  const propiedad = async (mutar) => (await violacionesTodas([...PAYLOADS, ...NORMALES, CARACTERES], mutar ? { mutar } : undefined)).length === 0;
   test("con el codigo REAL la propiedad se cumple (linea base de los mutantes)", async () => assert.equal(await propiedad(), true));
   for (const [nombre, mut] of MUTANTES) test(`mutante: ${nombre}`, async () => assert.equal(await propiedad(mut), false, "el mutante SOBREVIVE: ninguna prueba protege esta garantia"));
-  test("mutante estatico: reintroducir SOLO la funcion quitarHtml (aunque aviso siga escapando) rompe la guarda estatica", () => {
+  test("mutante estatico: reintroducir SOLO la funcion quitarHtml rompe la guarda estatica", () => {
     const mutado = cambiar("global.PantallaUsuarios =", QUITAR_HTML)(leer("usuarios.js"));
     assert.ok(guardaEstatica(mutado).includes("quitarHtml presente")); assert.ok(guardaEstatica(mutado).includes("patron de des-escape por DOM (innerHTML=…; return …textContent)"));
   });
-  test("mutante estatico: aviso() sin escape rompe la guarda; alimentarlo con quitarHtml(textoDeFallo(r)) tambien", () => {
-    assert.ok(guardaEstatica(cambiar('toast(esc(msg), "off")', 'toast(msg, "off")')(leer("usuarios.js"))).includes("aviso() no escapa antes de entregar al toast"));
+  test("mutante estatico: aviso() que vuelve a escapar rompe la guarda; alimentarlo con quitarHtml(textoDeFallo(r)) tambien; toast() sin escape rompe la suya", () => {
+    assert.ok(guardaEstatica(cambiar('toast(msg, "off")', 'toast(esc(msg), "off")')(leer("usuarios.js"))).includes("aviso() no entrega texto plano al toast (que ya escapa)"));
     assert.ok(guardaEstatica(cambiar("aviso(textoPlanoDeFallo(r))", "aviso(quitarHtml(textoDeFallo(r)))")(leer("usuarios.js"))).some((x) => /recibe algo distinto/.test(x)));
+    assert.deepEqual(guardaToast(cambiar(TOAST_ESCAPA, TOAST_CRUDO)(leer("app.js"))), ["toast() no escapa su mensaje"]);
   });
 });

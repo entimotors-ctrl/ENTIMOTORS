@@ -13,7 +13,8 @@ export async function correr(ctx) {
 
   await caso("MUTANTE · el servidor de mutantes SÍ entrega las tres reversiones (control del control)", async () => {
     const u = await (await fetch("/usuarios.js")).text(), a = await (await fetch("/app.js")).text(), t = await (await fetch("/auth.js")).text();
-    ok(u.includes('toast(msg, "off")') && !u.includes('toast(esc(msg), "off")'), "usuarios.js no esta revertido");
+    // 3.15.1: F-SEC-1 se revierte en toast() de app.js (el escape se mudó allí); usuarios.js se sirve sin tocar y entrega texto plano
+    ok(u.includes('toast(msg, "off")') && a.includes('<span class="dot ${kind}"></span>${msg}`;'), "toast() de app.js no esta revertido (F-SEC-1)");
     ok(a.includes('(${NOMBRE_ROL[currentUser?.rol] || currentUser?.rol || "—"})'), "app.js no esta revertido");
     ok(!t.includes('return mal(r.motivo, r.detalle);'), "auth.js (F-FUNC-1) no esta revertido"); ok(!t.includes('"respuesta-invalida"'), "auth.js (OBS-4) no esta revertido");
     ok(a.includes('exigeGestion("Solo el administrador elimina una cita")'), "app.js (OBS-3) no esta revertido"); ok(!a.includes("!ROLES_DEL_TALLER.includes(session.rol)"), "app.js (rol desconocido) no esta revertido");

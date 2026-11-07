@@ -1,5 +1,23 @@
 # Registro de cambios · ENTIMOTORS OS
 
+## 3.15.1 — corrección de seguridad (noviembre de 2026)
+
+> **Alcance: solo frontends (Taller y Mi Trabajo).** La base de datos (sync-15a → 15g) y el backend de 3.15.0 no cambian.
+> Revertir 3.15.1 = volver a publicar los frontends de 3.15.0.
+
+### Seguridad
+- **TOAST-XSS:** `toast()` (app.js) pintaba su mensaje como HTML y varias llamadas interpolaban nombres escritos por
+  usuarios (cliente, repuesto; también los importados por CSV y los sincronizados desde otro dispositivo). Un nombre con
+  marcado ejecutaba código en la sesión de quien viera el aviso. Ahora `toast()` escapa su mensaje una sola vez para
+  TODAS las llamadas; `aviso()` de usuarios.js (F-SEC-1) deja de escapar por su cuenta para no hacerlo dos veces. Los
+  textos que ve la persona no cambian.
+- Pruebas: `32-toast-xss-nombres` (payloads, nombres normales, guardas estáticas y mutantes); `10-fsec1-mensajes-error`
+  actualizada al nuevo lugar del escape (mismas propiedades, mutantes sobre `toast()`).
+
+### Versión
+- PWA: caché `entimotors-v3.15.1` (Mi Trabajo: `entimotors-mitrabajo-v3.15.1`), las 19 etiquetas `?v=` y las 18 entradas
+  versionadas del `SHELL`. Los contratos de 3.15.0 se comprueban ahora sobre la instantánea del tag `v3.15.0` (`f2a6598`).
+
 ## 3.15.0 — release (octubre de 2026)
 
 > **Alcance: base de datos, backend y frontends.** Orden de publicación obligatorio: base de datos

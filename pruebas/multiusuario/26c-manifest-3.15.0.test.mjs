@@ -2,6 +2,8 @@
 // tamaño de la fuente que se confirma: runtime del frontend (Taller y la base de Mi Trabajo), su documentación, sus pruebas de release, las
 // migraciones 15a–15g con sus reversiones, y el backend (fuente + dist compilado). Mismo formato y verificador que 3.14.0 / 3.14.1 (26, 26b).
 // Además fija QUÉ cambia respecto de lo publicado en 3.14.1 (commit e807f65) y que el manifest no lleva nada de laboratorio ni privado.
+// 3.15.1: el árbol de trabajo ya cambia a propósito → este freeze se comprueba contra el release PUBLICADO 3.15.0 (commit f2a6598, git archive y
+// git ls-tree, solo lectura). Las aserciones no cambian: solo de DÓNDE se leen los archivos. El manifest de 3.15.1 está en 26d.
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -10,15 +12,16 @@ import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { RAIZ } from "./helpers/entorno.mjs";
 import { raiz3141 } from "./helpers/congelado-3.14.1.mjs";
+import { raiz3150, archivosDe3150 } from "./helpers/congelado-3.15.0.mjs";
 
 const F = "pruebas/multiusuario/release-3.15.0-manifest.json", FB = "pruebas/multiusuario/release-3.15.0-backend-manifest.json";
 const VERIF = path.join(RAIZ, "pruebas/multiusuario/verificar-backend-manifest.mjs");
-const M = JSON.parse(fs.readFileSync(path.join(RAIZ, F), "utf8")), B = JSON.parse(fs.readFileSync(path.join(RAIZ, FB), "utf8"));
+const R = raiz3150();
+const M = JSON.parse(fs.readFileSync(path.join(R, F), "utf8")), B = JSON.parse(fs.readFileSync(path.join(R, FB), "utf8"));
 const sha = (p) => crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
-const git = (...a) => spawnSync("git", ["-C", RAIZ, ...a], { encoding: "utf8" }).stdout.split("\n").filter(Boolean);
-// lo que el repositorio lleva o llevará (rastreado + nuevo sin ignorar): antes y después del commit da la misma lista
-const delRepo = (prefijo) => [...new Set([...git("ls-files", prefijo), ...git("ls-files", "--others", "--exclude-standard", prefijo)])].filter((p) => fs.existsSync(path.join(RAIZ, p))).sort();
-const verificar = (m) => spawnSync(process.execPath, [VERIF, "--raiz", RAIZ, "--manifest", m], { encoding: "utf8" });
+// lo que el release PUBLICADO lleva (git ls-tree del commit f2a6598)
+const delRepo = (prefijo) => archivosDe3150(prefijo).sort();
+const verificar = (m) => spawnSync(process.execPath, [VERIF, "--raiz", R, "--manifest", m], { encoding: "utf8" });
 
 describe("release 3.15.0 · manifest cerrado de la fuente (frontend, documentación, pruebas de release y base de datos)", () => {
   test("MATCH: cada archivo listado existe con su SHA-256 y su tamaño", () => {
@@ -26,12 +29,12 @@ describe("release 3.15.0 · manifest cerrado de la fuente (frontend, documentaci
   });
   test("formato, versión, commit base y matriz de versiones = lo que dice el código", () => {
     assert.equal(M.format, "entimotors-release-freeze/1"); assert.equal(M.version, "3.15.0"); assert.equal(M.base_commit, "e807f65502961497ed2866dbea8beaeb4bc1be3e");
-    const app = fs.readFileSync(path.join(RAIZ, "taller-demo/app.js"), "utf8"), sw = fs.readFileSync(path.join(RAIZ, "taller-demo/sw.js"), "utf8"), idx = fs.readFileSync(path.join(RAIZ, "taller-demo/index.html"), "utf8");
+    const app = fs.readFileSync(path.join(R, "taller-demo/app.js"), "utf8"), sw = fs.readFileSync(path.join(R, "taller-demo/sw.js"), "utf8"), idx = fs.readFileSync(path.join(R, "taller-demo/index.html"), "utf8");
     assert.equal(M.version_matrix.VERSION_APP, /const VERSION_APP = "([^"]+)"/.exec(app)[1]);
     assert.equal(M.version_matrix.CACHE_NAME, /const CACHE_NAME = "([^"]+)"/.exec(sw)[1]);
     assert.equal(M.version_matrix.index_html_query_v, (idx.match(/<script src="[^"?]+\?v=3\.15\.0"/g) || []).length);
     assert.deepEqual([M.version_matrix.index_html_query_v, M.version_matrix.sw_shell_query_v, M.version_matrix.sw_shell_total], [19, 18, 23]);
-    assert.equal(M.version_matrix.panel_tecnico, (/<span class="version" id="version">([^<]*)<\/span>/.exec(fs.readFileSync(path.join(RAIZ, "taller-demo/panel-tecnico.html"), "utf8")) || [])[1]);
+    assert.equal(M.version_matrix.panel_tecnico, (/<span class="version" id="version">([^<]*)<\/span>/.exec(fs.readFileSync(path.join(R, "taller-demo/panel-tecnico.html"), "utf8")) || [])[1]);
   });
   test("runtime_files = TODO lo del repositorio en taller-demo/ salvo supabase/ y la documentación (nada fuera, nada de más)", () => {
     const esperado = delRepo("taller-demo").filter((p) => !p.startsWith("taller-demo/supabase/") && !/^taller-demo\/(README|CHANGELOG)\.md$/.test(p));
@@ -42,7 +45,7 @@ describe("release 3.15.0 · manifest cerrado de la fuente (frontend, documentaci
     const esperado = delRepo("taller-demo/supabase/sync").filter((p) => /\/sync-15[a-g]-/.test(p));
     assert.deepEqual(M.database_files.map((e) => e.path), esperado); assert.equal(esperado.length, 14);
     assert.equal(esperado.filter((p) => p.endsWith("-rollback.sql")).length, 7);
-    for (const e of M.database_files) { const p = path.join(RAIZ, e.path); assert.equal(sha(p), e.sha256, e.path); assert.equal(fs.statSync(p).size, e.bytes, e.path); }
+    for (const e of M.database_files) { const p = path.join(R, e.path); assert.equal(sha(p), e.sha256, e.path); assert.equal(fs.statSync(p).size, e.bytes, e.path); }
   });
   test("respecto de 3.14.1 (e807f65): los archivos NUEVOS son exactamente los 4 de 3.15 y la lista del Taller es la del build", () => {
     const base = raiz3141();
@@ -50,7 +53,7 @@ describe("release 3.15.0 · manifest cerrado de la fuente (frontend, documentaci
     assert.deepEqual(nuevos.sort(), ["fecha-negocio.js", "finanzas-calc.js", "hacer-build-taller.sh", "sync-realtime.js"]);
     const sinCambio = M.runtime_files.filter((e) => { const b = path.join(base, e.path); return fs.existsSync(b) && sha(b) === e.sha256; }).map((e) => e.path.replace("taller-demo/", ""));
     for (const f of ["build-target.js", "manifest.json", "recovery.js"]) assert.ok(sinCambio.includes(f), `${f} no cambia en 3.15.0`);
-    const build = fs.readFileSync(path.join(RAIZ, "taller-demo/hacer-build-taller.sh"), "utf8");
+    const build = fs.readFileSync(path.join(R, "taller-demo/hacer-build-taller.sh"), "utf8");
     const lista = /^PUBLICAR=\(([\s\S]*?)\)/m.exec(build)[1].split(/\s+/).filter((x) => /\.(html|json|js|png)$/.test(x)).sort();
     assert.deepEqual(M.publicacion.taller_lista, lista); assert.equal(lista.length, 27);
     for (const f of lista) assert.ok(M.runtime_files.some((e) => e.path === "taller-demo/" + f), f);
@@ -61,7 +64,7 @@ describe("release 3.15.0 · manifest cerrado de la fuente (frontend, documentaci
     const t = M.test_files.map((e) => e.path);
     for (const f of ["pruebas/multiusuario/01-pwa-3.15.0.test.mjs", "pruebas/multiusuario/16d-alcance-3.15.0.test.mjs", "pruebas/multiusuario/26c-manifest-3.15.0.test.mjs", "pruebas/multiusuario/helpers/usar-3141.mjs",
       "pruebas/sync/node/f1-rechazadas-orden.test.mjs", "pruebas/sync/browser/b8-ventana-migracion.test.mjs", "pruebas/sync/browser/b8-pwa-actualizacion.test.mjs"]) assert.ok(t.includes(f), f);
-    for (const f of t) assert.ok(fs.existsSync(path.join(RAIZ, f)), f);
+    for (const f of t) assert.ok(fs.existsSync(path.join(R, f)), f);
   });
   test("estado real y alcance limpio: PHONE_RESCUE DEFERRED y protección TEMPORAL declarados; nada de laboratorio, respaldos, evidencia ni privados; sin secretos", () => {
     assert.ok(M.pendiente_conocido.some((x) => /^PHONE_RESCUE: DEFERRED/.test(x))); assert.ok(M.pendiente_conocido.some((x) => /protección TEMPORAL/.test(x)));
@@ -88,7 +91,7 @@ describe("release 3.15.0 · manifest cerrado del backend (fuente + dist compilad
     const base = raiz3141();
     const cambian = B.runtime_files.filter((e) => { const b = path.join(base, e.path); return !fs.existsSync(b) || sha(b) !== e.sha256; }).map((e) => e.path);
     assert.deepEqual(cambian.sort(), ["api-server/src/lib/pin.ts", "api-server/src/routes/admin-usuarios.ts", "api-server/src/routes/pin.ts"]);
-    const dist = fs.readFileSync(path.join(RAIZ, "api-server/dist/index.mjs"), "utf8");
+    const dist = fs.readFileSync(path.join(R, "api-server/dist/index.mjs"), "utf8");
     for (const s of ["usuario_impacto", "eliminar_usuario", "revocar_sesiones_usuario"]) assert.ok(dist.includes(s), s);
   });
   test("declara cómo despliega Render (rama, Auto-Deploy, comandos) y que el push a main va después de la base de datos", () => {

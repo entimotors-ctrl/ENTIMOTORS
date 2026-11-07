@@ -4,7 +4,21 @@ Sistema de gestión para un taller de motocicletas. Recibe la moto, la sigue por
 seis etapas de reparación, cobra, controla el inventario, lleva la caja y los
 créditos, y le manda al cliente su factura por WhatsApp.
 
-**Versión actual:** 3.15.0 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+**Versión actual:** 3.15.1 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+
+---
+
+## Novedades de 3.15.1
+
+- **Corrección de seguridad en los avisos.** Los avisos que aparecen abajo de la pantalla («"…" agregado al carrito»,
+  ««…» quedó registrado como cliente», stock de un repuesto, etc.) mostraban el nombre de un cliente o de un repuesto
+  como si fuera código de página. Un nombre con marcado (escrito a mano, importado por CSV o llegado de otro
+  dispositivo por la sincronización) podía ejecutarse en la sesión de quien viera el aviso. Desde 3.15.1 el aviso
+  muestra siempre el texto tal cual: los nombres normales («Tom & Jerry», «Filtro <K&N>») se leen igual que antes.
+- Solo cambia el frontend (`app.js` y `usuarios.js`): la base de datos y el backend de 3.15.0 no se tocan, y revertir
+  3.15.1 solo afecta a los frontends.
+- PWA con caché nueva `entimotors-v3.15.1` (Mi Trabajo: `entimotors-mitrabajo-v3.15.1`); la de 3.15.0 se borra al
+  activar la nueva. La actualización no es automática: la app avisa y la persona decide.
 
 ---
 
@@ -114,8 +128,8 @@ auditoría y seis documentos imprimibles que se pueden enviar como imagen o PDF.
 
 | Producto | Quién entra | Caché | Base local |
 |---|---|---|---|
-| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.15.0` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
-| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.15.0` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
+| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.15.1` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
+| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.15.1` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
 
 Se publican en **dos orígenes distintos** (la política de mismo origen del navegador es la que
 separa sus datos). `build-target.js` declara qué producto es cada copia y **lo decide el build,
@@ -316,8 +330,9 @@ No se toca `versionApp: "3.13.0"` de `armarRespaldoLocal313` (app.js): identific
 datos de la 3.13, no la versión de la app.
 
 El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z`: no se edita a mano.
-`pruebas/multiusuario/01-pwa-3.15.0.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.14.1`, `01-pwa-3.14.0` y
-`01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: los commits `e807f65` y `effbfa1` y el tag `v3.13.0`).
+`pruebas/multiusuario/01-pwa-3.15.1.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.15.0`, `01-pwa-3.14.1`, `01-pwa-3.14.0`
+y `01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: el tag `v3.15.0` (`f2a6598`), los commits `e807f65` y
+`effbfa1` y el tag `v3.13.0`).
 
 ---
 
@@ -344,6 +359,9 @@ los iconos vectoriales. Usa el backend y la base ya publicados; publicar o rever
 
 3.15.0 cambia base de datos, backend y frontends (sync-15a → 15g → backend → Taller y Mi Trabajo). Cada migración trae su
 script de reversión; las que registran actividad de 3.15 se niegan a revertirse si ya hay actividad.
+
+3.15.1 solo cambia los frontends (corrección de seguridad de los avisos): usa la base y el backend de 3.15.0 tal cual;
+publicar o revertir 3.15.1 solo afecta al Taller y a Mi Trabajo.
 
 **Pendiente conocido de 3.15.0 — rescate de datos de un dispositivo: DIFERIDO.** Un dispositivo conserva cambios que la
 nube no aceptó y que solo existen en él. Su respaldo fuera del dispositivo no se ha completado. Hasta entonces, 3.15.0

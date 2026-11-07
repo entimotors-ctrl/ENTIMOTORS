@@ -129,12 +129,12 @@ try {
   const componer = (...fs) => (t) => fs.reduce((acc, f) => f(acc), t);
   const MUTANTES = {
     // app.js: F-SEC-2 (sin esc() en el rol) + rol desconocido (sin lista blanca) + OBS-3 (eliminar cita con exigeGestion)
+    // + F-SEC-1 / TOAST-XSS (3.15.1: el escape vive en toast(); se revierte allí, aviso() de usuarios.js ya entrega texto plano)
     "app.js": componer(
       cambiar('(${esc(NOMBRE_ROL[currentUser?.rol] || currentUser?.rol || "—")})', '(${NOMBRE_ROL[currentUser?.rol] || currentUser?.rol || "—"})'),
       cambiar('if (typeof session.rol !== "string" || !ROLES_DEL_TALLER.includes(session.rol))', "if (false)"),
-      cambiar('if (!esAdmin()) { bloquear("Solo el administrador elimina una cita"); return; }', 'if (!exigeGestion("Solo el administrador elimina una cita")) return;')),
-    // usuarios.js: F-SEC-1 (aviso sin esc())
-    "usuarios.js": cambiar('toast(esc(msg), "off")', 'toast(msg, "off")'),
+      cambiar('if (!esAdmin()) { bloquear("Solo el administrador elimina una cita"); return; }', 'if (!exigeGestion("Solo el administrador elimina una cita")) return;'),
+      cambiar("${esc(msg)}`;", "${msg}`;")),
     // auth.js: F-FUNC-1 (sin conservar sin-conexion/tiempo-agotado) + OBS-4 (sin validar la forma del 200)
     "auth.js": componer(
       cambiar('if (r.motivo === "sin-conexion" || r.motivo === "tiempo-agotado") return mal(r.motivo, r.detalle);', ""),
