@@ -353,6 +353,9 @@
   .solo-telefono { display: none; }
   /* 3.16 (cambio 6): mensajes del administrador fijos arriba de Mi Trabajo y franja de mensaje nuevo */
   .mensaje-fijo { border-left: 4px solid var(--red); }
+  .input-oculto { display: none; }
+  .btn-fotos { width: 100%; cursor: pointer; }
+  #inputFotos:disabled + .btn-fotos, .btn-fotos:has(+ #inputFotos:disabled) { opacity: 0.5; pointer-events: none; }
   /* 3.16 (cambio 7): resultado de las acciones de Usuarios y equipo, fijo hasta «Entendido» */
   .aviso-fijo { margin-bottom: 1rem; border-left: 4px solid var(--green); }
   .aviso-fijo.aviso-error { border-left-color: var(--red); }
@@ -377,7 +380,8 @@
     table.tabla-tarjetas td, .tabla-renglones.tabla-tarjetas td:nth-child(3) { display: flex; justify-content: space-between; align-items: baseline;
       gap: 0.75rem; border: 0; padding: 0.15rem 0; text-align: right; }
     table.tabla-tarjetas td[data-label]::before { content: attr(data-label); color: var(--text-muted); font-size: 0.8rem; text-align: left; }
-    table.tabla-tarjetas td.celda-principal { display: block; text-align: left; font-weight: 600; padding-bottom: 0.3rem; overflow-wrap: anywhere; }
+    table.tabla-tarjetas tr { display: flex; flex-direction: column; }
+    table.tabla-tarjetas td.celda-principal { display: block; order: -1; text-align: left; font-weight: 600; padding-bottom: 0.3rem; overflow-wrap: anywhere; }
     table.tabla-tarjetas td:empty { display: none; }
     table.tabla-tarjetas tr.renglon-seccion { background: none; border: 0; border-radius: 0; padding: 0.3rem 0 0.1rem; margin: 0.8rem 0 0.3rem; }
     table.tabla-tarjetas tr.renglon-seccion td { padding: 0; }
@@ -1413,8 +1417,9 @@
             <p id="detalleFalla" style="color:var(--text-muted); font-size:0.9rem; margin:0;"></p>
           </div>
           <div>
-            <label style="margin-bottom:0.3rem;">Agregar fotos</label>
-            <input type="file" id="inputFotos" accept="image/*" multiple>
+            <!-- 3.16: el selector nativo («Elegir archivos / Ningún archivo seleccionado») era pequeño y poco claro en el teléfono -->
+            <label for="inputFotos" class="btn btn-fotos">📷 Tomar o elegir fotos</label>
+            <input type="file" id="inputFotos" accept="image/*" multiple class="input-oculto">
           </div>
         </div>
         <div class="photos" id="detalleFotos"></div>
@@ -1459,7 +1464,7 @@
       </div>
       <div class="widget-row" id="clientesWidgetRow"></div>
       <div class="table-scroll">
-      <table>
+      <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="1">
         <thead><tr><th></th><th>Cliente</th><th>Teléfono</th><th>Moto</th><th>Placa</th><th class="num">Km</th><th>Próx. mantenimiento</th><th></th></tr></thead>
         <tbody id="clientesBody"></tbody>
       </table>
@@ -1484,7 +1489,7 @@
       <div class="widget-row" id="inventarioWidgetRow"></div>
       <p class="hint">CSV esperado: <code>nombre,cantidad,precio,modelo</code> (con encabezado o sin él).</p>
       <div class="table-scroll">
-      <table>
+      <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="0">
         <thead><tr><th>Repuesto</th><th>Modelo compatible</th><th class="num">Cantidad</th><th class="num">Precio</th><th>Publicado en la web</th></tr></thead>
         <tbody id="inventarioBody"></tbody>
       </table>
@@ -1588,7 +1593,7 @@
       <div class="widget-grid" id="rendimientoResumen"></div>
       <div class="card fin-table-card">
         <div class="table-scroll">
-        <table>
+        <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="0">
           <thead><tr><th>Mecánico</th><th class="num">Pendientes</th><th class="num">Completados</th><th class="num">Producido</th><th class="num">Promedio</th></tr></thead>
           <tbody id="rendimientoBody"></tbody>
         </table>
@@ -1644,7 +1649,7 @@
       </div>
       <div class="card fin-table-card">
         <div class="table-scroll">
-        <table>
+        <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="4">
           <thead><tr><th>Fecha</th><th>Tipo</th><th>Categoría</th><th>Método</th><th>Descripción</th><th class="num">Monto</th><th></th></tr></thead>
           <tbody id="movimientosBody"></tbody>
         </table>
@@ -1681,7 +1686,7 @@
         </div>
       </div>
       <div class="table-scroll">
-      <table>
+      <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="0">
         <thead><tr><th>Cliente</th><th class="num">Facturas</th><th>Último crédito</th><th class="num">Total</th><th class="num">Abonado</th><th class="num">Saldo</th><th>Estado</th><th></th></tr></thead>
         <tbody id="creditosBody"></tbody>
       </table>

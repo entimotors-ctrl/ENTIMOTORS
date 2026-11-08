@@ -4759,6 +4759,28 @@ async function guardarRenglonOrden(r, editando, ctx) {
   return true;
 }
 
+/* 3.16 (cambio 3) · Tablas largas como tarjetas en el teléfono. Las tablas marcadas con data-etiquetas="auto" (Clientes,
+   Inventario, Finanzas, Créditos) copian a cada celda el texto de su columna como data-label, cada vez que se repintan: el CSS
+   de .tabla-tarjetas lo usa en pantallas angostas. data-principal es la columna que hace de título de la tarjeta. Así ninguna de
+   las funciones que pintan esas filas tiene que cambiar. Las filas con colspan («Ver más», «Sin datos») se dejan como están. */
+function etiquetarTabla(tabla) {
+  const titulos = [...tabla.querySelectorAll("thead th")].map((th) => th.textContent.trim());
+  const principal = Number(tabla.dataset.principal || 0);
+  tabla.querySelectorAll("tbody tr").forEach((tr) => {
+    if (tr.querySelector("td[colspan]")) return;
+    [...tr.children].forEach((td, i) => {
+      if (i === principal) td.classList.add("celda-principal");
+      else if (titulos[i] && !td.dataset.label) td.dataset.label = titulos[i];
+    });
+  });
+}
+document.querySelectorAll('table[data-etiquetas="auto"]').forEach((tabla) => {
+  const tbody = tabla.querySelector("tbody");
+  if (!tbody) return;
+  etiquetarTabla(tabla);
+  new MutationObserver(() => etiquetarTabla(tabla)).observe(tbody, { childList: true });
+});
+
 /* ---- enviar progreso de la reparación por WhatsApp ----
    3.16 (cambio 1): un enlace wa.me solo lleva texto, así que las fotos se quedaban en el sistema. Si la orden tiene fotos que
    todavía no se le mandaron al cliente, se abre una ventana con ellas marcadas y se comparten con el menú del teléfono (que ya
