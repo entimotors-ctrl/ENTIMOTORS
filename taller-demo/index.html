@@ -353,6 +353,10 @@
   .solo-telefono { display: none; }
   /* 3.16 (cambio 6): mensajes del administrador fijos arriba de Mi Trabajo y franja de mensaje nuevo */
   .mensaje-fijo { border-left: 4px solid var(--red); }
+  /* 3.16 (cambio 7): resultado de las acciones de Usuarios y equipo, fijo hasta «Entendido» */
+  .aviso-fijo { margin-bottom: 1rem; border-left: 4px solid var(--green); }
+  .aviso-fijo.aviso-error { border-left-color: var(--red); }
+  @media (max-width: 600px) { .lista-equipo .u-acciones > div, .u-eliminados .u-acciones > div { width: 100%; } .u-acciones .btn, .u-acciones select { flex: 1 1 100%; } }
   /* 3.16 (cambio 1): fotos del avance */
   .prog-fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
   .prog-foto { position: relative; display: block; border: 1px solid var(--border); border-radius: 0.6rem; overflow: hidden; cursor: pointer; }
@@ -1692,6 +1696,7 @@
       <div class="view-head">
         <div><h2>Usuarios y equipo</h2><p>Quién entra al sistema y con qué rol. Las cuentas las protege el servidor; los datos de este dispositivo los controla la aplicación.</p></div>
       </div>
+      <div id="usuariosAvisoFijo" role="status" style="display:none;"></div>
       <div id="usuariosCuerpo"></div>
     </section>
 
