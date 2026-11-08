@@ -1211,6 +1211,8 @@ async function renderMensajesMiTrabajo() {
   if (!mios.length) { cont.innerHTML = `<div class="card"><p style="color:var(--text-muted); margin:0;">No tienes mensajes del administrador.</p></div>`; return; }
   // 3.16 (cambio 6): los de las últimas 36 h y los sin leer quedan FIJOS arriba de Mi Trabajo; el resto, plegado más abajo
   const { fijos, historial } = MensajesFijos.separar(mios, Date.now(), noLeido);
+  // la franja de «mensaje nuevo» sobra cuando ya no queda ninguno sin leer (se marcó leído o se leyó en otro dispositivo)
+  if (!mios.some(noLeido)) { const franja = document.getElementById("avisoMensajeNuevo"); if (franja) franja.style.display = "none"; }
   if (contFijos) contFijos.innerHTML = fijos.length
     ? `<h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">📌 Mensajes del administrador</h3>` + (await tarjetasMensajes(fijos, ops, "mensaje-fijo")).join("")
     : "";
@@ -5375,8 +5377,14 @@ document.getElementById("btnCotRechazar").addEventListener("click", async () => 
    cotización no se podía borrar. Una cotización sin aceptar no movió inventario ni caja, así que basta con confirmar. */
 document.getElementById("btnCotEliminar").addEventListener("click", async () => {
   const id = cotizacionDetalleId;
+  // primero al día con la nube (como aceptar): otro teléfono pudo haberla aceptado y esta copia todavía no lo sabe
+  await alDiaParaDecidir();
   const cot = await DB.get("cotizaciones", id);
-  if (!cot || cot.estado === "aceptada" || cot.ordenId) return;
+  if (!cot || cot.estado === "aceptada" || cot.ordenId) {
+    toast(cot ? `La cotización #${cot.id} ya se aceptó: se corrige en su orden` : "Esa cotización ya no existe", "off");
+    if (cot) abrirCotizacionDetalle(cot.id);
+    return;
+  }
   const ok = await showConfirm(`Se borra la cotización #${cot.id} de ${cot.clienteNombre || cot.nombre || "este cliente"}. No movió inventario ni caja.`,
     { titulo: "Eliminar cotización", textoOk: "Eliminar" });
   if (!ok) return;

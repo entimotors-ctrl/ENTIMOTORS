@@ -144,6 +144,20 @@
   button.btn.wa:hover { background: #1a7a4d; }
   button.btn.danger { color: var(--red); }
   button.btn.danger:hover { background: var(--red-soft); border-color: var(--red-border); }
+  /* 3.16: «botones» que no son <button> (la etiqueta que abre el selector de fotos y los desplegables <summary>): mismo aspecto.
+     Sin esto tomaban la regla general de <label> (texto gris pequeño) y en el teléfono no se reconocían como botones. */
+  label.btn, summary.btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; margin: 0;
+    border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 0.55rem;
+    padding: 0.55rem 1rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; text-transform: none; letter-spacing: normal;
+  }
+  label.btn:hover, summary.btn:hover { border-color: var(--red-border); }
+  summary.btn.ghost { background: transparent; }
+  summary.btn.small { padding: 0.35rem 0.7rem; font-size: 0.78rem; }
+  summary.btn { list-style: none; }
+  summary.btn::-webkit-details-marker { display: none; }
+  summary.btn::before { content: "▸"; }
+  details[open] > summary.btn::before { content: "▾"; }
 
   /* ---- iconos SVG (sprite #i-*): heredan el color del texto; el acento rojo solo donde el contenedor lo pide ---- */
   svg.ic { width: 1em; height: 1em; flex: none; display: inline-block; vertical-align: -0.15em; overflow: visible; pointer-events: none; }
@@ -367,7 +381,8 @@
   .prog-foto input { position: absolute; top: 0.35rem; left: 0.35rem; width: 1.4rem; height: 1.4rem; margin: 0; }
   .prog-foto-estado { display: block; font-size: 0.72rem; padding: 0.25rem 0.4rem; color: var(--text-muted); }
   .prog-foto:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px var(--green); }
-  #avisoMensajeNuevo { display: none; position: fixed; top: calc(0.6rem + env(safe-area-inset-top)); left: 0.6rem; right: 0.6rem; z-index: 80;
+  /* z-index por DEBAJO de las ventanas (.modal-bg: 40 y 60) para no tapar sus botones, y por encima del contenido */
+  #avisoMensajeNuevo { display: none; position: fixed; top: calc(0.6rem + env(safe-area-inset-top)); left: 0.6rem; right: 0.6rem; z-index: 35;
     gap: 0.6rem; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 0.7rem 0.8rem; border-radius: var(--radius);
     background: var(--bg-raise); border: 1px solid var(--red-border, var(--border)); box-shadow: var(--shadow); }
   #avisoMensajeNuevo .aviso-msg-cuerpo { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; flex: 1 1 14rem; overflow-wrap: anywhere; }
