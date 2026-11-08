@@ -3738,6 +3738,8 @@ async function renderStageContent(o) {
         ord.calidadChecklist = { ...(ord.calidadChecklist || {}), [e.target.dataset.key]: e.target.checked };
       }));
     });
+    // 3.16: en Calidad todavía se corrigen repuestos y mano de obra (lo que se encontró en la prueba de manejo)
+    if (!esMecanicoCuenta()) await renderPresupuestoStage(o, { anexar: true, soloLectura: !puedeCorregirRenglones(o) });
 
   } else if (o.estado === "entregado" && esMecanicoCuenta()) {
     // ni importes ni tipo de cobro ni garantía: para él es un registro cerrado
@@ -3833,6 +3835,8 @@ async function renderStageContent(o) {
       const texto = `Hola ${cliente.nombre}, ${cuerpo} — ENTIMOTORS`;
       navegarWA(ventana, cliente.telefono, texto);
     });
+    // 3.16: antes de cobrar todavía se corrige el detalle; ya cobrada queda a la vista en solo lectura
+    await renderPresupuestoStage(o, { anexar: true, soloLectura: !puedeCorregirRenglones(o) });
   }
 }
 
@@ -3858,7 +3862,13 @@ function etiquetaStockRenglon(it) {
   return `<span class="renglon-tag">se descuenta al aprobar</span>`;
 }
 
-async function renderPresupuestoStage(o, { anexar = false } = {}) {
+/* 3.16 · Los renglones se corrigen en CUALQUIER etapa mientras la orden no esté cobrada (el servidor solo los cierra con
+   finalizada/anulada: editar_item_orden y quitar_item_orden, sync-15b). Ya cobrada se ven en solo lectura: corregirla es anularla. */
+function puedeCorregirRenglones(o) {
+  return !esMecanicoCuenta() && !o.finalizada && !o.anulada;
+}
+
+async function renderPresupuestoStage(o, { anexar = false, soloLectura = false } = {}) {
   const items = o.items || [];
   const el = document.getElementById("stageContent");
   const html = `
@@ -3874,17 +3884,20 @@ async function renderPresupuestoStage(o, { anexar = false } = {}) {
       <div style="display:flex; justify-content:space-between; margin-top:0.6rem; font-weight:600;">
         <span>Total</span><span id="itemsTotal" style="font-variant-numeric:tabular-nums;">${money(items.reduce((s, it) => s + it.cantidad * it.precio, 0))}</span>
       </div>
-      <button class="btn small" id="btnAgregarItem" style="margin-top:0.7rem;">+ Agregar mano de obra o repuesto</button>
-      <div id="aprobacionBox" style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line);"></div>
+      ${soloLectura
+        ? `<p class="hint" style="margin:0.7rem 0 0;">La orden ya se cobró: para corregirla hay que anularla (PIN del propietario).</p>`
+        : `<button class="btn small" id="btnAgregarItem" style="margin-top:0.7rem;">+ Agregar mano de obra o repuesto</button>
+      <div id="aprobacionBox" style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--line);"></div>`}
     </div>`;
   if (anexar) el.insertAdjacentHTML("beforeend", html); else el.innerHTML = html;
 
   document.getElementById("itemsBody").innerHTML = items.length ? filasTablaRenglones(items, ({ it, i }) => `
     <tr>
       <td class="celda-principal">${esc(it.nombre)}${etiquetaStockRenglon(it)}</td><td class="num" data-label="Cantidad">${it.cantidad}</td><td class="num" data-label="Precio">${money(it.precio)}</td><td class="num" data-label="Subtotal">${money(it.cantidad * it.precio)}</td>
-      <td class="num"><span class="acciones acciones-renglon"><button type="button" class="btn ghost small" data-editar="${i}" title="Editar renglón" aria-label="Editar ${esc(it.nombre)}">✎<span class="solo-telefono"> Editar</span></button><button type="button" class="btn ghost small danger" data-quitar="${i}" title="Quitar ítem" aria-label="Quitar ${esc(it.nombre)}">🗑<span class="solo-telefono"> Quitar</span></button></span></td>
+      <td class="num">${soloLectura ? "" : `<span class="acciones acciones-renglon"><button type="button" class="btn ghost small" data-editar="${i}" title="Editar renglón" aria-label="Editar ${esc(it.nombre)}">✎<span class="solo-telefono"> Editar</span></button><button type="button" class="btn ghost small danger" data-quitar="${i}" title="Quitar ítem" aria-label="Quitar ${esc(it.nombre)}">🗑<span class="solo-telefono"> Quitar</span></button></span>`}</td>
     </tr>`, { cols: 5, colSub: 3 }) : `<tr><td colspan="5" style="color:var(--text-faint);">Sin ítems todavía</td></tr>`;
 
+  if (soloLectura) return;
   document.getElementById("itemsBody").querySelectorAll("[data-editar]").forEach(btn => {
     btn.addEventListener("click", async () => {
       const idx = Number(btn.dataset.editar);
