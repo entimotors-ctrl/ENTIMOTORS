@@ -42,7 +42,10 @@ describe("README.md · 3.15.1", () => {
 describe("CHANGELOG.md · entrada 3.15.1", () => {
   const i3151 = CHANGELOG.indexOf("## 3.15.1"), i315 = CHANGELOG.indexOf("## 3.15.0"), E = CHANGELOG.slice(i3151, i315);
   test("es la PRIMERA entrada, declara el alcance (solo frontends) y nombra la corrección y sus pruebas", () => {
-    assert.equal(CHANGELOG.indexOf("## "), i3151); assert.ok(i315 > i3151);
+    // 3.16 en desarrollo: por encima solo puede haber UNA entrada cuyo título diga «SIN PUBLICAR»; 3.15.1 sigue siendo la primera publicada
+    const primera = CHANGELOG.indexOf("## "), titulo = CHANGELOG.slice(primera, CHANGELOG.indexOf("\n", primera));
+    if (primera !== i3151) { assert.match(titulo, /SIN PUBLICAR/, titulo); assert.equal(CHANGELOG.indexOf("\n## ", primera) + 1, i3151, "una sola entrada sin publicar"); }
+    assert.ok(i315 > i3151);
     for (const t of ["Alcance: solo frontends", "TOAST-XSS", "`toast()`", "`aviso()`", "32-toast-xss-nombres", "`entimotors-v3.15.1`", "`entimotors-mitrabajo-v3.15.1`", "`f2a6598`"]) assert.ok(E.includes(t), t);
     assert.doesNotMatch(E, PRIVADO);
   });
