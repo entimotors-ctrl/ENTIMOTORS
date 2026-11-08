@@ -56,7 +56,7 @@ describe("OBS-8 · orden de la pantalla real de Usuarios y equipo", () => {
     assert.deepEqual(R.filter((x) => !x.ok), [], "comprobaciones fallidas");
   });
   test("el fuente de usuarios.js declara la tarjeta antes que el botón «+ Nuevo usuario» y que la tabla", () => {
-    const i = FUENTE.indexOf('id="cardNuevoUsuario"'), b = FUENTE.indexOf('id="btnNuevoUsuario"'), t = FUENTE.indexOf("<table>");
+    const i = FUENTE.indexOf('id="cardNuevoUsuario"'), b = FUENTE.indexOf('id="btnNuevoUsuario"'), t = FUENTE.indexOf("<table");   // 3.16: la tabla lleva clases (vista en tarjetas)
     assert.ok(i > 0 && b > i && t > i, `card@${i} boton@${b} tabla@${t}`);
   });
   test("«+ Nuevo usuario» muestra el formulario y «Cancelar» lo oculta (los handlers siguen enganchados a los mismos ids)", async () => {
