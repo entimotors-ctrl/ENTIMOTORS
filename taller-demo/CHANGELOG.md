@@ -1,5 +1,46 @@
 # Registro de cambios · ENTIMOTORS OS
 
+## 3.16.0 — cambios pedidos por el cliente · parte A (SIN PUBLICAR, rama `feat/3.16-cambios-cliente`)
+
+> **Alcance: solo frontends.** Base de datos y backend sin cambios. La versión visible sigue siendo 3.15.1 hasta preparar la
+> publicación (subir `VERSION_APP`, cachés y `?v=`, regenerar el manifiesto de release y los builds). La parte B (citas y
+> trabajo rápido del mecánico) necesita migración y va aparte.
+
+### Avance por WhatsApp con fotos (cambio 1)
+- «📲 Progreso por WhatsApp» con fotos que el cliente todavía no recibió abre una ventana con ellas marcadas y las manda con
+  el menú de compartir del teléfono, junto con el texto. Las ya enviadas dicen «Ya enviada» y no se repiten (paso 2 sin la
+  foto del paso 1). Solo se marcan si el envío termina; cancelado o en PC (se descargan) se vuelven a ofrecer. Sin fotos
+  nuevas, el texto sale como siempre. La marca vive en este dispositivo (`fotos-avance.js`); en la nube, en la parte B.
+
+### Corregir presupuestos (cambio 2)
+- **Cotización:** «🗑 Eliminar cotización» funciona en producción. Antes pedía un código que solo existe en desarrollo y
+  ningún código servía. Basta con confirmar, porque una cotización sin aceptar no movió inventario ni caja. Una aceptada no
+  se borra y tiene «Abrir la orden #N para corregir».
+- **Orden:** los renglones se editan, quitan y agregan en cualquier etapa hasta cobrarla (también en Calidad y Entregado). Ya
+  cobrada se ven en solo lectura con la indicación de que se corrige anulándola.
+
+### Uso en el teléfono (cambio 3)
+- Presupuestos, cotizaciones, Clientes, Inventario, Finanzas, Créditos y Usuarios se ven como tarjetas en pantallas
+  angostas, con «Editar» / «Quitar» / «Eliminar» a la vista. Antes quedaban fuera de la pantalla dentro de tablas que había
+  que deslizar. En PC siguen siendo tablas.
+- Con el dedo todo lo que se toca mide al menos 44 px. «Agregar fotos» es un botón grande. El botón de inicio ya no tapa
+  el final de las listas.
+- Corregido: la fila de sección del presupuesto («Sin clasificar…») rompía las columnas de la tabla.
+
+### Mensajes al mecánico (cambio 6)
+- En Mi Trabajo, los mensajes del administrador de las últimas 36 horas y los que siguen sin leer quedan fijos arriba con
+  el texto completo; los demás, en «Mensajes anteriores». El aviso de mensaje nuevo muestra el texto y no se va solo.
+
+### Usuarios y equipo (cambio 7)
+- Al eliminar a alguien desaparece de la lista del equipo (queda en «Ver eliminados (N)», con su historial). Antes seguía en
+  la lista y parecía que no se había borrado.
+- El resultado de cada acción queda en un recuadro fijo hasta «Entendido». Si falta el PIN del propietario se dice antes de
+  empezar, con «Ir a Ajustes». Cambiar el rol pide confirmación.
+
+### Pruebas
+- `pruebas/ui-telefono/`: revisión de todas las pantallas a 360/390 px y pruebas t2–t8 sobre una copia sin nube.
+- `pruebas/sync/node/c1-fotos-avance`, `c6-mensajes-fijos`. Contrato de versionado del árbol: `3.16-dev` (21/20/25).
+
 ## 3.15.1 — corrección de seguridad (noviembre de 2026)
 
 > **Alcance: solo frontends (Taller y Mi Trabajo).** La base de datos (sync-15a → 15g) y el backend de 3.15.0 no cambian.
