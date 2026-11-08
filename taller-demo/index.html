@@ -328,7 +328,8 @@
   .cot-vacia { padding: 0.9rem 0.7rem; text-align: center; color: var(--text-faint); font-size: 0.83rem; }
 
   /* 3.15 · Bloque 2: renglones separados por tipo (taller / repuestos del negocio / manuales / sin clasificar) */
-  .renglon-seccion { padding: 0.4rem 0.7rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  /* solo el div de la lista de la cotización: aplicado también a <tr> lo volvía flex y rompía las columnas de la tabla */
+  div.renglon-seccion { padding: 0.4rem 0.7rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
     color: var(--text-muted); background: var(--surface-2, rgba(127,127,127,0.08)); display: flex; justify-content: space-between; gap: 0.5rem; }
   .renglon-seccion + .cot-item-fila { border-top: none; }
   tr.renglon-seccion td { padding: 0.45rem 0.4rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
@@ -344,6 +345,36 @@
   .tabla-renglones td .acciones { display: inline-flex; gap: 0.2rem; }
   @media (max-width: 560px) {
     .tabla-renglones th:nth-child(3), .tabla-renglones td:nth-child(3) { display: none; }
+  }
+
+  /* 3.16 · En el teléfono las tablas con acciones se ven como TARJETAS: una fila = una tarjeta, cada celda con su etiqueta
+     (data-label) y los botones a lo ancho, con texto. Antes la tabla era más ancha que la pantalla y los botones de editar/quitar
+     quedaban fuera de la vista sin que nada indicara que había que deslizarla. En PC se queda la tabla. */
+  .solo-telefono { display: none; }
+  @media (max-width: 600px) {
+    .solo-telefono { display: inline; }
+    table.tabla-tarjetas, table.tabla-tarjetas tbody, table.tabla-tarjetas tr, table.tabla-tarjetas td { display: block; width: 100%; }
+    table.tabla-tarjetas thead { display: none; }
+    table.tabla-tarjetas tr { border: 1px solid var(--border); border-radius: 0.7rem; padding: 0.6rem 0.75rem; margin-bottom: 0.6rem; background: var(--bg-raise); }
+    table.tabla-tarjetas td, .tabla-renglones.tabla-tarjetas td:nth-child(3) { display: flex; justify-content: space-between; align-items: baseline;
+      gap: 0.75rem; border: 0; padding: 0.15rem 0; text-align: right; }
+    table.tabla-tarjetas td[data-label]::before { content: attr(data-label); color: var(--text-muted); font-size: 0.8rem; text-align: left; }
+    table.tabla-tarjetas td.celda-principal { display: block; text-align: left; font-weight: 600; padding-bottom: 0.3rem; overflow-wrap: anywhere; }
+    table.tabla-tarjetas td:empty { display: none; }
+    table.tabla-tarjetas tr.renglon-seccion { background: none; border: 0; border-radius: 0; padding: 0.3rem 0 0.1rem; margin: 0.8rem 0 0.3rem; }
+    table.tabla-tarjetas tr.renglon-seccion td { padding: 0; }
+    .acciones-renglon, .tabla-renglones td .acciones-renglon { display: flex; gap: 0.5rem; width: 100%; margin-top: 0.4rem; }
+    .acciones-renglon > button { flex: 1 1 0; justify-content: center; }
+    .cot-item-fila { flex-wrap: wrap; }
+    .cot-item-fila .acciones-renglon { flex-basis: 100%; }
+    .cot-item-fila .acciones-renglon button { border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text); }
+  }
+  /* 3.16 · Con el dedo, todo lo que se toca mide al menos 44 px (pauta de accesibilidad táctil). Con ratón no cambia nada. */
+  @media (pointer: coarse) {
+    .btn, button.btn.small, .seg-opt, .cat-chip, select,
+    input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]) { min-height: 44px; }
+    .btn, .acciones button, .acciones-renglon button { min-width: 44px; min-height: 44px; }
+    .btn, .cat-chip { display: inline-flex; align-items: center; justify-content: center; }
   }
 
   .cot-totales { display: grid; gap: 0.25rem; margin-bottom: 0.9rem; font-size: 0.88rem; }
@@ -406,6 +437,8 @@
     cursor: pointer; box-shadow: var(--shadow); transition: transform .15s, background .15s;
   }
   #shell.active ~ #fabHome:not(.fab-hidden) { display: flex; }
+  /* 3.16: espacio al final de cada vista para que el botón no tape la última fila ni el carrito */
+  #shell.active .view { padding-bottom: calc(52px + 2.2rem + env(safe-area-inset-bottom)); }
   #fabHome:hover { background: var(--red-hover); }
   #fabHome:active { transform: scale(0.92); }
   @media print { #fabHome { display: none !important; } }
@@ -1957,7 +1990,7 @@
     </div>
 
     <div class="table-scroll">
-      <table>
+      <table class="tabla-renglones tabla-tarjetas">
         <thead><tr><th>Ítem</th><th class="num">Cant.</th><th class="num">Precio</th><th class="num">Subtotal</th></tr></thead>
         <tbody id="cotDetItems"></tbody>
       </table>

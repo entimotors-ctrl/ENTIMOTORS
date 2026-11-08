@@ -3866,7 +3866,7 @@ async function renderPresupuestoStage(o, { anexar = false } = {}) {
       <h4 class="font-display" style="font-size:0.95rem; margin-bottom:0.6rem;">${anexar ? "Repuestos y mano de obra" : "Presupuesto"}</h4>
       <div class="presupuesto-estado" id="presupuestoEstado"></div>
       <div class="table-scroll">
-        <table id="tablaItems" class="tabla-renglones">
+        <table id="tablaItems" class="tabla-renglones tabla-tarjetas">
           <thead><tr><th>Ítem</th><th class="num">Cant.</th><th class="num">Precio</th><th class="num">Subtotal</th><th></th></tr></thead>
           <tbody id="itemsBody"></tbody>
         </table>
@@ -3881,8 +3881,8 @@ async function renderPresupuestoStage(o, { anexar = false } = {}) {
 
   document.getElementById("itemsBody").innerHTML = items.length ? filasTablaRenglones(items, ({ it, i }) => `
     <tr>
-      <td>${esc(it.nombre)}${etiquetaStockRenglon(it)}</td><td class="num">${it.cantidad}</td><td class="num">${money(it.precio)}</td><td class="num">${money(it.cantidad * it.precio)}</td>
-      <td class="num"><span class="acciones"><button type="button" class="btn ghost small" data-editar="${i}" title="Editar renglón" aria-label="Editar ${esc(it.nombre)}">✎</button><button type="button" class="btn ghost small danger" data-quitar="${i}" title="Quitar ítem" aria-label="Quitar ítem">🗑</button></span></td>
+      <td class="celda-principal">${esc(it.nombre)}${etiquetaStockRenglon(it)}</td><td class="num" data-label="Cantidad">${it.cantidad}</td><td class="num" data-label="Precio">${money(it.precio)}</td><td class="num" data-label="Subtotal">${money(it.cantidad * it.precio)}</td>
+      <td class="num"><span class="acciones acciones-renglon"><button type="button" class="btn ghost small" data-editar="${i}" title="Editar renglón" aria-label="Editar ${esc(it.nombre)}">✎<span class="solo-telefono"> Editar</span></button><button type="button" class="btn ghost small danger" data-quitar="${i}" title="Quitar ítem" aria-label="Quitar ${esc(it.nombre)}">🗑<span class="solo-telefono"> Quitar</span></button></span></td>
     </tr>`, { cols: 5, colSub: 3 }) : `<tr><td colspan="5" style="color:var(--text-faint);">Sin ítems todavía</td></tr>`;
 
   document.getElementById("itemsBody").querySelectorAll("[data-editar]").forEach(btn => {
@@ -4928,8 +4928,8 @@ function renderCotItemsEdit() {
       <div class="cot-item-fila">
         <span class="nom">${esc(it.nombre)}<small>${it.cantidad} × ${money(it.precio)}</small></span>
         <span class="sub">${money(it.cantidad * it.precio)}</span>
-        <button type="button" data-editar="${i}" title="Editar" aria-label="Editar ${esc(it.nombre)}">✎</button>
-        <button type="button" data-quitar="${i}" title="Quitar" aria-label="Quitar ${esc(it.nombre)}">🗑</button>
+        <span class="acciones-renglon"><button type="button" data-editar="${i}" title="Editar" aria-label="Editar ${esc(it.nombre)}">✎<span class="solo-telefono"> Editar</span></button>
+        <button type="button" data-quitar="${i}" title="Quitar" aria-label="Quitar ${esc(it.nombre)}">🗑<span class="solo-telefono"> Quitar</span></button></span>
       </div>`).join("")}`).join("")
     : `<div class="cot-vacia">Sin renglones todavía — agrega la mano de obra y los repuestos.</div>`;
 
@@ -5084,7 +5084,7 @@ async function abrirCotizacionDetalle(id) {
   document.getElementById("cotDetDiagnostico").textContent = cot.diagnostico || "";
 
   document.getElementById("cotDetItems").innerHTML = filasTablaRenglones(cot.items || [], ({ it }) => `
-    <tr><td>${esc(it.nombre)}</td><td class="num">${it.cantidad}</td><td class="num">${money(it.precio)}</td><td class="num">${money(it.cantidad * it.precio)}</td></tr>`);
+    <tr><td class="celda-principal">${esc(it.nombre)}</td><td class="num" data-label="Cantidad">${it.cantidad}</td><td class="num" data-label="Precio">${money(it.precio)}</td><td class="num" data-label="Subtotal">${money(it.cantidad * it.precio)}</td></tr>`);
 
   document.getElementById("cotDetTotales").innerHTML = totalesPorTipoHtml(cot.items || []);
 
