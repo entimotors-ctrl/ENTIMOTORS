@@ -353,6 +353,13 @@
   .solo-telefono { display: none; }
   /* 3.16 (cambio 6): mensajes del administrador fijos arriba de Mi Trabajo y franja de mensaje nuevo */
   .mensaje-fijo { border-left: 4px solid var(--red); }
+  /* 3.16 (cambio 1): fotos del avance */
+  .prog-fotos { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 0.5rem; margin-bottom: 0.4rem; }
+  .prog-foto { position: relative; display: block; border: 1px solid var(--border); border-radius: 0.6rem; overflow: hidden; cursor: pointer; }
+  .prog-foto img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--panel); }
+  .prog-foto input { position: absolute; top: 0.35rem; left: 0.35rem; width: 1.4rem; height: 1.4rem; margin: 0; }
+  .prog-foto-estado { display: block; font-size: 0.72rem; padding: 0.25rem 0.4rem; color: var(--text-muted); }
+  .prog-foto:has(input:checked) { border-color: var(--green); box-shadow: 0 0 0 2px var(--green); }
   #avisoMensajeNuevo { display: none; position: fixed; top: calc(0.6rem + env(safe-area-inset-top)); left: 0.6rem; right: 0.6rem; z-index: 80;
     gap: 0.6rem; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 0.7rem 0.8rem; border-radius: var(--radius);
     background: var(--bg-raise); border: 1px solid var(--red-border, var(--border)); box-shadow: var(--shadow); }
@@ -2205,6 +2212,22 @@
   </div>
 </div>
 
+<!-- 3.16 (cambio 1): avance por WhatsApp con las fotos que el cliente todavía no recibió -->
+<div class="modal-bg" id="modalProgresoFotos">
+  <div class="modal">
+    <h3>Avance por WhatsApp</h3>
+    <p class="hint" id="progFotosTexto" style="margin-top:0;"></p>
+    <p class="hint" style="margin:0 0 0.4rem;">Vienen marcadas las fotos que el cliente todavía no recibió. Al enviar se abre el menú del teléfono: elige WhatsApp y el chat del cliente.</p>
+    <div class="prog-fotos" id="progFotosLista"></div>
+    <p class="hint" id="progFotosEstado" aria-live="polite"></p>
+    <div class="modal-actions" style="flex-wrap:wrap;">
+      <button class="btn ghost" id="btnProgFotosCerrar">Cancelar</button>
+      <button class="btn ghost" id="btnProgFotosSoloTexto">Solo el texto</button>
+      <button class="btn wa" id="btnProgFotosEnviar" disabled>Enviar por WhatsApp</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: cobrar servicio suelto en TPV (sin inventario) -->
 <div class="modal-bg" id="modalServicioPOS">
   <div class="modal">
@@ -2751,6 +2774,7 @@
 <script src="fecha-negocio.js?v=3.15.1"></script>
 <script src="finanzas-calc.js?v=3.15.1"></script>
 <script src="mensajes-fijos.js?v=3.15.1"></script>
+<script src="fotos-avance.js?v=3.15.1"></script>
 <script src="config-local.js?v=3.15.1"></script>
 <!-- Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5). Apagado por
      defecto (ver sync-engine.js): sin ENTIMOTORS_SYNC.enabled === true, que

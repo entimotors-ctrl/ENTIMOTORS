@@ -19,6 +19,8 @@ const SHELL = ["./", "./index.html",
   "./finanzas-calc.js?v=3.15.1",
   // 3.16 (cambio 6): qué mensajes del administrador quedan fijos arriba en Mi Trabajo
   "./mensajes-fijos.js?v=3.15.1",
+  // 3.16 (cambio 1): qué fotos del avance ya recibió el cliente
+  "./fotos-avance.js?v=3.15.1",
   // Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5) + fotos de Mi Trabajo (SYNC-6): mismo
   // motivo que la capa de Supabase, index.html los carga antes de app.js.
   "./sync-rest.js?v=3.15.1", "./sync-db.js?v=3.15.1", "./sync-engine.js?v=3.15.1", "./sync-realtime.js?v=3.15.1", "./sync-mappers.js?v=3.15.1",

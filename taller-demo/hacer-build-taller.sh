@@ -21,7 +21,7 @@ if [ -z "$DESTINO" ]; then echo "uso: $0 <directorio-destino>" >&2; exit 1; fi
 ORIGEN="$(cd "$(dirname "$0")" && pwd)"
 
 PUBLICAR=(index.html manifest.json sw.js build-target.js supabase-config.js supabase-client.js auth.js recovery.js
-  fecha-negocio.js finanzas-calc.js mensajes-fijos.js sync-rest.js sync-db.js sync-engine.js sync-realtime.js sync-mappers.js sync-fotos.js
+  fecha-negocio.js finanzas-calc.js mensajes-fijos.js fotos-avance.js sync-rest.js sync-db.js sync-engine.js sync-realtime.js sync-mappers.js sync-fotos.js
   sync-finanzas.js pin-ui.js import-313.js app.js usuarios.js
   icons/icon-192.png icons/icon-192-maskable.png icons/icon-512.png icons/icon-512-maskable.png icons/logo-watermark.png icons/logo-watermark-doc.png)
 

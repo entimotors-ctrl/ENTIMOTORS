@@ -4759,15 +4759,144 @@ async function guardarRenglonOrden(r, editando, ctx) {
   return true;
 }
 
-/* ---- enviar progreso de la reparación por WhatsApp ---- */
-document.getElementById("btnEnviarProgresoWA").addEventListener("click", () => {
-  const ventana = abrirVentanaWA(); // sincrónico, antes de cualquier await
-  const { o, moto, cliente } = currentOrderCache;
+/* ---- enviar progreso de la reparación por WhatsApp ----
+   3.16 (cambio 1): un enlace wa.me solo lleva texto, así que las fotos se quedaban en el sistema. Si la orden tiene fotos que
+   todavía no se le mandaron al cliente, se abre una ventana con ellas marcadas y se comparten con el menú del teléfono (que ya
+   trae WhatsApp), igual que la factura. Solo se marcan como enviadas cuando el menú de compartir termina bien: si se cancela o el
+   navegador no comparte archivos, el próximo avance las vuelve a ofrecer. Sin fotos nuevas, el texto sale como siempre. */
+function textoProgreso(o, moto, cliente) {
   const motoDesc = `${moto.marca} ${moto.modelo}`.trim();
   const cuerpo = (PROGRESO_MENSAJES[o.estado] || (() => `tu ${motoDesc} avanzó de etapa.`))(motoDesc);
-  const texto = `Hola ${cliente.nombre}, ${cuerpo} — ENTIMOTORS`;
-  navegarWA(ventana, cliente.telefono, texto);
+  return `Hola ${cliente.nombre}, ${cuerpo} — ENTIMOTORS`;
+}
+function llaveFotosAvance(o) { return o.uid || "local:" + o.id; }
+function fotosDeLaOrden(o) {
+  // las del Taller (base64 en el dispositivo; en Mi Trabajo, rutas) + la evidencia de los mecánicos (rutas de Storage)
+  return [...(o.fotos || []), ...(o.fotosNube || []).filter(esRutaFoto)];
+}
+
+document.getElementById("btnEnviarProgresoWA").addEventListener("click", () => {
+  const { o, moto, cliente } = currentOrderCache;
+  const texto = textoProgreso(o, moto, cliente);
+  const fotos = fotosDeLaOrden(o);
+  if (!FotosAvance.pendientes(fotos, FotosAvance.enviadasDe(llaveFotosAvance(o))).length) {
+    navegarWA(abrirVentanaWA(), cliente.telefono, texto);   // abrirVentanaWA sincrónico: el toque sigue vigente
+    return;
+  }
+  abrirProgresoFotos(o, cliente, texto, fotos);
 });
+
+let progresoFotos = null;   // { o, cliente, texto, fotos: [{ src, clave, enviada, archivo, error }] }
+
+function dataUrlABlob(url) {
+  const [cab, datos] = url.split(",");
+  const tipo = (cab.match(/^data:([^;,]+)/i) || [])[1] || "image/jpeg";
+  const bin = /;base64/i.test(cab) ? atob(datos) : decodeURIComponent(datos);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: tipo });
+}
+
+function abrirProgresoFotos(o, cliente, texto, fotos) {
+  const enviadas = FotosAvance.enviadasDe(llaveFotosAvance(o));
+  const ctx = { o, cliente, texto, fotos: fotos.map((src) => ({ src, clave: FotosAvance.claveFoto(src), enviada: false, archivo: null, error: false })) };
+  ctx.fotos.forEach((f) => { f.enviada = enviadas.includes(f.clave); });
+  progresoFotos = ctx;
+  document.getElementById("progFotosTexto").textContent = texto;
+  const lista = document.getElementById("progFotosLista");
+  lista.innerHTML = ctx.fotos.map((f, i) => `
+    <label class="prog-foto">
+      <input type="checkbox" data-i="${i}" ${f.enviada ? "" : "checked"}>
+      <img data-i="${i}" alt="Foto ${i + 1} de la orden" ${/^data:/i.test(f.src) ? `src="${esc(f.src)}"` : ""}>
+      <span class="prog-foto-estado">${f.enviada ? "Ya enviada" : "Nueva"}</span>
+    </label>`).join("");
+  lista.querySelectorAll("input[type=checkbox]").forEach((c) => c.addEventListener("change", pintarEstadoProgresoFotos));
+  document.getElementById("modalProgresoFotos").classList.add("active");
+  pintarEstadoProgresoFotos();
+  prepararArchivosProgreso(ctx);
+}
+
+/* Los archivos se arman ANTES de tocar «Enviar»: navigator.share solo funciona mientras el toque sigue vigente. */
+async function prepararArchivosProgreso(ctx) {
+  await Promise.all(ctx.fotos.map(async (f, i) => {
+    try {
+      let blob;
+      if (/^data:/i.test(f.src)) blob = dataUrlABlob(f.src);
+      else {
+        const url = await obtenerUrlFotoFirmada(f.src);
+        if (!url) throw new Error("sin URL");
+        blob = await (await fetch(url)).blob();
+        const img = document.querySelector(`#progFotosLista img[data-i="${i}"]`);
+        if (img && progresoFotos === ctx) img.src = URL.createObjectURL(blob);
+      }
+      const ext = (blob.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
+      f.archivo = new File([blob], `avance-orden-${ctx.o.id}-${i + 1}.${ext}`, { type: blob.type || "image/jpeg" });
+    } catch (e) { f.error = true; }
+  }));
+  if (progresoFotos === ctx) pintarEstadoProgresoFotos();
+}
+
+function fotosElegidas(ctx) {
+  return [...document.querySelectorAll("#progFotosLista input[type=checkbox]")].filter((c) => c.checked).map((c) => ctx.fotos[Number(c.dataset.i)]);
+}
+
+function pintarEstadoProgresoFotos() {
+  const ctx = progresoFotos;
+  if (!ctx) return;
+  const elegidas = fotosElegidas(ctx);
+  const faltan = elegidas.filter((f) => !f.archivo && !f.error).length;
+  const fallaron = elegidas.filter((f) => f.error).length;
+  const btn = document.getElementById("btnProgFotosEnviar");
+  btn.disabled = !elegidas.length || faltan > 0 || fallaron === elegidas.length;
+  btn.textContent = elegidas.length ? `Enviar ${elegidas.length} foto${elegidas.length === 1 ? "" : "s"} por WhatsApp` : "Elige al menos una foto";
+  document.getElementById("progFotosEstado").textContent = faltan ? "Preparando las fotos…"
+    : fallaron ? `${fallaron} foto${fallaron === 1 ? "" : "s"} no se pudo cargar (sin conexión o sin permiso) y no se enviará.` : "";
+}
+
+function cerrarProgresoFotos() {
+  document.querySelectorAll("#progFotosLista img").forEach((img) => { if (img.src.startsWith("blob:")) URL.revokeObjectURL(img.src); });
+  progresoFotos = null;
+  document.getElementById("modalProgresoFotos").classList.remove("active");
+}
+
+document.getElementById("btnProgFotosEnviar").addEventListener("click", () => {
+  const ctx = progresoFotos;
+  if (!ctx) return;
+  const elegidas = fotosElegidas(ctx).filter((f) => f.archivo);
+  const files = elegidas.map((f) => f.archivo);
+  if (!files.length) return;
+  // ni un solo await antes de share(): el navegador solo lo permite mientras el toque sigue vigente
+  if (navigator.canShare?.({ files })) {
+    navigator.clipboard?.writeText(ctx.texto).catch(() => {});   // en iPhone WhatsApp a veces descarta el texto: queda para pegarlo
+    navigator.share({ files, text: ctx.texto, title: `Avance de la orden #${ctx.o.id}` })
+      .then(() => {
+        const llave = llaveFotosAvance(ctx.o);
+        FotosAvance.guardar(llave, FotosAvance.marcar(FotosAvance.enviadasDe(llave), elegidas.map((f) => f.src)));
+        cerrarProgresoFotos();
+        toast(`Avance enviado · ${files.length} foto${files.length === 1 ? "" : "s"} (el texto también quedó copiado)`);
+      })
+      .catch((err) => {
+        if (err?.name === "AbortError") return;   // canceló el menú: no se marca nada
+        toast("No se pudo abrir el menú de compartir", "off");
+      });
+    return;
+  }
+  // PC u otro navegador que no comparte archivos: se descargan para adjuntarlas a mano y NO se marcan como enviadas
+  files.forEach((archivo) => {
+    const url = URL.createObjectURL(archivo), a = document.createElement("a");
+    a.href = url; a.download = archivo.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+  toast("Este navegador no comparte fotos: se descargaron para que las adjuntes", "off");
+});
+
+document.getElementById("btnProgFotosSoloTexto").addEventListener("click", () => {
+  const ctx = progresoFotos;
+  if (!ctx) return;
+  navegarWA(abrirVentanaWA(), ctx.cliente.telefono, ctx.texto);
+  cerrarProgresoFotos();
+});
+document.getElementById("btnProgFotosCerrar").addEventListener("click", cerrarProgresoFotos);
 
 /* ---- factura de la orden: imprimirla o mandarla como archivo ----
    Llenar la plantilla es lo mismo en los dos casos, así que va aparte y

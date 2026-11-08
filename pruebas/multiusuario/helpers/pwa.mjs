@@ -13,7 +13,8 @@ export const CONTRATOS = {
   "3.15.0": { etiquetas: 19, shellV: 18, shell: 23 },   // + fecha-negocio.js y sync-realtime.js (Bloque 3) y finanzas-calc.js (Bloque 5)
   "3.15.1": { etiquetas: 19, shellV: 18, shell: 23 },   // TOAST-XSS: sin scripts nuevos (toast() de app.js y aviso() de usuarios.js)
   // 3.16 en desarrollo (rama feat/3.16-cambios-cliente, la versión sigue «3.15.1» hasta preparar la publicación): + mensajes-fijos.js
-  "3.16-dev": { etiquetas: 20, shellV: 19, shell: 24 },
+  // y fotos-avance.js
+  "3.16-dev": { etiquetas: 21, shellV: 20, shell: 25 },
 };
 export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.15.1";
 /* RELEASE 3.15.1: el árbol de trabajo ES la release 3.15.1 (19 / 18 / 23). Las releases PUBLICADAS 3.15.0 (instantánea f2a6598) y 3.14.1

@@ -34,7 +34,7 @@ function textoVisible(html) {
 
 test("L16 · el artefacto del Taller es EXACTAMENTE su lista; ninguno de los dos publica archivos técnicos", () => {
   const t = archivos(TALLER), m = archivos(MT);
-  assert.equal(t.length, 28, t.join(", "));   // 3.16: + mensajes-fijos.js
+  assert.equal(t.length, 29, t.join(", "));   // 3.16: + mensajes-fijos.js y fotos-avance.js
   for (const lista of [t, m]) for (const f of lista) {
     assert.doesNotMatch(f, /\.(sh|md|sql)$|panel-tecnico|config-local|build-mecanicos|supabase\//, f);
   }

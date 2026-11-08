@@ -88,11 +88,11 @@ describe("contenido del build de «Mi Trabajo»", () => {
     const sw = leerEn(destino, "sw.js"); assert.deepEqual([...sw.matchAll(/const CACHE_NAME = "([^"]+)"/g)].map((m) => m[1]), [`entimotors-mitrabajo-v${V}`]);
     for (const f of ["app.js", "sw.js", "index.html"]) assert.ok(!/3\.12\.[12](?![0-9])|entimotors-(mitrabajo-)?v3\.12\./.test(leerEn(destino, f)), f);
   });
-  test(`los 19 <script ?v=> de index.html (los 20 del taller sin config-local.js) apuntan a ${V} y el SHELL del service worker coincide`, () => {
+  test(`los 20 <script ?v=> de index.html (los 21 del taller sin config-local.js) apuntan a ${V} y el SHELL del service worker coincide`, () => {
     const idx = leerEn(destino, "index.html"); assert.deepEqual([...idx.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)].map((m) => `${m[1]}?v=${m[2]}`).sort(),
-      ["app.js", "auth.js", "build-target.js", "fecha-negocio.js", "finanzas-calc.js", "import-313.js", "mensajes-fijos.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
+      ["app.js", "auth.js", "build-target.js", "fecha-negocio.js", "finanzas-calc.js", "fotos-avance.js", "import-313.js", "mensajes-fijos.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js", "sync-db.js", "sync-engine.js",
        "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-realtime.js", "sync-rest.js", "usuarios.js"].map((a) => `${a}?v=${V}`).sort());
-    assert.equal(ETIQUETAS_MT, 19);
+    assert.equal(ETIQUETAS_MT, 20);
   });
   test("index.html = el del taller SIN el bloque de config-local, con titulo y textos de «Mi Trabajo» (transformacion documentada del script)", () => {
     const src = leerEn(RUNTIME, "index.html");
@@ -128,7 +128,7 @@ describe("contenido del build de «Mi Trabajo»", () => {
     const sw = leerEn(destino, "sw.js"); const w = ejecutarServiceWorker({ sw });
     assert.equal(w.nombreCache(), `entimotors-mitrabajo-v${V}`); await w.instalar();
     assert.deepEqual(w.llamadas.abiertas, [`entimotors-mitrabajo-v${V}`]); assert.equal(w.llamadas.skipWaiting, 0, "skipWaiting automatico en install");
-    const shell = w.shell(); assert.equal(shell.length, K.shell); assert.equal(K.shell, 24);   // 3.15 (Bloque 5): + finanzas-calc.js · 3.16: + mensajes-fijos.js
+    const shell = w.shell(); assert.equal(shell.length, K.shell); assert.equal(K.shell, 25);   // 3.15 (Bloque 5): + finanzas-calc.js · 3.16: + mensajes-fijos.js y fotos-avance.js
     for (const url of shell) { assert.ok(w.llamadas.fetch.some((f) => f.url === url && f.opciones?.cache === "no-store"), `no se precacheo ${url} con no-store`); if (url !== "./") assert.ok(fs.existsSync(path.join(destino, url.slice(2).split("?")[0])), `SHELL: ${url} no existe en el build`); }
   });
   test("al activarse, el service worker del build borra caches VIEJAS de Mi Trabajo, conserva la actual y llama clients.claim() sin skipWaiting", async () => {
