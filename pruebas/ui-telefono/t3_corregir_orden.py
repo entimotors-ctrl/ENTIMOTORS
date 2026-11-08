@@ -35,7 +35,7 @@ try:
         # cobrarla
         pg.click("#btnAvanzar"); pg.wait_for_timeout(800)
         for _ in range(3):
-            ok = pg.locator(".modal.active .btn.primary").first
+            ok = pg.locator("#modalConfirm.active #btnConfirmAceptar").first
             if ok.is_visible(): ok.click(); pg.wait_for_timeout(1000)
         finalizada = pg.evaluate("(async () => (await DB.get('ordenes', 3)).finalizada === true)()")
         comprobar(finalizada, "la orden 3 quedó cobrada (finalizada)")

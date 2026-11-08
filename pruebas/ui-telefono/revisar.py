@@ -39,14 +39,16 @@ MEDIR = """([nombre, minimo]) => {
 }"""
 
 
-def preparar_copia():
+def preparar_copia(con_codigo_admin=True):
+    """con_codigo_admin=False reproduce producción: allí config-local.js no existe y no hay adminCode."""
     destino = tempfile.mkdtemp(prefix="entimotors-telefono-")
     app = os.path.join(destino, "app")
     shutil.copytree(os.path.join(RAIZ, "taller-demo"), app, ignore=shutil.ignore_patterns("supabase", "build-mecanicos", "config-local.js"))
     with open(os.path.join(app, "supabase-config.js"), "w") as f:
         f.write('window.ENTIMOTORS_SUPABASE = { url: "http://127.0.0.1:9", anonKey: "x", habilitado: false, apiUrl: "" };\n')
     with open(os.path.join(app, "config-local.js"), "w") as f:
-        f.write('window.ENTIMOTORS_LOCAL = { teamPasswords: { wilkin: "prueba123" }, adminCode: "0000" };\n')
+        codigo = ', adminCode: "0000"' if con_codigo_admin else ""
+        f.write('window.ENTIMOTORS_LOCAL = { teamPasswords: { wilkin: "prueba123" }' + codigo + ' };\n')
     return destino, app
 
 

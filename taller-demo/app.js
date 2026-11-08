@@ -5118,6 +5118,12 @@ async function abrirCotizacionDetalle(id) {
   document.getElementById("btnCotRechazar").style.display = (estado === "pendiente" || estado === "vencida") ? "inline-flex" : "none";
   document.getElementById("btnCotRenovar").style.display = (estado === "vencida" || estado === "rechazada") ? "inline-flex" : "none";
   document.getElementById("btnCotEnviarWA").style.display = yaCerrada ? "none" : "inline-flex";
+  // 3.16: una aceptada no se borra (ya es una orden con su inventario): se corrige en la orden, a un toque
+  document.getElementById("btnCotEliminar").style.display = yaCerrada || cot.ordenId ? "none" : "inline-flex";
+  const abrirOrden = document.getElementById("btnCotAbrirOrden");
+  abrirOrden.style.display = cot.ordenId ? "inline-flex" : "none";
+  abrirOrden.textContent = cot.ordenId ? `Abrir la orden #${cot.ordenId} para corregir` : "";
+  abrirOrden.dataset.orden = cot.ordenId || "";
 
   document.getElementById("modalCotDetalle").classList.add("active");
 }
@@ -5172,16 +5178,29 @@ document.getElementById("btnCotRechazar").addEventListener("click", async () => 
   abrirCotizacionDetalle(cot.id);
 });
 
-document.getElementById("btnCotEliminar").addEventListener("click", () => {
+/* 3.16: antes pedía el código de administrador de config-local.js, que NO se publica: en producción ningún código servía y la
+   cotización no se podía borrar. Una cotización sin aceptar no movió inventario ni caja, así que basta con confirmar. */
+document.getElementById("btnCotEliminar").addEventListener("click", async () => {
   const id = cotizacionDetalleId;
-  requestAdminCode(async () => {
-    await DB.delete("cotizaciones", id);
-    markDirty();
-    toast("Cotización eliminada");
-    cerrarCotDetalle();
-    await renderCotizaciones();
-    renderDashboard();
-  });
+  const cot = await DB.get("cotizaciones", id);
+  if (!cot || cot.estado === "aceptada" || cot.ordenId) return;
+  const ok = await showConfirm(`Se borra la cotización #${cot.id} de ${cot.clienteNombre || cot.nombre || "este cliente"}. No movió inventario ni caja.`,
+    { titulo: "Eliminar cotización", textoOk: "Eliminar" });
+  if (!ok) return;
+  await DB.delete("cotizaciones", id);
+  markDirty();
+  registrarAuditoria("eliminar", "cotizaciones", id, `Cotización #${cot.id}`);
+  toast("Cotización eliminada");
+  cerrarCotDetalle();
+  await renderCotizaciones();
+  renderDashboard();
+});
+
+document.getElementById("btnCotAbrirOrden").addEventListener("click", (e) => {
+  const ordenId = Number(e.currentTarget.dataset.orden);
+  if (!ordenId) return;
+  cerrarCotDetalle();
+  openOrder(ordenId);
 });
 
 /* ---- 3.15 · Bloque 1A · aceptar en MODO NUBE = convertir_cotizacion ----
