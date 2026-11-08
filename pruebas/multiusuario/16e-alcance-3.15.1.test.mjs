@@ -2,6 +2,9 @@
 // (16c) sobre e807f65, etc. Guardas de que README, CHANGELOG y panel técnico de 3.15.1 (1) dicen la versión y las cachés REALES del código,
 // (2) describen el alcance real —solo frontends, corrección de seguridad de los avisos—, (3) no llevan datos privados y (4) conservan la
 // historia de 3.15.0 hacia atrás tal cual se publicó.
+// 3.16.0: contrato de 3.15.1 → se ejecuta sobre la instantánea del commit 746744c (helpers/usar-3151.mjs, PRIMER import). Única aserción
+// ajustada: ya no corre sobre el árbol de trabajo sino sobre esa instantánea. El de 3.16.0 está en 16f-alcance-3.16.0.
+import "./helpers/usar-3151.mjs";
 import test, { describe } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -16,8 +19,8 @@ const PRIVADO = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|AD
 const ANTES = (f) => fs.readFileSync(path.join(raiz3150(), "taller-demo", f), "utf8");
 
 describe("README.md · 3.15.1", () => {
-  test("se ejecuta sobre el árbol de trabajo; versión 3.15.1 en el README, en app.js, en la caché y en el panel técnico", () => {
-    assert.equal(RELEASE_CONGELADA, null); assert.equal(VERSION, "3.15.1"); assert.equal(CACHE, "entimotors-v3.15.1");
+  test("se ejecuta sobre la instantánea de 3.15.1 (746744c); versión 3.15.1 en el README, en app.js, en la caché y en el panel técnico", () => {
+    assert.equal(RELEASE_CONGELADA, "3.15.1"); assert.equal(VERSION, "3.15.1"); assert.equal(CACHE, "entimotors-v3.15.1");
     assert.match(README, /\*\*Versión actual:\*\* 3\.15\.1 ·/);
     assert.equal((/<span class="version" id="version">([^<]*)<\/span>/.exec(PANEL) || [])[1], "3.15.1");
   });
@@ -42,10 +45,7 @@ describe("README.md · 3.15.1", () => {
 describe("CHANGELOG.md · entrada 3.15.1", () => {
   const i3151 = CHANGELOG.indexOf("## 3.15.1"), i315 = CHANGELOG.indexOf("## 3.15.0"), E = CHANGELOG.slice(i3151, i315);
   test("es la PRIMERA entrada, declara el alcance (solo frontends) y nombra la corrección y sus pruebas", () => {
-    // 3.16 en desarrollo: por encima solo puede haber UNA entrada cuyo título diga «SIN PUBLICAR»; 3.15.1 sigue siendo la primera publicada
-    const primera = CHANGELOG.indexOf("## "), titulo = CHANGELOG.slice(primera, CHANGELOG.indexOf("\n", primera));
-    if (primera !== i3151) { assert.match(titulo, /SIN PUBLICAR/, titulo); assert.equal(CHANGELOG.indexOf("\n## ", primera) + 1, i3151, "una sola entrada sin publicar"); }
-    assert.ok(i315 > i3151);
+    assert.equal(CHANGELOG.indexOf("## "), i3151); assert.ok(i315 > i3151);
     for (const t of ["Alcance: solo frontends", "TOAST-XSS", "`toast()`", "`aviso()`", "32-toast-xss-nombres", "`entimotors-v3.15.1`", "`entimotors-mitrabajo-v3.15.1`", "`f2a6598`"]) assert.ok(E.includes(t), t);
     assert.doesNotMatch(E, PRIVADO);
   });

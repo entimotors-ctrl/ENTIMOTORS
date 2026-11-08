@@ -1,10 +1,10 @@
 # Registro de cambios · ENTIMOTORS OS
 
-## 3.16.0 — cambios pedidos por el cliente · parte A (SIN PUBLICAR, rama `feat/3.16-cambios-cliente`)
+## 3.16.0 — cambios pedidos por el cliente (noviembre de 2026)
 
-> **Alcance: solo frontends.** Base de datos y backend sin cambios. La versión visible sigue siendo 3.15.1 hasta preparar la
-> publicación (subir `VERSION_APP`, cachés y `?v=`, regenerar el manifiesto de release y los builds). La parte B (citas y
-> trabajo rápido del mecánico) necesita migración y va aparte.
+> **Alcance: solo frontends.** Base de datos y backend de 3.15.0 sin cambios. **Incluye 3.15.1 completa**, que no se publicó
+> por separado (TOAST-XSS, LOGIN-ESTADO, OBS-E1a; su contrato se comprueba sobre la instantánea `746744c`). Las citas y el
+> trabajo rápido del mecánico necesitan migración y van en una versión aparte.
 
 ### Avance por WhatsApp con fotos (cambio 1)
 - «📲 Progreso por WhatsApp» con fotos que el cliente todavía no recibió abre una ventana con ellas marcadas y las manda con
@@ -48,7 +48,13 @@
 
 ### Pruebas
 - `pruebas/ui-telefono/`: revisión de todas las pantallas a 360/390 px y pruebas t2–t10 sobre una copia sin nube.
-- `pruebas/sync/node/c1-fotos-avance`, `c6-mensajes-fijos`. Contrato de versionado del árbol: `3.16-dev` (21/20/25).
+- `pruebas/sync/node/c1-fotos-avance`, `c6-mensajes-fijos`.
+- Contratos nuevos `01-pwa-3.16.0` (21 / 20 / 25), `16f-alcance-3.16.0` y `26e-manifest-3.16.0`. Los de 3.15.1 (`01-pwa-3.15.1`,
+  `16e`, `26d`) pasan a correr sobre la instantánea `746744c`; `26b` (3.14.1) compara con lo versionado en su release.
+
+### Versión
+- PWA: caché `entimotors-v3.16.0` (Mi Trabajo: `entimotors-mitrabajo-v3.16.0`), las 21 etiquetas `?v=` y las 20 entradas
+  versionadas del `SHELL`.
 
 ## 3.15.1 — corrección de seguridad (noviembre de 2026)
 

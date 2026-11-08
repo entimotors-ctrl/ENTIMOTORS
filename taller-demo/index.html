@@ -2813,45 +2813,45 @@
      la app sigue funcionando igual. Ver config-local.example.js. -->
 <!-- Declara si esta copia es el taller o «Mi Trabajo». Va primero: app.js lo
      lee al arrancar. Ver build-target.js. -->
-<script src="build-target.js?v=3.15.1"></script>
+<script src="build-target.js?v=3.16.0"></script>
 <!-- Capa de Supabase. Si supabase-config.js no existe o está sin rellenar, los
      cuatro se cargan igual y no hacen nada: la app sigue funcionando entera con
      IndexedDB, como hasta ahora. -->
-<script src="supabase-config.js?v=3.15.1"></script>
-<script src="supabase-client.js?v=3.15.1"></script>
-<script src="auth.js?v=3.15.1"></script>
-<script src="recovery.js?v=3.15.1"></script>
+<script src="supabase-config.js?v=3.16.0"></script>
+<script src="supabase-client.js?v=3.16.0"></script>
+<script src="auth.js?v=3.16.0"></script>
+<script src="recovery.js?v=3.16.0"></script>
 <!-- 3.15 (Bloque 3): día empresarial America/Tegucigalpa (hoy, caja del día, filtros). Antes de app.js. -->
-<script src="fecha-negocio.js?v=3.15.1"></script>
-<script src="finanzas-calc.js?v=3.15.1"></script>
-<script src="mensajes-fijos.js?v=3.15.1"></script>
-<script src="fotos-avance.js?v=3.15.1"></script>
-<script src="config-local.js?v=3.15.1"></script>
+<script src="fecha-negocio.js?v=3.16.0"></script>
+<script src="finanzas-calc.js?v=3.16.0"></script>
+<script src="mensajes-fijos.js?v=3.16.0"></script>
+<script src="fotos-avance.js?v=3.16.0"></script>
+<script src="config-local.js?v=3.16.0"></script>
 <!-- Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5). Apagado por
      defecto (ver sync-engine.js): sin ENTIMOTORS_SYNC.enabled === true, que
      app.js solo pone en true dentro de prepararModoNube() para una sesión de
      Supabase activa, no abren ninguna base ni hacen ninguna petición. -->
-<script src="sync-rest.js?v=3.15.1"></script>
-<script src="sync-db.js?v=3.15.1"></script>
-<script src="sync-engine.js?v=3.15.1"></script>
+<script src="sync-rest.js?v=3.16.0"></script>
+<script src="sync-db.js?v=3.16.0"></script>
+<script src="sync-engine.js?v=3.16.0"></script>
 <!-- 3.15 (Bloque 3): avisos en tiempo real (Supabase Realtime, Broadcast privado). Sin sesión de nube no abre nada. -->
-<script src="sync-realtime.js?v=3.15.1"></script>
-<script src="sync-mappers.js?v=3.15.1"></script>
-<script src="sync-fotos.js?v=3.15.1"></script>
+<script src="sync-realtime.js?v=3.16.0"></script>
+<script src="sync-mappers.js?v=3.16.0"></script>
+<script src="sync-fotos.js?v=3.16.0"></script>
 <!-- SYNC-7B: dinero y stock por RPC en modo nube (antes de app.js: prepararModoNube la arma) -->
-<script src="sync-finanzas.js?v=3.15.1"></script>
+<script src="sync-finanzas.js?v=3.16.0"></script>
 <!-- Autorización con PIN administrativo (SYNC-7, D-7): habla con el api-server, nunca con Supabase
      directo. Va antes de app.js porque prepararModoNube() la inicializa (PinUI.prepararInstancia). -->
-<script src="pin-ui.js?v=3.15.1"></script>
+<script src="pin-ui.js?v=3.16.0"></script>
 <!-- SYNC-10: importador 3.13 → nube (validación, vista previa, paquete atómico) -->
-<script src="import-313.js?v=3.15.1"></script>
+<script src="import-313.js?v=3.16.0"></script>
 <!-- el ?v= debe cambiar cada vez que se toque app.js (junto con CACHE_NAME en
      sw.js) — es la forma más universal de forzar que CUALQUIER navegador
      pida el archivo de nuevo aunque ya tenga guardada una copia vieja en su
      propio caché HTTP, sin depender de que respete el Service Worker. -->
-<script src="app.js?v=3.15.1"></script>
+<script src="app.js?v=3.16.0"></script>
 <!-- Pantalla «Usuarios y equipo»: habla con el api-server, no con IndexedDB.
      Va después de app.js porque solo se invoca al abrir esa vista. -->
-<script src="usuarios.js?v=3.15.1"></script>
+<script src="usuarios.js?v=3.16.0"></script>
 </body>
 </html>

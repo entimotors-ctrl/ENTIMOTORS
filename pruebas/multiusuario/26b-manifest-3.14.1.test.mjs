@@ -10,13 +10,12 @@ import crypto from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { RAIZ } from "./helpers/entorno.mjs";
 import { raiz3140 } from "./helpers/congelado-3.14.0.mjs";
-import { raiz3141 } from "./helpers/congelado-3.14.1.mjs";
+import { raiz3141, archivosDe3141 } from "./helpers/congelado-3.14.1.mjs";
 
 const F = "pruebas/multiusuario/release-3.14.1-manifest.json";
 const VERIF = path.join(RAIZ, "pruebas/multiusuario/verificar-backend-manifest.mjs");
 const M = JSON.parse(fs.readFileSync(path.join(RAIZ, F), "utf8"));
 const sha = (p) => crypto.createHash("sha256").update(fs.readFileSync(p)).digest("hex");
-const git = (...a) => spawnSync("git", ["-C", RAIZ, ...a], { encoding: "utf8" }).stdout.split("\n").filter(Boolean);
 
 describe("release 3.14.1 · manifest cerrado del frontend", () => {
   // 3.15 (Bloque 1A): el árbol de trabajo ya cambia a propósito; el freeze se comprueba contra el release PUBLICADO (e807f65, git archive).
@@ -34,7 +33,8 @@ describe("release 3.14.1 · manifest cerrado del frontend", () => {
     assert.equal(M.version_matrix.index_html_query_v, 16); assert.equal(M.version_matrix.sw_shell_query_v, 15);
   });
   test("runtime_files = TODO lo versionado de taller-demo/ salvo supabase/ y la documentación (nada fuera, nada de más)", () => {
-    const esperado = git("ls-files", "taller-demo").filter((p) => !p.startsWith("taller-demo/supabase/") && !/^taller-demo\/(README|CHANGELOG)\.md$/.test(p)).sort();
+    // 3.16.0: lo versionado EN EL RELEASE PUBLICADO (git ls-tree de e807f65), no en el árbol de trabajo, que ya suma archivos nuevos
+    const esperado = archivosDe3141("taller-demo").filter((p) => !p.startsWith("taller-demo/supabase/") && !/^taller-demo\/(README|CHANGELOG)\.md$/.test(p)).sort();
     assert.deepEqual(M.runtime_files.map((e) => e.path), esperado);
     assert.deepEqual(M.documentation_files.map((e) => e.path), ["taller-demo/CHANGELOG.md", "taller-demo/README.md"]);
   });

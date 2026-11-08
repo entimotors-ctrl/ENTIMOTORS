@@ -486,7 +486,8 @@
       });
       var listoBtn = document.getElementById("btnListoUsuario");
       if (listoBtn) listoBtn.addEventListener("click", function () { render(); });
-      bien("Usuario creado");
+      // solo el aviso corto: el resultado (con el enlace) ya está a la vista en la tarjeta, y el recuadro fijo de arriba lo empujaría (OBS-8)
+      if (typeof toast === "function") toast("Usuario creado");
     });
   }
 

@@ -4,7 +4,31 @@ Sistema de gestión para un taller de motocicletas. Recibe la moto, la sigue por
 seis etapas de reparación, cobra, controla el inventario, lleva la caja y los
 créditos, y le manda al cliente su factura por WhatsApp.
 
-**Versión actual:** 3.15.1 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+**Versión actual:** 3.16.0 · **Datos del taller:** Supabase (nube) + caché local offline · **Esquema local 3.13:** IndexedDB v6 (se conserva)
+
+---
+
+## Novedades de 3.16.0
+
+Cambios pedidos por el cliente. **3.15.1 no se publicó por separado: entra completa en 3.16.0** (corrección de los
+avisos, aviso del inicio de sesión y etapas que preguntan antes de guardar; ver «Novedades de 3.15.1» abajo).
+
+- **Avance por WhatsApp con fotos.** «📲 Progreso por WhatsApp» manda también las fotos que el cliente todavía no
+  recibió, con el menú de compartir del teléfono. Las ya enviadas dicen «Ya enviada» y no se repiten.
+- **Corregir presupuestos.** Una cotización sin aceptar se borra con una confirmación (antes era imposible). Una
+  aceptada lleva a su orden. Los renglones de una orden se corrigen en cualquier etapa hasta cobrarla.
+- **Todo cómodo en el teléfono.** Listas como tarjetas con sus botones a la vista y todo lo que se toca de al menos
+  44 px.
+- **Mensajes al mecánico.** Quedan fijos arriba en Mi Trabajo 36 horas (los no leídos, hasta leerlos), y el aviso de
+  mensaje nuevo no se va solo.
+- **Usuarios y equipo.** Quien se elimina sale de la lista (queda en «Ver eliminados»). El resultado de cada acción se
+  queda a la vista, falta de PIN se avisa antes de empezar y cambiar el rol pide confirmación.
+- **«＋ Entrada» de mercancía.** Sumar lo que llegó a un repuesto que ya existe sin escribir un motivo (con costo y nota
+  opcionales). «Nuevo repuesto» con uno que ya existe ofrece sumarle en vez de duplicarlo.
+- Solo cambia el frontend: la base de datos y el backend de 3.15.0 no se tocan, y revertir 3.16.0 solo afecta a los
+  frontends.
+- PWA con caché nueva `entimotors-v3.16.0` (Mi Trabajo: `entimotors-mitrabajo-v3.16.0`); la de 3.15.0 se borra al
+  activar la nueva. La actualización no es automática: la app avisa y la persona decide.
 
 ---
 
@@ -136,8 +160,8 @@ auditoría y seis documentos imprimibles que se pueden enviar como imagen o PDF.
 
 | Producto | Quién entra | Caché | Base local |
 |---|---|---|---|
-| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.15.1` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
-| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.15.1` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
+| **ENTIMOTORS Taller** | administrador y cajero con cuenta; miembros de la lista local `TEAM` si existe `config-local.js` | `entimotors-v3.16.0` | nube + caché `entimotors_sync` (sin nube: `entimotors_os_demo`) |
+| **ENTIMOTORS Mi Trabajo** | únicamente **mecánicos con cuenta activa** | `entimotors-mitrabajo-v3.16.0` | nube + caché propia del perfil (`entimotors_sync_mec_<id>`) |
 
 Se publican en **dos orígenes distintos** (la política de mismo origen del navegador es la que
 separa sus datos). `build-target.js` declara qué producto es cada copia y **lo decide el build,
@@ -338,9 +362,9 @@ No se toca `versionApp: "3.13.0"` de `armarRespaldoLocal313` (app.js): identific
 datos de la 3.13, no la versión de la app.
 
 El build de Mi Trabajo renombra solo `CACHE_NAME` a `entimotors-mitrabajo-vX.Y.Z`: no se edita a mano.
-`pruebas/multiusuario/01-pwa-3.15.1.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.15.0`, `01-pwa-3.14.1`, `01-pwa-3.14.0`
-y `01-pwa-3.13.0` la de las releases anteriores sobre su instantánea inmutable: el tag `v3.15.0` (`f2a6598`), los commits `e807f65` y
-`effbfa1` y el tag `v3.13.0`).
+`pruebas/multiusuario/01-pwa-3.16.0.test.mjs` comprueba la coherencia de todo esto (y `01-pwa-3.15.1`, `01-pwa-3.15.0`, `01-pwa-3.14.1`,
+`01-pwa-3.14.0` y `01-pwa-3.13.0` la de las versiones anteriores sobre su instantánea inmutable: la 3.15.1 terminada (`746744c`), el tag
+`v3.15.0` (`f2a6598`), los commits `e807f65` y `effbfa1` y el tag `v3.13.0`).
 
 ---
 

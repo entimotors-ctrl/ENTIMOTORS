@@ -37,7 +37,11 @@ async function llenarPrompt(app, etiqueta, valor) {
   app.$("#promptInput").value = valor; app.$("#btnPromptAceptar").click();
 }
 export async function dispararCamino(app, camino) {
-  if (camino === "rol") { const s = app.$$(".u-rol")[0]; s.value = "cajero"; s.dispatchEvent(new app.win.Event("change", { bubbles: true })); }
+  if (camino === "rol") {
+    const s = app.$$(".u-rol")[0]; s.value = "cajero"; s.dispatchEvent(new app.win.Event("change", { bubbles: true }));
+    // 3.16 (cambio 7): cambiar el rol pide confirmación antes de guardar
+    await esperarHasta(() => app.$("#modalConfirm.active"), { desc: "confirmación del cambio de rol" }); app.$("#btnConfirmAceptar").click();
+  }
   else if (camino === "baja") app.$$(".u-estado")[0].click();
   else if (camino === "editar") { app.$$(".u-editar")[0].click(); await llenarPrompt(app, "Nombre", "x"); await llenarPrompt(app, "Teléfono (puede quedar vacío)", "y"); }
 }

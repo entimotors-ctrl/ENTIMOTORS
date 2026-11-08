@@ -12,14 +12,12 @@ export const CONTRATOS = {
   "3.14.1": { etiquetas: 16, shellV: 15, shell: 20 },   // UI-1B, UI-1C, SECURITY-1E: sin scripts nuevos (todo en app.js e index.html)
   "3.15.0": { etiquetas: 19, shellV: 18, shell: 23 },   // + fecha-negocio.js y sync-realtime.js (Bloque 3) y finanzas-calc.js (Bloque 5)
   "3.15.1": { etiquetas: 19, shellV: 18, shell: 23 },   // TOAST-XSS: sin scripts nuevos (toast() de app.js y aviso() de usuarios.js)
-  // 3.16 en desarrollo (rama feat/3.16-cambios-cliente, la versión sigue «3.15.1» hasta preparar la publicación): + mensajes-fijos.js
-  // y fotos-avance.js
-  "3.16-dev": { etiquetas: 21, shellV: 20, shell: 25 },
+  "3.16.0": { etiquetas: 21, shellV: 20, shell: 25 },   // cambios del cliente: + mensajes-fijos.js y fotos-avance.js
 };
-export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.15.1";
-/* RELEASE 3.15.1: el árbol de trabajo ES la release 3.15.1 (19 / 18 / 23). Las releases PUBLICADAS 3.15.0 (instantánea f2a6598) y 3.14.1
-   (instantánea e807f65), RELEASE_CONGELADA, siguen con su contrato de CONTRATOS. */
-export const CONTRATO_ARBOL = CONTRATOS["3.16-dev"];
+export const VERSION_ESPERADA = RELEASE_CONGELADA ?? "3.16.0";
+/* RELEASE 3.16.0: el árbol de trabajo ES la release 3.16.0 (21 / 20 / 25). La 3.15.1 terminada (instantánea 746744c, no publicada por
+   separado) y las releases PUBLICADAS 3.15.0 (f2a6598) y 3.14.1 (e807f65), RELEASE_CONGELADA, siguen con su contrato de CONTRATOS. */
+export const CONTRATO_ARBOL = CONTRATOS["3.16.0"];
 export const CONTRATO_ACTUAL = RELEASE_CONGELADA ? CONTRATOS[RELEASE_CONGELADA] : CONTRATO_ARBOL;
 export const fuentesReales = () => ({ app: leer("app.js"), sw: leer("sw.js"), index: leer("index.html"), existe });
 
