@@ -179,11 +179,15 @@ describe("traduccion de fallos (pedir + textoDeFallo)", () => {
 });
 
 describe("la tabla del equipo", () => {
-  test("pinta una fila por persona, con conteo, rol legible y estado", async () => {
+  // 3.16 (cambio 7): el conteo y la lista del equipo son de las personas NO eliminadas; la eliminada sigue a la vista (su nombre está
+  // en la historia) pero dentro de «Ver eliminados (N)». Cada celda lleva su etiqueta para la vista en tarjetas del teléfono.
+  test("pinta una fila por persona, con conteo, rol legible y estado; las eliminadas aparte", async () => {
     const env = await pantalla({}); await env.dibujar(); const h = env.cuerpo().innerHTML;
-    assert.match(h, /Equipo · 7/); for (const n of ["Administrador", "Mecánico", "Cajero", "Desarrollador"]) assert.ok(h.includes(`<td>${n}</td>`), n);
-    assert.equal((h.match(/<tr>/g) || []).length, 1 + 7, "cabecera + una fila por persona (también la eliminada: su nombre sigue en la historia)");
-    assert.ok(h.includes("Inactivo")); assert.ok(h.includes("Eliminado")); assert.ok(h.includes("(tú)"));
+    assert.match(h, /Equipo · 6/); for (const n of ["Administrador", "Mecánico", "Cajero", "Desarrollador"]) assert.ok(h.includes(`<td data-label="Rol">${n}</td>`), n);
+    assert.equal((h.match(/<tr>/g) || []).length, (1 + 6) + (1 + 1), "lista del equipo (cabecera + 6) y la de eliminados (cabecera + 1)");
+    const [equipo, eliminados] = h.split('<details class="u-eliminados"');
+    assert.ok(equipo.includes("Inactivo") && !equipo.includes("Eliminado"), "la eliminada no está en la lista del equipo");
+    assert.match(eliminados, /Ver eliminados \(1\)/); assert.ok(eliminados.includes("Eliminado")); assert.ok(h.includes("(tú)"));
   });
   test("sin controles para uno mismo ni para otros admin (ni cambiar rol, ni baja, ni editar)", async () => {
     const env = await pantalla({}); await env.dibujar();
@@ -230,13 +234,21 @@ describe("la tabla del equipo", () => {
 
 describe("acciones sobre una persona", () => {
   test("cambiar rol: PATCH /<id> con SOLO {rol}, aviso «Rol actualizado» y recarga de la lista", async () => {
-    const env = await pantalla({}); await env.dibujar();
+    const env = await pantalla({}); await env.dibujar(); env.win.showConfirm = async () => true;
     const sel = env.hijos(".u-rol").find((e) => e.dataset.id === UUID(103)); sel.value = "cajero"; await sel.disparar("change"); await env.asentar();
     const patch = env.pedidos.find((p) => p.metodo === "PATCH"); assert.deepEqual([patch.ruta, patch.cuerpo, patch.auth], [`/api/admin/usuarios/${UUID(103)}`, { rol: "cajero" }, "sesion"]);
     assert.ok(toasts(env).includes("Rol actualizado")); assert.equal(env.pedidos.filter((p) => p.metodo === "GET").length, 2);
   });
+  // 3.16: el rol ya no se guarda al primer toque; si se cancela la pregunta no sale nada y el selector vuelve a su valor
+  test("cambiar rol pide confirmación con los nombres; cancelado no envía nada y el selector vuelve", async () => {
+    const env = await pantalla({}); await env.dibujar(); const preguntas = [];
+    env.win.showConfirm = async (t, o) => { preguntas.push([t, o]); return false; };
+    const sel = env.hijos(".u-rol").find((e) => e.dataset.id === UUID(103)); sel.value = "cajero"; await sel.disparar("change"); await env.asentar();
+    assert.equal(preguntas.length, 1); assert.match(preguntas[0][0], /Persona 3 de Mecánico a Cajero/);
+    assert.equal(env.pedidos.filter((p) => p.metodo === "PATCH").length, 0); assert.equal(sel.value, "mecanico");
+  });
   test("cambiar rol rechazado (403): aviso del motivo y la lista se recarga para volver al valor real", async () => {
-    const env = await pantalla({ api: async (m) => (m === "PATCH" ? { status: 403, body: { error: "nope" } } : null) }); await env.dibujar();
+    const env = await pantalla({ api: async (m) => (m === "PATCH" ? { status: 403, body: { error: "nope" } } : null) }); await env.dibujar(); env.win.showConfirm = async () => true;
     const sel = env.hijos(".u-rol")[0]; sel.value = "desarrollador"; await sel.disparar("change"); await env.asentar();
     assert.deepEqual(toasts(env).slice(-1), ["Solo el administrador puede gestionar usuarios."]); assert.equal(env.pedidos.filter((p) => p.metodo === "GET").length, 2);
   });
@@ -370,8 +382,8 @@ describe("mutantes de usuarios.js: cada garantia se ROMPE si se altera la linea 
   const MUTANTES = [
     ["un no-admin no llama al servidor", "quitar la comprobacion de admin", cambiar("if (!global.Auth || !Auth.esAdmin()) {", "if (false) {")],
     ["el listado se pide con el token de sesion", "enviar un token que no es el de la sesion", cambiar('Authorization: "Bearer " + ses.access_token', 'Authorization: "Bearer invalido"')],
-    ["el nombre se pinta escapado", "no escapar el nombre en la celda", cambiar('"<td>" + esc(u.nombre) + (u.esUsted', '"<td>" + u.nombre + (u.esUsted')],
-    ["el correo se pinta escapado", "no escapar el correo", cambiar('"<td>" + esc(u.correo) + "</td>"', '"<td>" + u.correo + "</td>"')],
+    ["el nombre se pinta escapado", "no escapar el nombre en la celda", cambiar("'<td class=\"celda-principal\">' + esc(u.nombre) + (u.esUsted", "'<td class=\"celda-principal\">' + u.nombre + (u.esUsted")],
+    ["el correo se pinta escapado", "no escapar el correo", cambiar("'<td data-label=\"Correo\">' + esc(u.correo) + \"</td>\"", "'<td data-label=\"Correo\">' + u.correo + \"</td>\"")],
     ["data-nombre no se sale del atributo", "no escapar data-nombre", cambiar("'\" data-nombre=\"' + esc(u.nombre) +", "'\" data-nombre=\"' + u.nombre +")],
     ["reactivar envia activo:true", "invertir el valor de activo", cambiar('{ activo: b.dataset.activo !== "1" }', '{ activo: b.dataset.activo === "1" }')],
     ["el error al crear se muestra escapado", "no escapar el mensaje del servidor", cambiar("return esc(r.mensaje || \"No se pudo completar la operación.\");", "return (r.mensaje || \"No se pudo completar la operación.\");")],
