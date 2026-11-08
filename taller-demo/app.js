@@ -6647,7 +6647,7 @@ async function renderInventario() {
   const body = document.getElementById("inventarioBody");
   document.getElementById("inventarioEmpty").style.display = invAll.length ? "none" : "block";
   if (inventarioFiltro && !inv.length) {
-    body.innerHTML = `<tr><td colspan="5" style="color:var(--text-faint); text-align:center; padding:1.5rem 0;">Ningún repuesto coincide con este filtro.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" style="color:var(--text-faint); text-align:center; padding:1.5rem 0;">Ningún repuesto coincide con este filtro.</td></tr>`;
     return;
   }
   body.innerHTML = inv.map(r => `
@@ -6656,12 +6656,14 @@ async function renderInventario() {
       <td style="cursor:pointer;">${esc(r.modelo || "Todos")}</td>
       <td class="num" style="cursor:pointer;">${r.cantidad}${r.requiereRevision ? ` <span title="Stock negativo por una venta sin conexión: revisar">⚠</span>` : ""}</td>
       <td class="num" style="cursor:pointer;">${money(r.precio)}</td>
-      <td><label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; margin:0;"><input type="checkbox" class="chk-publicar" data-id="${r.id}" ${r.publicarEnWeb ? "checked" : ""} style="width:1.05rem; height:1.05rem; margin:0; accent-color:var(--red);"></label></td>
+      <td class="no-abrir"><label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; margin:0;"><input type="checkbox" class="chk-publicar" data-id="${r.id}" ${r.publicarEnWeb ? "checked" : ""} style="width:1.05rem; height:1.05rem; margin:0; accent-color:var(--red);"></label></td>
+      <td class="no-abrir">${puedeDarEntrada() ? `<div class="acciones-renglon"><button type="button" class="btn small btn-entrada" data-id="${r.id}">＋ Entrada</button></div>` : ""}</td>
     </tr>`).join("");
 
-  body.querySelectorAll(".rep-row td:not(:last-child)").forEach(td => {
+  body.querySelectorAll(".rep-row td:not(.no-abrir)").forEach(td => {
     td.addEventListener("click", () => openRepuestoDetalle(Number(td.closest("tr").dataset.id)));
   });
+  body.querySelectorAll(".btn-entrada").forEach(btn => btn.addEventListener("click", () => abrirEntrada(Number(btn.dataset.id))));
   body.querySelectorAll(".chk-publicar").forEach(chk => {
     chk.addEventListener("click", (e) => e.stopPropagation());
     chk.addEventListener("change", async () => {
@@ -6691,6 +6693,7 @@ async function openRepuestoDetalle(id) {
   document.getElementById("repDetalleCantidad").textContent = r.cantidad + (r.requiereRevision ? " ⚠ revisar" : "");
   // SYNC-7B: ajuste manual por ledger (ajustar_stock). Admin directo, cajero con PIN; el mecánico no lo ve.
   document.getElementById("btnAjustarStock").style.display = finanzasNube() && ["admin", "cajero"].includes(currentUser?.rol) ? "" : "none";
+  document.getElementById("btnEntradaStock").style.display = puedeDarEntrada() ? "" : "none";
   document.getElementById("repDetallePrecio").textContent = money(r.precio);
   document.getElementById("repDetalleFotoWrap").innerHTML = r.foto ? `<img src="${r.foto}" style="width:100%; max-height:220px; object-fit:cover; border-radius:0.6rem; border:1px solid var(--border);">` : "";
   document.getElementById("modalRepuestoDetalle").classList.add("active");
@@ -6710,6 +6713,71 @@ document.getElementById("btnAjustarStock").addEventListener("click", async () =>
     renderInventario();
   }
 });
+/* 3.16 (cambio 8) · entrada de mercancía. Recibir lo que llegó es lo más común del inventario y antes solo se podía con
+   «Ajustar stock» (pensado para corregir errores) o cambiando la cantidad en Editar, y los dos pedían un motivo. Aquí no:
+   el motivo lo escribe el sistema. En modo nube viaja por el mismo ajustar_stock con delta (el servidor no tiene todavía una
+   acción propia de entrada, así que el cajero sigue necesitando el PIN); sin nube suma directo y lo anota en la auditoría. */
+function puedeDarEntrada() { return ["admin", "cajero"].includes(currentUser?.rol); }
+let entradaRepuestoId = null;
+function cantidadEntrada() { return Number(String(document.getElementById("entradaCantidad").value).replace(",", ".")); }
+async function pintarEntrada() {
+  const r = await DB.get("inventario", entradaRepuestoId);
+  if (!r) return;
+  const n = cantidadEntrada();
+  document.getElementById("entradaResultado").textContent = Number.isFinite(n) && n > 0
+    ? `Hay ${r.cantidad} → quedarán ${Number(r.cantidad) + n}` : `Hay ${r.cantidad}`;
+}
+async function abrirEntrada(id, cantidad = 1) {
+  const r = await DB.get("inventario", id);
+  if (!r) return;
+  entradaRepuestoId = id;
+  document.getElementById("entradaRepuesto").textContent = r.nombre + (r.modelo ? " · " + r.modelo : "");
+  document.getElementById("entradaCantidad").value = cantidad;
+  document.getElementById("entradaCosto").value = r.costoCompra || "";
+  document.getElementById("entradaNota").value = "";
+  document.getElementById("entradaError").textContent = "";
+  await pintarEntrada();
+  document.getElementById("modalRepuestoDetalle").classList.remove("active");
+  document.getElementById("modalEntrada").classList.add("active");
+}
+document.getElementById("entradaCantidad").addEventListener("input", pintarEntrada);
+[["btnEntradaMas", 1], ["btnEntradaMenos", -1]].forEach(([idBtn, paso]) => document.getElementById(idBtn).addEventListener("click", () => {
+  const n = cantidadEntrada();
+  document.getElementById("entradaCantidad").value = Math.max(1, (Number.isFinite(n) ? Math.round(n) : 0) + paso);
+  pintarEntrada();
+}));
+document.getElementById("btnCancelarEntrada").addEventListener("click", () => document.getElementById("modalEntrada").classList.remove("active"));
+document.getElementById("btnEntradaStock").addEventListener("click", () => abrirEntrada(repDetalleActualId));
+alHacerClicUnaVez(document.getElementById("btnGuardarEntrada"), async () => {
+  const error = document.getElementById("entradaError");
+  error.textContent = "";
+  const r = await DB.get("inventario", entradaRepuestoId);
+  if (!r) return;
+  const n = cantidadEntrada();
+  if (!Number.isFinite(n) || n <= 0) { error.textContent = "Escribe cuántos llegaron (1 o más)."; return; }
+  const textoCosto = String(document.getElementById("entradaCosto").value).trim();
+  const costo = textoCosto === "" ? null : Number(textoCosto.replace(",", "."));
+  if (costo !== null && (!Number.isFinite(costo) || costo < 0)) { error.textContent = "El costo no puede ser negativo."; return; }
+  const nota = document.getElementById("entradaNota").value.trim();
+  const antes = Number(r.cantidad) || 0;
+  const motivo = "Entrada de mercancía" + (nota ? ": " + nota : "");
+  if (finanzasNube()) {
+    if (!(await accionAutorizada((d) => syncFin.construir.ajusteStock(d), { inventarioUid: r.uid, delta: n, motivo }, ["inventario"], `Entrada registrada: quedan ${antes + n}`))) return;
+  } else {
+    await DB.save("inventario", { ...r, cantidad: antes + n });
+    await registrarAuditoria("entrada_stock", "inventario", r.id, `${r.nombre}: +${n} (${antes} → ${antes + n})${nota ? " · " + nota : ""}`);
+    toast(`Entrada registrada: quedan ${antes + n}`);
+  }
+  // el costo es dato del maestro (no del ledger de stock): se guarda aparte, sobre el registro ya bajado de la nube
+  if (costo !== null && costo !== Number(r.costoCompra || 0)) {
+    const fresco = await DB.get("inventario", r.id);
+    if (fresco) await DB.save("inventario", { ...fresco, costoCompra: costo });
+  }
+  markDirty();
+  document.getElementById("modalEntrada").classList.remove("active");
+  renderInventario();
+});
+
 document.getElementById("btnEditarRepuesto").addEventListener("click", async () => {
   const r = await DB.get("inventario", repDetalleActualId);
   if (!r) return;
@@ -6717,6 +6785,7 @@ document.getElementById("btnEditarRepuesto").addEventListener("click", async () 
   document.getElementById("repuestoNombre").value = r.nombre || "";
   document.getElementById("repuestoModelo").value = r.modelo || "";
   document.getElementById("repuestoCantidad").value = r.cantidad || 0;
+  marcarCantidadEditable(!finanzasNube());
   document.getElementById("repuestoPrecio").value = r.precio || 0;
   document.getElementById("repuestoCosto").value = r.costoCompra || 0;
   document.getElementById("repuestoStockMinimo").value = r.stockMinimo ?? 3;
@@ -6729,10 +6798,16 @@ document.getElementById("btnEditarRepuesto").addEventListener("click", async () 
 });
 
 let repuestoEditId = null;
+// en modo nube la cantidad de un repuesto que ya existe solo cambia con «＋ Entrada» o «Ajustar stock» (los dos van al ledger)
+function marcarCantidadEditable(si) {
+  document.getElementById("repuestoCantidad").readOnly = !si;
+  document.getElementById("repuestoCantidadNota").style.display = si ? "none" : "";
+}
 document.getElementById("btnNuevoRepuesto").addEventListener("click", async () => {
   repuestoEditId = null;
   ["repuestoNombre", "repuestoModelo", "repuestoPrecio", "repuestoCodigoBarras"].forEach(id => document.getElementById(id).value = "");
   document.getElementById("repuestoCantidad").value = 1;
+  marcarCantidadEditable(true);
   document.getElementById("repuestoCosto").value = 0;
   document.getElementById("repuestoStockMinimo").value = 3;
   document.getElementById("repuestoPublicarWeb").checked = false;
@@ -6758,6 +6833,22 @@ alHacerClicUnaVez(document.getElementById("btnGuardarRepuesto"), async () => {
   const foto = fotoFile ? await fotoLocal(fotoFile) : (repuestoEditId ? (await DB.get("inventario", repuestoEditId))?.foto : null);
   const precio = Number(document.getElementById("repuestoPrecio").value) || 0;
   const cantidad = Number(document.getElementById("repuestoCantidad").value) || 0;
+  if (!repuestoEditId) {
+    // 3.16 (cambio 8): si ya está registrado (mismo nombre y modelo, o mismo código de barras), sumar en vez de duplicar
+    const codigo = document.getElementById("repuestoCodigoBarras").value.trim();
+    const modelo = normalizarNombre(document.getElementById("repuestoModelo").value);
+    const existente = (await DB.getAll("inventario")).find((x) => (codigo && x.codigoBarras === codigo)
+      || (normalizarNombre(x.nombre) === normalizarNombre(nombre) && normalizarNombre(x.modelo) === modelo));
+    if (existente) {
+      const sumar = await showConfirm(`Ya tienes «${existente.nombre}»${existente.modelo ? " (" + existente.modelo + ")" : ""} con ${existente.cantidad}. ¿Sumarle lo que llegó en lugar de crear otro igual?`,
+        { titulo: "Este repuesto ya existe", textoOk: "Sumar al que existe", textoCancelar: "Volver" });
+      if (sumar) {
+        document.getElementById("modalRepuesto").classList.remove("active");
+        await abrirEntrada(existente.id, cantidad > 0 ? cantidad : 1);
+      }
+      return;
+    }
+  }
   const costoCompra = Number(document.getElementById("repuestoCosto").value) || 0;
   const stockMinimo = Number(document.getElementById("repuestoStockMinimo").value) || 0;
   if (precio < 0 || cantidad < 0 || costoCompra < 0 || stockMinimo < 0) {

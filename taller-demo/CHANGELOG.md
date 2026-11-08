@@ -37,8 +37,17 @@
 - El resultado de cada acción queda en un recuadro fijo hasta «Entendido». Si falta el PIN del propietario se dice antes de
   empezar, con «Ir a Ajustes». Cambiar el rol pide confirmación.
 
+### Entrada de mercancía (cambio 8)
+- «＋ Entrada» en la tarjeta del repuesto y en su detalle: cuántos llegaron con − / +, «Hay 6 → quedarán 8», costo de
+  compra y nota opcionales. **No pide motivo**: el sistema escribe «Entrada de mercancía» (+ la nota). Antes sumar
+  mercancía solo se podía con «Ajustar stock» o cambiando la cantidad en Editar, y los dos pedían un motivo.
+- En modo nube viaja por el mismo `ajustar_stock` con delta (el cajero sigue necesitando el PIN hasta que el servidor tenga
+  una acción propia de entrada, parte B). Sin nube suma directo y queda en la auditoría como `entrada_stock`.
+- En modo nube la cantidad ya no se escribe en Editar (explica cómo sumar o ajustar). «Nuevo repuesto» con el mismo nombre
+  y modelo, o el mismo código de barras, que uno existente ofrece sumarle en lugar de crear un duplicado.
+
 ### Pruebas
-- `pruebas/ui-telefono/`: revisión de todas las pantallas a 360/390 px y pruebas t2–t8 sobre una copia sin nube.
+- `pruebas/ui-telefono/`: revisión de todas las pantallas a 360/390 px y pruebas t2–t10 sobre una copia sin nube.
 - `pruebas/sync/node/c1-fotos-avance`, `c6-mensajes-fijos`. Contrato de versionado del árbol: `3.16-dev` (21/20/25).
 
 ## 3.15.1 — corrección de seguridad (noviembre de 2026)

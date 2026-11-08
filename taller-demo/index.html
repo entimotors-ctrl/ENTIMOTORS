@@ -1505,7 +1505,7 @@
       <p class="hint">CSV esperado: <code>nombre,cantidad,precio,modelo</code> (con encabezado o sin él).</p>
       <div class="table-scroll">
       <table class="tabla-tarjetas" data-etiquetas="auto" data-principal="0">
-        <thead><tr><th>Repuesto</th><th>Modelo compatible</th><th class="num">Cantidad</th><th class="num">Precio</th><th>Publicado en la web</th></tr></thead>
+        <thead><tr><th>Repuesto</th><th>Modelo compatible</th><th class="num">Cantidad</th><th class="num">Precio</th><th>Publicado en la web</th><th aria-label="Acciones"></th></tr></thead>
         <tbody id="inventarioBody"></tbody>
       </table>
       </div>
@@ -2314,7 +2314,8 @@
     <label>Nombre</label><input type="text" id="repuestoNombre">
     <label>Modelo compatible</label><input type="text" id="repuestoModelo" placeholder="Todos, o ej. CB190R">
     <div class="field-row" style="grid-template-columns:1fr 1fr;">
-      <div><label>Cantidad</label><input type="number" id="repuestoCantidad" value="1" min="0"></div>
+      <div><label>Cantidad</label><input type="number" id="repuestoCantidad" value="1" min="0">
+        <p class="hint" id="repuestoCantidadNota" style="display:none; margin:-0.5rem 0 0.8rem;">Para sumar mercancía usa «＋ Entrada»; para corregir un conteo, «Ajustar stock».</p></div>
       <div><label>Precio de venta (L.)</label><input type="number" id="repuestoPrecio" step="0.01" min="0"></div>
     </div>
     <div class="field-row" style="grid-template-columns:1fr 1fr;">
@@ -2354,7 +2355,32 @@
     <div class="modal-actions">
       <button class="btn ghost" id="btnCerrarRepuestoDetalle">Cerrar</button>
       <button class="btn ghost" id="btnAjustarStock" style="display:none;">Ajustar stock</button>
+      <button class="btn" id="btnEntradaStock" style="display:none;">＋ Entrada</button>
       <button class="btn primary" id="btnEditarRepuesto">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: entrada de mercancía (3.16, cambio 8). Sumar lo que llegó NO es corregir un error: no pide motivo. -->
+<div class="modal-bg" id="modalEntrada">
+  <div class="modal">
+    <h3>＋ Entrada de mercancía</h3>
+    <p class="hint" style="margin-top:0;" id="entradaRepuesto"></p>
+    <label for="entradaCantidad">¿Cuántos llegaron?</label>
+    <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.9rem;">
+      <button type="button" class="btn" id="btnEntradaMenos" aria-label="Uno menos" style="min-width:3rem;">−</button>
+      <input type="number" id="entradaCantidad" value="1" min="1" inputmode="decimal" style="flex:1; margin:0; text-align:center; font-size:1.2rem;">
+      <button type="button" class="btn" id="btnEntradaMas" aria-label="Uno más" style="min-width:3rem;">+</button>
+    </div>
+    <p id="entradaResultado" style="font-weight:600; margin:0 0 0.9rem;"></p>
+    <label for="entradaCosto">Costo de compra de cada uno (L.) · opcional</label>
+    <input type="number" id="entradaCosto" step="0.01" min="0">
+    <label for="entradaNota">Nota · opcional</label>
+    <input type="text" id="entradaNota" maxlength="120" placeholder="Proveedor o número de factura">
+    <p class="aviso-error" id="entradaError" role="alert" style="color:var(--red); margin:0 0 0.6rem;"></p>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnCancelarEntrada">Cancelar</button>
+      <button class="btn primary" id="btnGuardarEntrada">Registrar entrada</button>
     </div>
   </div>
 </div>
