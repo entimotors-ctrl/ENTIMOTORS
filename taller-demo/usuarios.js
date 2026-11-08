@@ -60,7 +60,13 @@
     el.style.display = "";
     if (typeof el.scrollIntoView === "function") el.scrollIntoView({ block: "nearest" });
   }
-  function aviso(msg, accion) { if (typeof toast === "function") toast(msg, "off"); avisoFijo(msg, "error", accion); }
+  function aviso(msg) { if (typeof toast === "function") toast(msg, "off"); avisoFijo(msg, "error"); }
+  /* Sin PIN del propietario no se puede eliminar: se dice ANTES de empezar y se ofrece ir a Ajustes (texto fijo, sin datos del servidor). */
+  function avisoSinPin() {
+    var msg = "Primero configura el PIN del propietario en Ajustes. Sin él no se puede eliminar a nadie.";
+    if (typeof toast === "function") toast(msg, "off");
+    avisoFijo(msg, "error", { texto: "Ir a Ajustes", hacer: function () { if (typeof showView === "function") showView("ajustes"); } });
+  }
   function bien(msg) { if (typeof toast === "function") toast(msg); avisoFijo(msg, "ok"); }
 
   /* Primera CADENA no vacía de la lista; un objeto anidado no se convierte a
@@ -337,8 +343,7 @@
       // 3.16: sin PIN configurado el flujo terminaba en un aviso de 3 s después de la confirmación; ahora se dice antes y a dónde ir
       var pin = await pedirApi("GET", "/api/admin/pin/estado");
       if (pin.ok && pin.datos && pin.datos.configurado === false) {
-        aviso("Primero configura el PIN del propietario en Ajustes. Sin él no se puede eliminar a nadie.", {
-          texto: "Ir a Ajustes", hacer: function () { if (typeof showView === "function") showView("ajustes"); } });
+        avisoSinPin();
         return;
       }
       var dev = await idDispositivo();

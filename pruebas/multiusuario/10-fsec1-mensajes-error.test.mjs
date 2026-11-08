@@ -29,6 +29,8 @@ async function pantalla(respuestaError, { mutar, apiUrl = URL_API } = {}) {
   const env = nuevoEntorno({ producto: "admin", cuenta: CUENTAS.adminActivo, apiUrl, ...(mutar ? { mutar } : {}) }); await env.asentar();
   // 3.15: U(3) dada de baja «de antes» → botón «Reactivar» (vehículo del botón de estado) y «Eliminar usuario» (cuyo 1.er paso, el impacto, también puede fallar)
   env.servidor.api = async (metodo, ruta) => (metodo === "GET" && !/impacto$/.test(ruta || "") ? { status: 200, body: { usuarios: [U(1, { rol: "admin", esUsted: true }), U(3, { activo: false })] } } : respuestaError);
+  // 3.16: cambiar el rol pide confirmación (si no, el diálogo real queda esperando un toque que nunca llega)
+  env.win.showConfirm = async () => true;
   await env.win.PantallaUsuarios.render(); await env.asentar();
   return env;
 }
