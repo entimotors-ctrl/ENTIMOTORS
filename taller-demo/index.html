@@ -351,6 +351,13 @@
      (data-label) y los botones a lo ancho, con texto. Antes la tabla era más ancha que la pantalla y los botones de editar/quitar
      quedaban fuera de la vista sin que nada indicara que había que deslizarla. En PC se queda la tabla. */
   .solo-telefono { display: none; }
+  /* 3.16 (cambio 6): mensajes del administrador fijos arriba de Mi Trabajo y franja de mensaje nuevo */
+  .mensaje-fijo { border-left: 4px solid var(--red); }
+  #avisoMensajeNuevo { display: none; position: fixed; top: calc(0.6rem + env(safe-area-inset-top)); left: 0.6rem; right: 0.6rem; z-index: 80;
+    gap: 0.6rem; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 0.7rem 0.8rem; border-radius: var(--radius);
+    background: var(--bg-raise); border: 1px solid var(--red-border, var(--border)); box-shadow: var(--shadow); }
+  #avisoMensajeNuevo .aviso-msg-cuerpo { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; flex: 1 1 14rem; overflow-wrap: anywhere; }
+  #avisoMensajeNuevo .aviso-msg-acciones { display: flex; gap: 0.4rem; }
   @media (max-width: 600px) {
     .solo-telefono { display: inline; }
     table.tabla-tarjetas, table.tabla-tarjetas tbody, table.tabla-tarjetas tr, table.tabla-tarjetas td { display: block; width: 100%; }
@@ -1267,11 +1274,12 @@
     <section class="view" id="view-mi-trabajo">
       <h2 class="font-display" style="margin-bottom:0.2rem;">Mi trabajo</h2>
       <p style="color:var(--text-muted); margin:0 0 1rem;" id="miTrabajoSub">Acceso para mecánicos.</p>
+      <div id="miTrabajoMensajesFijos"></div>
       <div class="card" id="miTrabajoAlcance" style="margin-bottom:1rem;">
         <p style="margin:0; color:var(--text-muted);">Aquí aparecen los trabajos que el administrador te asigna. Lo que avances se guarda aunque no haya señal y se envía solo al volver la red.</p>
       </div>
       <p class="hint" id="miTrabajoVivo" style="margin:-0.4rem 0 0.8rem;"></p>
-      <h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">Mensajes del administrador <span class="badge" id="miTrabajoMsgBadge" style="display:none;"></span></h3>
+      <h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">Historial de mensajes <span class="badge" id="miTrabajoMsgBadge" style="display:none;"></span></h3>
       <div id="miTrabajoMensajes" style="margin-bottom:1.2rem;"></div>
       <h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">Mis citas</h3>
       <div id="miTrabajoCitas"></div>
@@ -2742,6 +2750,7 @@
 <!-- 3.15 (Bloque 3): día empresarial America/Tegucigalpa (hoy, caja del día, filtros). Antes de app.js. -->
 <script src="fecha-negocio.js?v=3.15.1"></script>
 <script src="finanzas-calc.js?v=3.15.1"></script>
+<script src="mensajes-fijos.js?v=3.15.1"></script>
 <script src="config-local.js?v=3.15.1"></script>
 <!-- Núcleo de sincronización (SYNC-4) + mappers reales (SYNC-5). Apagado por
      defecto (ver sync-engine.js): sin ENTIMOTORS_SYNC.enabled === true, que

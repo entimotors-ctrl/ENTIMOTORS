@@ -1141,7 +1141,7 @@ async function alCambiosRemotos(cambios) {
   programarChipNube();
   await pintarBadgeMensajes();
   if (esMecanicoCuenta()) {
-    if (cambios.some((c) => c.ent === "mensajes" && c.nuevo)) toast("Tienes un mensaje nuevo del administrador");
+    if (cambios.some((c) => c.ent === "mensajes" && c.nuevo)) await avisarMensajeNuevo();
     if (cambios.some((c) => c.ent === "ordenes" && c.nuevo)) toast("Te asignaron un trabajo nuevo");
     if (currentOrderId != null && document.getElementById("view-detalle")?.classList.contains("active")) {
       const uid = await syncBd.mapa.uidDe("ordenes", currentOrderId);
@@ -1203,16 +1203,34 @@ async function contextoMensaje(m) {
 async function renderMensajesMiTrabajo() {
   const cont = document.getElementById("miTrabajoMensajes");
   if (!cont) return;
+  const contFijos = document.getElementById("miTrabajoMensajesFijos");
+  if (contFijos) contFijos.innerHTML = "";
   if (!esMecanicoCuenta()) { cont.innerHTML = ""; return; }
   const [msgs, ops] = await Promise.all([mensajesLocales(), opsDeMensajes()]);
   const mios = msgs.filter((m) => m.destinatarioId === currentUser.perfilId);
   if (!mios.length) { cont.innerHTML = `<div class="card"><p style="color:var(--text-muted); margin:0;">No tienes mensajes del administrador.</p></div>`; return; }
+  // 3.16 (cambio 6): los de las últimas 36 h y los sin leer quedan FIJOS arriba de Mi Trabajo; el resto, plegado más abajo
+  const { fijos, historial } = MensajesFijos.separar(mios, Date.now(), noLeido);
+  if (contFijos) contFijos.innerHTML = fijos.length
+    ? `<h3 class="font-display" style="font-size:0.95rem; margin:0 0 0.5rem;">📌 Mensajes del administrador</h3>` + (await tarjetasMensajes(fijos, ops, "mensaje-fijo")).join("")
+    : "";
+  const viejos = await tarjetasMensajes(historial.slice(0, 50), ops, "");
+  cont.innerHTML = viejos.length
+    ? `<details><summary class="btn ghost small">Mensajes anteriores (${historial.length})</summary><div style="margin-top:0.6rem;">${viejos.join("")}</div></details>`
+    : (fijos.length ? "" : `<div class="card"><p style="color:var(--text-muted); margin:0;">No tienes mensajes del administrador.</p></div>`);
+  [contFijos, cont].forEach((c) => {
+    if (!c) return;
+    c.querySelectorAll("[data-marcar-leido]").forEach((b) => b.addEventListener("click", () => marcarMensajeLeido(Number(b.dataset.marcarLeido))));
+    c.querySelectorAll("[data-abrir-orden]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); openOrder(Number(a.dataset.abrirOrden)); }));
+  });
+}
+async function tarjetasMensajes(lista, ops, clase) {
   const filas = [];
-  for (const m of mios.slice(0, 50)) {
+  for (const m of lista) {
     const ctx = await contextoMensaje(m);
     const confirmando = ops.some((o) => o.rpc === "marcar_mensaje_leido" && o.uid === m.uid && ["pending", "syncing"].includes(o.estado));
     const estado = m.leidoEn ? `Leído ${esc(FechaNegocio.fechaHora(m.leidoEn))}` : (m.leidoLocal || confirmando) ? "Leído · pendiente de confirmar" : "";
-    filas.push(`<div class="card mensaje-mt${noLeido(m) ? " no-leido" : ""}" data-mensaje="${m.id}" style="margin-bottom:0.6rem;">
+    filas.push(`<div class="card mensaje-mt${clase ? " " + clase : ""}${noLeido(m) ? " no-leido" : ""}" data-mensaje="${m.id}" style="margin-bottom:0.6rem;">
       <div style="display:flex; justify-content:space-between; gap:0.6rem; align-items:baseline;">
         <b>${esc(m.remitenteNombre || "Administrador")}</b>
         <span class="meta">${esc(FechaNegocio.fechaHora(m.creadoEn))}</span>
@@ -1225,9 +1243,33 @@ async function renderMensajesMiTrabajo() {
       </div>
     </div>`);
   }
-  cont.innerHTML = filas.join("");
-  cont.querySelectorAll("[data-marcar-leido]").forEach((b) => b.addEventListener("click", () => marcarMensajeLeido(Number(b.dataset.marcarLeido))));
-  cont.querySelectorAll("[data-abrir-orden]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); openOrder(Number(a.dataset.abrirOrden)); }));
+  return filas;
+}
+
+/* 3.16 (cambio 6): el aviso de mensaje nuevo era un toast de 3,4 s sin el texto. Ahora es una franja arriba con el comienzo del
+   mensaje, que se queda hasta que el mecánico la cierra o toca «Ver». El texto va con textContent: nunca como marcado. */
+async function avisarMensajeNuevo() {
+  if (!esMecanicoCuenta()) return;
+  const ultimo = (await mensajesLocales()).filter(noLeido)[0];
+  if (!ultimo) return;
+  let el = document.getElementById("avisoMensajeNuevo");
+  if (!el) {
+    el = document.createElement("div");
+    el.id = "avisoMensajeNuevo"; el.setAttribute("role", "status");
+    el.innerHTML = `<div class="aviso-msg-cuerpo"><b>📌 Mensaje nuevo del administrador</b><span data-texto></span></div>
+      <div class="aviso-msg-acciones"><button type="button" class="btn primary small" data-ver-aviso>Ver</button>
+      <button type="button" class="btn ghost small" data-cerrar-aviso>Cerrar</button></div>`;
+    el.querySelector("[data-cerrar-aviso]").addEventListener("click", () => { el.style.display = "none"; });
+    el.querySelector("[data-ver-aviso]").addEventListener("click", async () => {
+      el.style.display = "none";
+      if (showView("mi-trabajo")) await renderMiTrabajo();
+      document.getElementById("miTrabajoMensajesFijos")?.scrollIntoView({ block: "start" });
+    });
+    document.body.appendChild(el);
+  }
+  const texto = String(ultimo.texto || "");
+  el.querySelector("[data-texto]").textContent = texto.length > 120 ? texto.slice(0, 120) + "…" : texto;
+  el.style.display = "flex";
 }
 async function marcarMensajeLeido(localId) {
   if (!syncMotor || !esMecanicoCuenta()) return;
