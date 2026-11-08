@@ -182,6 +182,8 @@ export function crearEntorno(opts = {}) {
       if (nombre === "app" && existe("fecha-negocio.js") && !win.FechaNegocio) cargarRel("fecha-negocio.js");
       // 3.15 (Bloque 5): y finanzas-calc.js (indicadores de efectivo sin red), también antes de app.js
       if (nombre === "app" && existe("finanzas-calc.js") && !win.FinanzasCalc) cargarRel("finanzas-calc.js");
+      // 3.16 (cambio 6): y mensajes-fijos.js (qué mensajes quedan fijos en Mi Trabajo)
+      if (nombre === "app" && existe("mensajes-fijos.js") && !win.MensajesFijos) cargarRel("mensajes-fijos.js");
       cargarRel(ARCHIVO[nombre], nombre);
     }
   }

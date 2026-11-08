@@ -22,11 +22,12 @@ describe("PWA 3.15.1 — el runtime real", () => {
   });
   test("CACHE_NAME = entimotors-v3.15.1", () => assert.match(real.sw, /const CACHE_NAME = "entimotors-v3\.15\.1";/));
   // 3.15.0 (Bloque 3): + fecha-negocio.js y sync-realtime.js; (Bloque 5): + finanzas-calc.js → 19 (3.15.1 no añade scripts)
-  test("las 19 etiquetas <script ?v=> de index.html llevan 3.15.1 (incluidas app.js, config-local.js y las 9 de la nube)", () => {
+  // 3.16 (en desarrollo): + mensajes-fijos.js → 20
+  test("las 20 etiquetas <script ?v=> de index.html llevan 3.15.1 (incluidas app.js, config-local.js y las 9 de la nube)", () => {
     const t = [...real.index.matchAll(/<script src="([^"?]+)\?v=([^"]+)"/g)];
-    assert.equal(t.length, 19);
+    assert.equal(t.length, 20);
     assert.ok(t.every((m) => m[2] === "3.15.1"));
-    assert.deepEqual(t.map((m) => m[1]).sort(), ["app.js", "auth.js", "build-target.js", "config-local.js", "fecha-negocio.js", "finanzas-calc.js", "import-313.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js",
+    assert.deepEqual(t.map((m) => m[1]).sort(), ["app.js", "auth.js", "build-target.js", "config-local.js", "fecha-negocio.js", "finanzas-calc.js", "import-313.js", "mensajes-fijos.js", "pin-ui.js", "recovery.js", "supabase-client.js", "supabase-config.js",
       "sync-db.js", "sync-engine.js", "sync-finanzas.js", "sync-fotos.js", "sync-mappers.js", "sync-realtime.js", "sync-rest.js", "usuarios.js"]);
   });
   test("0 residuos runtime de 3.12.2 y de 3.12.1 en app.js, sw.js e index.html", () => {
@@ -36,7 +37,7 @@ describe("PWA 3.15.1 — el runtime real", () => {
   });
   test("el orden y la estructura de los scripts: build-target primero; la nube y el importador ANTES de app.js; usuarios al final", () => {
     const orden = [...real.index.matchAll(/<script src="([^"?]+)\?v=/g)].map((m) => m[1]);
-    assert.deepEqual(orden, ["build-target.js", "supabase-config.js", "supabase-client.js", "auth.js", "recovery.js", "fecha-negocio.js", "finanzas-calc.js", "config-local.js", "sync-rest.js", "sync-db.js",
+    assert.deepEqual(orden, ["build-target.js", "supabase-config.js", "supabase-client.js", "auth.js", "recovery.js", "fecha-negocio.js", "finanzas-calc.js", "mensajes-fijos.js", "config-local.js", "sync-rest.js", "sync-db.js",
       "sync-engine.js", "sync-realtime.js", "sync-mappers.js", "sync-fotos.js", "sync-finanzas.js", "pin-ui.js", "import-313.js", "app.js", "usuarios.js"]);
     assert.ok(!/<script[^>]*\b(async|defer)\b/.test(real.index.split("chart.js")[1] || ""), "no debe haber async/defer en los scripts locales");
   });
